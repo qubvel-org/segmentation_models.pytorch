@@ -1,0 +1,74 @@
+from torchvision.models.resnet import ResNet
+from torchvision.models.resnet import BasicBlock
+from torchvision.models.resnet import Bottleneck
+from torchvision.models.resnet import model_urls
+
+
+class ResNetEncoder(ResNet):
+
+    def forward(self, x):
+        x0 = self.conv1(x)
+        x0 = self.bn1(x0)
+        x0 = self.relu(x0)
+
+        x1 = self.maxpool(x0)
+        x1 = self.layer1(x1)
+
+        x2 = self.layer2(x1)
+        x3 = self.layer3(x2)
+        x4 = self.layer4(x3)
+
+        return [x4, x3, x2, x1, x0]
+
+
+resnet_encoders = {
+    'resnet18': {
+        'encoder': ResNetEncoder,
+        'url': model_urls['resnet18'],
+        'out_shapes': (512, 256, 128, 64, 64),
+        'params': {
+            'block': BasicBlock,
+            'layers': [2, 2, 2, 2],
+        },
+    },
+
+    'resnet34': {
+        'encoder': ResNetEncoder,
+        'url': model_urls['resnet34'],
+        'out_shapes': (512, 256, 128, 64, 64),
+        'params': {
+            'block': BasicBlock,
+            'layers': [3, 4, 6, 3],
+        },
+    },
+
+    'resnet50': {
+        'encoder': ResNetEncoder,
+        'url': model_urls['resnet50'],
+        'out_shapes': (2048, 1024, 512, 256, 64),
+        'params': {
+            'block': Bottleneck,
+            'layers': [3, 4, 6, 3],
+        },
+    },
+
+    'resnet101': {
+        'encoder': ResNetEncoder,
+        'url': model_urls['resnet101'],
+        'out_shapes': (2048, 1024, 512, 256, 64),
+        'params': {
+            'block': Bottleneck,
+            'layers': [3, 4, 23, 3],
+        },
+    },
+
+    'resnet152': {
+        'encoder': ResNetEncoder,
+        'url': model_urls['resnet152'],
+        'out_shapes': (2048, 1024, 512, 256, 64),
+        'params': {
+            'block': Bottleneck,
+            'layers': [3, 8, 36, 3],
+        },
+    },
+}

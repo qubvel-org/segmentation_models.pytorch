@@ -1,0 +1,7 @@
+# dirs
+.idea/*
+__pycache__/
+
+# files
+*.pyc
+*.pyx
