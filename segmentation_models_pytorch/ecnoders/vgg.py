@@ -7,6 +7,10 @@ from torchvision.models.vgg import model_urls
 
 class VGGEncoder(VGG):
 
+    def __init__(self, config, batch_norm=False, *args, **kwargs):
+        features = make_layers(config, batch_norm=batch_norm)
+        super().__init__(features, *args, **kwargs)
+
     def forward(self, x):
 
         features = []
@@ -29,7 +33,8 @@ vgg_encoders = {
         'out_shapes': (512, 512, 512, 256, 128),
         'url': model_urls['vgg11'],
         'params': {
-            'features': make_layers(cfg['A'], batch_norm=False),
+            'config': cfg['A'],
+            'batch_norm': False,
         },
     },
 
@@ -38,7 +43,8 @@ vgg_encoders = {
         'out_shapes': (512, 512, 512, 256, 128),
         'url': model_urls['vgg11_bn'],
         'params': {
-            'features': make_layers(cfg['A'], batch_norm=True),
+            'config': cfg['A'],
+            'batch_norm': True,
         },
     },
 
@@ -47,7 +53,8 @@ vgg_encoders = {
         'out_shapes': (512, 512, 512, 256, 128),
         'url': model_urls['vgg13'],
         'params': {
-            'features': make_layers(cfg['B'], batch_norm=False),
+            'config': cfg['B'],
+            'batch_norm': False,
         },
     },
 
@@ -56,7 +63,8 @@ vgg_encoders = {
         'out_shapes': (512, 512, 512, 256, 128),
         'url': model_urls['vgg13_bn'],
         'params': {
-            'features': make_layers(cfg['B'], batch_norm=True),
+            'config': cfg['B'],
+            'batch_norm': True,
         },
     },
 
@@ -65,7 +73,8 @@ vgg_encoders = {
         'out_shapes': (512, 512, 512, 256, 128),
         'url': model_urls['vgg16'],
         'params': {
-            'features': make_layers(cfg['D'], batch_norm=False),
+            'config': cfg['D'],
+            'batch_norm': False,
         },
     },
 
@@ -74,7 +83,8 @@ vgg_encoders = {
         'out_shapes': (512, 512, 512, 256, 128),
         'url': model_urls['vgg16_bn'],
         'params': {
-            'features': make_layers(cfg['D'], batch_norm=True),
+            'config': cfg['D'],
+            'batch_norm': True,
         },
     },
 
@@ -83,7 +93,8 @@ vgg_encoders = {
         'out_shapes': (512, 512, 512, 256, 128),
         'url': model_urls['vgg19'],
         'params': {
-            'features': make_layers(cfg['E'], batch_norm=False),
+            'config': cfg['E'],
+            'batch_norm': False,
         },
     },
 
@@ -92,7 +103,8 @@ vgg_encoders = {
         'out_shapes': (512, 512, 512, 256, 128),
         'url': model_urls['vgg19_bn'],
         'params': {
-            'features': make_layers(cfg['E'], batch_norm=True),
+            'config': cfg['E'],
+            'batch_norm': True,
         },
     },
 }
