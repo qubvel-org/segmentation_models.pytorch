@@ -1,0 +1,137 @@
+from pretrainedmodels.models.senet import SENet
+from pretrainedmodels.models.senet import SEBottleneck
+from pretrainedmodels.models.senet import SEResNetBottleneck
+from pretrainedmodels.models.senet import SEResNeXtBottleneck
+from pretrainedmodels.models.senet import pretrained_settings
+
+
+def _get_url(name):
+    return pretrained_settings[name]['imagenet']['url']
+
+
+class SENetEncoder(SENet):
+
+    def forward(self, x):
+        for module in self.layer0[:-1]:
+            x = module(x)
+
+        x0 = x
+        x = self.layer0[-1](x)
+        x1 = self.layer1(x)
+        x2 = self.layer2(x1)
+        x3 = self.layer3(x2)
+        x4 = self.layer4(x3)
+
+        features = [x4, x3, x2, x1, x0]
+
+        shapes = [f.shape[1] for f in features]
+        print(tuple(shapes))
+
+        return features
+
+
+senet_encoders = {
+    'senet154': {
+        'encoder': SENetEncoder,
+        'url': _get_url('senet154'),
+        'out_shapes': (2048, 1024, 512, 256, 128),
+        'params': {
+            'block': SEBottleneck,
+            'dropout_p': 0.2,
+            'groups': 64,
+            'layers': [3, 8, 36, 3],
+            'num_classes': 1000,
+            'reduction': 16
+        },
+    },
+
+    'se_resnet50': {
+        'encoder': SENetEncoder,
+        'url': _get_url('se_resnet50'),
+        'out_shapes': (2048, 1024, 512, 256, 64),
+        'params': {
+            'block': SEResNetBottleneck,
+            'layers': [3, 4, 6, 3],
+            'downsample_kernel_size': 1,
+            'downsample_padding': 0,
+            'dropout_p': None,
+            'groups': 1,
+            'inplanes': 64,
+            'input_3x3': False,
+            'num_classes': 1000,
+            'reduction': 16
+        },
+    },
+
+    'se_resnet101': {
+        'encoder': SENetEncoder,
+        'url': _get_url('se_resnet101'),
+        'out_shapes': (2048, 1024, 512, 256, 64),
+        'params': {
+            'block': SEResNetBottleneck,
+            'layers': [3, 4, 23, 3],
+            'downsample_kernel_size': 1,
+            'downsample_padding': 0,
+            'dropout_p': None,
+            'groups': 1,
+            'inplanes': 64,
+            'input_3x3': False,
+            'num_classes': 1000,
+            'reduction': 16
+        },
+    },
+
+    'se_resnet152': {
+        'encoder': SENetEncoder,
+        'url': _get_url('se_resnet152'),
+        'out_shapes': (2048, 1024, 512, 256, 64),
+        'params': {
+            'block': SEResNetBottleneck,
+            'layers': [3, 8, 36, 3],
+            'downsample_kernel_size': 1,
+            'downsample_padding': 0,
+            'dropout_p': None,
+            'groups': 1,
+            'inplanes': 64,
+            'input_3x3': False,
+            'num_classes': 1000,
+            'reduction': 16
+        },
+    },
+
+    'se_resnext50_32x4d': {
+        'encoder': SENetEncoder,
+        'url': _get_url('se_resnext50_32x4d'),
+        'out_shapes': (2048, 1024, 512, 256, 64),
+        'params': {
+            'block': SEResNeXtBottleneck,
+            'layers': [3, 4, 6, 3],
+            'downsample_kernel_size': 1,
+            'downsample_padding': 0,
+            'dropout_p': None,
+            'groups': 32,
+            'inplanes': 64,
+            'input_3x3': False,
+            'num_classes': 1000,
+            'reduction': 16
+        },
+    },
+
+    'se_resnext101_32x4d': {
+        'encoder': SENetEncoder,
+        'url': _get_url('se_resnext101_32x4d'),
+        'out_shapes': (2048, 1024, 512, 256, 64),
+        'params': {
+            'block': SEResNeXtBottleneck,
+            'layers': [3, 4, 23, 3],
+            'downsample_kernel_size': 1,
+            'downsample_padding': 0,
+            'dropout_p': None,
+            'groups': 32,
+            'inplanes': 64,
+            'input_3x3': False,
+            'num_classes': 1000,
+            'reduction': 16
+        },
+    },
+}
