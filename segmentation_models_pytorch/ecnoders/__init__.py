@@ -5,6 +5,7 @@ from .dpn import dpn_encoders
 from .vgg import vgg_encoders
 from .senet import senet_encoders
 from .densenet import densenet_encoders
+from .inceptionresnetv2 import inception_encoders
 
 encoders = {}
 encoders.update(resnet_encoders)
@@ -12,6 +13,7 @@ encoders.update(dpn_encoders)
 encoders.update(vgg_encoders)
 encoders.update(senet_encoders)
 encoders.update(densenet_encoders)
+encoders.update(inception_encoders)
 
 
 def get_encoder(name, pretrained=True):

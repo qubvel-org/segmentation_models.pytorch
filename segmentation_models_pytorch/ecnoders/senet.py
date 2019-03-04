@@ -11,6 +11,11 @@ def _get_url(name):
 
 class SENetEncoder(SENet):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        del self.last_linear
+        del self.avg_pool
+
     def forward(self, x):
         for module in self.layer0[:-1]:
             x = module(x)
@@ -24,10 +29,12 @@ class SENetEncoder(SENet):
 
         features = [x4, x3, x2, x1, x0]
 
-        shapes = [f.shape[1] for f in features]
-        print(tuple(shapes))
-
         return features
+
+    def load_state_dict(self, state_dict, **kwargs):
+        state_dict.pop('last_linear.bias')
+        state_dict.pop('last_linear.weight')
+        super().load_state_dict(state_dict, **kwargs)
 
 
 senet_encoders = {

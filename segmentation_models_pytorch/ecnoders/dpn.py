@@ -12,6 +12,8 @@ class DPNEncorder(DPN):
         super().__init__(*args, **kwargs)
         self.feature_blocks = np.cumsum(feature_blocks)
 
+        del self.last_linear
+
     def forward(self, x):
 
         features = []
@@ -43,6 +45,12 @@ class DPNEncorder(DPN):
         print(tuple(shapes))
 
         return out_features
+    
+    def load_state_dict(self, state_dict, **kwargs):
+        state_dict.pop('last_linear.bias')
+        state_dict.pop('last_linear.weight')
+        super().load_state_dict(state_dict, **kwargs)
+        
 
 
 dpn_encoders = {

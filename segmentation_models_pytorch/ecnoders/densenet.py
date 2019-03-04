@@ -7,6 +7,7 @@ class DenseNetEncoder(DenseNet):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        del self.classifier
         self.initialize()
 
     @staticmethod
@@ -61,6 +62,11 @@ class DenseNetEncoder(DenseNet):
                 new_key = res.group(1) + res.group(2)
                 state_dict[new_key] = state_dict[key]
                 del state_dict[key]
+
+        # remove linear
+        state_dict.pop('classifier.bias')
+        state_dict.pop('classifier.weight')
+
         super().load_state_dict(state_dict)
 
 

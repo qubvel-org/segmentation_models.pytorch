@@ -11,6 +11,8 @@ class VGGEncoder(VGG):
         features = make_layers(config, batch_norm=batch_norm)
         super().__init__(features, *args, **kwargs)
 
+        del self.classifier
+
     def forward(self, x):
 
         features = []
@@ -24,6 +26,13 @@ class VGGEncoder(VGG):
         features.append(x)
 
         return features[::-1]
+
+    def load_state_dict(self, state_dict, **kwargs):
+        keys = list(state_dict.keys())
+        for k in keys:
+            if k.startswith('classifier'):
+                state_dict.pop(k)
+        super().load_state_dict(state_dict, **kwargs)
 
 
 vgg_encoders = {

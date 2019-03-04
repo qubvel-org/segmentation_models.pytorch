@@ -1,3 +1,4 @@
+import torch.nn as nn
 from pretrainedmodels.models.inceptionresnetv2 import InceptionResNetV2
 
 
@@ -6,30 +7,17 @@ class InceptionResNetV2Encoder(InceptionResNetV2):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # correct conv paddings
-        self.conv2d_1a.conv.padding = (1, 1)
-        self.conv2d_2a.conv.padding = (1, 1)
-        self.conv2d_2b.conv.padding = (1, 1)
-        self.conv2d_4a.conv.padding = (1, 1)
-
-        # maxpool paddings
-        self.maxpool_3a.padding = (1, 1)
-        self.maxpool_5a.padding = (1, 1)
-
-        # mixed 6a
-        self.mixed_6a.branch0.conv.padding = (1, 1)
-        self.mixed_6a.branch1[-1].conv.padding = (1, 1)
-        self.mixed_6a.branch2.padding = (1, 1)
-
-        # mixed 7a
-        self.mixed_7a.branch0[-1].conv.padding = (1, 1)
-        self.mixed_7a.branch1[-1].conv.padding = (1, 1)
-        self.mixed_7a.branch2[-1].conv.padding = (1, 1)
-        self.mixed_7a.branch3.padding = (1, 1)
+        # correct paddings
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                if m.kernel_size == (3, 3):
+                    m.padding = (1, 1)
+            if isinstance(m, nn.MaxPool2d):
+                m.padding = (1, 1)
 
         # remove linear layers
-        self.avgpool_1a = None
-        self.last_linear = None
+        del self.avgpool_1a
+        del self.last_linear
 
     def forward(self, x):
         x = self.conv2d_1a(x)
