@@ -1,7 +1,8 @@
+import torch
 import torch.nn as nn
 from .decoder import UnetDecoder
 
-from ..ecnoders import get_encoder
+from ..encoders import get_encoder
 
 
 class Unet(nn.Module):
@@ -48,6 +49,8 @@ class Unet(nn.Module):
         if self.training:
             self.eval()
 
-        x = self.forward(x)
-        x = self.activation(x)
+        with torch.no_grad():
+            x = self.forward(x)
+            x = self.activation(x)
+
         return x
