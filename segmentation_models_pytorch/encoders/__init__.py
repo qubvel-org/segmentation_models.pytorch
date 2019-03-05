@@ -25,3 +25,6 @@ def get_encoder(name, pretrained=True):
     if pretrained:
         encoder.load_state_dict(model_zoo.load_url(encoders[name]['url']))
     return encoder
+
+def get_encoder_names():
+    return list(encoders.keys())
