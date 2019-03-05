@@ -1,0 +1,2 @@
+torchvision
+pretrainedmodels
