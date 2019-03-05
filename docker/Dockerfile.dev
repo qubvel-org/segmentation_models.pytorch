@@ -1,0 +1,7 @@
+FROM anibali/pytorch:cuda-9.0
+
+COPY . /tmp/smp
+WORKDIR /tmp/smp
+
+RUN pip install -r requirements.txt
+RUN pip install .[test]
