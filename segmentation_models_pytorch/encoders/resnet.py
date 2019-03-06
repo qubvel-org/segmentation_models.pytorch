@@ -1,7 +1,7 @@
 from torchvision.models.resnet import ResNet
 from torchvision.models.resnet import BasicBlock
 from torchvision.models.resnet import Bottleneck
-from torchvision.models.resnet import model_urls
+from pretrainedmodels.models.torchvision_models import pretrained_settings
 
 
 class ResNetEncoder(ResNet):
@@ -33,7 +33,7 @@ class ResNetEncoder(ResNet):
 resnet_encoders = {
     'resnet18': {
         'encoder': ResNetEncoder,
-        'url': model_urls['resnet18'],
+        'pretrained_settings': pretrained_settings['resnet18'],
         'out_shapes': (512, 256, 128, 64, 64),
         'params': {
             'block': BasicBlock,
@@ -43,7 +43,7 @@ resnet_encoders = {
 
     'resnet34': {
         'encoder': ResNetEncoder,
-        'url': model_urls['resnet34'],
+        'pretrained_settings': pretrained_settings['resnet34'],
         'out_shapes': (512, 256, 128, 64, 64),
         'params': {
             'block': BasicBlock,
@@ -53,7 +53,7 @@ resnet_encoders = {
 
     'resnet50': {
         'encoder': ResNetEncoder,
-        'url': model_urls['resnet50'],
+        'pretrained_settings': pretrained_settings['resnet50'],
         'out_shapes': (2048, 1024, 512, 256, 64),
         'params': {
             'block': Bottleneck,
@@ -63,7 +63,7 @@ resnet_encoders = {
 
     'resnet101': {
         'encoder': ResNetEncoder,
-        'url': model_urls['resnet101'],
+        'pretrained_settings': pretrained_settings['resnet101'],
         'out_shapes': (2048, 1024, 512, 256, 64),
         'params': {
             'block': Bottleneck,
@@ -73,7 +73,7 @@ resnet_encoders = {
 
     'resnet152': {
         'encoder': ResNetEncoder,
-        'url': model_urls['resnet152'],
+        'pretrained_settings': pretrained_settings['resnet152'],
         'out_shapes': (2048, 1024, 512, 256, 64),
         'params': {
             'block': Bottleneck,

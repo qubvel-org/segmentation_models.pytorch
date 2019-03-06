@@ -1,6 +1,8 @@
 import re
 import torch.nn as nn
-from torchvision.models.densenet import DenseNet, model_urls
+
+from pretrainedmodels.models.torchvision_models import pretrained_settings
+from torchvision.models.densenet import DenseNet
 
 
 class DenseNetEncoder(DenseNet):
@@ -73,7 +75,7 @@ class DenseNetEncoder(DenseNet):
 densenet_encoders = {
     'densenet121': {
         'encoder': DenseNetEncoder,
-        'url': model_urls['densenet121'],
+        'pretrained_settings': pretrained_settings['densenet121'],
         'out_shapes': (1024, 1024, 512, 256, 64),
         'params': {
             'num_init_features': 64,
@@ -84,7 +86,7 @@ densenet_encoders = {
 
     'densenet169': {
         'encoder': DenseNetEncoder,
-        'url': model_urls['densenet169'],
+        'pretrained_settings': pretrained_settings['densenet169'],
         'out_shapes': (1664, 1280, 512, 256, 64),
         'params': {
             'num_init_features': 64,
@@ -95,7 +97,7 @@ densenet_encoders = {
 
     'densenet201': {
         'encoder': DenseNetEncoder,
-        'url': model_urls['densenet201'],
+        'pretrained_settings': pretrained_settings['densenet201'],
         'out_shapes': (1920, 1792, 512, 256, 64),
         'params': {
             'num_init_features': 64,
@@ -106,7 +108,7 @@ densenet_encoders = {
 
     'densenet161': {
         'encoder': DenseNetEncoder,
-        'url': model_urls['densenet161'],
+        'pretrained_settings': pretrained_settings['densenet161'],
         'out_shapes': (2208, 2112, 768, 384, 96),
         'params': {
             'num_init_features': 96,

@@ -1,5 +1,6 @@
 import torch.nn as nn
 from pretrainedmodels.models.inceptionresnetv2 import InceptionResNetV2
+from pretrainedmodels.models.inceptionresnetv2 import pretrained_settings
 
 
 class InceptionResNetV2Encoder(InceptionResNetV2):
@@ -58,7 +59,7 @@ class InceptionResNetV2Encoder(InceptionResNetV2):
 inception_encoders = {
     'inceptionresnetv2': {
         'encoder': InceptionResNetV2Encoder,
-        'url': 'http://data.lip6.fr/cadene/pretrainedmodels/inceptionresnetv2-520b38e4.pth',
+        'pretrained_settings': pretrained_settings['inceptionresnetv2'],
         'out_shapes': (1536, 1088, 320, 192, 64),
         'params': {
             'num_classes': 1000,

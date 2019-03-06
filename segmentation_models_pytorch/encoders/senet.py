@@ -5,10 +5,6 @@ from pretrainedmodels.models.senet import SEResNeXtBottleneck
 from pretrainedmodels.models.senet import pretrained_settings
 
 
-def _get_url(name):
-    return pretrained_settings[name]['imagenet']['url']
-
-
 class SENetEncoder(SENet):
 
     def __init__(self, *args, **kwargs):
@@ -40,7 +36,7 @@ class SENetEncoder(SENet):
 senet_encoders = {
     'senet154': {
         'encoder': SENetEncoder,
-        'url': _get_url('senet154'),
+        'pretrained_settings': pretrained_settings['senet154'],
         'out_shapes': (2048, 1024, 512, 256, 128),
         'params': {
             'block': SEBottleneck,
@@ -54,7 +50,7 @@ senet_encoders = {
 
     'se_resnet50': {
         'encoder': SENetEncoder,
-        'url': _get_url('se_resnet50'),
+        'pretrained_settings': pretrained_settings['se_resnet50'],
         'out_shapes': (2048, 1024, 512, 256, 64),
         'params': {
             'block': SEResNetBottleneck,
@@ -72,7 +68,7 @@ senet_encoders = {
 
     'se_resnet101': {
         'encoder': SENetEncoder,
-        'url': _get_url('se_resnet101'),
+        'pretrained_settings': pretrained_settings['se_resnet101'],
         'out_shapes': (2048, 1024, 512, 256, 64),
         'params': {
             'block': SEResNetBottleneck,
@@ -90,7 +86,7 @@ senet_encoders = {
 
     'se_resnet152': {
         'encoder': SENetEncoder,
-        'url': _get_url('se_resnet152'),
+        'pretrained_settings': pretrained_settings['se_resnet152'],
         'out_shapes': (2048, 1024, 512, 256, 64),
         'params': {
             'block': SEResNetBottleneck,
@@ -108,7 +104,7 @@ senet_encoders = {
 
     'se_resnext50_32x4d': {
         'encoder': SENetEncoder,
-        'url': _get_url('se_resnext50_32x4d'),
+        'pretrained_settings': pretrained_settings['se_resnext50_32x4d'],
         'out_shapes': (2048, 1024, 512, 256, 64),
         'params': {
             'block': SEResNeXtBottleneck,
@@ -126,7 +122,7 @@ senet_encoders = {
 
     'se_resnext101_32x4d': {
         'encoder': SENetEncoder,
-        'url': _get_url('se_resnext101_32x4d'),
+        'pretrained_settings': pretrained_settings['se_resnext101_32x4d'],
         'out_shapes': (2048, 1024, 512, 256, 64),
         'params': {
             'block': SEResNeXtBottleneck,

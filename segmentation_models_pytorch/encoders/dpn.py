@@ -4,7 +4,7 @@ import torch
 import torch.nn.functional as F
 
 from pretrainedmodels.models.dpn import DPN
-
+from pretrainedmodels.models.dpn import pretrained_settings
 
 class DPNEncorder(DPN):
 
@@ -57,7 +57,7 @@ dpn_encoders = {
     'dpn68': {
         'encoder': DPNEncorder,
         'out_shapes': (832, 704, 320, 144, 10),
-        'url': 'http://data.lip6.fr/cadene/pretrainedmodels/dpn68-4af7d88d2.pth',
+        'pretrained_settings': pretrained_settings['dpn68'],
         'params': {
             'feature_blocks': (3, 4, 12, 4),
             'groups': 32,
@@ -74,7 +74,7 @@ dpn_encoders = {
     'dpn68b': {
         'encoder': DPNEncorder,
         'out_shapes': (832, 704, 320, 144, 10),
-        'url': 'http://data.lip6.fr/cadene/pretrainedmodels/dpn68b_extra-363ab9c19.pth',
+        'pretrained_settings': pretrained_settings['dpn68b'],
         'params': {
             'feature_blocks': (3, 4, 12, 4),
             'b': True,
@@ -92,7 +92,7 @@ dpn_encoders = {
     'dpn92': {
         'encoder': DPNEncorder,
         'out_shapes': (2688, 1552, 704, 336, 64),
-        'url': 'http://data.lip6.fr/cadene/pretrainedmodels/dpn92_extra-fda993c95.pth',
+        'pretrained_settings': pretrained_settings['dpn92'],
         'params': {
             'feature_blocks': (3, 4, 20, 4),
             'groups': 32,
@@ -108,7 +108,7 @@ dpn_encoders = {
     'dpn98': {
         'encoder': DPNEncorder,
         'out_shapes': (2688, 1728, 768, 336, 96),
-        'url': 'http://data.lip6.fr/cadene/pretrainedmodels/dpn98-722954780.pth',
+        'pretrained_settings': pretrained_settings['dpn98'],
         'params': {
             'feature_blocks': (3, 6, 20, 4),
             'groups': 40,
@@ -124,7 +124,7 @@ dpn_encoders = {
     'dpn107': {
         'encoder': DPNEncorder,
         'out_shapes': (2688, 2432, 1152, 376, 128),
-        'url': 'http://data.lip6.fr/cadene/pretrainedmodels/dpn107_extra-b7f9f4cc9.pth',
+        'pretrained_settings': pretrained_settings['dpn107'],
         'params': {
             'feature_blocks': (4, 8, 20, 4),
             'groups': 50,
@@ -140,7 +140,7 @@ dpn_encoders = {
     'dpn131': {
         'encoder': DPNEncorder,
         'out_shapes': (2688, 1984, 832, 352, 128),
-        'url': 'http://data.lip6.fr/cadene/pretrainedmodels/dpn131-7af84be88.pth',
+        'pretrained_settings': pretrained_settings['dpn131'],
         'params': {
             'feature_blocks': (4, 8, 28, 4),
             'groups': 40,
