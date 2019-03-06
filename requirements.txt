@@ -1,2 +1,2 @@
-torchvision
-pretrainedmodels
+torchvision==0.2.2
+pretrainedmodels==0.7.4
