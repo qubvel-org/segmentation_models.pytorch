@@ -47,7 +47,6 @@ class InceptionResNetV2Encoder(InceptionResNetV2):
         x4 = x
 
         features = [x4, x3, x2, x1, x0]
-
         return features
 
     def load_state_dict(self, state_dict, **kwargs):

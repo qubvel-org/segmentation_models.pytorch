@@ -6,12 +6,12 @@ import torch.nn.functional as F
 from pretrainedmodels.models.dpn import DPN
 from pretrainedmodels.models.dpn import pretrained_settings
 
+
 class DPNEncorder(DPN):
 
     def __init__(self, feature_blocks, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.feature_blocks = np.cumsum(feature_blocks)
-
         del self.last_linear
 
     def forward(self, x):
@@ -28,7 +28,6 @@ class DPNEncorder(DPN):
         x = input_block.pool(x)
 
         for i, module in enumerate(self.features[1:], 1):
-
             x = module(x)
             if i in self.feature_blocks:
                 features.append(x)
@@ -41,16 +40,12 @@ class DPNEncorder(DPN):
             features[0],
         ]
 
-        shapes = [f.shape[1] for f in out_features]
-        print(tuple(shapes))
-
         return out_features
-    
+
     def load_state_dict(self, state_dict, **kwargs):
         state_dict.pop('last_linear.bias')
         state_dict.pop('last_linear.weight')
         super().load_state_dict(state_dict, **kwargs)
-        
 
 
 dpn_encoders = {

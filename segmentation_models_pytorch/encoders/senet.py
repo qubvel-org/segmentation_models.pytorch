@@ -24,7 +24,6 @@ class SENetEncoder(SENet):
         x4 = self.layer4(x3)
 
         features = [x4, x3, x2, x1, x0]
-
         return features
 
     def load_state_dict(self, state_dict, **kwargs):

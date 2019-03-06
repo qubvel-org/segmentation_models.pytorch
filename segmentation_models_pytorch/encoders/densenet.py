@@ -49,10 +49,6 @@ class DenseNetEncoder(DenseNet):
         x4 = self.features.norm5(x)
 
         features = [x4, x3, x2, x1, x0]
-
-        shapes = [f.shape[1] for f in features]
-        print(tuple(shapes))
-
         return features
 
     def load_state_dict(self, state_dict):

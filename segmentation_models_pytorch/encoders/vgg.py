@@ -10,21 +10,15 @@ class VGGEncoder(VGG):
     def __init__(self, config, batch_norm=False, *args, **kwargs):
         features = make_layers(config, batch_norm=batch_norm)
         super().__init__(features, *args, **kwargs)
-
         del self.classifier
 
     def forward(self, x):
-
         features = []
-
         for module in self.features:
             if isinstance(module, nn.MaxPool2d):
                 features.append(x)
-
             x = module(x)
-
         features.append(x)
-
         return features[::-1]
 
     def load_state_dict(self, state_dict, **kwargs):
