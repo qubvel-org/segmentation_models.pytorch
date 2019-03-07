@@ -17,14 +17,10 @@ class Model(nn.Module):
                 nn.init.constant_(m.bias, 0)
 
 
-class EncoderDecoder(Model):
+class PretrainedModel(Model):
 
-    def __init__(self, encoder, decoder, activation):
+    def __init__(self):
         super().__init__()
-        self.encoder = encoder
-        self.decoder = decoder
-        self.activation = activation
-        
         self._input_size = None
         self._input_space = None
         self._input_range = None
@@ -65,6 +61,15 @@ class EncoderDecoder(Model):
         self._mean = mean
         self._std = std
 
+    def get_preprocessing_params(self):
+        return {
+            'input_range': self.input_range,
+            'input_size': self.input_size,
+            'input_space': self.input_space,
+            'mean': self.mean,
+            'std': self.std,
+        }
+
     def preprocess_input(self, x, x_space='RGB'):
 
         if x.ndim == 2:
@@ -85,20 +90,5 @@ class EncoderDecoder(Model):
         if self._std is not None:
             std = np.array(self.std)[None, :, None, None]
             x /= std
-
-        return x
-
-    def forward(self, x):
-        x = self.encoder(x)
-        x = self.decoder(x)
-        return x
-
-    def predict(self, x):
-        if self.training:
-            self.eval()
-
-        with torch.no_grad():
-            x = self.forward(x)
-            x = self.activation(x)
 
         return x
