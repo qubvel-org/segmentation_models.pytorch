@@ -9,6 +9,8 @@ class SENetEncoder(SENet):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.pretrained = False
+        
         del self.last_linear
         del self.avg_pool
 

@@ -8,6 +8,7 @@ class ResNetEncoder(ResNet):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.pretrained = False
         del self.fc
 
     def forward(self, x):

@@ -8,6 +8,8 @@ class InceptionResNetV2Encoder(InceptionResNetV2):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.pretrained = False
+
         # correct paddings
         for m in self.modules():
             if isinstance(m, nn.Conv2d):

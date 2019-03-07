@@ -8,8 +8,12 @@ from pretrainedmodels.models.torchvision_models import pretrained_settings
 class VGGEncoder(VGG):
 
     def __init__(self, config, batch_norm=False, *args, **kwargs):
-        features = make_layers(config, batch_norm=batch_norm)
-        super().__init__(features, *args, **kwargs)
+        super().__init__(
+            make_layers(config, batch_norm=batch_norm), 
+            *args, 
+            **kwargs
+        )
+        self.pretrained = False
         del self.classifier
 
     def forward(self, x):

@@ -9,6 +9,7 @@ class DenseNetEncoder(DenseNet):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.pretrained = False
         del self.classifier
         self.initialize()
 

@@ -24,8 +24,8 @@ def get_encoder(name, encoder_weights=None):
 
     if encoder_weights is not None:
         settings = encoders[name]['pretrained_settings'][encoder_weights]
-
         encoder.load_state_dict(model_zoo.load_url(settings['url']))
+        encoder.pretrained = True
         encoder.input_space = settings['input_space']
         encoder.input_size = settings['input_size']
         encoder.input_range = settings['input_range']

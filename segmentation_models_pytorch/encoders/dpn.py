@@ -12,6 +12,8 @@ class DPNEncorder(DPN):
     def __init__(self, feature_blocks, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.feature_blocks = np.cumsum(feature_blocks)
+        self.pretrained = False
+        
         del self.last_linear
 
     def forward(self, x):
