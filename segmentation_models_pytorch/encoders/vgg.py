@@ -23,7 +23,10 @@ class VGGEncoder(VGG):
                 features.append(x)
             x = module(x)
         features.append(x)
-        return features[::-1]
+
+        features = features[1:]
+        features = features[::-1]
+        return features
 
     def load_state_dict(self, state_dict, **kwargs):
         keys = list(state_dict.keys())
