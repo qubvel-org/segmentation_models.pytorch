@@ -8,12 +8,11 @@ class TransposeX2(nn.Module):
 
     def __init__(self, in_channels, out_channels, use_batchnorm=True, **batchnorm_params):
         super().__init__()
-        layers = [
-            nn.ConvTranspose2d(in_channels, out_channels, kernel_size=4, stride=2, padding=1),
-            nn.ReLU(inplace=True),
-        ]
+        layers = []
+        layers.append(nn.ConvTranspose2d(in_channels, out_channels, kernel_size=4, stride=2, padding=1))
         if use_batchnorm:
-            layers.insert(1, nn.BatchNorm2d(out_channels, **batchnorm_params))
+            layers.append(nn.BatchNorm2d(out_channels, **batchnorm_params))
+        layers.append(nn.ReLU(inplace=True))
 
         self.block = nn.Sequential(*layers)
 
@@ -35,7 +34,7 @@ class DecoderBlock(nn.Module):
         x, skip = x
         x = self.block(x)
         if skip is not None:
-            x += skip
+            x = x + skip
         return x
 
 
