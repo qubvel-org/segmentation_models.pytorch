@@ -98,11 +98,11 @@ class PSPDecoder(Model):
 
     def _get(self, xs):
         if self.downsample_factor == 4:
-            return xs[4]
-        elif self.downsample_factor == 8:
             return xs[3]
-        elif self.downsample_factor == 16:
+        elif self.downsample_factor == 8:
             return xs[2]
+        elif self.downsample_factor == 16:
+            return xs[1]
         else:
             raise ValueError('Downsample factor should bi in [4, 8, 16], got {}'
                              .format(self.downsample_factor))
