@@ -75,14 +75,14 @@ class FPNDecoder(Model):
         s2 = self.s2(p2)
 
         x = torch.cat([
-            F.interpolate(s5, scale_factor=8, mode='bilinear'),
-            F.interpolate(s4, scale_factor=4, mode='bilinear'),
-            F.interpolate(s3, scale_factor=2, mode='bilinear'),
+            F.interpolate(s5, scale_factor=8, mode='bilinear', align_corners=True),
+            F.interpolate(s4, scale_factor=4, mode='bilinear', align_corners=True),
+            F.interpolate(s3, scale_factor=2, mode='bilinear', align_corners=True),
             s2,
         ], dim=1)
 
         x = self.dropout(x)
         x = self.final_conv(x)
 
-        x = F.interpolate(x, scale_factor=4, mode='bilinear')
+        x = F.interpolate(x, scale_factor=4, mode='bilinear', align_corners=True)
         return x
