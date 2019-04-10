@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
-from .model import PretrainedModel
+from .model import Model
 
 
-class EncoderDecoder(PretrainedModel):
+class EncoderDecoder(Model):
 
     def __init__(self, encoder, decoder, activation):
         super().__init__()
