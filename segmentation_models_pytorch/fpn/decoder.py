@@ -17,7 +17,7 @@ class FPNBlock(nn.Module):
         x = F.interpolate(x, scale_factor=2, mode='nearest')
         skip = self.skip_conv(skip)
 
-        x += skip
+        x = x + skip
         return x
 
 
@@ -59,6 +59,7 @@ class FPNDecoder(Model):
 
         self.dropout = nn.Dropout2d(p=dropout, inplace=True)
         self.final_conv = nn.Conv2d(4 * segmentation_channels, final_channels, kernel_size=3, padding=1)
+
         self.initialize()
 
     def forward(self, x):
