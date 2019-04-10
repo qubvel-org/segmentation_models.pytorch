@@ -32,6 +32,7 @@ model = smp.Unet('resnet34', classes=3, activation='softmax')
 As all models have pretrained weights, so you have to prepare your data the same way as during weights pretraining:
 ```python
 from segmentation_models_pytorch.encoders import get_preprocessing_fn
+
 preprocess_input = get_preprocessing_fn('renset18', pretrained='imagenet')
 ```
 
