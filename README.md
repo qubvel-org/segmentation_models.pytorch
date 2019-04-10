@@ -6,7 +6,7 @@ The main features of this library are:
 
  - High level API (just two lines to create NN)
  - 4 models architectures for binary and multi class segmentation (including legendary Unet)
- - 25 available encoders for each architecture
+ - 30 available encoders for each architecture
  - All backbones have pre-trained weights for faster and better convergence
 
 
