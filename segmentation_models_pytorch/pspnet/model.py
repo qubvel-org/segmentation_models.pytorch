@@ -15,7 +15,7 @@ class PSPNet(EncoderDecoder):
             psp_aux_output=False,
             classes=21,
             dropout=0.2,
-            activation='sigmoid',
+            activation='softmax',
     ):
 
         encoder = get_encoder(
