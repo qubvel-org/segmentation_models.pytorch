@@ -9,8 +9,16 @@ The main features of this library are:
  - 30 available encoders for each architecture
  - All backbones have pre-trained weights for faster and better convergence
 
+### Table of content
+ 1. [Quick start](#start)
+ 2. [Models](#models) 
+    1. [Architectires](#architectires)
+    2. [Encoders](#encoders)
+    3. [Pretrained weights](#weights)
+ 3. [Installation](#installation)
+ 4. [License](#license)
 
-### Quick start
+### Quick start <a name="start"></a>
 Since the library is built on the PyTorch framework, created segmentation model is just a PyTorch nn.Module, which can be created as easy as:
 ```python
 import segmentation_models_pytorch as smp
@@ -36,15 +44,15 @@ from segmentation_models_pytorch.encoders import get_preprocessing_fn
 preprocess_input = get_preprocessing_fn('renset18', pretrained='imagenet')
 ```
 
-### Models
+### Models <a name="models"></a>
 
-#### Architectires 
- - Unet
- - Linknet
- - FPN
- - PSPNet
+#### Architectires <a name="architectires"></a>
+ - [Unet](https://arxiv.org/abs/1505.04597)
+ - [Linknet](https://arxiv.org/abs/1707.03718)
+ - [FPN](http://presentations.cocodataset.org/COCO17-Stuff-FAIR.pdf)
+ - [PSPNet](https://arxiv.org/abs/1612.01105)
  
-#### Encoders
+#### Encoders <a name="encoders"></a>
 
 | Type       | Encoder names                                                 |
 |------------|-----------------------------------------------------------------|
@@ -57,14 +65,21 @@ preprocess_input = get_preprocessing_fn('renset18', pretrained='imagenet')
 | SE-ResNeXt | se_resnext50_32x4d,  se_resnext101_32x4d                        |
 | SENet      | senet154                                                        |                                                           |
 
-#### Weights
+#### Weights <a name="weights"></a>
 
 | Weights name | Encoder names         |
 |--------------|-----------------------|
 | imagenet+5k  | dpn68b, dpn92, dpn107 |
 | imagenet     | * all other encoders  |
 
-    
+
+### Installation <a name="installation"></a>
+PyPI version is not released yet, to install package from source run following command:
+```bash
+$ pip install git+https://github.com/qubvel/segmentation_models.pytorch
+````
+### License <a name="license"></a>
+Project is distributed under [MIT License](https://github.com/qubvel/segmentation_models.pytorch/blob/master/LICENSE)
 
 ### Run tests
 ```bash
