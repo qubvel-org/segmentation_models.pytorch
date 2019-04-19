@@ -18,16 +18,7 @@ class EncoderDecoder(Model):
             self.activation = nn.Sigmoid()
         else:
             raise ValueError('Activation should be "sigmoid" or "softmax"')
-        
-        if encoder.pretrained:
-            self.set_preprocessing_params(
-                input_size=encoder.input_size,
-                input_space=encoder.input_space,
-                input_range=encoder.input_range,
-                mean=encoder.mean,
-                std=encoder.std,
-            )
-
+            
     def forward(self, x):
         x = self.encoder(x)
         x = self.decoder(x)
