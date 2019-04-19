@@ -45,7 +45,7 @@ def get_preprocessing_fn(encoder_name, pretrained='imagenet'):
     mean = settings[pretrained].get('mean')
     std = settings[pretrained].get('std')
 
-    def _preprocess_input(x):
-        return preprocess_input(x, mean=mean, std=std, input_space=input_space, input_range=input_range)
+    def _preprocess_input(x, **kwargs):
+        return preprocess_input(x, mean=mean, std=std, input_space=input_space, input_range=input_range, **kwargs)
 
     return _preprocess_input

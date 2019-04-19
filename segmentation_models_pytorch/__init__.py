@@ -4,3 +4,4 @@ from .fpn import FPN
 from .pspnet import PSPNet
 
 from . import encoders
+from . import utils
