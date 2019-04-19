@@ -5,10 +5,10 @@ Segmentation models is python library with Neural Networks for Image Segmentatio
 
 The main features of this library are:
 
- - High level API (just two lines to create NN)
+ - High level API (just two lines to create neural network)
  - 4 models architectures for binary and multi class segmentation (including legendary Unet)
  - 30 available encoders for each architecture
- - All backbones have pre-trained weights for faster and better convergence
+ - All encoders have pre-trained weights for faster and better convergence
 
 ### Table of content
  1. [Quick start](#start)
@@ -44,6 +44,8 @@ from segmentation_models_pytorch.encoders import get_preprocessing_fn
 
 preprocess_input = get_preprocessing_fn('renset18', pretrained='imagenet')
 ```
+
+**Model training example** on CamVid dataset [here](https://github.com/qubvel/segmentation_models.pytorch/blob/master/examples/cars%20segmentation%20(camvid).ipynb).
 
 ### Models <a name="models"></a>
 
