@@ -3,6 +3,8 @@ import torch
 
 def iou(pr, gt, eps=1e-7, threshold=None, activation='sigmoid'):
     """
+    Source:
+        https://github.com/catalyst-team/catalyst/
     Args:
         pr (torch.Tensor): A list of predicted elements
         gt (torch.Tensor):  A list of elements that are to be predicted
