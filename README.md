@@ -77,7 +77,11 @@ preprocess_input = get_preprocessing_fn('renset18', pretrained='imagenet')
 
 
 ### Installation <a name="installation"></a>
-PyPI version is not released yet, to install package from source run following command:
+PyPI version:
+```bash
+$ pip install segmentation-models-pytorch
+````
+Latest version from source:
 ```bash
 $ pip install git+https://github.com/qubvel/segmentation_models.pytorch
 ````
