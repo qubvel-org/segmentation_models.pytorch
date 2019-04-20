@@ -13,7 +13,7 @@ class Unet(EncoderDecoder):
         decoder_channels: list of numbers of ``Conv2D`` layer filters in decoder blocks
         decoder_use_batchnorm: if ``True``, ``BatchNormalisation`` layer between ``Conv2D`` and ``Activation`` layers
             is used.
-        classes: a number of classes for output (output shape - ``(h, w, classes)``).
+        classes: a number of classes for output (output shape - ``(batch, classes, h, w)``).
         activation: one of [``sigmoid``, ``softmax``, None]
         center: if ``True`` add ``Conv2dReLU`` block on encoder head (useful for VGG models)
 

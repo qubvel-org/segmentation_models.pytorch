@@ -15,7 +15,7 @@ class Linknet(EncoderDecoder):
         encoder_weights: one of ``None`` (random initialization), ``imagenet`` (pre-training on ImageNet).
         decoder_use_batchnorm: if ``True``, ``BatchNormalisation`` layer between ``Conv2D`` and ``Activation`` layers
             is used.
-        classes: a number of classes for output (output shape - ``(h, w, classes)``).
+        classes: a number of classes for output (output shape - ``(batch, classes, h, w)``).
         activation: one of [``sigmoid``, ``softmax``, None]
 
     Returns:
