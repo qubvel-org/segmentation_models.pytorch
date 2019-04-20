@@ -4,6 +4,26 @@ from ..encoders import get_encoder
 
 
 class Unet(EncoderDecoder):
+    """Unet_ is a fully convolution neural network for image semantic segmentation
+
+    Args:
+        encoder_name: name of classification model (without last dense layers) used as feature
+            extractor to build segmentation model.
+        encoder_weights: one of ``None`` (random initialization), ``imagenet`` (pre-training on ImageNet).
+        decoder_channels: list of numbers of ``Conv2D`` layer filters in decoder blocks
+        decoder_use_batchnorm: if ``True``, ``BatchNormalisation`` layer between ``Conv2D`` and ``Activation`` layers
+            is used.
+        classes: a number of classes for output (output shape - ``(h, w, classes)``).
+        activation: one of [``sigmoid``, ``softmax``, None]
+        center: if ``True`` add ``Conv2dReLU`` block on encoder head (useful for VGG models)
+
+    Returns:
+        ``torch.nn.Module``: **Unet**
+
+    .. _Unet:
+        https://arxiv.org/pdf/1505.04597
+
+    """
 
     def __init__(
             self,
