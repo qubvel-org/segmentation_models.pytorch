@@ -2,8 +2,27 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from ..common.blocks import Conv2dReLU
 from ..base.model import Model
+
+
+class Conv3x3GNReLU(nn.Module):
+    def __init__(self, in_channels, out_channels, upsample=False):
+
+        super().__init__()
+        self.upsample = upsample
+        self.block = nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, (3, 3),
+                              stride=1, padding=1, bias=False),
+            nn.GroupNorm(32, out_channels),
+            nn.ReLU(inplace=True),
+        )
+
+    def forward(self, x):
+        x = self.block(x)
+        if self.upsample:
+            x = F.interpolate(x, scale_factor=2, mode='bilinear', align_corners=True)
+        return x
+
 
 
 class FPNBlock(nn.Module):
@@ -22,12 +41,18 @@ class FPNBlock(nn.Module):
 
 
 class SegmentationBlock(nn.Module):
-    def __init__(self, in_channels, out_channels, use_batchnorm=True):
+    def __init__(self, in_channels, out_channels, n_upsamples=0):
         super().__init__()
-        self.block = nn.Sequential(
-            Conv2dReLU(in_channels, out_channels, kernel_size=3, padding=1, use_batchnorm=use_batchnorm),
-            Conv2dReLU(out_channels, out_channels, kernel_size=3, padding=1, use_batchnorm=use_batchnorm),
-        )
+
+        blocks = [
+            Conv3x3GNReLU(in_channels, out_channels, upsample=bool(n_upsamples))
+        ]
+
+        if n_upsamples > 1:
+            for _ in range(1, n_upsamples):
+                blocks.append(Conv3x3GNReLU(out_channels, out_channels, upsample=True))
+
+        self.block = nn.Sequential(*blocks)
 
     def forward(self, x):
         return self.block(x)
@@ -42,7 +67,6 @@ class FPNDecoder(Model):
             segmentation_channels=128,
             final_channels=1,
             dropout=0.2,
-            use_batchnorm=True,
     ):
         super().__init__()
 
@@ -52,13 +76,13 @@ class FPNDecoder(Model):
         self.p3 = FPNBlock(pyramid_channels, encoder_channels[2])
         self.p2 = FPNBlock(pyramid_channels, encoder_channels[3])
 
-        self.s5 = SegmentationBlock(pyramid_channels, segmentation_channels, use_batchnorm=use_batchnorm)
-        self.s4 = SegmentationBlock(pyramid_channels, segmentation_channels, use_batchnorm=use_batchnorm)
-        self.s3 = SegmentationBlock(pyramid_channels, segmentation_channels, use_batchnorm=use_batchnorm)
-        self.s2 = SegmentationBlock(pyramid_channels, segmentation_channels, use_batchnorm=use_batchnorm)
+        self.s5 = SegmentationBlock(pyramid_channels, segmentation_channels, n_upsamples=3)
+        self.s4 = SegmentationBlock(pyramid_channels, segmentation_channels, n_upsamples=2)
+        self.s3 = SegmentationBlock(pyramid_channels, segmentation_channels, n_upsamples=1)
+        self.s2 = SegmentationBlock(pyramid_channels, segmentation_channels, n_upsamples=0)
 
         self.dropout = nn.Dropout2d(p=dropout, inplace=True)
-        self.final_conv = nn.Conv2d(4 * segmentation_channels, final_channels, kernel_size=3, padding=1)
+        self.final_conv = nn.Conv2d(segmentation_channels, final_channels, kernel_size=1, padding=0)
 
         self.initialize()
 
@@ -75,12 +99,7 @@ class FPNDecoder(Model):
         s3 = self.s3(p3)
         s2 = self.s2(p2)
 
-        x = torch.cat([
-            F.interpolate(s5, scale_factor=8, mode='bilinear', align_corners=True),
-            F.interpolate(s4, scale_factor=4, mode='bilinear', align_corners=True),
-            F.interpolate(s3, scale_factor=2, mode='bilinear', align_corners=True),
-            s2,
-        ], dim=1)
+        x = s5 + s4 + s3 + s2
 
         x = self.dropout(x)
         x = self.final_conv(x)
