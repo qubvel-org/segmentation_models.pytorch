@@ -14,11 +14,12 @@ The main features of this library are:
  1. [Quick start](#start)
  2. [Examples](#examples)
  3. [Models](#models) 
-    1. [Architectires](#architectires)
+    1. [Architectures](#architectires)
     2. [Encoders](#encoders)
     3. [Pretrained weights](#weights)
- 4. [Installation](#installation)
- 5. [License](#license)
+ 4. [Models API](#api)
+ 5. [Installation](#installation)
+ 6. [License](#license)
 
 ### Quick start <a name="start"></a>
 Since the library is built on the PyTorch framework, created segmentation model is just a PyTorch nn.Module, which can be created as easy as:
@@ -77,6 +78,12 @@ preprocess_input = get_preprocessing_fn('renset18', pretrained='imagenet')
 | imagenet+5k  | dpn68b, dpn92, dpn107 |
 | imagenet     | * all other encoders  |
 
+### Models API <a name="api"></a>
+ - `model.encoder` - pretrained backbone to extract features of different spatial resolution  
+ - `model.decoder` - segmentation head, depends on models architecture (`Unet`/`Linknet`/`PSPNet`/`FPN`)  
+ - `model.activation` - output activation function, one of `sigmoid`, `softmax`
+ - `model.forward(x)` - sequentially pass `x` through model\`s encoder and decoder (return logits!)  
+ - `model.predict(x)` - inference method, switch model to `.eval()` mode, call `.forward(x)` and apply activation function with `torch.no_grad()`
 
 ### Installation <a name="installation"></a>
 PyPI version:
