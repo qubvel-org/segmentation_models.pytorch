@@ -12,12 +12,13 @@ The main features of this library are:
 
 ### Table of content
  1. [Quick start](#start)
- 2. [Models](#models) 
+ 2. [Examples](#examples)
+ 3. [Models](#models) 
     1. [Architectires](#architectires)
     2. [Encoders](#encoders)
     3. [Pretrained weights](#weights)
- 3. [Installation](#installation)
- 4. [License](#license)
+ 4. [Installation](#installation)
+ 5. [License](#license)
 
 ### Quick start <a name="start"></a>
 Since the library is built on the PyTorch framework, created segmentation model is just a PyTorch nn.Module, which can be created as easy as:
@@ -44,8 +45,9 @@ from segmentation_models_pytorch.encoders import get_preprocessing_fn
 
 preprocess_input = get_preprocessing_fn('renset18', pretrained='imagenet')
 ```
-
-**Model training example** on CamVid dataset [here](https://github.com/qubvel/segmentation_models.pytorch/blob/master/examples/cars%20segmentation%20(camvid).ipynb).
+### Examples <a name="examples"></a>
+ - Training model for cars segmentation on CamVid dataset [here](https://github.com/qubvel/segmentation_models.pytorch/blob/master/examples/cars%20segmentation%20(camvid).ipynb).
+ - Training model with [Catalyst](https://github.com/catalyst-team/catalyst) (high-level framework for PyTorch) - [here](https://colab.research.google.com/gist/Scitator/e3fd90eec05162e16b476de832500576/cars-segmentation-camvid.ipynb).
 
 ### Models <a name="models"></a>
 
