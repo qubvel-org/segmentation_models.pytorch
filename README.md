@@ -52,7 +52,7 @@ preprocess_input = get_preprocessing_fn('renset18', pretrained='imagenet')
 
 ### Models <a name="models"></a>
 
-#### Architectires <a name="architectires"></a>
+#### Architectures <a name="architectires"></a>
  - [Unet](https://arxiv.org/abs/1505.04597)
  - [Linknet](https://arxiv.org/abs/1707.03718)
  - [FPN](http://presentations.cocodataset.org/COCO17-Stuff-FAIR.pdf)
