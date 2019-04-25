@@ -10,7 +10,7 @@ class EncoderDecoder(Model):
         self.encoder = encoder
         self.decoder = decoder
         
-        if callable(activation):
+        if callable(activation) or activation is None:
             self.activation = activation
         elif activation == 'softmax':
             self.activation = nn.Softmax(dim=1)
@@ -30,6 +30,7 @@ class EncoderDecoder(Model):
 
         with torch.no_grad():
             x = self.forward(x)
-            x = self.activation(x)
+            if self.activation:
+                x = self.activation(x)
 
         return x
