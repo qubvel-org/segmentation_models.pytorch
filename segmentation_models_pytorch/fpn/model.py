@@ -13,10 +13,11 @@ class FPN(EncoderDecoder):
         decoder_segmentation_channels: a number of convolution filters in segmentation head of FPN_.
         classes: a number of classes for output (output shape - ``(batch, classes, h, w)``).
         dropout: spatial dropout rate in range (0, 1).
-        activation: one of [``sigmoid``, ``softmax``, None]
+        activation: activation function used in ``.predict(x)`` method for inference.
+            One of [``sigmoid``, ``softmax``, callable, None]
 
     Returns:
-        ``keras.models.Model``: **FPN**
+        ``torch.nn.Module``: **FPN**
 
     .. _FPN:
         http://presentations.cocodataset.org/COCO17-Stuff-FAIR.pdf

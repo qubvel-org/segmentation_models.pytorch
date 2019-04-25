@@ -16,7 +16,8 @@ class Linknet(EncoderDecoder):
         decoder_use_batchnorm: if ``True``, ``BatchNormalisation`` layer between ``Conv2D`` and ``Activation`` layers
             is used.
         classes: a number of classes for output (output shape - ``(batch, classes, h, w)``).
-        activation: one of [``sigmoid``, ``softmax``, None]
+        activation: activation function used in ``.predict(x)`` method for inference.
+            One of [``sigmoid``, ``softmax``, callable, None]
 
     Returns:
         ``torch.nn.Module``: **Linknet**

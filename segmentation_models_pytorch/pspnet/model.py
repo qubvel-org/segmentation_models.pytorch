@@ -18,7 +18,8 @@ class PSPNet(EncoderDecoder):
         psp_aux_output: if ``True`` add auxiliary classification output for encoder training
         psp_dropout: spatial dropout rate between 0 and 1.
         classes: a number of classes for output (output shape - ``(batch, classes, h, w)``).
-        activation: one of [``sigmoid``, ``softmax``, None]
+        activation: activation function used in ``.predict(x)`` method for inference.
+            One of [``sigmoid``, ``softmax``, callable, None]
 
     Returns:
         ``torch.nn.Module``: **PSPNet**

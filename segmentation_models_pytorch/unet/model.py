@@ -14,7 +14,8 @@ class Unet(EncoderDecoder):
         decoder_use_batchnorm: if ``True``, ``BatchNormalisation`` layer between ``Conv2D`` and ``Activation`` layers
             is used.
         classes: a number of classes for output (output shape - ``(batch, classes, h, w)``).
-        activation: one of [``sigmoid``, ``softmax``, None]
+        activation: activation function used in ``.predict(x)`` method for inference.
+            One of [``sigmoid``, ``softmax``, callable, None]
         center: if ``True`` add ``Conv2dReLU`` block on encoder head (useful for VGG models)
 
     Returns:
