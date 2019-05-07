@@ -44,7 +44,7 @@ All models have pretrained encoders, so you have to prepare your data the same w
 ```python
 from segmentation_models_pytorch.encoders import get_preprocessing_fn
 
-preprocess_input = get_preprocessing_fn('renset18', pretrained='imagenet')
+preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
 ```
 ### Examples <a name="examples"></a>
  - Training model for cars segmentation on CamVid dataset [here](https://github.com/qubvel/segmentation_models.pytorch/blob/master/examples/cars%20segmentation%20(camvid).ipynb).
