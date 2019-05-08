@@ -1,3 +1,4 @@
+import functools
 import torch.utils.model_zoo as model_zoo
 
 from .resnet import resnet_encoders
@@ -44,8 +45,5 @@ def get_preprocessing_fn(encoder_name, pretrained='imagenet'):
     input_range = settings[pretrained].get('input_range')
     mean = settings[pretrained].get('mean')
     std = settings[pretrained].get('std')
-
-    def _preprocess_input(x, **kwargs):
-        return preprocess_input(x, mean=mean, std=std, input_space=input_space, input_range=input_range, **kwargs)
-
-    return _preprocess_input
+    
+    return functools.partial(preprocess_input, mean=mean, std=std, input_space=input_space, input_range=input_range)
