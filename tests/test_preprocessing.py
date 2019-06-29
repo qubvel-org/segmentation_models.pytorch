@@ -1,6 +1,11 @@
 import os
+import sys
+import mock
 import pytest
 import numpy as np
+
+# mock detection module 
+sys.modules['torchvision._C'] = mock.Mock()
 
 import segmentation_models_pytorch as smp
 
