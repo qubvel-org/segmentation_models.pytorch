@@ -17,7 +17,7 @@ install:
   
   # Useful for debugging any issues with conda
   - conda info -a
-  - conda create -q -n test-environment -c pytorch python=$TRAVIS_PYTHON_VERSION numpy mock pytorch-cpu
+  - conda create -q -n test-environment -c pytorch python=$TRAVIS_PYTHON_VERSION numpy mock pytorch
   - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then pip install enum34; fi
   - source activate test-environment
   
