@@ -5,7 +5,7 @@ python:
 stages:
   - test
 
-install:
+before_install:
 
   - sudo apt-get update
   - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
@@ -14,19 +14,21 @@ install:
   - hash -r
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
+  - conda info -a
   
   # Useful for debugging any issues with conda
   - conda info -a
-  - conda create -q -n test-environment -c pytorch python=$TRAVIS_PYTHON_VERSION numpy mock pytorch-cpu
-  - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then pip install enum34; fi
+  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION pytorch-cpu scipy -c pytorch
+  # - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then pip install enum34; fi
   - source activate test-environment
   
-  # Dependencies
-  - pip install -r requirements.txt
+  - pip install future
+  - pip install pytest pytest-cov codecov
+  - pip install mock
   
-  # Package
-  - python setup.py install
-  - pip install --upgrade pytest #codecov pytest-cov
+install:
+
+  - pip install .
   
 script:
   - python -m pytest -s tests
