@@ -42,10 +42,11 @@ def f_score(pr, gt, beta=1, eps=1e-7, threshold=None, activation='sigmoid'):
     Args:
         pr (torch.Tensor): A list of predicted elements
         gt (torch.Tensor):  A list of elements that are to be predicted
+        beta (float): positive constant
         eps (float): epsilon to avoid zero division
         threshold: threshold for outputs binarization
     Returns:
-        float: IoU (Jaccard) score
+        float: F score
     """
 
     if activation is None or activation == "none":
