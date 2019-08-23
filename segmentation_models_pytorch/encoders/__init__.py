@@ -35,15 +35,20 @@ def get_encoder_names():
     return list(encoders.keys())
 
 
-def get_preprocessing_fn(encoder_name, pretrained='imagenet'):
+def get_preprocessing_params(encoder_name, pretrained='imagenet'):
     settings = encoders[encoder_name]['pretrained_settings']
 
     if pretrained not in settings.keys():
         raise ValueError('Avaliable pretrained options {}'.format(settings.keys()))
-
-    input_space = settings[pretrained].get('input_space')
-    input_range = settings[pretrained].get('input_range')
-    mean = settings[pretrained].get('mean')
-    std = settings[pretrained].get('std')
     
-    return functools.partial(preprocess_input, mean=mean, std=std, input_space=input_space, input_range=input_range)
+    formatted_settings = {}
+    formatted_settings['input_space'] = settings[pretrained].get('input_space')
+    formatted_settings['input_range'] = settings[pretrained].get('input_range')
+    formatted_settings['mean'] = settings[pretrained].get('mean')
+    formatted_settings['std'] = settings[pretrained].get('std')
+    return formatted_settings
+
+
+def get_preprocessing_fn(encoder_name, pretrained='imagenet'):
+    params = get_preprocessing_params(encoder_name, pretrained=pretrained)
+    return functools.partial(preprocess_input, **params)
