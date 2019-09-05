@@ -2,13 +2,15 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from ..common.blocks import Conv2dReLU
+from ..common.blocks import Conv2dReLU, SCSEModule
 from ..base.model import Model
 
 
 class DecoderBlock(nn.Module):
     def __init__(self, in_channels, out_channels, use_batchnorm=True):
         super().__init__()
+        self.se_in = SCSEModule(in_channels)
+        self.se_out = SCSEModule(out_channels)
         self.block = nn.Sequential(
             Conv2dReLU(in_channels, out_channels, kernel_size=3, padding=1, use_batchnorm=use_batchnorm),
             Conv2dReLU(out_channels, out_channels, kernel_size=3, padding=1, use_batchnorm=use_batchnorm),
@@ -19,7 +21,9 @@ class DecoderBlock(nn.Module):
         x = F.interpolate(x, scale_factor=2, mode='nearest')
         if skip is not None:
             x = torch.cat([x, skip], dim=1)
+        x = self.se_in(x)
         x = self.block(x)
+        x = self.se_out(x)
         return x
 
 
