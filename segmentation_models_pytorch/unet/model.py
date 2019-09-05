@@ -17,6 +17,8 @@ class Unet(EncoderDecoder):
         activation: activation function used in ``.predict(x)`` method for inference.
             One of [``sigmoid``, ``softmax``, callable, None]
         center: if ``True`` add ``Conv2dReLU`` block on encoder head (useful for VGG models)
+        attention_type: attention module used in decoder of the model
+            One of [``None``, ``scse``]
 
     Returns:
         ``torch.nn.Module``: **Unet**
