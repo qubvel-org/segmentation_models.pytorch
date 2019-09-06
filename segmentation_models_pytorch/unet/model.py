@@ -17,6 +17,8 @@ class Unet(EncoderDecoder):
         activation: activation function used in ``.predict(x)`` method for inference.
             One of [``sigmoid``, ``softmax``, callable, None]
         center: if ``True`` add ``Conv2dReLU`` block on encoder head (useful for VGG models)
+        attention_type: attention module used in decoder of the model
+            One of [``None``, ``scse``]
 
     Returns:
         ``torch.nn.Module``: **Unet**
@@ -35,6 +37,7 @@ class Unet(EncoderDecoder):
             classes=1,
             activation='sigmoid',
             center=False,  # usefull for VGG models
+            attention_type=None
     ):
         encoder = get_encoder(
             encoder_name,
@@ -47,6 +50,7 @@ class Unet(EncoderDecoder):
             final_channels=classes,
             use_batchnorm=decoder_use_batchnorm,
             center=center,
+            attention_type=attention_type
         )
 
         super().__init__(encoder, decoder, activation)
