@@ -60,23 +60,25 @@ preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
  
 #### Encoders <a name="encoders"></a>
 
-| Type       | Encoder names                                                 |
-|------------|-----------------------------------------------------------------|
-| VGG        | vgg11, vgg13, vgg16, vgg19, vgg11bn,  vgg13bn, vgg16bn, vgg19bn |
-| DenseNet   | densenet121, densenet169, densenet201, densenet161              |
-| DPN        | dpn68, dpn68b, dpn92, dpn98, dpn107, dpn131                     |
-| Inception  | inceptionresnetv2                                               |
-| ResNet     | resnet18, resnet34, resnet50, resnet101, resnet152              |
-| SE-ResNet  | se_resnet50, se_resnet101, se_resnet152                         |
-| SE-ResNeXt | se_resnext50_32x4d,  se_resnext101_32x4d                        |
-| SENet      | senet154                                                        |                                                           |
+| Type       | Encoder names                                                                               |
+|------------|---------------------------------------------------------------------------------------------|
+| VGG        | vgg11, vgg13, vgg16, vgg19, vgg11bn,  vgg13bn, vgg16bn, vgg19bn                             |
+| DenseNet   | densenet121, densenet169, densenet201, densenet161                                          |
+| DPN        | dpn68, dpn68b, dpn92, dpn98, dpn107, dpn131                                                 |
+| Inception  | inceptionresnetv2                                                                           |
+| ResNet     | resnet18, resnet34, resnet50, resnet101, resnet152                                          |
+| ResNeXt    | resnext50_32x4d, resnext101_32x8d, resnext101_32x16d, resnext101_32x32d, resnext101_32x48d  |
+| SE-ResNet  | se_resnet50, se_resnet101, se_resnet152                                                     |
+| SE-ResNeXt | se_resnext50_32x4d,  se_resnext101_32x4d                                                    |
+| SENet      | senet154                                                                                    |  
 
 #### Weights <a name="weights"></a>
 
-| Weights name | Encoder names         |
-|--------------|-----------------------|
-| imagenet+5k  | dpn68b, dpn92, dpn107 |
-| imagenet     | * all other encoders  |
+| Weights name                                                              | Encoder names                                                                                                                                                                                                                                                                                                                                                                       |
+|---------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| imagenet+5k                                                               | dpn68b, dpn92, dpn107                                                                                                                                                                                                                                                                                                                                                               |
+| imagenet                                                                  | vgg11, vgg13, vgg16, vgg19, vgg11bn,  vgg13bn, vgg16bn, vgg19bn, <br> densenet121, densenet169, densenet201, densenet161, dpn68, dpn98, dpn131, <br> inceptionresnetv2, <br> resnet18, resnet34, resnet50, resnet101, resnet152, <br> resnext50_32x4d, resnext101_32x8d, <br> se_resnet50, se_resnet101, se_resnet152, <br> se_resnext50_32x4d,  se_resnext101_32x4d, <br> senet154 |
+| [instagram](https://pytorch.org/hub/facebookresearch_WSL-Images_resnext/) | resnext101_32x8d, resnext101_32x16d, resnext101_32x32d, resnext101_32x48d                                                                                                                                                                                                                                                                                                           |
 
 ### Models API <a name="api"></a>
  - `model.encoder` - pretrained backbone to extract features of different spatial resolution  
