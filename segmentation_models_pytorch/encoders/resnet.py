@@ -81,4 +81,26 @@ resnet_encoders = {
             'layers': [3, 8, 36, 3],
         },
     },
+
+    'resnext50_32x4d': {
+        'encoder': ResNetEncoder,
+        'pretrained_settings': {
+            'imagenet': {
+                'url': 'https://download.pytorch.org/models/resnext50_32x4d-7cdf4587.pth',
+                'input_space': 'RGB',
+                'input_size': [3, 224, 224],
+                'input_range': [0, 1],
+                'mean': [0.485, 0.456, 0.406],
+                'std': [0.229, 0.224, 0.225],
+                'num_classes': 1000
+            }
+        },
+        'out_shapes': (2048, 1024, 512, 256, 64),
+        'params': {
+            'block': Bottleneck,
+            'layers': [3, 4, 23, 3],
+            'groups': 32,
+            'width_per_group': 4
+        },
+    },
 }
