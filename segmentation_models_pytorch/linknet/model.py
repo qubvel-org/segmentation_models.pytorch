@@ -44,8 +44,9 @@ class Linknet(EncoderDecoder):
             prefinal_channels=32,
             final_channels=classes,
             use_batchnorm=decoder_use_batchnorm,
+            final_activation=activation,
         )
 
-        super().__init__(encoder, decoder, activation)
+        super().__init__(encoder, decoder)
 
         self.name = 'link-{}'.format(encoder_name)

@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from ..base.model import Model
-
+from .. import common as cmn
 
 class Conv3x3GNReLU(nn.Module):
     def __init__(self, in_channels, out_channels, upsample=False):
@@ -66,6 +66,7 @@ class FPNDecoder(Model):
             pyramid_channels=256,
             segmentation_channels=128,
             final_channels=1,
+            final_activation=None,
             dropout=0.2,
     ):
         super().__init__()
@@ -83,6 +84,7 @@ class FPNDecoder(Model):
 
         self.dropout = nn.Dropout2d(p=dropout, inplace=True)
         self.final_conv = nn.Conv2d(segmentation_channels, final_channels, kernel_size=1, padding=0)
+        self.final_activation = cmn.Activation(final_activation, dim=1)
 
         self.initialize()
 
@@ -105,4 +107,6 @@ class FPNDecoder(Model):
         x = self.final_conv(x)
 
         x = F.interpolate(x, scale_factor=4, mode='bilinear', align_corners=True)
+        x = self.final_activation(x)
+
         return x

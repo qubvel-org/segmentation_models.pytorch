@@ -1,7 +1,7 @@
 import torch
 
 
-def iou(pr, gt, eps=1e-7, threshold=None, activation='sigmoid'):
+def iou(pr, gt, eps=1e-7, threshold=None):
     """
     Source:
         https://github.com/catalyst-team/catalyst/
@@ -14,19 +14,6 @@ def iou(pr, gt, eps=1e-7, threshold=None, activation='sigmoid'):
         float: IoU (Jaccard) score
     """
 
-    if activation is None or activation == "none":
-        activation_fn = lambda x: x
-    elif activation == "sigmoid":
-        activation_fn = torch.nn.Sigmoid()
-    elif activation == "softmax2d":
-        activation_fn = torch.nn.Softmax2d()
-    else:
-        raise NotImplementedError(
-            "Activation implemented for sigmoid and softmax2d"
-        )
-
-    pr = activation_fn(pr)
-
     if threshold is not None:
         pr = (pr > threshold).float()
 
@@ -37,7 +24,7 @@ def iou(pr, gt, eps=1e-7, threshold=None, activation='sigmoid'):
 jaccard = iou
 
 
-def f_score(pr, gt, beta=1, eps=1e-7, threshold=None, activation='sigmoid'):
+def f_score(pr, gt, beta=1, eps=1e-7, threshold=None):
     """
     Args:
         pr (torch.Tensor): A list of predicted elements
@@ -48,19 +35,6 @@ def f_score(pr, gt, beta=1, eps=1e-7, threshold=None, activation='sigmoid'):
     Returns:
         float: F score
     """
-
-    if activation is None or activation == "none":
-        activation_fn = lambda x: x
-    elif activation == "sigmoid":
-        activation_fn = torch.nn.Sigmoid()
-    elif activation == "softmax2d":
-        activation_fn = torch.nn.Softmax2d()
-    else:
-        raise NotImplementedError(
-            "Activation implemented for sigmoid and softmax2d"
-        )
-
-    pr = activation_fn(pr)
 
     if threshold is not None:
         pr = (pr > threshold).float()

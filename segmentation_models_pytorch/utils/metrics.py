@@ -1,31 +1,30 @@
-import torch.nn as nn
+from . import base
 from . import functions as F
+from .. import common as cmn
 
 
-class IoUMetric(nn.Module):
+class IoUMetric(base.Named):
 
-    __name__ = 'iou'
-
-    def __init__(self, eps=1e-7, threshold=0.5, activation='sigmoid'):
-        super().__init__()
-        self.activation = activation
+    def __init__(self, eps=1e-7, threshold=0.5, activation=None, **kwargs):
+        super().__init__(**kwargs)
         self.eps = eps
         self.threshold = threshold
+        self.activation = cmn.Activation(activation, dim=1)
 
     def forward(self, y_pr, y_gt):
-        return F.iou(y_pr, y_gt, self.eps, self.threshold, self.activation)
+        y_pr = self.activation(y_pr)
+        return F.iou(y_pr, y_gt, self.eps, self.threshold)
 
 
-class FscoreMetric(nn.Module):
+class FscoreMetric(base.Named):
 
-    __name__ = 'f-score'
-
-    def __init__(self, beta=1, eps=1e-7, threshold=0.5, activation='sigmoid'):
-        super().__init__()
-        self.activation = activation
+    def __init__(self, beta=1, eps=1e-7, threshold=0.5, activation=None, **kwargs):
+        super().__init__(**kwargs)
         self.eps = eps
-        self.threshold = threshold
         self.beta = beta
+        self.threshold = threshold
+        self.activation = cmn.Activation(activation, dim=1)
 
     def forward(self, y_pr, y_gt):
-        return F.f_score(y_pr, y_gt, self.beta, self.eps, self.threshold, self.activation)
+        y_pr = self.activation(y_pr)
+        return F.f_score(y_pr, y_gt, self.beta, self.eps, self.threshold)

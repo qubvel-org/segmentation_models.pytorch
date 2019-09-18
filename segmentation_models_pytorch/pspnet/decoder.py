@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from ..base.model import Model
-from ..common.blocks import Conv2dReLU
+from .. import common as cmn
 
 
 def _upsample(x, size):
@@ -18,7 +18,7 @@ class PyramidStage(nn.Module):
             use_bathcnorm = False
         self.pool = nn.Sequential(
             nn.AdaptiveAvgPool2d(output_size=(pool_size, pool_size)),
-            Conv2dReLU(in_channels, out_channels, (1, 1), use_batchnorm=use_bathcnorm)
+            cmn.Conv2dReLU(in_channels, out_channels, (1, 1), use_batchnorm=use_bathcnorm)
         )
 
     def forward(self, x):
@@ -65,6 +65,7 @@ class PSPDecoder(Model):
             final_channels=21,
             aux_output=False,
             dropout=0.2,
+            final_activation=None,
     ):
         super().__init__()
         self.downsample_factor = downsample_factor
@@ -78,7 +79,7 @@ class PSPDecoder(Model):
             use_bathcnorm=use_batchnorm,
         )
 
-        self.conv = Conv2dReLU(
+        self.conv = cmn.Conv2dReLU(
             self.out_channels * 2,
             psp_out_channels,
             kernel_size=1,
@@ -90,6 +91,7 @@ class PSPDecoder(Model):
 
         self.final_conv = nn.Conv2d(psp_out_channels, final_channels,
                                     kernel_size=(3, 3), padding=1)
+        self.final_activation = cmn.Activation(final_activation, dim=1)
 
         if self.aux_output:
             self.aux = AUXModule(self.out_channels, final_channels)
@@ -121,6 +123,7 @@ class PSPDecoder(Model):
             mode='bilinear',
             align_corners=True
         )
+        x = self.final_activation(x)
 
         if self.training and self.aux_output:
             aux = self.aux(features)

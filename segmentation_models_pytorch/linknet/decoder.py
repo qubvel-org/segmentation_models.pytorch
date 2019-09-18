@@ -1,6 +1,6 @@
 import torch.nn as nn
 
-from ..common.blocks import Conv2dReLU
+from .. import common as cmn
 from ..base.model import Model
 
 
@@ -25,9 +25,9 @@ class DecoderBlock(nn.Module):
         super().__init__()
 
         self.block = nn.Sequential(
-            Conv2dReLU(in_channels, in_channels // 4, kernel_size=1, use_batchnorm=use_batchnorm),
+            cmn.Conv2dReLU(in_channels, in_channels // 4, kernel_size=1, use_batchnorm=use_batchnorm),
             TransposeX2(in_channels // 4, in_channels // 4, use_batchnorm=use_batchnorm),
-            Conv2dReLU(in_channels // 4, out_channels, kernel_size=1, use_batchnorm=use_batchnorm),
+            cmn.Conv2dReLU(in_channels // 4, out_channels, kernel_size=1, use_batchnorm=use_batchnorm),
         )
 
     def forward(self, x):
@@ -46,6 +46,7 @@ class LinknetDecoder(Model):
             prefinal_channels=32,
             final_channels=1,
             use_batchnorm=True,
+            final_activation=None,
     ):
         super().__init__()
 
@@ -57,6 +58,7 @@ class LinknetDecoder(Model):
         self.layer4 = DecoderBlock(in_channels[3], in_channels[4], use_batchnorm=use_batchnorm)
         self.layer5 = DecoderBlock(in_channels[4], prefinal_channels, use_batchnorm=use_batchnorm)
         self.final_conv = nn.Conv2d(prefinal_channels, final_channels, kernel_size=(1, 1))
+        self.final_activation = cmn.Activation(final_activation, dim=1)
 
         self.initialize()
 
@@ -70,5 +72,6 @@ class LinknetDecoder(Model):
         x = self.layer4([x, skips[3]])
         x = self.layer5([x, None])
         x = self.final_conv(x)
+        x = self.final_activation(x)
 
         return x

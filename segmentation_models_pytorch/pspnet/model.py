@@ -38,7 +38,7 @@ class PSPNet(EncoderDecoder):
             psp_aux_output=False,
             classes=21,
             dropout=0.2,
-            activation='softmax',
+            final_activation=None,
     ):
         encoder = get_encoder(
             encoder_name,
@@ -53,8 +53,9 @@ class PSPNet(EncoderDecoder):
             dropout=dropout,
             aux_output=psp_aux_output,
             use_batchnorm=psp_use_batchnorm,
+            final_activation=final_activation,
         )
 
-        super().__init__(encoder, decoder, activation)
+        super().__init__(encoder, decoder)
 
         self.name = 'psp-{}'.format(encoder_name)

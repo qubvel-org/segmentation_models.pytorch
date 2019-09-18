@@ -13,12 +13,12 @@ class Unet(EncoderDecoder):
         decoder_channels: list of numbers of ``Conv2D`` layer filters in decoder blocks
         decoder_use_batchnorm: if ``True``, ``BatchNormalisation`` layer between ``Conv2D`` and ``Activation`` layers
             is used.
-        classes: a number of classes for output (output shape - ``(batch, classes, h, w)``).
-        activation: activation function used in ``.predict(x)`` method for inference.
-            One of [``sigmoid``, ``softmax``, callable, None]
-        center: if ``True`` add ``Conv2dReLU`` block on encoder head (useful for VGG models)
-        attention_type: attention module used in decoder of the model
+        decoder_attention_type: attention module used in decoder of the model
             One of [``None``, ``scse``]
+        classes: a number of classes for output (output shape - ``(batch, classes, h, w)``).
+        final_activation: activation function to apply after final convolution;
+            One of [``sigmoid``, ``softmax``, ``logsoftmax``, ``identity``, callable, None]
+        center: if ``True`` add ``Conv2dReLU`` block on encoder head (useful for VGG models)
 
     Returns:
         ``torch.nn.Module``: **Unet**
@@ -34,10 +34,10 @@ class Unet(EncoderDecoder):
             encoder_weights='imagenet',
             decoder_use_batchnorm=True,
             decoder_channels=(256, 128, 64, 32, 16),
+            decoder_attention_type=None,
             classes=1,
-            activation='sigmoid',
+            final_activation=None,
             center=False,  # usefull for VGG models
-            attention_type=None
     ):
         encoder = get_encoder(
             encoder_name,
@@ -50,9 +50,10 @@ class Unet(EncoderDecoder):
             final_channels=classes,
             use_batchnorm=decoder_use_batchnorm,
             center=center,
-            attention_type=attention_type
+            attention_type=decoder_attention_type,
+            final_activation=final_activation,
         )
 
-        super().__init__(encoder, decoder, activation)
+        super().__init__(encoder, decoder)
 
         self.name = 'u-{}'.format(encoder_name)

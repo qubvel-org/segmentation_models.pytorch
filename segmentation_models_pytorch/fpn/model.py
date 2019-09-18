@@ -13,8 +13,8 @@ class FPN(EncoderDecoder):
         decoder_segmentation_channels: a number of convolution filters in segmentation head of FPN_.
         classes: a number of classes for output (output shape - ``(batch, classes, h, w)``).
         dropout: spatial dropout rate in range (0, 1).
-        activation: activation function used in ``.predict(x)`` method for inference.
-            One of [``sigmoid``, ``softmax``, callable, None]
+        final_activation: activation function to apply after final convolution;
+            One of [``sigmoid``, ``softmax``, ``logsoftmax``, ``identity``, callable, None]
 
     Returns:
         ``torch.nn.Module``: **FPN**
@@ -32,7 +32,7 @@ class FPN(EncoderDecoder):
             decoder_segmentation_channels=128,
             classes=1,
             dropout=0.2,
-            activation='sigmoid',
+            final_activation=None,
     ):
         encoder = get_encoder(
             encoder_name,
@@ -45,8 +45,9 @@ class FPN(EncoderDecoder):
             segmentation_channels=decoder_segmentation_channels,
             final_channels=classes,
             dropout=dropout,
+            final_activation=final_activation,
         )
 
-        super().__init__(encoder, decoder, activation)
+        super().__init__(encoder, decoder)
 
         self.name = 'fpn-{}'.format(encoder_name)
