@@ -1,7 +1,7 @@
 import torch.nn as nn
 
 from . import base
-from . import functions as F
+from . import functional as F
 from .. import common as cmn
 
 
