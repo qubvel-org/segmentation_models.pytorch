@@ -5,6 +5,7 @@ import torch.nn as nn
 class BaseObject(nn.Module):
 
     def __init__(self, name=None):
+        super().__init__()
         self._name = name
 
     @property

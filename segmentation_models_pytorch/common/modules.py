@@ -5,6 +5,8 @@ class Activation(nn.Module):
 
     def __init__(self, name, **params):
 
+        super().__init__()
+
         if name is None or name == 'identity':
             self.activation = nn.Identity(**params)
         elif name == 'sigmoid':
