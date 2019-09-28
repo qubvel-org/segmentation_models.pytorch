@@ -65,11 +65,12 @@ class FPNDecoder(Model):
             encoder_channels,
             pyramid_channels=256,
             segmentation_channels=128,
+            final_upsampling=4,
             final_channels=1,
             dropout=0.2,
     ):
         super().__init__()
-
+        self.final_upsampling = final_upsampling
         self.conv1 = nn.Conv2d(encoder_channels[0], pyramid_channels, kernel_size=(1, 1))
 
         self.p4 = FPNBlock(pyramid_channels, encoder_channels[1])
@@ -104,5 +105,6 @@ class FPNDecoder(Model):
         x = self.dropout(x)
         x = self.final_conv(x)
 
-        x = F.interpolate(x, scale_factor=4, mode='bilinear', align_corners=True)
+        if self.final_upsampling is not None and self.final_upsampling > 1:
+            x = F.interpolate(x, scale_factor=self.final_upsampling, mode='bilinear', align_corners=True)
         return x

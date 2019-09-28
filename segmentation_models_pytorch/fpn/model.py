@@ -15,6 +15,8 @@ class FPN(EncoderDecoder):
         dropout: spatial dropout rate in range (0, 1).
         activation: activation function used in ``.predict(x)`` method for inference.
             One of [``sigmoid``, ``softmax``, callable, None]
+        final_upsampling: optional, final upsampling factor
+            (default is 4 to preserve input -> output spatial shape identity)
 
     Returns:
         ``torch.nn.Module``: **FPN**
@@ -33,6 +35,7 @@ class FPN(EncoderDecoder):
             classes=1,
             dropout=0.2,
             activation='sigmoid',
+            final_upsampling=4,
     ):
         encoder = get_encoder(
             encoder_name,
@@ -45,6 +48,7 @@ class FPN(EncoderDecoder):
             segmentation_channels=decoder_segmentation_channels,
             final_channels=classes,
             dropout=dropout,
+            final_upsampling=final_upsampling,
         )
 
         super().__init__(encoder, decoder, activation)
