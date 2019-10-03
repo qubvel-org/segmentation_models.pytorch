@@ -1,2 +1,3 @@
 torchvision>=0.2.2,<=0.4.0
 pretrainedmodels==0.7.4
+efficientnet-pytorch==0.4.0
