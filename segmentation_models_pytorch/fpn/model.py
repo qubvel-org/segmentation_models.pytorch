@@ -17,6 +17,7 @@ class FPN(EncoderDecoder):
             One of [``sigmoid``, ``softmax``, callable, None]
         final_upsampling: optional, final upsampling factor
             (default is 4 to preserve input -> output spatial shape identity)
+        weight_std boolean Use weight standratization https://arxiv.org/abs/1903.10520
 
     Returns:
         ``torch.nn.Module``: **FPN**
@@ -36,6 +37,7 @@ class FPN(EncoderDecoder):
             dropout=0.2,
             activation='sigmoid',
             final_upsampling=4,
+            weight_std=False
     ):
         encoder = get_encoder(
             encoder_name,
@@ -49,6 +51,7 @@ class FPN(EncoderDecoder):
             final_channels=classes,
             dropout=dropout,
             final_upsampling=final_upsampling,
+            weight_std=weight_std
         )
 
         super().__init__(encoder, decoder, activation)
