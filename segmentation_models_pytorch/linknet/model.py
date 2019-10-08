@@ -14,11 +14,11 @@ class Linknet(EncoderDecoder):
             extractor to build segmentation model.
         encoder_weights: one of ``None`` (random initialization), ``imagenet`` (pre-training on ImageNet).
         decoder_use_batchnorm: if ``True``, ``BatchNormalisation`` layer between ``Conv2D`` and ``Activation`` layers
-            is used.
+            is used. If 'inplace' InplaceABN will be used, allows to decrease memory consumption.
+            One of [True, False, 'inplace']
         classes: a number of classes for output (output shape - ``(batch, classes, h, w)``).
         activation: activation function used in ``.predict(x)`` method for inference.
             One of [``sigmoid``, ``softmax``, callable, None]
-
     Returns:
         ``torch.nn.Module``: **Linknet**
 

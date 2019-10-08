@@ -14,13 +14,13 @@ class PSPNet(EncoderDecoder):
             to construct PSP module on it.
         psp_out_channels: number of filters in PSP block.
         psp_use_batchnorm: if ``True``, ``BatchNormalisation`` layer between ``Conv2D`` and ``Activation`` layers
-                is used.
+            is used. If 'inplace' InplaceABN will be used, allows to decrease memory consumption.
+            One of [True, False, 'inplace']
         psp_aux_output: if ``True`` add auxiliary classification output for encoder training
         psp_dropout: spatial dropout rate between 0 and 1.
         classes: a number of classes for output (output shape - ``(batch, classes, h, w)``).
         activation: activation function used in ``.predict(x)`` method for inference.
             One of [``sigmoid``, ``softmax``, callable, None]
-
     Returns:
         ``torch.nn.Module``: **PSPNet**
 

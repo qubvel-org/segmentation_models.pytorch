@@ -12,14 +12,14 @@ class Unet(EncoderDecoder):
         encoder_weights: one of ``None`` (random initialization), ``imagenet`` (pre-training on ImageNet).
         decoder_channels: list of numbers of ``Conv2D`` layer filters in decoder blocks
         decoder_use_batchnorm: if ``True``, ``BatchNormalisation`` layer between ``Conv2D`` and ``Activation`` layers
-            is used.
+            is used. If 'inplace' InplaceABN will be used, allows to decrease memory consumption.
+            One of [True, False, 'inplace']
         classes: a number of classes for output (output shape - ``(batch, classes, h, w)``).
         activation: activation function used in ``.predict(x)`` method for inference.
             One of [``sigmoid``, ``softmax``, callable, None]
         center: if ``True`` add ``Conv2dReLU`` block on encoder head (useful for VGG models)
         attention_type: attention module used in decoder of the model
             One of [``None``, ``scse``]
-
     Returns:
         ``torch.nn.Module``: **Unet**
 

@@ -8,14 +8,30 @@ class Conv2dReLU(nn.Module):
         super().__init__()
 
         layers = [
-            nn.Conv2d(in_channels, out_channels, kernel_size,
-                              stride=stride, padding=padding, bias=not (use_batchnorm)),
-            nn.ReLU(inplace=True),
+            nn.Conv2d(
+                in_channels, 
+                out_channels, 
+                kernel_size,
+                stride=stride, 
+                padding=padding, 
+                bias=not (use_batchnorm)
+            )
         ]
 
-        if use_batchnorm:
-            layers.insert(1, nn.BatchNorm2d(out_channels, **batchnorm_params))
-
+        if use_batchnorm == 'inplace':
+            try:
+                from inplace_abn import InPlaceABN
+            except ImportError:
+                raise RuntimeError("In order to use `use_batchnorm='inplace'` inplace_abn package must be installed. To install see: https://github.com/mapillary/inplace_abn")
+            
+            layers.append(InPlaceABN(out_channels, activation='leaky_relu', activation_param=0.0, **batchnorm_params))
+        elif use_batchnorm:
+            layers.append(nn.BatchNorm2d(out_channels, **batchnorm_params))
+            layers.append(nn.ReLU(inplace=True))  
+        else:
+            layers.append(nn.ReLU(inplace=True))
+                
+            
         self.block = nn.Sequential(*layers)
 
     def forward(self, x):
