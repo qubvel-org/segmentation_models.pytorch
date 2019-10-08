@@ -17,7 +17,8 @@ class FPN(EncoderDecoder):
             One of [``sigmoid``, ``softmax``, callable, None]
         final_upsampling: optional, final upsampling factor
             (default is 4 to preserve input -> output spatial shape identity)
-
+        decoder_merge_policy: determines how to merge outputs inside FPN.
+            One of [``add``, ``cat``]
     Returns:
         ``torch.nn.Module``: **FPN**
 
@@ -36,6 +37,7 @@ class FPN(EncoderDecoder):
             dropout=0.2,
             activation='sigmoid',
             final_upsampling=4,
+            decoder_merge_policy='add'
     ):
         encoder = get_encoder(
             encoder_name,
@@ -49,6 +51,7 @@ class FPN(EncoderDecoder):
             final_channels=classes,
             dropout=dropout,
             final_upsampling=final_upsampling,
+            merge_policy=decoder_merge_policy
         )
 
         super().__init__(encoder, decoder, activation)

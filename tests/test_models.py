@@ -65,6 +65,10 @@ def test_fpn(encoder_name):
     _test_forward_backward(smp.FPN, encoder_name)
     _test_pretrained_model(smp.FPN, encoder_name, get_pretrained_weights_name(encoder_name))
 
+    from functools import partial
+    _test_forward_backward(partial(smp.FPN, decoder_merge_policy='cat'), encoder_name)
+    _test_pretrained_model(partial(smp.FPN, decoder_merge_policy='cat'), encoder_name, get_pretrained_weights_name(encoder_name))
+
 
 @pytest.mark.parametrize('encoder_name', _select_names(ENCODERS, k=1))
 def test_linknet(encoder_name):
