@@ -7,13 +7,13 @@ The main features of this library are:
 
  - High level API (just two lines to create neural network)
  - 4 models architectures for binary and multi class segmentation (including legendary Unet)
- - 30 available encoders for each architecture
+ - 31 available encoders for each architecture
  - All encoders have pre-trained weights for faster and better convergence
 
 ### Table of content
  1. [Quick start](#start)
  2. [Examples](#examples)
- 3. [Models](#models) 
+ 3. [Models](#models)
     1. [Architectures](#architectires)
     2. [Encoders](#encoders)
     3. [Pretrained weights](#weights)
@@ -57,7 +57,7 @@ preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
  - [Linknet](https://arxiv.org/abs/1707.03718)
  - [FPN](http://presentations.cocodataset.org/COCO17-Stuff-FAIR.pdf)
  - [PSPNet](https://arxiv.org/abs/1612.01105)
- 
+
 #### Encoders <a name="encoders"></a>
 
 | Type       | Encoder names                                                                               |
@@ -82,10 +82,10 @@ preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
 | [instagram](https://pytorch.org/hub/facebookresearch_WSL-Images_resnext/) | resnext101_32x8d, resnext101_32x16d, resnext101_32x32d, resnext101_32x48d                                                                                                                                                                                                                                                                                                           |
 
 ### Models API <a name="api"></a>
- - `model.encoder` - pretrained backbone to extract features of different spatial resolution  
- - `model.decoder` - segmentation head, depends on models architecture (`Unet`/`Linknet`/`PSPNet`/`FPN`)  
+ - `model.encoder` - pretrained backbone to extract features of different spatial resolution
+ - `model.decoder` - segmentation head, depends on models architecture (`Unet`/`Linknet`/`PSPNet`/`FPN`)
  - `model.activation` - output activation function, one of `sigmoid`, `softmax`
- - `model.forward(x)` - sequentially pass `x` through model\`s encoder and decoder (return logits!)  
+ - `model.forward(x)` - sequentially pass `x` through model\`s encoder and decoder (return logits!)
  - `model.predict(x)` - inference method, switch model to `.eval()` mode, call `.forward(x)` and apply activation function with `torch.no_grad()`
 
 ### Installation <a name="installation"></a>

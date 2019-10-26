@@ -57,7 +57,7 @@ class InceptionResNetV2Encoder(InceptionResNetV2):
         super().load_state_dict(state_dict, **kwargs)
 
 
-inception_encoders = {
+inceptionresnetv2_encoders = {
     'inceptionresnetv2': {
         'encoder': InceptionResNetV2Encoder,
         'pretrained_settings': pretrained_settings['inceptionresnetv2'],
