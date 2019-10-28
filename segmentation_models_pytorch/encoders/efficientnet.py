@@ -1,7 +1,5 @@
 from efficientnet_pytorch import EfficientNet
-from efficientnet_pytorch.utils import relu_fn, url_map, get_model_params
-import torch.nn as nn
-import torch
+from efficientnet_pytorch.utils import url_map, get_model_params
 
 
 class EfficientNetEncoder(EfficientNet):
@@ -16,7 +14,7 @@ class EfficientNetEncoder(EfficientNet):
         
     def forward(self, x):
         result = []
-        x = relu_fn(self._bn0(self._conv_stem(x)))
+        x = self._swish(self._bn0(self._conv_stem(x)))
         result.append(x)
 
         skip_connection_idx = 0
