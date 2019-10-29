@@ -1,31 +1,32 @@
 import os
-import sys
-import mock
 import pytest
 import torch
 import random
 import importlib
 
-# mock detection module 
-sys.modules['torchvision._C'] = mock.Mock()
 
 import segmentation_models_pytorch as smp
 
+IS_TRAVIS = os.environ.get('TRAVIS', False)
 
-def get_encoder():
-    is_travis = os.environ.get('TRAVIS', False)
-    exclude = ['senet154']
+
+def get_encoders():
+    exclude = ['senet154', 'resnext101_32x48d']
 
     encoders = smp.encoders.get_encoder_names()
-    if is_travis:
+    if IS_TRAVIS:
         encoders = [e for e in encoders if e not in exclude]
 
     return encoders
 
-def get_pretrained_weights_name(encoder_name):
-    return list(smp.encoders.encoders[encoder_name]['pretrained_settings'].keys())[0]
 
-ENCODERS = get_encoder()
+def get_pretrained_weights_name(encoder_name):
+    if not IS_TRAVIS:
+        return list(smp.encoders.encoders[encoder_name]['pretrained_settings'].keys())[0]
+    return None
+
+
+ENCODERS = get_encoders()
 
 
 def _select_names(names, k=2):
@@ -67,7 +68,8 @@ def test_fpn(encoder_name):
 
     from functools import partial
     _test_forward_backward(partial(smp.FPN, decoder_merge_policy='cat'), encoder_name)
-    _test_pretrained_model(partial(smp.FPN, decoder_merge_policy='cat'), encoder_name, get_pretrained_weights_name(encoder_name))
+    _test_pretrained_model(partial(smp.FPN, decoder_merge_policy='cat'),
+                           encoder_name, get_pretrained_weights_name(encoder_name))
 
 
 @pytest.mark.parametrize('encoder_name', _select_names(ENCODERS, k=1))
@@ -85,7 +87,8 @@ def test_pspnet(encoder_name):
 @pytest.mark.skipif(importlib.util.find_spec('inplace_abn') is None, reason='')
 def test_inplace_abn():
     _test_forward_backward(smp.Unet, 'resnet18', decoder_use_batchnorm='inplace')
-    _test_pretrained_model(smp.Unet, 'resnet18', get_pretrained_weights_name('resnet18'), decoder_use_batchnorm='inplace')
+    _test_pretrained_model(smp.Unet, 'resnet18', get_pretrained_weights_name(
+        'resnet18'), decoder_use_batchnorm='inplace')
 
 
 if __name__ == '__main__':

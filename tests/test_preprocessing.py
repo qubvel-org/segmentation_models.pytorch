@@ -1,11 +1,4 @@
-import os
-import sys
-import mock
-import pytest
 import numpy as np
-
-# mock detection module 
-sys.modules['torchvision._C'] = mock.Mock()
 
 import segmentation_models_pytorch as smp
 
@@ -40,7 +33,7 @@ def test_input_range():
 def test_input_space():
     inp = np.stack(
         [np.ones((32, 32)),
-        np.zeros((32, 32))],
+         np.zeros((32, 32))],
         axis=-1
     )
     out = np.stack(

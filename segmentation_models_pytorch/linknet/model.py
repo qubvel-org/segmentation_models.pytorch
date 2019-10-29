@@ -23,7 +23,7 @@ class Linknet(EncoderDecoder):
         ``torch.nn.Module``: **Linknet**
 
     .. _Linknet:
-        https://arxiv.org/pdf/1707.03718.pdf
+        https://arxiv.org/abs/1707.03718
     """
 
     def __init__(

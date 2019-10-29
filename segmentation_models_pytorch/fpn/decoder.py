@@ -12,7 +12,7 @@ class Conv3x3GNReLU(nn.Module):
         self.upsample = upsample
         self.block = nn.Sequential(
             nn.Conv2d(in_channels, out_channels, (3, 3),
-                              stride=1, padding=1, bias=False),
+                      stride=1, padding=1, bias=False),
             nn.GroupNorm(32, out_channels),
             nn.ReLU(inplace=True),
         )
@@ -22,7 +22,6 @@ class Conv3x3GNReLU(nn.Module):
         if self.upsample:
             x = F.interpolate(x, scale_factor=2, mode='bilinear', align_corners=True)
         return x
-
 
 
 class FPNBlock(nn.Module):
@@ -71,7 +70,7 @@ class FPNDecoder(Model):
             merge_policy='add'
     ):
         super().__init__()
-        
+
         if merge_policy not in ['add', 'cat']:
             raise ValueError("`merge_policy` must be one of: ['add', 'cat'], got {}".format(merge_policy))
         self.merge_policy = merge_policy
@@ -92,7 +91,7 @@ class FPNDecoder(Model):
 
         if self.merge_policy == 'cat':
             segmentation_channels *= 4
-        
+
         self.final_conv = nn.Conv2d(segmentation_channels, final_channels, kernel_size=1, padding=0)
 
         self.initialize()

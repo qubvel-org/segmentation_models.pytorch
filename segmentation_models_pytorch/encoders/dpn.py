@@ -13,7 +13,7 @@ class DPNEncorder(DPN):
         super().__init__(*args, **kwargs)
         self.feature_blocks = np.cumsum(feature_blocks)
         self.pretrained = False
-        
+
         del self.last_linear
 
     def forward(self, x):

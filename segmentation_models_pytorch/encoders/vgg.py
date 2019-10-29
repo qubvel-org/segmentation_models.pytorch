@@ -16,8 +16,8 @@ class VGGEncoder(VGG):
 
     def __init__(self, config, batch_norm=False, *args, **kwargs):
         super().__init__(
-            make_layers(config, batch_norm=batch_norm), 
-            *args, 
+            make_layers(config, batch_norm=batch_norm),
+            *args,
             **kwargs
         )
         self.pretrained = False

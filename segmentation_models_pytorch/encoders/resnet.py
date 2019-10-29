@@ -138,7 +138,7 @@ resnet_encoders = {
     'resnext101_32x16d': {
         'encoder': ResNetEncoder,
         'pretrained_settings': {
-            'instagram':{
+            'instagram': {
                 'url': 'https://download.pytorch.org/models/ig_resnext101_32x16-c6f796b0.pth',
                 'input_space': 'RGB',
                 'input_size': [3, 224, 224],

@@ -24,7 +24,7 @@ class Unet(EncoderDecoder):
         ``torch.nn.Module``: **Unet**
 
     .. _Unet:
-        https://arxiv.org/pdf/1505.04597
+        https://arxiv.org/abs/1505.04597
 
     """
 

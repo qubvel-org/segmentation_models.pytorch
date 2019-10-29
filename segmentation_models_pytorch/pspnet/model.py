@@ -25,7 +25,7 @@ class PSPNet(EncoderDecoder):
         ``torch.nn.Module``: **PSPNet**
 
     .. _PSPNet:
-        https://arxiv.org/pdf/1612.01105.pdf
+        https://arxiv.org/abs/1612.01105
     """
 
     def __init__(

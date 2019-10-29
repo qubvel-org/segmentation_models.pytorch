@@ -1,7 +1,5 @@
 from efficientnet_pytorch import EfficientNet
-from efficientnet_pytorch.utils import relu_fn, url_map, get_model_params
-import torch.nn as nn
-import torch
+from efficientnet_pytorch.utils import url_map, get_model_params
 
 
 class EfficientNetEncoder(EfficientNet):
@@ -11,12 +9,12 @@ class EfficientNetEncoder(EfficientNet):
         super().__init__(blocks_args, global_params)
         self._skip_connections = list(skip_connections)
         self._skip_connections.append(len(self._blocks))
-        
+
         del self._fc
-        
+
     def forward(self, x):
         result = []
-        x = relu_fn(self._bn0(self._conv_stem(x)))
+        x = self._swish(self._bn0(self._conv_stem(x)))
         result.append(x)
 
         skip_connection_idx = 0
@@ -35,7 +33,6 @@ class EfficientNetEncoder(EfficientNet):
         state_dict.pop('_fc.bias')
         state_dict.pop('_fc.weight')
         super().load_state_dict(state_dict, **kwargs)
-
 
 
 def _get_pretrained_settings(encoder):
