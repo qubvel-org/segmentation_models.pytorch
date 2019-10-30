@@ -1,31 +1,41 @@
-from pretrainedmodels.models.senet import SENet
-from pretrainedmodels.models.senet import SEBottleneck
-from pretrainedmodels.models.senet import SEResNetBottleneck
-from pretrainedmodels.models.senet import SEResNeXtBottleneck
-from pretrainedmodels.models.senet import pretrained_settings
+import torch.nn as nn
+
+from pretrainedmodels.models.senet import (
+    SENet,
+    SEBottleneck,
+    SEResNetBottleneck,
+    SEResNeXtBottleneck,
+    pretrained_settings,
+)
+from .base import EncoderMixin
 
 
-class SENetEncoder(SENet):
+class SENetEncoder(SENet, EncoderMixin):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, out_channels, *args, depth=5, **kwargs):
         super().__init__(*args, **kwargs)
-        self.pretrained = False
-        
+
+        self._out_channels = out_channels
+        self._depth = depth
+
         del self.last_linear
         del self.avg_pool
 
     def forward(self, x):
-        for module in self.layer0[:-1]:
-            x = module(x)
+        modules = [
+            nn.Identity(),
+            self.layer0[:-1],
+            nn.Sequential(self.layer0[-1], self.layer1),
+            self.layer2,
+            self.layer3,
+            self.layer4,
+        ]
 
-        x0 = x
-        x = self.layer0[-1](x)
-        x1 = self.layer1(x)
-        x2 = self.layer2(x1)
-        x3 = self.layer3(x2)
-        x4 = self.layer4(x3)
+        features = []
+        for i in range(self._depth + 1):
+            x = modules[i](x)
+            features.append(x)
 
-        features = [x4, x3, x2, x1, x0]
         return features
 
     def load_state_dict(self, state_dict, **kwargs):
@@ -39,6 +49,7 @@ senet_encoders = {
         'encoder': SENetEncoder,
         'pretrained_settings': pretrained_settings['senet154'],
         'out_shapes': (2048, 1024, 512, 256, 128),
+        'out_channels': (3, 128, 256, 512, 1024, 2048),
         'params': {
             'block': SEBottleneck,
             'dropout_p': 0.2,
@@ -53,6 +64,7 @@ senet_encoders = {
         'encoder': SENetEncoder,
         'pretrained_settings': pretrained_settings['se_resnet50'],
         'out_shapes': (2048, 1024, 512, 256, 64),
+        'out_channels': (3, 64, 256, 512, 1024, 2048),
         'params': {
             'block': SEResNetBottleneck,
             'layers': [3, 4, 6, 3],
@@ -71,6 +83,7 @@ senet_encoders = {
         'encoder': SENetEncoder,
         'pretrained_settings': pretrained_settings['se_resnet101'],
         'out_shapes': (2048, 1024, 512, 256, 64),
+        'out_channels': (3, 64, 256, 512, 1024, 2048),
         'params': {
             'block': SEResNetBottleneck,
             'layers': [3, 4, 23, 3],
@@ -89,6 +102,7 @@ senet_encoders = {
         'encoder': SENetEncoder,
         'pretrained_settings': pretrained_settings['se_resnet152'],
         'out_shapes': (2048, 1024, 512, 256, 64),
+        'out_channels': (3, 64, 256, 512, 1024, 2048),
         'params': {
             'block': SEResNetBottleneck,
             'layers': [3, 8, 36, 3],
@@ -107,6 +121,7 @@ senet_encoders = {
         'encoder': SENetEncoder,
         'pretrained_settings': pretrained_settings['se_resnext50_32x4d'],
         'out_shapes': (2048, 1024, 512, 256, 64),
+        'out_channels': (3, 64, 256, 512, 1024, 2048),
         'params': {
             'block': SEResNeXtBottleneck,
             'layers': [3, 4, 6, 3],
@@ -125,6 +140,7 @@ senet_encoders = {
         'encoder': SENetEncoder,
         'pretrained_settings': pretrained_settings['se_resnext101_32x4d'],
         'out_shapes': (2048, 1024, 512, 256, 64),
+        'out_channels': (3, 64, 256, 512, 1024, 2048),
         'params': {
             'block': SEResNeXtBottleneck,
             'layers': [3, 4, 23, 3],

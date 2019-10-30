@@ -1,29 +1,37 @@
+import torch.nn as nn
+
 from torchvision.models.resnet import ResNet
 from torchvision.models.resnet import BasicBlock
 from torchvision.models.resnet import Bottleneck
 from pretrainedmodels.models.torchvision_models import pretrained_settings
 
+from .base import EncoderMixin
 
-class ResNetEncoder(ResNet):
 
-    def __init__(self, *args, **kwargs):
+class ResNetEncoder(ResNet, EncoderMixin):
+
+    def __init__(self, out_channels, *args, depth=5, **kwargs):
         super().__init__(*args, **kwargs)
-        self.pretrained = False
+        self._depth = depth
+        self._out_channels = out_channels
         del self.fc
 
     def forward(self, x):
-        x0 = self.conv1(x)
-        x0 = self.bn1(x0)
-        x0 = self.relu(x0)
+        modules = [
+            nn.Identity(),
+            nn.Sequential(self.conv1, self.bn1, self.relu),
+            nn.Sequential(self.maxpool, self.layer1),
+            self.layer2,
+            self.layer3,
+            self.layer4,
+        ]
 
-        x1 = self.maxpool(x0)
-        x1 = self.layer1(x1)
+        features = []
+        for i in range(self._depth + 1):
+            x = modules[i](x)
+            features.append(x)
 
-        x2 = self.layer2(x1)
-        x3 = self.layer3(x2)
-        x4 = self.layer4(x3)
-
-        return [x4, x3, x2, x1, x0]
+        return features
 
     def load_state_dict(self, state_dict, **kwargs):
         state_dict.pop('fc.bias')
@@ -36,6 +44,7 @@ resnet_encoders = {
         'encoder': ResNetEncoder,
         'pretrained_settings': pretrained_settings['resnet18'],
         'out_shapes': (512, 256, 128, 64, 64),
+        'out_channels': (3, 64, 64, 128, 256, 512),
         'params': {
             'block': BasicBlock,
             'layers': [2, 2, 2, 2],
@@ -46,6 +55,7 @@ resnet_encoders = {
         'encoder': ResNetEncoder,
         'pretrained_settings': pretrained_settings['resnet34'],
         'out_shapes': (512, 256, 128, 64, 64),
+        'out_channels': (3, 64, 64, 128, 256, 512),
         'params': {
             'block': BasicBlock,
             'layers': [3, 4, 6, 3],
@@ -56,6 +66,7 @@ resnet_encoders = {
         'encoder': ResNetEncoder,
         'pretrained_settings': pretrained_settings['resnet50'],
         'out_shapes': (2048, 1024, 512, 256, 64),
+        'out_channels': (3, 64, 256, 512, 1024, 2048),
         'params': {
             'block': Bottleneck,
             'layers': [3, 4, 6, 3],
@@ -66,6 +77,7 @@ resnet_encoders = {
         'encoder': ResNetEncoder,
         'pretrained_settings': pretrained_settings['resnet101'],
         'out_shapes': (2048, 1024, 512, 256, 64),
+        'out_channels': (3, 64, 256, 512, 1024, 2048),
         'params': {
             'block': Bottleneck,
             'layers': [3, 4, 23, 3],
@@ -76,6 +88,7 @@ resnet_encoders = {
         'encoder': ResNetEncoder,
         'pretrained_settings': pretrained_settings['resnet152'],
         'out_shapes': (2048, 1024, 512, 256, 64),
+        'out_channels': (3, 64, 256, 512, 1024, 2048),
         'params': {
             'block': Bottleneck,
             'layers': [3, 8, 36, 3],
@@ -96,6 +109,7 @@ resnet_encoders = {
             }
         },
         'out_shapes': (2048, 1024, 512, 256, 64),
+        'out_channels': (3, 64, 256, 512, 1024, 2048),
         'params': {
             'block': Bottleneck,
             'layers': [3, 4, 6, 3],
@@ -127,6 +141,7 @@ resnet_encoders = {
             }
         },
         'out_shapes': (2048, 1024, 512, 256, 64),
+        'out_channels': (3, 64, 256, 512, 1024, 2048),
         'params': {
             'block': Bottleneck,
             'layers': [3, 4, 23, 3],
@@ -138,7 +153,7 @@ resnet_encoders = {
     'resnext101_32x16d': {
         'encoder': ResNetEncoder,
         'pretrained_settings': {
-            'instagram':{
+            'instagram': {
                 'url': 'https://download.pytorch.org/models/ig_resnext101_32x16-c6f796b0.pth',
                 'input_space': 'RGB',
                 'input_size': [3, 224, 224],
@@ -149,6 +164,7 @@ resnet_encoders = {
             }
         },
         'out_shapes': (2048, 1024, 512, 256, 64),
+        'out_channels': (3, 64, 256, 512, 1024, 2048),
         'params': {
             'block': Bottleneck,
             'layers': [3, 4, 23, 3],
@@ -171,6 +187,7 @@ resnet_encoders = {
             }
         },
         'out_shapes': (2048, 1024, 512, 256, 64),
+        'out_channels': (3, 64, 256, 512, 1024, 2048),
         'params': {
             'block': Bottleneck,
             'layers': [3, 4, 23, 3],
@@ -193,6 +210,7 @@ resnet_encoders = {
             }
         },
         'out_shapes': (2048, 1024, 512, 256, 64),
+        'out_channels': (3, 64, 256, 512, 1024, 2048),
         'params': {
             'block': Bottleneck,
             'layers': [3, 4, 23, 3],

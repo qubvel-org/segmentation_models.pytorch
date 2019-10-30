@@ -1,15 +1,18 @@
 import torch.nn as nn
-from pretrainedmodels.models.inceptionresnetv2 import InceptionResNetV2
-from pretrainedmodels.models.inceptionresnetv2 import pretrained_settings
+from pretrainedmodels.models.inceptionv4 import InceptionV4, BasicConv2d
+from pretrainedmodels.models.inceptionv4 import pretrained_settings
 
 from .base import EncoderMixin
 
-
-class InceptionResNetV2Encoder(InceptionResNetV2, EncoderMixin):
+class InceptionV4Encoder(InceptionV4, EncoderMixin):
 
     def __init__(self, out_channels, *args, depth=5, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # self.features[0] = BasicConv2d(self.in_channels, 32, kernel_size=3, stride=2, padding=1)
+        # self.features[1] = BasicConv2d(32, 32, kernel_size=3, stride=1, padding=1)
+
+        self._chunks = [3, 5, 9, 15]
         self._out_channels = out_channels
         self._depth = depth
 
@@ -22,18 +25,17 @@ class InceptionResNetV2Encoder(InceptionResNetV2, EncoderMixin):
                 m.padding = (1, 1)
 
         # remove linear layers
-        del self.avgpool_1a
         del self.last_linear
 
     def forward(self, x):
 
         modules = [
             nn.Identity(),
-            nn.Sequential(self.conv2d_1a, self.conv2d_2a, self.conv2d_2b),
-            nn.Sequential(self.maxpool_3a, self.conv2d_3b, self.conv2d_4a),
-            nn.Sequential(self.maxpool_5a, self.mixed_5b, self.repeat),
-            nn.Sequential(self.mixed_6a, self.repeat_1),
-            nn.Sequential(self.mixed_7a, self.repeat_2, self.block8, self.conv2d_7b),
+            self.features[:self._chunks[0]],
+            self.features[self._chunks[0]:self._chunks[1]],
+            self.features[self._chunks[1]:self._chunks[2]],
+            self.features[self._chunks[2]:self._chunks[3]],
+            self.features[self._chunks[3]:],
         ]
 
         features = []
@@ -49,15 +51,14 @@ class InceptionResNetV2Encoder(InceptionResNetV2, EncoderMixin):
         super().load_state_dict(state_dict, **kwargs)
 
 
-inceptionresnetv2_encoders = {
-    'inceptionresnetv2': {
-        'encoder': InceptionResNetV2Encoder,
-        'pretrained_settings': pretrained_settings['inceptionresnetv2'],
-        'out_shapes': (1536, 1088, 320, 192, 64),
-        'out_channels': (3, 64, 192, 320, 1088, 1536),
+inceptionv4_encoders = {
+    'inceptionv4': {
+        'encoder': InceptionV4Encoder,
+        'pretrained_settings': pretrained_settings['inceptionv4'],
+        'out_shapes': (1536, 1024, 384, 192, 64),
+        'out_channels': (3, 64, 192, 384, 1024, 1536),
         'params': {
-            'num_classes': 1000,
+            'num_classes': 1001,
         }
-
     }
 }

@@ -3,6 +3,7 @@ from torchvision.models.vgg import VGG
 from torchvision.models.vgg import make_layers
 from pretrainedmodels.models.torchvision_models import pretrained_settings
 
+from .base import EncoderMixin
 
 cfg = {
     'A': [64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
@@ -12,15 +13,15 @@ cfg = {
 }
 
 
-class VGGEncoder(VGG):
+class VGGEncoder(VGG, EncoderMixin):
 
-    def __init__(self, config, batch_norm=False, *args, **kwargs):
+    def __init__(self, out_channels, config, batch_norm=False, depth=5, **kwargs):
         super().__init__(
-            make_layers(config, batch_norm=batch_norm), 
-            *args, 
+            make_layers(config, batch_norm=batch_norm),
             **kwargs
         )
-        self.pretrained = False
+        self._out_channels = out_channels
+        self._depth = depth
         del self.classifier
 
     def forward(self, x):
@@ -28,11 +29,13 @@ class VGGEncoder(VGG):
         for module in self.features:
             if isinstance(module, nn.MaxPool2d):
                 features.append(x)
+                if len(features) == self._depth + 1:
+                    break
             x = module(x)
-        features.append(x)
 
-        features = features[1:]
-        features = features[::-1]
+        if len(features) < self._depth + 1:
+            features.append(x)
+
         return features
 
     def load_state_dict(self, state_dict, **kwargs):
@@ -48,6 +51,7 @@ vgg_encoders = {
     'vgg11': {
         'encoder': VGGEncoder,
         'out_shapes': (512, 512, 512, 256, 128),
+        'out_channels': (64, 128, 256, 512, 512, 512),
         'pretrained_settings': pretrained_settings['vgg11'],
         'params': {
             'config': cfg['A'],
@@ -58,6 +62,7 @@ vgg_encoders = {
     'vgg11_bn': {
         'encoder': VGGEncoder,
         'out_shapes': (512, 512, 512, 256, 128),
+        'out_channels': (64, 128, 256, 512, 512, 512),
         'pretrained_settings': pretrained_settings['vgg11_bn'],
         'params': {
             'config': cfg['A'],
@@ -68,6 +73,7 @@ vgg_encoders = {
     'vgg13': {
         'encoder': VGGEncoder,
         'out_shapes': (512, 512, 512, 256, 128),
+        'out_channels': (64, 128, 256, 512, 512, 512),
         'pretrained_settings': pretrained_settings['vgg13'],
         'params': {
             'config': cfg['B'],
@@ -78,6 +84,7 @@ vgg_encoders = {
     'vgg13_bn': {
         'encoder': VGGEncoder,
         'out_shapes': (512, 512, 512, 256, 128),
+        'out_channels': (64, 128, 256, 512, 512, 512),
         'pretrained_settings': pretrained_settings['vgg13_bn'],
         'params': {
             'config': cfg['B'],
@@ -88,6 +95,7 @@ vgg_encoders = {
     'vgg16': {
         'encoder': VGGEncoder,
         'out_shapes': (512, 512, 512, 256, 128),
+        'out_channels': (64, 128, 256, 512, 512, 512),
         'pretrained_settings': pretrained_settings['vgg16'],
         'params': {
             'config': cfg['D'],
@@ -98,6 +106,7 @@ vgg_encoders = {
     'vgg16_bn': {
         'encoder': VGGEncoder,
         'out_shapes': (512, 512, 512, 256, 128),
+        'out_channels': (64, 128, 256, 512, 512, 512),
         'pretrained_settings': pretrained_settings['vgg16_bn'],
         'params': {
             'config': cfg['D'],
@@ -108,6 +117,7 @@ vgg_encoders = {
     'vgg19': {
         'encoder': VGGEncoder,
         'out_shapes': (512, 512, 512, 256, 128),
+        'out_channels': (64, 128, 256, 512, 512, 512),
         'pretrained_settings': pretrained_settings['vgg19'],
         'params': {
             'config': cfg['E'],
@@ -118,6 +128,7 @@ vgg_encoders = {
     'vgg19_bn': {
         'encoder': VGGEncoder,
         'out_shapes': (512, 512, 512, 256, 128),
+        'out_channels': (64, 128, 256, 512, 512, 512),
         'pretrained_settings': pretrained_settings['vgg19_bn'],
         'params': {
             'config': cfg['E'],

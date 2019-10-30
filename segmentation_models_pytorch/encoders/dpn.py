@@ -1,48 +1,43 @@
-import numpy as np
-
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
 
 from pretrainedmodels.models.dpn import DPN
 from pretrainedmodels.models.dpn import pretrained_settings
 
+from .base import EncoderMixin
 
-class DPNEncorder(DPN):
 
-    def __init__(self, feature_blocks, *args, **kwargs):
+class DPNEncorder(DPN, EncoderMixin):
+
+    def __init__(self, stage_idxs, out_channels, *args, depth=5, **kwargs):
         super().__init__(*args, **kwargs)
-        self.feature_blocks = np.cumsum(feature_blocks)
-        self.pretrained = False
-        
+        self._stage_idxs = stage_idxs
+        self._depth = depth
+        self._out_channels = out_channels
+
         del self.last_linear
 
     def forward(self, x):
 
-        features = []
-
-        input_block = self.features[0]
-
-        x = input_block.conv(x)
-        x = input_block.bn(x)
-        x = input_block.act(x)
-        features.append(x)
-
-        x = input_block.pool(x)
-
-        for i, module in enumerate(self.features[1:], 1):
-            x = module(x)
-            if i in self.feature_blocks:
-                features.append(x)
-
-        out_features = [
-            features[4],
-            F.relu(torch.cat(features[3], dim=1), inplace=True),
-            F.relu(torch.cat(features[2], dim=1), inplace=True),
-            F.relu(torch.cat(features[1], dim=1), inplace=True),
-            features[0],
+        stages = [
+            nn.Identity(),
+            nn.Sequential(self.features[0].conv, self.features[0].bn, self.features[0].act),
+            nn.Sequential(self.features[0].pool, self.features[1:self._stage_idxs[0]]),
+            self.features[self._stage_idxs[0]:self._stage_idxs[1]],
+            self.features[self._stage_idxs[1]:self._stage_idxs[2]],
+            self.features[self._stage_idxs[2]:self._stage_idxs[3]],
         ]
 
-        return out_features
+        features = []
+        for i in range(self._depth + 1):
+            x = stages[i](x)
+            if isinstance(x, (list, tuple)):
+                features.append(F.relu(torch.cat(x, dim=1), inplace=True))
+            else:
+                features.append(x)
+
+        return features
 
     def load_state_dict(self, state_dict, **kwargs):
         state_dict.pop('last_linear.bias')
@@ -54,9 +49,11 @@ dpn_encoders = {
     'dpn68': {
         'encoder': DPNEncorder,
         'out_shapes': (832, 704, 320, 144, 10),
+        'out_channels': (3, 10, 144, 320, 704, 832),
         'pretrained_settings': pretrained_settings['dpn68'],
         'params': {
-            'feature_blocks': (3, 4, 12, 4),
+            #'stage_idxs': (3, 7, 19, 23),
+            'stage_idxs': (4, 8, 20, 24),
             'groups': 32,
             'inc_sec': (16, 32, 32, 64),
             'k_r': 128,
@@ -71,9 +68,10 @@ dpn_encoders = {
     'dpn68b': {
         'encoder': DPNEncorder,
         'out_shapes': (832, 704, 320, 144, 10),
+        'out_channels': (3, 10, 144, 320, 704, 832),
         'pretrained_settings': pretrained_settings['dpn68b'],
         'params': {
-            'feature_blocks': (3, 4, 12, 4),
+            'stage_idxs': (4, 8, 20, 24),
             'b': True,
             'groups': 32,
             'inc_sec': (16, 32, 32, 64),
@@ -89,9 +87,10 @@ dpn_encoders = {
     'dpn92': {
         'encoder': DPNEncorder,
         'out_shapes': (2688, 1552, 704, 336, 64),
+        'out_channels': (3, 64, 336, 704, 1552, 2688),
         'pretrained_settings': pretrained_settings['dpn92'],
         'params': {
-            'feature_blocks': (3, 4, 20, 4),
+            'stage_idxs': (4, 8, 28, 32),
             'groups': 32,
             'inc_sec': (16, 32, 24, 128),
             'k_r': 96,
@@ -105,9 +104,10 @@ dpn_encoders = {
     'dpn98': {
         'encoder': DPNEncorder,
         'out_shapes': (2688, 1728, 768, 336, 96),
+        'out_channels': (3, 96, 336, 768, 1728, 2688),
         'pretrained_settings': pretrained_settings['dpn98'],
         'params': {
-            'feature_blocks': (3, 6, 20, 4),
+            'stage_idxs': (4, 10, 30, 34),
             'groups': 40,
             'inc_sec': (16, 32, 32, 128),
             'k_r': 160,
@@ -121,9 +121,10 @@ dpn_encoders = {
     'dpn107': {
         'encoder': DPNEncorder,
         'out_shapes': (2688, 2432, 1152, 376, 128),
+        'out_channels': (3, 128, 376, 1152, 2432, 2688),
         'pretrained_settings': pretrained_settings['dpn107'],
         'params': {
-            'feature_blocks': (4, 8, 20, 4),
+            'stage_idxs': (5, 13, 33, 37),
             'groups': 50,
             'inc_sec': (20, 64, 64, 128),
             'k_r': 200,
@@ -137,9 +138,10 @@ dpn_encoders = {
     'dpn131': {
         'encoder': DPNEncorder,
         'out_shapes': (2688, 1984, 832, 352, 128),
+        'out_channels': (3, 128, 352, 832, 1984, 2688),
         'pretrained_settings': pretrained_settings['dpn131'],
         'params': {
-            'feature_blocks': (4, 8, 28, 4),
+            'stage_idxs': (5, 13, 41, 45),
             'groups': 40,
             'inc_sec': (16, 32, 32, 128),
             'k_r': 160,

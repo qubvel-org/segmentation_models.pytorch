@@ -7,13 +7,13 @@ The main features of this library are:
 
  - High level API (just two lines to create neural network)
  - 4 models architectures for binary and multi class segmentation (including legendary Unet)
- - 30 available encoders for each architecture
+ - 31 available encoders for each architecture
  - All encoders have pre-trained weights for faster and better convergence
 
 ### Table of content
  1. [Quick start](#start)
  2. [Examples](#examples)
- 3. [Models](#models) 
+ 3. [Models](#models)
     1. [Architectures](#architectires)
     2. [Encoders](#encoders)
     3. [Pretrained weights](#weights)
@@ -57,7 +57,7 @@ preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
  - [Linknet](https://arxiv.org/abs/1707.03718)
  - [FPN](http://presentations.cocodataset.org/COCO17-Stuff-FAIR.pdf)
  - [PSPNet](https://arxiv.org/abs/1612.01105)
- 
+
 #### Encoders <a name="encoders"></a>
 
 | Type       | Encoder names                                                                               |
@@ -70,21 +70,22 @@ preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
 | ResNeXt    | resnext50_32x4d, resnext101_32x8d, resnext101_32x16d, resnext101_32x32d, resnext101_32x48d  |
 | SE-ResNet  | se_resnet50, se_resnet101, se_resnet152                                                     |
 | SE-ResNeXt | se_resnext50_32x4d,  se_resnext101_32x4d                                                    |
-| SENet      | senet154                                                                                    |  
+| SENet      | senet154                                                                                    |
+| EfficientNet | efficientnet-b0, efficientnet-b1, efficientnet-b2, efficientnet-b3, efficientnet-b4, efficientnet-b5, efficientnet-b6, efficientnet-b7
 
 #### Weights <a name="weights"></a>
 
 | Weights name                                                              | Encoder names                                                                                                                                                                                                                                                                                                                                                                       |
 |---------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | imagenet+5k                                                               | dpn68b, dpn92, dpn107                                                                                                                                                                                                                                                                                                                                                               |
-| imagenet                                                                  | vgg11, vgg13, vgg16, vgg19, vgg11bn,  vgg13bn, vgg16bn, vgg19bn, <br> densenet121, densenet169, densenet201, densenet161, dpn68, dpn98, dpn131, <br> inceptionresnetv2, <br> resnet18, resnet34, resnet50, resnet101, resnet152, <br> resnext50_32x4d, resnext101_32x8d, <br> se_resnet50, se_resnet101, se_resnet152, <br> se_resnext50_32x4d,  se_resnext101_32x4d, <br> senet154 |
+| imagenet                                                                  | vgg11, vgg13, vgg16, vgg19, vgg11bn,  vgg13bn, vgg16bn, vgg19bn, <br> densenet121, densenet169, densenet201, densenet161, dpn68, dpn98, dpn131, <br> inceptionresnetv2, <br> resnet18, resnet34, resnet50, resnet101, resnet152, <br> resnext50_32x4d, resnext101_32x8d, <br> se_resnet50, se_resnet101, se_resnet152, <br> se_resnext50_32x4d,  se_resnext101_32x4d, <br> senet154, <br> efficientnet-b0, efficientnet-b1, efficientnet-b2, efficientnet-b3, efficientnet-b4, efficientnet-b5, efficientnet-b6, efficientnet-b7 |
 | [instagram](https://pytorch.org/hub/facebookresearch_WSL-Images_resnext/) | resnext101_32x8d, resnext101_32x16d, resnext101_32x32d, resnext101_32x48d                                                                                                                                                                                                                                                                                                           |
 
 ### Models API <a name="api"></a>
- - `model.encoder` - pretrained backbone to extract features of different spatial resolution  
- - `model.decoder` - segmentation head, depends on models architecture (`Unet`/`Linknet`/`PSPNet`/`FPN`)  
+ - `model.encoder` - pretrained backbone to extract features of different spatial resolution
+ - `model.decoder` - segmentation head, depends on models architecture (`Unet`/`Linknet`/`PSPNet`/`FPN`)
  - `model.activation` - output activation function, one of `sigmoid`, `softmax`
- - `model.forward(x)` - sequentially pass `x` through model\`s encoder and decoder (return logits!)  
+ - `model.forward(x)` - sequentially pass `x` through model\`s encoder and decoder (return logits!)
  - `model.predict(x)` - inference method, switch model to `.eval()` mode, call `.forward(x)` and apply activation function with `torch.no_grad()`
 
 ### Installation <a name="installation"></a>

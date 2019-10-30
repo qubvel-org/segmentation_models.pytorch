@@ -4,79 +4,79 @@ import mock
 import pytest
 import torch
 import random
+import importlib
 
-# mock detection module 
-sys.modules['torchvision._C'] = mock.Mock()
+# mock detection module
+sys.modules["torchvision._C"] = mock.Mock()
 
 import segmentation_models_pytorch as smp
 
 
-def get_encoder():
-    is_travis = os.environ.get('TRAVIS', False)
-    exclude = ['senet154']
+def get_encoders():
+    is_travis = True  # os.environ.get("TRAVIS", False)
+    travis_exclude_encoders = [
+        "senet154",
+        "resnext101_32x16d",
+        "resnext101_32x32d",
+        "resnext101_32x48d",
+    ]
 
     encoders = smp.encoders.get_encoder_names()
     if is_travis:
-        encoders = [e for e in encoders if e not in exclude]
+        encoders = [e for e in encoders if e not in travis_exclude_encoders]
 
     return encoders
 
+
 def get_pretrained_weights_name(encoder_name):
-    return list(smp.encoders.encoders[encoder_name]['pretrained_settings'].keys())[0]
-
-ENCODERS = get_encoder()
+    return list(smp.encoders.encoders[encoder_name]["pretrained_settings"].keys())[0]
 
 
-def _select_names(names, k=2):
-    is_full = os.environ.get('FULL_TEST', False)
-    if not is_full:
-        return random.sample(names, k)
-    else:
-        return names
+ENCODERS = get_encoders()
+DEFAULT_ENCODER = 'resnet18'
+DEFAULT_SAMPLE = torch.ones([1, 3, 64, 64])
 
 
-def _test_forward_backward(model_fn, encoder_name):
-
-    model = model_fn(encoder_name, encoder_weights=None)
-
-    x = torch.ones((1, 3, 64, 64))
-    y = model.forward(x)
-    l = y.mean()
-    l.backward()
+def _test_forward(model):
+    with torch.no_grad():
+        model(DEFAULT_SAMPLE)
 
 
-def _test_pretrained_model(model_fn, encoder_name, encoder_weights):
-    model = model_fn(encoder_name, encoder_weights=encoder_weights)
-
-    x = torch.ones((1, 3, 64, 64))
-    y = model.predict(x)
-
-    assert x.shape[2:] == y.shape[2:]
+def _test_forward_backward(model):
+    out = model(DEFAULT_SAMPLE)
+    out.mean().backward()
 
 
-@pytest.mark.parametrize('encoder_name', _select_names(ENCODERS, k=1))
-def test_unet(encoder_name):
-    _test_forward_backward(smp.Unet, encoder_name)
-    _test_pretrained_model(smp.Unet, encoder_name, get_pretrained_weights_name(encoder_name))
+@pytest.mark.parametrize('encoder_name', ENCODERS)
+@pytest.mark.parametrize('encoder_depth', [3, 5])
+@pytest.mark.parametrize('model_class', [smp.FPN, smp.PSPNet, smp.Linknet, smp.Unet])
+def test_forward(model_class, encoder_name, encoder_depth, **kwargs):
+    if model_class is smp.Unet:
+        kwargs['decoder_channels'] = (16, 16, 16, 16, 16)[-encoder_depth:]
+    model = model_class(encoder_name, encoder_depth=encoder_depth, encoder_weights=None, **kwargs)
+    _test_forward(model)
 
 
-@pytest.mark.parametrize('encoder_name', _select_names(ENCODERS, k=1))
-def test_fpn(encoder_name):
-    _test_forward_backward(smp.FPN, encoder_name)
-    _test_pretrained_model(smp.FPN, encoder_name, get_pretrained_weights_name(encoder_name))
+@pytest.mark.parametrize('model_class', [smp.FPN, smp.PSPNet, smp.Linknet, smp.Unet])
+def test_forward_backward(model_class):
+    model = model_class(DEFAULT_ENCODER)
+    _test_forward_backward(model)
 
 
-@pytest.mark.parametrize('encoder_name', _select_names(ENCODERS, k=1))
-def test_linknet(encoder_name):
-    _test_forward_backward(smp.Linknet, encoder_name)
-    _test_pretrained_model(smp.Linknet, encoder_name, get_pretrained_weights_name(encoder_name))
+@pytest.mark.parametrize('model_class', [smp.FPN, smp.PSPNet, smp.Linknet, smp.Unet])
+def test_aux_output(model_class):
+    model = model_class(DEFAULT_ENCODER, aux_params=dict(classes=2))
+    mask, label = model(DEFAULT_SAMPLE)
+    assert label.size() == (1, 2)
 
 
-@pytest.mark.parametrize('encoder_name', _select_names(ENCODERS, k=1))
-def test_pspnet(encoder_name):
-    _test_forward_backward(smp.PSPNet, encoder_name)
-    _test_pretrained_model(smp.PSPNet, encoder_name, get_pretrained_weights_name(encoder_name))
+# @pytest.mark.parametrize('upsampling', [2, 4, 8])
+# @pytest.mark.parametrize('model_class', [smp.FPN, smp.PSPNet])
+# def test_upsample(model_class):
+#     model = model_class(DEFAULT_ENCODER, aux_params=dict(classes=2))
+#     mask, label = model(DEFAULT_SAMPLE)
+#     assert label.size() == (1, 2)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pytest.main([__file__])

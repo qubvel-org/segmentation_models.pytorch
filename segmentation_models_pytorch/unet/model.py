@@ -1,9 +1,10 @@
 from .decoder import UnetDecoder
-from ..base import EncoderDecoder
 from ..encoders import get_encoder
+from ..base import SegmentationModel
+from ..base import SegmentationHead, ClassificationHead
 
 
-class Unet(EncoderDecoder):
+class Unet(SegmentationModel):
     """Unet_ is a fully convolution neural network for image semantic segmentation
 
     Args:
@@ -12,7 +13,8 @@ class Unet(EncoderDecoder):
         encoder_weights: one of ``None`` (random initialization), ``imagenet`` (pre-training on ImageNet).
         decoder_channels: list of numbers of ``Conv2D`` layer filters in decoder blocks
         decoder_use_batchnorm: if ``True``, ``BatchNormalisation`` layer between ``Conv2D`` and ``Activation`` layers
-            is used.
+            is used. If 'inplace' InplaceABN will be used, allows to decrease memory consumption.
+            One of [True, False, 'inplace']
         decoder_attention_type: attention module used in decoder of the model
             One of [``None``, ``scse``]
         classes: a number of classes for output (output shape - ``(batch, classes, h, w)``).
@@ -29,31 +31,44 @@ class Unet(EncoderDecoder):
     """
 
     def __init__(
-            self,
-            encoder_name='resnet34',
-            encoder_weights='imagenet',
-            decoder_use_batchnorm=True,
-            decoder_channels=(256, 128, 64, 32, 16),
-            decoder_attention_type=None,
-            classes=1,
-            final_activation=None,
-            center=False,  # usefull for VGG models
+        self,
+        encoder_name="resnet34",
+        encoder_weights="imagenet",
+        encoder_depth=5,
+        decoder_use_batchnorm=True,
+        decoder_channels=(256, 128, 64, 32, 16),
+        decoder_attention_type=None,
+        classes=1,
+        activation=None,
+        aux_params=None,
     ):
-        encoder = get_encoder(
-            encoder_name,
-            encoder_weights=encoder_weights
+        super().__init__()
+
+        self.encoder = get_encoder(
+            encoder_name, depth=encoder_depth, weights=encoder_weights
         )
 
-        decoder = UnetDecoder(
-            encoder_channels=encoder.out_shapes,
+        self.decoder = UnetDecoder(
+            encoder_channels=self.encoder.out_channels,
             decoder_channels=decoder_channels,
-            final_channels=classes,
+            n_blocks=encoder_depth,
             use_batchnorm=decoder_use_batchnorm,
-            center=center,
+            center=True if encoder_name.startswith("vgg") else False,
             attention_type=decoder_attention_type,
-            final_activation=final_activation,
         )
 
-        super().__init__(encoder, decoder)
+        self.segmentation_head = SegmentationHead(
+            in_channels=decoder_channels[-1],
+            out_channels=classes,
+            activation=activation,
+            kernel_size=3,
+        )
 
-        self.name = 'u-{}'.format(encoder_name)
+        if aux_params is not None:
+            self.classification_head = ClassificationHead(
+                in_channels=self.encoder.out_channels[-1], **aux_params
+            )
+        else:
+            self.classification_head = None
+
+        self.name = "u-{}".format(encoder_name)
