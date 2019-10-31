@@ -4,15 +4,11 @@ from pretrainedmodels.models.inceptionv4 import pretrained_settings
 
 from .base import EncoderMixin
 
+
 class InceptionV4Encoder(InceptionV4, EncoderMixin):
-
-    def __init__(self, out_channels, *args, depth=5, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # self.features[0] = BasicConv2d(self.in_channels, 32, kernel_size=3, stride=2, padding=1)
-        # self.features[1] = BasicConv2d(32, 32, kernel_size=3, stride=1, padding=1)
-
-        self._chunks = [3, 5, 9, 15]
+    def __init__(self, stage_idxs, out_channels, depth=5, **kwargs):
+        super().__init__(**kwargs)
+        self._stage_idxs = stage_idxs
         self._out_channels = out_channels
         self._depth = depth
 
@@ -29,36 +25,36 @@ class InceptionV4Encoder(InceptionV4, EncoderMixin):
 
     def forward(self, x):
 
-        modules = [
+        stages = [
             nn.Identity(),
-            self.features[:self._chunks[0]],
-            self.features[self._chunks[0]:self._chunks[1]],
-            self.features[self._chunks[1]:self._chunks[2]],
-            self.features[self._chunks[2]:self._chunks[3]],
-            self.features[self._chunks[3]:],
+            self.features[: self._stage_idxs[0]],
+            self.features[self._stage_idxs[0] : self._stage_idxs[1]],
+            self.features[self._stage_idxs[1] : self._stage_idxs[2]],
+            self.features[self._stage_idxs[2] : self._stage_idxs[3]],
+            self.features[self._stage_idxs[3] :],
         ]
 
         features = []
         for i in range(self._depth + 1):
-            x = modules[i](x)
+            x = stages[i](x)
             features.append(x)
 
         return features
 
     def load_state_dict(self, state_dict, **kwargs):
-        state_dict.pop('last_linear.bias')
-        state_dict.pop('last_linear.weight')
+        state_dict.pop("last_linear.bias")
+        state_dict.pop("last_linear.weight")
         super().load_state_dict(state_dict, **kwargs)
 
 
 inceptionv4_encoders = {
-    'inceptionv4': {
-        'encoder': InceptionV4Encoder,
-        'pretrained_settings': pretrained_settings['inceptionv4'],
-        'out_shapes': (1536, 1024, 384, 192, 64),
-        'out_channels': (3, 64, 192, 384, 1024, 1536),
-        'params': {
-            'num_classes': 1001,
-        }
+    "inceptionv4": {
+        "encoder": InceptionV4Encoder,
+        "pretrained_settings": pretrained_settings["inceptionv4"],
+        "params": {
+            "stage_idxs": (3, 5, 9, 15),
+            "out_channels": (3, 64, 192, 384, 1024, 1536),
+            "num_classes": 1001,
+        },
     }
 }

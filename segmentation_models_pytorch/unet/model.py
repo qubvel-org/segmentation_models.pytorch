@@ -1,3 +1,4 @@
+from typing import Optional, Union, List
 from .decoder import UnetDecoder
 from ..encoders import get_encoder
 from ..base import SegmentationModel
@@ -10,6 +11,10 @@ class Unet(SegmentationModel):
     Args:
         encoder_name: name of classification model (without last dense layers) used as feature
             extractor to build segmentation model.
+        encoder_depth (int): number of stages used in decoder, larger depth - more features are generated.
+            e.g. for depth=3 encoder will generate list of features with following spatial shapes
+            [(H,W), (H/2, W/2), (H/4, W/4), (H/8, W/8)], so in general the deepest feature tensor will have
+            spatial resolution (H/(2^depth), W/(2^depth)]
         encoder_weights: one of ``None`` (random initialization), ``imagenet`` (pre-training on ImageNet).
         decoder_channels: list of numbers of ``Conv2D`` layer filters in decoder blocks
         decoder_use_batchnorm: if ``True``, ``BatchNormalisation`` layer between ``Conv2D`` and ``Activation`` layers
@@ -18,9 +23,12 @@ class Unet(SegmentationModel):
         decoder_attention_type: attention module used in decoder of the model
             One of [``None``, ``scse``]
         classes: a number of classes for output (output shape - ``(batch, classes, h, w)``).
-        final_activation: activation function to apply after final convolution;
+        activation: activation function to apply after final convolution;
             One of [``sigmoid``, ``softmax``, ``logsoftmax``, ``identity``, callable, None]
-        center: if ``True`` add ``Conv2dReLU`` block on encoder head (useful for VGG models)
+        aux_params: if specified model will have additional classification auxiliary output
+            build on top of encoder, supported params:
+                - classes (int): number of classes
+                - activation (str): activation function to apply "sigmoid"/"softmax" (could be None to return logits)
 
     Returns:
         ``torch.nn.Module``: **Unet**
@@ -32,15 +40,15 @@ class Unet(SegmentationModel):
 
     def __init__(
         self,
-        encoder_name="resnet34",
-        encoder_weights="imagenet",
-        encoder_depth=5,
-        decoder_use_batchnorm=True,
-        decoder_channels=(256, 128, 64, 32, 16),
-        decoder_attention_type=None,
-        classes=1,
-        activation=None,
-        aux_params=None,
+        encoder_name: str = "resnet34",
+        encoder_depth: int = 5,
+        encoder_weights: str = "imagenet",
+        decoder_use_batchnorm: bool = True,
+        decoder_channels: List[int] = (256, 128, 64, 32, 16),
+        decoder_attention_type: Optional[str] = None,
+        classes: int = 1,
+        activation: Optional[Union[str, callable]] = None,
+        aux_params: Optional[dict] = None,
     ):
         super().__init__()
 

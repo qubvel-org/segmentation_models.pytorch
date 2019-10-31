@@ -8,9 +8,8 @@ from .base import EncoderMixin
 
 
 class DenseNetEncoder(DenseNet, EncoderMixin):
-
-    def __init__(self, out_channels, *args, depth=5, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, out_channels, depth=5, **kwargs):
+        super().__init__(**kwargs)
         self._out_channels = out_channels
         self._depth = depth
         del self.classifier
@@ -58,7 +57,8 @@ class DenseNetEncoder(DenseNet, EncoderMixin):
 
     def load_state_dict(self, state_dict):
         pattern = re.compile(
-            r'^(.*denselayer\d+\.(?:norm|relu|conv))\.((?:[12])\.(?:weight|bias|running_mean|running_var))$')
+            r"^(.*denselayer\d+\.(?:norm|relu|conv))\.((?:[12])\.(?:weight|bias|running_mean|running_var))$"
+        )
         for key in list(state_dict.keys()):
             res = pattern.match(key)
             if res:
@@ -67,55 +67,51 @@ class DenseNetEncoder(DenseNet, EncoderMixin):
                 del state_dict[key]
 
         # remove linear
-        state_dict.pop('classifier.bias')
-        state_dict.pop('classifier.weight')
+        state_dict.pop("classifier.bias")
+        state_dict.pop("classifier.weight")
 
         super().load_state_dict(state_dict)
 
 
 densenet_encoders = {
-    'densenet121': {
-        'encoder': DenseNetEncoder,
-        'pretrained_settings': pretrained_settings['densenet121'],
-        'out_channels': (3, 64, 256, 512, 1024, 1024),
-        'params': {
-            'num_init_features': 64,
-            'growth_rate': 32,
-            'block_config': (6, 12, 24, 16),
-        }
+    "densenet121": {
+        "encoder": DenseNetEncoder,
+        "pretrained_settings": pretrained_settings["densenet121"],
+        "params": {
+            "out_channels": (3, 64, 256, 512, 1024, 1024),
+            "num_init_features": 64,
+            "growth_rate": 32,
+            "block_config": (6, 12, 24, 16),
+        },
     },
-
-    'densenet169': {
-        'encoder': DenseNetEncoder,
-        'pretrained_settings': pretrained_settings['densenet169'],
-        'out_channels': (3, 64, 256, 512, 1280, 1664),
-        'params': {
-            'num_init_features': 64,
-            'growth_rate': 32,
-            'block_config': (6, 12, 32, 32),
-        }
+    "densenet169": {
+        "encoder": DenseNetEncoder,
+        "pretrained_settings": pretrained_settings["densenet169"],
+        "params": {
+            "out_channels": (3, 64, 256, 512, 1280, 1664),
+            "num_init_features": 64,
+            "growth_rate": 32,
+            "block_config": (6, 12, 32, 32),
+        },
     },
-
-    'densenet201': {
-        'encoder': DenseNetEncoder,
-        'pretrained_settings': pretrained_settings['densenet201'],
-        'out_channels': (3, 64, 256, 512, 1792, 1920),
-        'params': {
-            'num_init_features': 64,
-            'growth_rate': 32,
-            'block_config': (6, 12, 48, 32),
-        }
+    "densenet201": {
+        "encoder": DenseNetEncoder,
+        "pretrained_settings": pretrained_settings["densenet201"],
+        "params": {
+            "out_channels": (3, 64, 256, 512, 1792, 1920),
+            "num_init_features": 64,
+            "growth_rate": 32,
+            "block_config": (6, 12, 48, 32),
+        },
     },
-
-    'densenet161': {
-        'encoder': DenseNetEncoder,
-        'pretrained_settings': pretrained_settings['densenet161'],
-        'out_channels': (3, 96, 384, 768, 2112, 2208),
-        'params': {
-            'num_init_features': 96,
-            'growth_rate': 48,
-            'block_config': (6, 12, 36, 24),
-        }
+    "densenet161": {
+        "encoder": DenseNetEncoder,
+        "pretrained_settings": pretrained_settings["densenet161"],
+        "params": {
+            "out_channels": (3, 96, 384, 768, 2112, 2208),
+            "num_init_features": 96,
+            "growth_rate": 48,
+            "block_config": (6, 12, 36, 24),
+        },
     },
-
 }

@@ -21,7 +21,7 @@ def initialize_decoder(module):
 
 def initialize_head(module):
     for m in module.modules():
-        if isinstance(m, nn.Linear):
+        if isinstance(m, (nn.Linear, nn.Conv2d)):
             nn.init.xavier_uniform_(m.weight)
             if m.bias is not None:
                 nn.init.constant_(m.bias, 0)

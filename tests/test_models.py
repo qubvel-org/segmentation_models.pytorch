@@ -59,23 +59,24 @@ def test_forward(model_class, encoder_name, encoder_depth, **kwargs):
 
 @pytest.mark.parametrize('model_class', [smp.FPN, smp.PSPNet, smp.Linknet, smp.Unet])
 def test_forward_backward(model_class):
-    model = model_class(DEFAULT_ENCODER)
+    model = model_class(DEFAULT_ENCODER, encoder_weights=None)
     _test_forward_backward(model)
 
 
 @pytest.mark.parametrize('model_class', [smp.FPN, smp.PSPNet, smp.Linknet, smp.Unet])
 def test_aux_output(model_class):
-    model = model_class(DEFAULT_ENCODER, aux_params=dict(classes=2))
+    model = model_class(DEFAULT_ENCODER, encoder_weights=None, aux_params=dict(classes=2))
     mask, label = model(DEFAULT_SAMPLE)
     assert label.size() == (1, 2)
 
 
-# @pytest.mark.parametrize('upsampling', [2, 4, 8])
-# @pytest.mark.parametrize('model_class', [smp.FPN, smp.PSPNet])
-# def test_upsample(model_class):
-#     model = model_class(DEFAULT_ENCODER, aux_params=dict(classes=2))
-#     mask, label = model(DEFAULT_SAMPLE)
-#     assert label.size() == (1, 2)
+@pytest.mark.parametrize('upsampling', [2, 4, 8])
+@pytest.mark.parametrize('model_class', [smp.FPN, smp.PSPNet])
+def test_upsample(model_class, upsampling):
+    default_upsampling = 4 if model_class is smp.FPN else 8
+    model = model_class(DEFAULT_ENCODER, encoder_weights=None, upsampling=upsampling)
+    mask = model(DEFAULT_SAMPLE)
+    assert mask.size()[-1] / 64 == upsampling / default_upsampling
 
 
 if __name__ == "__main__":

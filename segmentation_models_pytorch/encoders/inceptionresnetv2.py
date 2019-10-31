@@ -6,9 +6,8 @@ from .base import EncoderMixin
 
 
 class InceptionResNetV2Encoder(InceptionResNetV2, EncoderMixin):
-
-    def __init__(self, out_channels, *args, depth=5, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, out_channels, depth=5, **kwargs):
+        super().__init__(**kwargs)
 
         self._out_channels = out_channels
         self._depth = depth
@@ -27,7 +26,7 @@ class InceptionResNetV2Encoder(InceptionResNetV2, EncoderMixin):
 
     def forward(self, x):
 
-        modules = [
+        stages = [
             nn.Identity(),
             nn.Sequential(self.conv2d_1a, self.conv2d_2a, self.conv2d_2b),
             nn.Sequential(self.maxpool_3a, self.conv2d_3b, self.conv2d_4a),
@@ -38,26 +37,21 @@ class InceptionResNetV2Encoder(InceptionResNetV2, EncoderMixin):
 
         features = []
         for i in range(self._depth + 1):
-            x = modules[i](x)
+            x = stages[i](x)
             features.append(x)
 
         return features
 
     def load_state_dict(self, state_dict, **kwargs):
-        state_dict.pop('last_linear.bias')
-        state_dict.pop('last_linear.weight')
+        state_dict.pop("last_linear.bias")
+        state_dict.pop("last_linear.weight")
         super().load_state_dict(state_dict, **kwargs)
 
 
 inceptionresnetv2_encoders = {
-    'inceptionresnetv2': {
-        'encoder': InceptionResNetV2Encoder,
-        'pretrained_settings': pretrained_settings['inceptionresnetv2'],
-        'out_shapes': (1536, 1088, 320, 192, 64),
-        'out_channels': (3, 64, 192, 320, 1088, 1536),
-        'params': {
-            'num_classes': 1000,
-        }
-
+    "inceptionresnetv2": {
+        "encoder": InceptionResNetV2Encoder,
+        "pretrained_settings": pretrained_settings["inceptionresnetv2"],
+        "params": {"out_channels": (3, 64, 192, 320, 1088, 1536), "num_classes": 1000},
     }
 }

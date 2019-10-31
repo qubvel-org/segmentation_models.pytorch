@@ -1,3 +1,5 @@
+from typing import Optional, Union
+
 from .decoder import PSPDecoder
 from ..encoders import get_encoder
 
@@ -11,18 +13,26 @@ class PSPNet(SegmentationModel):
     Args:
         encoder_name: name of classification model used as feature
                 extractor to build segmentation model.
+        encoder_depth: number of stages used in decoder, larger depth - more features are generated.
+            e.g. for depth=3 encoder will generate list of features with following spatial shapes
+            [(H,W), (H/2, W/2), (H/4, W/4), (H/8, W/8)], so in general the deepest feature will have
+            spatial resolution (H/(2^depth), W/(2^depth)]
         encoder_weights: one of ``None`` (random initialization), ``imagenet`` (pre-training on ImageNet).
-        psp_in_factor: one of 4, 8 and 16. Downsampling rate or in other words backbone depth
-            to construct PSP module on it.
         psp_out_channels: number of filters in PSP block.
         psp_use_batchnorm: if ``True``, ``BatchNormalisation`` layer between ``Conv2D`` and ``Activation`` layers
             is used. If 'inplace' InplaceABN will be used, allows to decrease memory consumption.
             One of [True, False, 'inplace']
-        psp_aux_output: if ``True`` add auxiliary classification output for encoder training
         psp_dropout: spatial dropout rate between 0 and 1.
         classes: a number of classes for output (output shape - ``(batch, classes, h, w)``).
         activation: activation function used in ``.predict(x)`` method for inference.
             One of [``sigmoid``, ``softmax``, callable, None]
+        upsampling: optional, final upsampling factor
+            (default is 8 for depth=3 to preserve input -> output spatial shape identity)
+        aux_params: if specified model will have additional classification auxiliary output
+            build on top of encoder, supported params:
+                - classes (int): number of classes
+                - activation (str): activation function to apply "sigmoid"/"softmax" (could be None to return logits)
+
     Returns:
         ``torch.nn.Module``: **PSPNet**
 
@@ -31,24 +41,22 @@ class PSPNet(SegmentationModel):
     """
 
     def __init__(
-            self,
-            encoder_name='resnet34',
-            encoder_weights='imagenet',
-            encoder_depth=3,
-            psp_out_channels=512,
-            psp_use_batchnorm=True,
-            psp_dropout=0.2,
-            classes=1,
-            activation=None,
-            upsampling=8,
-            aux_params=None,
+        self,
+        encoder_name: str = "resnet34",
+        encoder_weights: Optional[str] = "imagenet",
+        encoder_depth: int = 3,
+        psp_out_channels: int = 512,
+        psp_use_batchnorm: bool = True,
+        psp_dropout: float = 0.2,
+        classes: int = 1,
+        activation: Optional[Union[str, callable]] = None,
+        upsampling: int = 8,
+        aux_params: Optional[dict] = None,
     ):
         super().__init__()
 
         self.encoder = get_encoder(
-            encoder_name,
-            depth=encoder_depth,
-            weights=encoder_weights
+            encoder_name, depth=encoder_depth, weights=encoder_weights
         )
 
         self.decoder = PSPDecoder(
@@ -56,7 +64,6 @@ class PSPNet(SegmentationModel):
             use_batchnorm=psp_use_batchnorm,
             out_channels=psp_out_channels,
             dropout=psp_dropout,
-
         )
 
         self.segmentation_head = SegmentationHead(
@@ -69,10 +76,9 @@ class PSPNet(SegmentationModel):
 
         if aux_params:
             self.classification_head = ClassificationHead(
-                in_channels=self.encoder.out_channels[-1],
-                **aux_params,
+                in_channels=self.encoder.out_channels[-1], **aux_params
             )
         else:
             self.classification_head = None
 
-        self.name = 'psp-{}'.format(encoder_name)
+        self.name = "psp-{}".format(encoder_name)

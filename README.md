@@ -16,7 +16,6 @@ The main features of this library are:
  3. [Models](#models)
     1. [Architectures](#architectires)
     2. [Encoders](#encoders)
-    3. [Pretrained weights](#weights)
  4. [Models API](#api)
  5. [Installation](#installation)
  6. [License](#license)
@@ -60,26 +59,52 @@ preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
 
 #### Encoders <a name="encoders"></a>
 
-| Type       | Encoder names                                                                               |
-|------------|---------------------------------------------------------------------------------------------|
-| VGG        | vgg11, vgg13, vgg16, vgg19, vgg11bn,  vgg13bn, vgg16bn, vgg19bn                             |
-| DenseNet   | densenet121, densenet169, densenet201, densenet161                                          |
-| DPN        | dpn68, dpn68b, dpn92, dpn98, dpn107, dpn131                                                 |
-| Inception  | inceptionresnetv2                                                                           |
-| ResNet     | resnet18, resnet34, resnet50, resnet101, resnet152                                          |
-| ResNeXt    | resnext50_32x4d, resnext101_32x8d, resnext101_32x16d, resnext101_32x32d, resnext101_32x48d  |
-| SE-ResNet  | se_resnet50, se_resnet101, se_resnet152                                                     |
-| SE-ResNeXt | se_resnext50_32x4d,  se_resnext101_32x4d                                                    |
-| SENet      | senet154                                                                                    |
-| EfficientNet | efficientnet-b0, efficientnet-b1, efficientnet-b2, efficientnet-b3, efficientnet-b4, efficientnet-b5, efficientnet-b6, efficientnet-b7
-
-#### Weights <a name="weights"></a>
-
-| Weights name                                                              | Encoder names                                                                                                                                                                                                                                                                                                                                                                       |
-|---------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| imagenet+5k                                                               | dpn68b, dpn92, dpn107                                                                                                                                                                                                                                                                                                                                                               |
-| imagenet                                                                  | vgg11, vgg13, vgg16, vgg19, vgg11bn,  vgg13bn, vgg16bn, vgg19bn, <br> densenet121, densenet169, densenet201, densenet161, dpn68, dpn98, dpn131, <br> inceptionresnetv2, <br> resnet18, resnet34, resnet50, resnet101, resnet152, <br> resnext50_32x4d, resnext101_32x8d, <br> se_resnet50, se_resnet101, se_resnet152, <br> se_resnext50_32x4d,  se_resnext101_32x4d, <br> senet154, <br> efficientnet-b0, efficientnet-b1, efficientnet-b2, efficientnet-b3, efficientnet-b4, efficientnet-b5, efficientnet-b6, efficientnet-b7 |
-| [instagram](https://pytorch.org/hub/facebookresearch_WSL-Images_resnext/) | resnext101_32x8d, resnext101_32x16d, resnext101_32x32d, resnext101_32x48d                                                                                                                                                                                                                                                                                                           |
+|Encoder                         |Weights                         |Params, M                       |
+|--------------------------------|:------------------------------:|:------------------------------:|
+|resnet18                        |imagenet                        |11M                             |
+|resnet34                        |imagenet                        |21M                             |
+|resnet50                        |imagenet                        |23M                             |
+|resnet101                       |imagenet                        |42M                             |
+|resnet152                       |imagenet                        |58M                             |
+|resnext50_32x4d                 |imagenet                        |22M                             |
+|resnext101_32x8d                |imagenet<br>instagram           |86M                             |
+|resnext101_32x16d               |instagram                       |191M                            |
+|resnext101_32x32d               |instagram                       |466M                            |
+|resnext101_32x48d               |instagram                       |826M                            |
+|dpn68                           |imagenet                        |11M                             |
+|dpn68b                          |imagenet+5k                     |11M                             |
+|dpn92                           |imagenet+5k                     |34M                             |
+|dpn98                           |imagenet                        |58M                             |
+|dpn107                          |imagenet+5k                     |84M                             |
+|dpn131                          |imagenet                        |76M                             |
+|vgg11                           |imagenet                        |9M                              |
+|vgg11_bn                        |imagenet                        |9M                              |
+|vgg13                           |imagenet                        |9M                              |
+|vgg13_bn                        |imagenet                        |9M                              |
+|vgg16                           |imagenet                        |14M                             |
+|vgg16_bn                        |imagenet                        |14M                             |
+|vgg19                           |imagenet                        |20M                             |
+|vgg19_bn                        |imagenet                        |20M                             |
+|senet154                        |imagenet                        |113M                            |
+|se_resnet50                     |imagenet                        |26M                             |
+|se_resnet101                    |imagenet                        |47M                             |
+|se_resnet152                    |imagenet                        |64M                             |
+|se_resnext50_32x4d              |imagenet                        |25M                             |
+|se_resnext101_32x4d             |imagenet                        |46M                             |
+|densenet121                     |imagenet                        |6M                              |
+|densenet169                     |imagenet                        |12M                             |
+|densenet201                     |imagenet                        |18M                             |
+|densenet161                     |imagenet                        |26M                             |
+|inceptionresnetv2               |imagenet<br>imagenet+background |54M                             |
+|inceptionv4                     |imagenet<br>imagenet+background |41M                             |
+|efficientnet-b0                 |imagenet                        |4M                              |
+|efficientnet-b1                 |imagenet                        |6M                              |
+|efficientnet-b2                 |imagenet                        |7M                              |
+|efficientnet-b3                 |imagenet                        |10M                             |
+|efficientnet-b4                 |imagenet                        |17M                             |
+|efficientnet-b5                 |imagenet                        |28M                             |
+|efficientnet-b6                 |imagenet                        |40M                             |
+|efficientnet-b7                 |imagenet                        |63M                             |
 
 ### Models API <a name="api"></a>
  - `model.encoder` - pretrained backbone to extract features of different spatial resolution
@@ -100,8 +125,13 @@ $ pip install git+https://github.com/qubvel/segmentation_models.pytorch
 ### License <a name="license"></a>
 Project is distributed under [MIT License](https://github.com/qubvel/segmentation_models.pytorch/blob/master/LICENSE)
 
-### Run tests
+### Contributing
+
+##### Run test
 ```bash
-$ docker build -f docker/Dockerfile.dev -t smp:dev .
-$ docker run --rm smp:dev pytest -p no:cacheprovider
+$ docker build -f docker/Dockerfile.dev -t smp:dev . && docker run --rm smp:dev pytest -p no:cacheprovider
+```
+##### Generate table
+```bash
+$ docker build -f docker/Dockerfile.dev -t smp:dev . && docker run --rm smp:dev python misc/generate_table.py
 ```
