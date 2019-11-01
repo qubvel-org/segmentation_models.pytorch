@@ -2,7 +2,7 @@ import torch.nn as nn
 from pretrainedmodels.models.inceptionv4 import InceptionV4, BasicConv2d
 from pretrainedmodels.models.inceptionv4 import pretrained_settings
 
-from .base import EncoderMixin
+from ._base import EncoderMixin
 
 
 class InceptionV4Encoder(InceptionV4, EncoderMixin):
@@ -11,6 +11,7 @@ class InceptionV4Encoder(InceptionV4, EncoderMixin):
         self._stage_idxs = stage_idxs
         self._out_channels = out_channels
         self._depth = depth
+        self._in_channels = 3
 
         # correct paddings
         for m in self.modules():

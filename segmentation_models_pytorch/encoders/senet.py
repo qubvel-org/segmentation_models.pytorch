@@ -7,7 +7,7 @@ from pretrainedmodels.models.senet import (
     SEResNeXtBottleneck,
     pretrained_settings,
 )
-from .base import EncoderMixin
+from ._base import EncoderMixin
 
 
 class SENetEncoder(SENet, EncoderMixin):
@@ -16,6 +16,7 @@ class SENetEncoder(SENet, EncoderMixin):
 
         self._out_channels = out_channels
         self._depth = depth
+        self._in_channels = 3
 
         del self.last_linear
         del self.avg_pool

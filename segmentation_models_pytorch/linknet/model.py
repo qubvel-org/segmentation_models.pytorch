@@ -21,12 +21,14 @@ class Linknet(SegmentationModel):
         decoder_use_batchnorm: if ``True``, ``BatchNormalisation`` layer between ``Conv2D`` and ``Activation`` layers
             is used. If 'inplace' InplaceABN will be used, allows to decrease memory consumption.
             One of [True, False, 'inplace']
+        in_channels: number of input channels for model, default is 3.
         classes: a number of classes for output (output shape - ``(batch, classes, h, w)``).
         activation: activation function used in ``.predict(x)`` method for inference.
             One of [``sigmoid``, ``softmax``, callable, None]
         aux_params: if specified model will have additional classification auxiliary output
             build on top of encoder, supported params:
                 - classes (int): number of classes
+                - dropout (float): dropout factor in [0, 1)
                 - activation (str): activation function to apply "sigmoid"/"softmax" (could be None to return logits)
 
     Returns:
@@ -42,6 +44,7 @@ class Linknet(SegmentationModel):
         encoder_depth: int = 5,
         encoder_weights: Optional[str] = "imagenet",
         decoder_use_batchnorm: bool = True,
+        in_channels: int = 3,
         classes: int = 1,
         activation: Optional[Union[str, callable]] = None,
         aux_params: Optional[dict] = None,
@@ -49,7 +52,10 @@ class Linknet(SegmentationModel):
         super().__init__()
 
         self.encoder = get_encoder(
-            encoder_name, depth=encoder_depth, weights=encoder_weights
+            encoder_name,
+            in_channels=in_channels,
+            depth=encoder_depth,
+            weights=encoder_weights,
         )
 
         self.decoder = LinknetDecoder(
@@ -71,3 +77,4 @@ class Linknet(SegmentationModel):
             self.classification_head = None
 
         self.name = "link-{}".format(encoder_name)
+        self.initialize()

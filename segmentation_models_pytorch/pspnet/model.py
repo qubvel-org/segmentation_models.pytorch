@@ -23,6 +23,7 @@ class PSPNet(SegmentationModel):
             is used. If 'inplace' InplaceABN will be used, allows to decrease memory consumption.
             One of [True, False, 'inplace']
         psp_dropout: spatial dropout rate between 0 and 1.
+        in_channels: number of input channels for model, default is 3.
         classes: a number of classes for output (output shape - ``(batch, classes, h, w)``).
         activation: activation function used in ``.predict(x)`` method for inference.
             One of [``sigmoid``, ``softmax``, callable, None]
@@ -31,6 +32,7 @@ class PSPNet(SegmentationModel):
         aux_params: if specified model will have additional classification auxiliary output
             build on top of encoder, supported params:
                 - classes (int): number of classes
+                - dropout (float): dropout factor in [0, 1)
                 - activation (str): activation function to apply "sigmoid"/"softmax" (could be None to return logits)
 
     Returns:
@@ -48,6 +50,7 @@ class PSPNet(SegmentationModel):
         psp_out_channels: int = 512,
         psp_use_batchnorm: bool = True,
         psp_dropout: float = 0.2,
+        in_channels: int = 3,
         classes: int = 1,
         activation: Optional[Union[str, callable]] = None,
         upsampling: int = 8,
@@ -56,7 +59,10 @@ class PSPNet(SegmentationModel):
         super().__init__()
 
         self.encoder = get_encoder(
-            encoder_name, depth=encoder_depth, weights=encoder_weights
+            encoder_name,
+            in_channels=in_channels,
+            depth=encoder_depth,
+            weights=encoder_weights,
         )
 
         self.decoder = PSPDecoder(
@@ -82,3 +88,4 @@ class PSPNet(SegmentationModel):
             self.classification_head = None
 
         self.name = "psp-{}".format(encoder_name)
+        self.initialize()

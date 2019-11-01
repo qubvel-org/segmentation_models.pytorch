@@ -5,7 +5,7 @@ import torch.nn.functional as F
 from pretrainedmodels.models.dpn import DPN
 from pretrainedmodels.models.dpn import pretrained_settings
 
-from .base import EncoderMixin
+from ._base import EncoderMixin
 
 
 class DPNEncorder(DPN, EncoderMixin):
@@ -14,6 +14,7 @@ class DPNEncorder(DPN, EncoderMixin):
         self._stage_idxs = stage_idxs
         self._depth = depth
         self._out_channels = out_channels
+        self._in_channels = 3
 
         del self.last_linear
 

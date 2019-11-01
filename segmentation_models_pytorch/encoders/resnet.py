@@ -5,7 +5,7 @@ from torchvision.models.resnet import BasicBlock
 from torchvision.models.resnet import Bottleneck
 from pretrainedmodels.models.torchvision_models import pretrained_settings
 
-from .base import EncoderMixin
+from ._base import EncoderMixin
 
 
 class ResNetEncoder(ResNet, EncoderMixin):
@@ -13,6 +13,7 @@ class ResNetEncoder(ResNet, EncoderMixin):
         super().__init__(**kwargs)
         self._depth = depth
         self._out_channels = out_channels
+        self._in_channels = 3
         del self.fc
 
     def forward(self, x):

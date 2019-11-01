@@ -2,7 +2,7 @@ import torch.nn as nn
 from pretrainedmodels.models.inceptionresnetv2 import InceptionResNetV2
 from pretrainedmodels.models.inceptionresnetv2 import pretrained_settings
 
-from .base import EncoderMixin
+from ._base import EncoderMixin
 
 
 class InceptionResNetV2Encoder(InceptionResNetV2, EncoderMixin):
@@ -11,6 +11,7 @@ class InceptionResNetV2Encoder(InceptionResNetV2, EncoderMixin):
 
         self._out_channels = out_channels
         self._depth = depth
+        self._in_channels = 3
 
         # correct paddings
         for m in self.modules():

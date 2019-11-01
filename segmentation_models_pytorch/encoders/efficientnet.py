@@ -1,7 +1,7 @@
 from efficientnet_pytorch import EfficientNet
 from efficientnet_pytorch.utils import url_map, get_model_params
 
-from .base import EncoderMixin
+from ._base import EncoderMixin
 
 
 class EfficientNetEncoder(EfficientNet, EncoderMixin):
@@ -13,6 +13,7 @@ class EfficientNetEncoder(EfficientNet, EncoderMixin):
         self._stage_idxs = list(stage_idxs) + [len(self._blocks)]
         self._out_channels = out_channels
         self._depth = depth
+        self._in_channels = 3
 
         del self._fc
 

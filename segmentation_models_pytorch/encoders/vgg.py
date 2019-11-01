@@ -3,7 +3,7 @@ from torchvision.models.vgg import VGG
 from torchvision.models.vgg import make_layers
 from pretrainedmodels.models.torchvision_models import pretrained_settings
 
-from .base import EncoderMixin
+from ._base import EncoderMixin
 
 # fmt: off
 cfg = {
@@ -20,6 +20,7 @@ class VGGEncoder(VGG, EncoderMixin):
         super().__init__(make_layers(config, batch_norm=batch_norm), **kwargs)
         self._out_channels = out_channels
         self._depth = depth
+        self._in_channels = 3
         del self.classifier
 
     def forward(self, x):

@@ -4,7 +4,7 @@ import torch.nn as nn
 from pretrainedmodels.models.torchvision_models import pretrained_settings
 from torchvision.models.densenet import DenseNet
 
-from .base import EncoderMixin
+from ._base import EncoderMixin
 
 
 class DenseNetEncoder(DenseNet, EncoderMixin):
@@ -12,6 +12,7 @@ class DenseNetEncoder(DenseNet, EncoderMixin):
         super().__init__(**kwargs)
         self._out_channels = out_channels
         self._depth = depth
+        self._in_channels = 3
         del self.classifier
 
     @staticmethod

@@ -19,6 +19,7 @@ class FPN(SegmentationModel):
         decoder_merge_policy: determines how to merge outputs inside FPN.
             One of [``add``, ``cat``]
         decoder_dropout: spatial dropout rate in range (0, 1).
+        in_channels: number of input channels for model, default is 3.
         classes: a number of classes for output (output shape - ``(batch, classes, h, w)``).
         activation (str, callable): activation function used in ``.predict(x)`` method for inference.
             One of [``sigmoid``, ``softmax2d``, callable, None]
@@ -27,6 +28,7 @@ class FPN(SegmentationModel):
         aux_params: if specified model will have additional classification auxiliary output
             build on top of encoder, supported params:
                 - classes (int): number of classes
+                - dropout (float): dropout factor in [0, 1)
                 - activation (str): activation function to apply "sigmoid"/"softmax" (could be None to return logits)
 
     Returns:
@@ -46,6 +48,7 @@ class FPN(SegmentationModel):
         decoder_segmentation_channels: int = 128,
         decoder_merge_policy: str = "add",
         decoder_dropout: float = 0.2,
+        in_channels: int = 3,
         classes: int = 1,
         activation: Optional[str] = None,
         upsampling: int = 4,
@@ -54,7 +57,10 @@ class FPN(SegmentationModel):
         super().__init__()
 
         self.encoder = get_encoder(
-            encoder_name, depth=encoder_depth, weights=encoder_weights
+            encoder_name,
+            in_channels=in_channels,
+            depth=encoder_depth,
+            weights=encoder_weights,
         )
 
         self.decoder = FPNDecoder(
@@ -82,3 +88,4 @@ class FPN(SegmentationModel):
             self.classification_head = None
 
         self.name = "fpn-{}".format(encoder_name)
+        self.initialize()
