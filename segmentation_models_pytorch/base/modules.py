@@ -97,7 +97,7 @@ class Attention(nn.Module):
         if name is None:
             self.attention = nn.Identity(**params)
         elif name == 'scse':
-            self.attention = nn.SCSEModule(**params)
+            self.attention = SCSEModule(**params)
         else:
             raise ValueError("Attention {} is not implemented".format(name))
 
