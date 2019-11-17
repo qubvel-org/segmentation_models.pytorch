@@ -40,7 +40,15 @@ class MobileNetV2Encoder(torchvision.models.MobileNetV2, EncoderMixin):
 mobilenet_encoders = {
     "mobilenet_v2": {
         "encoder": MobileNetV2Encoder,
-        "pretrained_settings": pretrained_settings["mobilenet_v2"],
+        "pretrained_settings": {
+            "imagenet": {
+                "mean": [0.485, 0.456, 0.406],
+                "std": [0.229, 0.224, 0.225],
+                "url": "https://download.pytorch.org/models/mobilenet_v2-b0353104.pth",
+                "input_space": "RGB",
+                "input_range": [0, 1],
+            },
+        },
         "params": {
             "out_channels": (3, 16, 24, 32, 96, 1280),
         },

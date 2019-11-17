@@ -1,4 +1,4 @@
-FROM anibali/pytorch:cuda-9.0
+FROM python:3.6 #anibali/pytorch:cuda-9.0
 
 WORKDIR /tmp/smp/
 
