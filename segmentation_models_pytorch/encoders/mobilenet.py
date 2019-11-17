@@ -14,7 +14,7 @@ class MobileNetV2Encoder(torchvision.models.MobileNetV2, EncoderMixin):
         self._in_channels = 3
         del self.classifier
 
-    def forward(self):
+    def forward(self, x):
         stages = [
             nn.Identity(),
             self.features[:2],
