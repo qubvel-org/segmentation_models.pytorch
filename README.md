@@ -105,6 +105,7 @@ preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
 |efficientnet-b5                 |imagenet                        |28M                             |
 |efficientnet-b6                 |imagenet                        |40M                             |
 |efficientnet-b7                 |imagenet                        |63M                             |
+|mobilenet_v2                    |imagenet                        |2M                              |
 
 ### Models API <a name="api"></a>
  - `model.encoder` - pretrained backbone to extract features of different spatial resolution
