@@ -5,7 +5,7 @@ from pretrainedmodels.models.torchvision_models import pretrained_settings
 from ._base import EncoderMixin
 
 
-class MobileNetV2Encoder(torchvision.MobileNetV2, EncoderMixin):
+class MobileNetV2Encoder(torchvision.models.MobileNetV2, EncoderMixin):
 
     def __init__(self, out_channels, depth=5, **kwargs):
         super().__init__(**kwargs)
