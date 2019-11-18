@@ -48,7 +48,7 @@ preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
 ```
 ### Examples <a name="examples"></a>
  - Training model for cars segmentation on CamVid dataset [here](https://github.com/qubvel/segmentation_models.pytorch/blob/master/examples/cars%20segmentation%20(camvid).ipynb).
- - Training model with [Catalyst](https://github.com/catalyst-team/catalyst) (high-level framework for PyTorch) - [here](https://colab.research.google.com/gist/Scitator/e3fd90eec05162e16b476de832500576/cars-segmentation-camvid.ipynb).
+ - Training SMP model with [Catalyst](https://github.com/catalyst-team/catalyst) (high-level framework for PyTorch), [Ttach](https://github.com/qubvel/ttach) (TTA library for PyTorch) and [Albumentations](https://github.com/albu/albumentations) (fast image augmentation library) - [here](https://github.com/catalyst-team/catalyst/blob/master/examples/notebooks/segmentation-tutorial.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/catalyst-team/catalyst/blob/master/examples/notebooks/segmentation-tutorial.ipynb)
 
 ### Models <a name="models"></a>
 
