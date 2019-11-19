@@ -7,7 +7,7 @@ from  .base import Activation
 
 class JaccardLoss(base.Loss):
 
-    def __init__(self, eps=1e-7, activation=None, ignore_channels=None, **kwargs):
+    def __init__(self, eps=1., activation=None, ignore_channels=None, **kwargs):
         super().__init__(**kwargs)
         self.eps = eps
         self.activation = Activation(activation)
@@ -25,7 +25,7 @@ class JaccardLoss(base.Loss):
 
 class DiceLoss(base.Loss):
 
-    def __init__(self, eps=1e-7, beta=1., activation=None, ignore_channels=None, **kwargs):
+    def __init__(self, eps=1., beta=1., activation=None, ignore_channels=None, **kwargs):
         super().__init__(**kwargs)
         self.eps = eps
         self.beta = beta

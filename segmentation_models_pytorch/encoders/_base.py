@@ -4,13 +4,17 @@ from typing import List
 
 
 class EncoderMixin:
+    """Add encoder functionality such as:
+        - output channels specification of feature tensors (produced by encoder)
+        - patching first convolution for arbitrary input channels
+    """
     @property
     def out_channels(self) -> List:
         """Return channels dimensions for each tensor of forward output of encoder"""
         return self._out_channels[: self._depth + 1]
 
     def set_in_channels(self, in_channels):
-
+        """Change first convolution chennels"""
         if in_channels == 3:
             return
 

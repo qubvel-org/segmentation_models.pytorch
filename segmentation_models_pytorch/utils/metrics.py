@@ -2,7 +2,9 @@ from . import base
 from . import functional as F
 from .base import Activation
 
+
 class IoU(base.Metric):
+    __name__ = 'iou_score'
 
     def __init__(self, eps=1e-7, threshold=0.5, activation=None, ignore_channels=None, **kwargs):
         super().__init__(**kwargs)
