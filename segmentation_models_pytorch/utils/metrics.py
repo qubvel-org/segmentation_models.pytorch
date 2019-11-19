@@ -1,7 +1,6 @@
 from . import base
 from . import functional as F
-from .. import common as cmn
-
+from .base import Activation
 
 class IoU(base.Metric):
 
@@ -9,7 +8,7 @@ class IoU(base.Metric):
         super().__init__(**kwargs)
         self.eps = eps
         self.threshold = threshold
-        self.activation = cmn.Activation(activation, dim=1)
+        self.activation = Activation(activation)
         self.ignore_channels = ignore_channels
 
     def forward(self, y_pr, y_gt):
@@ -29,7 +28,7 @@ class Fscore(base.Metric):
         self.eps = eps
         self.beta = beta
         self.threshold = threshold
-        self.activation = cmn.Activation(activation, dim=1)
+        self.activation = Activation(activation)
         self.ignore_channels = ignore_channels
 
     def forward(self, y_pr, y_gt):
@@ -48,7 +47,7 @@ class Accuracy(base.Metric):
     def __init__(self, threshold=0.5, activation=None, ignore_channels=None, **kwargs):
         super().__init__(**kwargs)
         self.threshold = threshold
-        self.activation = cmn.Activation(activation, dim=1)
+        self.activation = Activation(activation)
         self.ignore_channels = ignore_channels
 
     def forward(self, y_pr, y_gt):
@@ -66,7 +65,7 @@ class Recall(base.Metric):
         super().__init__(**kwargs)
         self.eps = eps
         self.threshold = threshold
-        self.activation = cmn.Activation(activation, dim=1)
+        self.activation = Activation(activation)
         self.ignore_channels = ignore_channels
 
     def forward(self, y_pr, y_gt):
@@ -85,7 +84,7 @@ class Precision(base.Metric):
         super().__init__(**kwargs)
         self.eps = eps
         self.threshold = threshold
-        self.activation = cmn.Activation(activation, dim=1)
+        self.activation = Activation(activation)
         self.ignore_channels = ignore_channels
 
     def forward(self, y_pr, y_gt):
