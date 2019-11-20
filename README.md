@@ -121,7 +121,7 @@ preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
 ##### Input channels
 Input channels parameter allow you to create models, which process tensors with arbitrary number of channels.
 If you use pretrained weights from imagenet - weights of first convolution will be reused for
-1- or 2- channels inputs, for input channels > 4 weights of first convolution wil be initialized randomly.
+1- or 2- channels inputs, for input channels > 4 weights of first convolution will be initialized randomly.
 ```python
 model = smp.FPN('resnet34', in_channels=1)
 mask = model(torch.ones([1, 1, 64, 64]))
@@ -136,7 +136,7 @@ configured by `aux_params` as follows:
 ```python
 aux_params=dict(
     pooling='avg',             # one of 'avg', 'max'
-    dropout=0.5,               # dropout ration, default is None
+    dropout=0.5,               # dropout ratio, default is None
     activation='sigmoid',      # activation function, default is None
     classes=4,                 # define number of output labels
 )
