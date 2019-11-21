@@ -1,52 +1,67 @@
 import torch.nn as nn
-from . import functions as F
+
+from . import base
+from . import functional as F
+from  .base import Activation
 
 
-class JaccardLoss(nn.Module):
-    __name__ = 'jaccard_loss'
+class JaccardLoss(base.Loss):
 
-    def __init__(self, eps=1e-7, activation='sigmoid'):
-        super().__init__()
-        self.activation = activation
+    def __init__(self, eps=1., activation=None, ignore_channels=None, **kwargs):
+        super().__init__(**kwargs)
         self.eps = eps
+        self.activation = Activation(activation)
+        self.ignore_channels = ignore_channels
 
     def forward(self, y_pr, y_gt):
-        return 1 - F.jaccard(y_pr, y_gt, eps=self.eps, threshold=None, activation=self.activation)
+        y_pr = self.activation(y_pr)
+        return 1 - F.jaccard(
+            y_pr, y_gt,
+            eps=self.eps,
+            threshold=None,
+            ignore_channels=self.ignore_channels,
+        )
 
 
-class DiceLoss(nn.Module):
-    __name__ = 'dice_loss'
+class DiceLoss(base.Loss):
 
-    def __init__(self, eps=1e-7, activation='sigmoid'):
-        super().__init__()
-        self.activation = activation
+    def __init__(self, eps=1., beta=1., activation=None, ignore_channels=None, **kwargs):
+        super().__init__(**kwargs)
         self.eps = eps
+        self.beta = beta
+        self.activation = Activation(activation)
+        self.ignore_channels = ignore_channels
 
     def forward(self, y_pr, y_gt):
-        return 1 - F.f_score(y_pr, y_gt, beta=1., eps=self.eps, threshold=None, activation=self.activation)
+        y_pr = self.activation(y_pr)
+        return 1 - F.f_score(
+            y_pr, y_gt,
+            beta=self.beta,
+            eps=self.eps,
+            threshold=None,
+            ignore_channels=self.ignore_channels,
+        )
 
 
-class BCEJaccardLoss(JaccardLoss):
-    __name__ = 'bce_jaccard_loss'
-
-    def __init__(self, eps=1e-7, activation='sigmoid'):
-        super().__init__(eps, activation)
-        self.bce = nn.BCEWithLogitsLoss(reduction='mean')
-
-    def forward(self, y_pr, y_gt):
-        jaccard = super().forward(y_pr, y_gt)
-        bce = self.bce(y_pr, y_gt)
-        return jaccard + bce
+class L1Loss(nn.L1Loss, base.Loss):
+    pass
 
 
-class BCEDiceLoss(DiceLoss):
-    __name__ = 'bce_dice_loss'
+class MSELoss(nn.MSELoss, base.Loss):
+    pass
 
-    def __init__(self, eps=1e-7, activation='sigmoid'):
-        super().__init__(eps, activation)
-        self.bce = nn.BCEWithLogitsLoss(reduction='mean')
 
-    def forward(self, y_pr, y_gt):
-        dice = super().forward(y_pr, y_gt)
-        bce = self.bce(y_pr, y_gt)
-        return dice + bce
+class CrossEntropyLoss(nn.CrossEntropyLoss, base.Loss):
+    pass
+
+
+class NLLLoss(nn.NLLLoss, base.Loss):
+    pass
+
+
+class BCELoss(nn.BCELoss, base.Loss):
+    pass
+
+
+class BCEWithLogitsLoss(nn.BCEWithLogitsLoss, base.Loss):
+    pass

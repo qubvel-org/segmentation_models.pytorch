@@ -2,101 +2,120 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from ..common.blocks import Conv2dReLU, SCSEModule
-from ..base.model import Model
+from ..base import modules as md
 
 
 class DecoderBlock(nn.Module):
-    def __init__(self, in_channels, out_channels, use_batchnorm=True, attention_type=None):
+    def __init__(
+            self,
+            in_channels,
+            skip_channels,
+            out_channels,
+            use_batchnorm=True,
+            attention_type=None,
+    ):
         super().__init__()
-        if attention_type is None:
-            self.attention1 = nn.Identity()
-            self.attention2 = nn.Identity()
-        elif attention_type == 'scse':
-            self.attention1 = SCSEModule(in_channels)
-            self.attention2 = SCSEModule(out_channels)
-
-        self.block = nn.Sequential(
-            Conv2dReLU(in_channels, out_channels, kernel_size=3, padding=1, use_batchnorm=use_batchnorm),
-            Conv2dReLU(out_channels, out_channels, kernel_size=3, padding=1, use_batchnorm=use_batchnorm),
+        self.conv1 = md.Conv2dReLU(
+            in_channels + skip_channels,
+            out_channels,
+            kernel_size=3,
+            padding=1,
+            use_batchnorm=use_batchnorm,
         )
+        self.attention1 = md.Attention(attention_type, in_channels=in_channels + skip_channels)
+        self.conv2 = md.Conv2dReLU(
+            out_channels,
+            out_channels,
+            kernel_size=3,
+            padding=1,
+            use_batchnorm=use_batchnorm,
+        )
+        self.attention2 = md.Attention(attention_type, in_channels=out_channels)
 
-    def forward(self, x):
-        x, skip = x
-        x = F.interpolate(x, scale_factor=2, mode='nearest')
+    def forward(self, x, skip=None):
+        x = F.interpolate(x, scale_factor=2, mode="nearest")
         if skip is not None:
             x = torch.cat([x, skip], dim=1)
             x = self.attention1(x)
-
-        x = self.block(x)
+        x = self.conv1(x)
+        x = self.conv2(x)
         x = self.attention2(x)
         return x
 
 
-class CenterBlock(DecoderBlock):
+class CenterBlock(nn.Sequential):
+    def __init__(self, in_channels, out_channels, use_batchnorm=True):
+        conv1 = md.Conv2dReLU(
+            in_channels,
+            out_channels,
+            kernel_size=3,
+            padding=1,
+            use_batchnorm=use_batchnorm,
+        )
+        conv2 = md.Conv2dReLU(
+            out_channels,
+            out_channels,
+            kernel_size=3,
+            padding=1,
+            use_batchnorm=use_batchnorm,
+        )
+        super().__init__(conv1, conv2)
 
-    def forward(self, x):
-        return self.block(x)
 
-
-class UnetDecoder(Model):
-
+class UnetDecoder(nn.Module):
     def __init__(
             self,
             encoder_channels,
-            decoder_channels=(256, 128, 64, 32, 16),
-            final_channels=1,
+            decoder_channels,
+            n_blocks=5,
             use_batchnorm=True,
+            attention_type=None,
             center=False,
-            attention_type=None
     ):
         super().__init__()
 
-        if center:
-            channels = encoder_channels[0]
-            self.center = CenterBlock(channels, channels, use_batchnorm=use_batchnorm)
-        else:
-            self.center = None
+        if n_blocks != len(decoder_channels):
+            raise ValueError(
+                "Model depth is {}, but you provide `decoder_channels` for {} blocks.".format(
+                    n_blocks, len(decoder_channels)
+                )
+            )
 
-        in_channels = self.compute_channels(encoder_channels, decoder_channels)
+        encoder_channels = encoder_channels[1:]  # remove first skip with same spatial resolution
+        encoder_channels = encoder_channels[::-1]  # reverse channels to start from head of encoder
+
+        # computing blocks input and output channels
+        head_channels = encoder_channels[0]
+        in_channels = [head_channels] + list(decoder_channels[:-1])
+        skip_channels = list(encoder_channels[1:]) + [0]
         out_channels = decoder_channels
 
-        self.layer1 = DecoderBlock(in_channels[0], out_channels[0],
-                                   use_batchnorm=use_batchnorm, attention_type=attention_type)
-        self.layer2 = DecoderBlock(in_channels[1], out_channels[1],
-                                   use_batchnorm=use_batchnorm, attention_type=attention_type)
-        self.layer3 = DecoderBlock(in_channels[2], out_channels[2],
-                                   use_batchnorm=use_batchnorm, attention_type=attention_type)
-        self.layer4 = DecoderBlock(in_channels[3], out_channels[3],
-                                   use_batchnorm=use_batchnorm, attention_type=attention_type)
-        self.layer5 = DecoderBlock(in_channels[4], out_channels[4],
-                                   use_batchnorm=use_batchnorm, attention_type=attention_type)
-        self.final_conv = nn.Conv2d(out_channels[4], final_channels, kernel_size=(1, 1))
+        if center:
+            self.center = CenterBlock(
+                head_channels, head_channels, use_batchnorm=use_batchnorm
+            )
+        else:
+            self.center = nn.Identity()
 
-        self.initialize()
-
-    def compute_channels(self, encoder_channels, decoder_channels):
-        channels = [
-            encoder_channels[0] + encoder_channels[1],
-            encoder_channels[2] + decoder_channels[0],
-            encoder_channels[3] + decoder_channels[1],
-            encoder_channels[4] + decoder_channels[2],
-            0 + decoder_channels[3],
+        # combine decoder keyword arguments
+        kwargs = dict(use_batchnorm=use_batchnorm, attention_type=attention_type)
+        blocks = [
+            DecoderBlock(in_ch, skip_ch, out_ch, **kwargs)
+            for in_ch, skip_ch, out_ch in zip(in_channels, skip_channels, out_channels)
         ]
-        return channels
+        self.blocks = nn.ModuleList(blocks)
 
-    def forward(self, x):
-        encoder_head = x[0]
-        skips = x[1:]
+    def forward(self, *features):
 
-        if self.center:
-            encoder_head = self.center(encoder_head)
+        features = features[1:]    # remove first skip with same spatial resolution
+        features = features[::-1]  # reverse channels to start from head of encoder
 
-        x = self.layer1([encoder_head, skips[0]])
-        x = self.layer2([x, skips[1]])
-        x = self.layer3([x, skips[2]])
-        x = self.layer4([x, skips[3]])
-        x = self.layer5([x, None])
-        x = self.final_conv(x)
+        head = features[0]
+        skips = features[1:]
+
+        x = self.center(head)
+        for i, decoder_block in enumerate(self.blocks):
+            skip = skips[i] if i < len(skips) else None
+            x = decoder_block(x, skip)
 
         return x

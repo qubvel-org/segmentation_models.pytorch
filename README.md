@@ -7,7 +7,7 @@ The main features of this library are:
 
  - High level API (just two lines to create neural network)
  - 4 models architectures for binary and multi class segmentation (including legendary Unet)
- - 31 available encoders for each architecture
+ - 45 available encoders for each architecture
  - All encoders have pre-trained weights for faster and better convergence
 
 ### Table of content
@@ -16,10 +16,14 @@ The main features of this library are:
  3. [Models](#models)
     1. [Architectures](#architectires)
     2. [Encoders](#encoders)
-    3. [Pretrained weights](#weights)
  4. [Models API](#api)
+    1. [Input channels](#input-channels)
+    2. [Auxiliary classification output](#auxiliary-classification-output)
+    3. [Depth](#depth)
  5. [Installation](#installation)
- 6. [License](#license)
+ 6. [Competitions won with the library](#competitions-won-with-the-library)
+ 7. [License](#license)
+ 8. [Contributing](#contributing)
 
 ### Quick start <a name="start"></a>
 Since the library is built on the PyTorch framework, created segmentation model is just a PyTorch nn.Module, which can be created as easy as:
@@ -60,33 +64,95 @@ preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
 
 #### Encoders <a name="encoders"></a>
 
-| Type       | Encoder names                                                                               |
-|------------|---------------------------------------------------------------------------------------------|
-| VGG        | vgg11, vgg13, vgg16, vgg19, vgg11bn,  vgg13bn, vgg16bn, vgg19bn                             |
-| DenseNet   | densenet121, densenet169, densenet201, densenet161                                          |
-| DPN        | dpn68, dpn68b, dpn92, dpn98, dpn107, dpn131                                                 |
-| Inception  | inceptionresnetv2                                                                           |
-| ResNet     | resnet18, resnet34, resnet50, resnet101, resnet152                                          |
-| ResNeXt    | resnext50_32x4d, resnext101_32x8d, resnext101_32x16d, resnext101_32x32d, resnext101_32x48d  |
-| SE-ResNet  | se_resnet50, se_resnet101, se_resnet152                                                     |
-| SE-ResNeXt | se_resnext50_32x4d,  se_resnext101_32x4d                                                    |
-| SENet      | senet154                                                                                    |
-| EfficientNet | efficientnet-b0, efficientnet-b1, efficientnet-b2, efficientnet-b3, efficientnet-b4, efficientnet-b5, efficientnet-b6, efficientnet-b7
-
-#### Weights <a name="weights"></a>
-
-| Weights name                                                              | Encoder names                                                                                                                                                                                                                                                                                                                                                                       |
-|---------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| imagenet+5k                                                               | dpn68b, dpn92, dpn107                                                                                                                                                                                                                                                                                                                                                               |
-| imagenet                                                                  | vgg11, vgg13, vgg16, vgg19, vgg11bn,  vgg13bn, vgg16bn, vgg19bn, <br> densenet121, densenet169, densenet201, densenet161, dpn68, dpn98, dpn131, <br> inceptionresnetv2, <br> resnet18, resnet34, resnet50, resnet101, resnet152, <br> resnext50_32x4d, resnext101_32x8d, <br> se_resnet50, se_resnet101, se_resnet152, <br> se_resnext50_32x4d,  se_resnext101_32x4d, <br> senet154, <br> efficientnet-b0, efficientnet-b1, efficientnet-b2, efficientnet-b3, efficientnet-b4, efficientnet-b5, efficientnet-b6, efficientnet-b7 |
-| [instagram](https://pytorch.org/hub/facebookresearch_WSL-Images_resnext/) | resnext101_32x8d, resnext101_32x16d, resnext101_32x32d, resnext101_32x48d                                                                                                                                                                                                                                                                                                           |
+|Encoder                         |Weights                         |Params, M                       |
+|--------------------------------|:------------------------------:|:------------------------------:|
+|resnet18                        |imagenet                        |11M                             |
+|resnet34                        |imagenet                        |21M                             |
+|resnet50                        |imagenet                        |23M                             |
+|resnet101                       |imagenet                        |42M                             |
+|resnet152                       |imagenet                        |58M                             |
+|resnext50_32x4d                 |imagenet                        |22M                             |
+|resnext101_32x8d                |imagenet<br>instagram           |86M                             |
+|resnext101_32x16d               |instagram                       |191M                            |
+|resnext101_32x32d               |instagram                       |466M                            |
+|resnext101_32x48d               |instagram                       |826M                            |
+|dpn68                           |imagenet                        |11M                             |
+|dpn68b                          |imagenet+5k                     |11M                             |
+|dpn92                           |imagenet+5k                     |34M                             |
+|dpn98                           |imagenet                        |58M                             |
+|dpn107                          |imagenet+5k                     |84M                             |
+|dpn131                          |imagenet                        |76M                             |
+|vgg11                           |imagenet                        |9M                              |
+|vgg11_bn                        |imagenet                        |9M                              |
+|vgg13                           |imagenet                        |9M                              |
+|vgg13_bn                        |imagenet                        |9M                              |
+|vgg16                           |imagenet                        |14M                             |
+|vgg16_bn                        |imagenet                        |14M                             |
+|vgg19                           |imagenet                        |20M                             |
+|vgg19_bn                        |imagenet                        |20M                             |
+|senet154                        |imagenet                        |113M                            |
+|se_resnet50                     |imagenet                        |26M                             |
+|se_resnet101                    |imagenet                        |47M                             |
+|se_resnet152                    |imagenet                        |64M                             |
+|se_resnext50_32x4d              |imagenet                        |25M                             |
+|se_resnext101_32x4d             |imagenet                        |46M                             |
+|densenet121                     |imagenet                        |6M                              |
+|densenet169                     |imagenet                        |12M                             |
+|densenet201                     |imagenet                        |18M                             |
+|densenet161                     |imagenet                        |26M                             |
+|inceptionresnetv2               |imagenet<br>imagenet+background |54M                             |
+|inceptionv4                     |imagenet<br>imagenet+background |41M                             |
+|efficientnet-b0                 |imagenet                        |4M                              |
+|efficientnet-b1                 |imagenet                        |6M                              |
+|efficientnet-b2                 |imagenet                        |7M                              |
+|efficientnet-b3                 |imagenet                        |10M                             |
+|efficientnet-b4                 |imagenet                        |17M                             |
+|efficientnet-b5                 |imagenet                        |28M                             |
+|efficientnet-b6                 |imagenet                        |40M                             |
+|efficientnet-b7                 |imagenet                        |63M                             |
+|mobilenet_v2                    |imagenet                        |2M                              |
 
 ### Models API <a name="api"></a>
+
  - `model.encoder` - pretrained backbone to extract features of different spatial resolution
- - `model.decoder` - segmentation head, depends on models architecture (`Unet`/`Linknet`/`PSPNet`/`FPN`)
- - `model.activation` - output activation function, one of `sigmoid`, `softmax`
- - `model.forward(x)` - sequentially pass `x` through model\`s encoder and decoder (return logits!)
- - `model.predict(x)` - inference method, switch model to `.eval()` mode, call `.forward(x)` and apply activation function with `torch.no_grad()`
+ - `model.decoder` - depends on models architecture (`Unet`/`Linknet`/`PSPNet`/`FPN`)
+ - `model.segmentation_head` - last block to produce required number of mask channels (include also optional upsampling and activation)
+ - `model.classification_head` - optional block which create classification head on top of encoder
+ - `model.forward(x)` - sequentially pass `x` through model\`s encoder, decoder and segmentation head (and classification head if specified)
+
+##### Input channels
+Input channels parameter allow you to create models, which process tensors with arbitrary number of channels.
+If you use pretrained weights from imagenet - weights of first convolution will be reused for
+1- or 2- channels inputs, for input channels > 4 weights of first convolution will be initialized randomly.
+```python
+model = smp.FPN('resnet34', in_channels=1)
+mask = model(torch.ones([1, 1, 64, 64]))
+```
+
+##### Auxiliary classification output  
+All models support `aux_params` parameters, which is default set to `None`. 
+If `aux_params = None` than classification auxiliary output is not created, else
+model produce not only `mask`, but also `label` output with shape `NC`.
+Classification head consist of GlobalPooling->Dropout(optional)->Linear->Activation(optional) layers, which can be 
+configured by `aux_params` as follows:
+```python
+aux_params=dict(
+    pooling='avg',             # one of 'avg', 'max'
+    dropout=0.5,               # dropout ratio, default is None
+    activation='sigmoid',      # activation function, default is None
+    classes=4,                 # define number of output labels
+)
+model = smp.Unet('resnet34', classes=4, aux_params=aux_params)
+mask, label = model(x)
+```
+
+##### Depth
+Depth parameter specify a number of downsampling operations in encoder, so you can make
+your model lighted if specify smaller `depth`.
+```python
+model = smp.FPN('resnet34', depth=4)
+```
+
 
 ### Installation <a name="installation"></a>
 PyPI version:
@@ -97,11 +163,24 @@ Latest version from source:
 ```bash
 $ pip install git+https://github.com/qubvel/segmentation_models.pytorch
 ````
+
+### Competitions won with the library
+
+`Segmentation Models` package is widely used in the image segmentation competitions.
+[Here](https://github.com/qubvel/segmentation_models.pytorch/blob/master/HALLOFFAME.md) you can find competitions, names of the winners and links to their solutions.
+
+
 ### License <a name="license"></a>
 Project is distributed under [MIT License](https://github.com/qubvel/segmentation_models.pytorch/blob/master/LICENSE)
 
-### Run tests
+
+### Contributing
+
+##### Run test
 ```bash
-$ docker build -f docker/Dockerfile.dev -t smp:dev .
-$ docker run --rm smp:dev pytest -p no:cacheprovider
+$ docker build -f docker/Dockerfile.dev -t smp:dev . && docker run --rm smp:dev pytest -p no:cacheprovider
+```
+##### Generate table
+```bash
+$ docker build -f docker/Dockerfile.dev -t smp:dev . && docker run --rm smp:dev python misc/generate_table.py
 ```

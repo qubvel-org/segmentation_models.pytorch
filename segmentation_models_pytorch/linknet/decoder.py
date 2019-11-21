@@ -1,23 +1,21 @@
 import torch.nn as nn
 
-from ..common.blocks import Conv2dReLU
-from ..base.model import Model
+from ..base import modules
 
 
-class TransposeX2(nn.Module):
+class TransposeX2(nn.Sequential):
 
-    def __init__(self, in_channels, out_channels, use_batchnorm=True, **batchnorm_params):
+    def __init__(self, in_channels, out_channels, use_batchnorm=True):
         super().__init__()
-        layers = []
-        layers.append(nn.ConvTranspose2d(in_channels, out_channels, kernel_size=4, stride=2, padding=1))
+        layers = [
+            nn.ConvTranspose2d(in_channels, out_channels, kernel_size=4, stride=2, padding=1),
+            nn.ReLU(inplace=True)
+        ]
+
         if use_batchnorm:
-            layers.append(nn.BatchNorm2d(out_channels, **batchnorm_params))
-        layers.append(nn.ReLU(inplace=True))
+            layers.insert(1, nn.BatchNorm2d(out_channels))
 
-        self.block = nn.Sequential(*layers)
-
-    def forward(self, x):
-        return self.block(x)
+        super().__init__(*layers)
 
 
 class DecoderBlock(nn.Module):
@@ -25,50 +23,48 @@ class DecoderBlock(nn.Module):
         super().__init__()
 
         self.block = nn.Sequential(
-            Conv2dReLU(in_channels, in_channels // 4, kernel_size=1, use_batchnorm=use_batchnorm),
+            modules.Conv2dReLU(in_channels, in_channels // 4, kernel_size=1, use_batchnorm=use_batchnorm),
             TransposeX2(in_channels // 4, in_channels // 4, use_batchnorm=use_batchnorm),
-            Conv2dReLU(in_channels // 4, out_channels, kernel_size=1, use_batchnorm=use_batchnorm),
+            modules.Conv2dReLU(in_channels // 4, out_channels, kernel_size=1, use_batchnorm=use_batchnorm),
         )
 
-    def forward(self, x):
-        x, skip = x
+    def forward(self, x, skip=None):
         x = self.block(x)
         if skip is not None:
             x = x + skip
         return x
 
 
-class LinknetDecoder(Model):
+class LinknetDecoder(nn.Module):
 
     def __init__(
             self,
             encoder_channels,
             prefinal_channels=32,
-            final_channels=1,
+            n_blocks=5,
             use_batchnorm=True,
     ):
         super().__init__()
 
-        in_channels = encoder_channels
+        encoder_channels = encoder_channels[1:]  # remove first skip
+        encoder_channels = encoder_channels[::-1]  # reverse channels to start from head of encoder
 
-        self.layer1 = DecoderBlock(in_channels[0], in_channels[1], use_batchnorm=use_batchnorm)
-        self.layer2 = DecoderBlock(in_channels[1], in_channels[2], use_batchnorm=use_batchnorm)
-        self.layer3 = DecoderBlock(in_channels[2], in_channels[3], use_batchnorm=use_batchnorm)
-        self.layer4 = DecoderBlock(in_channels[3], in_channels[4], use_batchnorm=use_batchnorm)
-        self.layer5 = DecoderBlock(in_channels[4], prefinal_channels, use_batchnorm=use_batchnorm)
-        self.final_conv = nn.Conv2d(prefinal_channels, final_channels, kernel_size=(1, 1))
+        channels = list(encoder_channels) + [prefinal_channels]
 
-        self.initialize()
+        self.blocks = nn.ModuleList([
+            DecoderBlock(channels[i], channels[i + 1], use_batchnorm=use_batchnorm)
+            for i in range(n_blocks)
+        ])
 
-    def forward(self, x):
-        encoder_head = x[0]
-        skips = x[1:]
+    def forward(self, *features):
+        features = features[1:]  # remove first skip
+        features = features[::-1]  # reverse channels to start from head of encoder
 
-        x = self.layer1([encoder_head, skips[0]])
-        x = self.layer2([x, skips[1]])
-        x = self.layer3([x, skips[2]])
-        x = self.layer4([x, skips[3]])
-        x = self.layer5([x, None])
-        x = self.final_conv(x)
+        x = features[0]
+        skips = features[1:]
+
+        for i, decoder_block in enumerate(self.blocks):
+            skip = skips[i] if i < len(skips) else None
+            x = decoder_block(x, skip)
 
         return x

@@ -3,90 +3,91 @@ import sys
 import mock
 import pytest
 import torch
-import random
-import importlib
 
-# mock detection module 
-sys.modules['torchvision._C'] = mock.Mock()
+# mock detection module
+sys.modules["torchvision._C"] = mock.Mock()
 
 import segmentation_models_pytorch as smp
 
 
-def get_encoder():
-    is_travis = os.environ.get('TRAVIS', False)
-    exclude = ['senet154']
+IS_TRAVIS = os.environ.get("TRAVIS", False)
 
+
+def get_encoders():
+    travis_exclude_encoders = [
+        "senet154",
+        "resnext101_32x16d",
+        "resnext101_32x32d",
+        "resnext101_32x48d",
+    ]
     encoders = smp.encoders.get_encoder_names()
-    if is_travis:
-        encoders = [e for e in encoders if e not in exclude]
-
+    if IS_TRAVIS:
+        encoders = [e for e in encoders if e not in travis_exclude_encoders]
     return encoders
 
-def get_pretrained_weights_name(encoder_name):
-    return list(smp.encoders.encoders[encoder_name]['pretrained_settings'].keys())[0]
 
-ENCODERS = get_encoder()
-
-
-def _select_names(names, k=2):
-    is_full = os.environ.get('FULL_TEST', False)
-    if not is_full:
-        return random.sample(names, k)
-    else:
-        return names
+ENCODERS = get_encoders()
+DEFAULT_ENCODER = "resnet18"
+DEFAULT_SAMPLE = torch.ones([1, 3, 64, 64])
 
 
-def _test_forward_backward(model_fn, encoder_name, **model_params):
-    model = model_fn(encoder_name, encoder_weights=None, **model_params)
-
-    x = torch.ones((1, 3, 64, 64))
-    y = model.forward(x)
-    l = y.mean()
-    l.backward()
+def _test_forward(model):
+    with torch.no_grad():
+        model(DEFAULT_SAMPLE)
 
 
-def _test_pretrained_model(model_fn, encoder_name, encoder_weights, **model_params):
-    model = model_fn(encoder_name, encoder_weights=encoder_weights, **model_params)
-
-    x = torch.ones((1, 3, 64, 64))
-    y = model.predict(x)
-
-    assert x.shape[2:] == y.shape[2:]
+def _test_forward_backward(model):
+    out = model(DEFAULT_SAMPLE)
+    out.mean().backward()
 
 
-@pytest.mark.parametrize('encoder_name', _select_names(ENCODERS, k=1))
-def test_unet(encoder_name):
-    _test_forward_backward(smp.Unet, encoder_name)
-    _test_pretrained_model(smp.Unet, encoder_name, get_pretrained_weights_name(encoder_name))
+@pytest.mark.parametrize("encoder_name", ENCODERS)
+@pytest.mark.parametrize("encoder_depth", [3, 5])
+@pytest.mark.parametrize("model_class", [smp.FPN, smp.PSPNet, smp.Linknet, smp.Unet])
+def test_forward(model_class, encoder_name, encoder_depth, **kwargs):
+    if model_class is smp.Unet:
+        kwargs["decoder_channels"] = (16, 16, 16, 16, 16)[-encoder_depth:]
+    model = model_class(
+        encoder_name, encoder_depth=encoder_depth, encoder_weights=None, **kwargs
+    )
+    _test_forward(model)
 
 
-@pytest.mark.parametrize('encoder_name', _select_names(ENCODERS, k=1))
-def test_fpn(encoder_name):
-    _test_forward_backward(smp.FPN, encoder_name)
-    _test_pretrained_model(smp.FPN, encoder_name, get_pretrained_weights_name(encoder_name))
-
-    from functools import partial
-    _test_forward_backward(partial(smp.FPN, decoder_merge_policy='cat'), encoder_name)
-    _test_pretrained_model(partial(smp.FPN, decoder_merge_policy='cat'), encoder_name, get_pretrained_weights_name(encoder_name))
+@pytest.mark.parametrize("model_class", [smp.FPN, smp.PSPNet, smp.Linknet, smp.Unet])
+def test_forward_backward(model_class):
+    model = model_class(DEFAULT_ENCODER, encoder_weights=None)
+    _test_forward_backward(model)
 
 
-@pytest.mark.parametrize('encoder_name', _select_names(ENCODERS, k=1))
-def test_linknet(encoder_name):
-    _test_forward_backward(smp.Linknet, encoder_name)
-    _test_pretrained_model(smp.Linknet, encoder_name, get_pretrained_weights_name(encoder_name))
+@pytest.mark.parametrize("model_class", [smp.FPN, smp.PSPNet, smp.Linknet, smp.Unet])
+def test_aux_output(model_class):
+    model = model_class(
+        DEFAULT_ENCODER, encoder_weights=None, aux_params=dict(classes=2)
+    )
+    mask, label = model(DEFAULT_SAMPLE)
+    assert label.size() == (1, 2)
 
 
-@pytest.mark.parametrize('encoder_name', _select_names(ENCODERS, k=1))
-def test_pspnet(encoder_name):
-    _test_forward_backward(smp.PSPNet, encoder_name)
-    _test_pretrained_model(smp.PSPNet, encoder_name, get_pretrained_weights_name(encoder_name))
+@pytest.mark.parametrize("upsampling", [2, 4, 8])
+@pytest.mark.parametrize("model_class", [smp.FPN, smp.PSPNet])
+def test_upsample(model_class, upsampling):
+    default_upsampling = 4 if model_class is smp.FPN else 8
+    model = model_class(DEFAULT_ENCODER, encoder_weights=None, upsampling=upsampling)
+    mask = model(DEFAULT_SAMPLE)
+    assert mask.size()[-1] / 64 == upsampling / default_upsampling
 
 
-@pytest.mark.skipif(importlib.util.find_spec('inplace_abn') is None, reason='')
-def test_inplace_abn():
-    _test_forward_backward(smp.Unet, 'resnet18', decoder_use_batchnorm='inplace')
-    _test_pretrained_model(smp.Unet, 'resnet18', get_pretrained_weights_name('resnet18'), decoder_use_batchnorm='inplace')
+@pytest.mark.parametrize("model_class", [smp.FPN])
+@pytest.mark.parametrize("encoder_name", ENCODERS)
+@pytest.mark.parametrize("in_channels", [1, 2, 4])
+def test_in_channels(model_class, encoder_name, in_channels):
+    sample = torch.ones([1, in_channels, 64, 64])
+    model = model_class(DEFAULT_ENCODER, encoder_weights=None, in_channels=in_channels)
+    with torch.no_grad():
+        model(sample)
+
+    assert model.encoder._in_channels == in_channels
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pytest.main([__file__])
