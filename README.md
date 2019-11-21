@@ -21,7 +21,8 @@ The main features of this library are:
     2. [Auxiliary classification output](#auxiliary-classification-output)
     3. [Depth](#depth)
  5. [Installation](#installation)
- 6. [License](#license)
+ 6. [Competitions won with the library](#competitions-won-with-the-library)
+ 7. [License](#license)
 
 ### Quick start <a name="start"></a>
 Since the library is built on the PyTorch framework, created segmentation model is just a PyTorch nn.Module, which can be created as easy as:
@@ -163,6 +164,12 @@ $ pip install git+https://github.com/qubvel/segmentation_models.pytorch
 ````
 ### License <a name="license"></a>
 Project is distributed under [MIT License](https://github.com/qubvel/segmentation_models.pytorch/blob/master/LICENSE)
+
+### Competitions won with the library
+
+`Segmentation Models` package is widely used in the image segmentation competitions.
+[Here](https://github.com/qubvel/segmentation_models.pytorch/blob/master/HALLOFFAME.md) you can find competitions, names of the winners and links to their solutions.
+
 
 ### Contributing
 
