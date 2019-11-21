@@ -32,6 +32,7 @@ class PSPNet(SegmentationModel):
         aux_params: if specified model will have additional classification auxiliary output
             build on top of encoder, supported params:
                 - classes (int): number of classes
+                - pooling (str): one of 'max', 'avg'. Default is 'avg'.
                 - dropout (float): dropout factor in [0, 1)
                 - activation (str): activation function to apply "sigmoid"/"softmax" (could be None to return logits)
 

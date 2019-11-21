@@ -67,7 +67,9 @@ class MergeBlock(nn.Module):
         elif self.policy == 'cat':
             return torch.cat(x, dim=1)
         else:
-            raise
+            raise ValueError(
+                "`merge_policy` must be one of: ['add', 'cat'], got {}".format(self.policy)
+            )
 
 
 class FPNDecoder(nn.Module):
