@@ -150,7 +150,7 @@ mask, label = model(x)
 Depth parameter specify a number of downsampling operations in encoder, so you can make
 your model lighted if specify smaller `depth`.
 ```python
-model = smp.FPN('resnet34', depth=4)
+model = smp.Unet('resnet34', encoder_depth=4)
 ```
 
 
