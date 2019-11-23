@@ -52,12 +52,12 @@ class PSPNet(SegmentationModel):
         psp_use_batchnorm: bool = True,
         psp_dropout: float = 0.2,
         in_channels: int = 3,
-        classes: int = 1,
+        num_classes: int = 1,
         activation: Optional[Union[str, callable]] = None,
         upsampling: int = 8,
         aux_params: Optional[dict] = None,
     ):
-        super().__init__()
+        super().__init__(num_classes=num_classes)
 
         self.encoder = get_encoder(
             encoder_name,
@@ -75,7 +75,7 @@ class PSPNet(SegmentationModel):
 
         self.segmentation_head = SegmentationHead(
             in_channels=psp_out_channels,
-            out_channels=classes,
+            out_channels=num_classes,
             kernel_size=3,
             activation=activation,
             upsampling=upsampling,

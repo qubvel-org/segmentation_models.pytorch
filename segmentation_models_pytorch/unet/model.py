@@ -23,7 +23,7 @@ class Unet(SegmentationModel):
         decoder_attention_type: attention module used in decoder of the model
             One of [``None``, ``scse``]
         in_channels: number of input channels for model, default is 3.
-        classes: a number of classes for output (output shape - ``(batch, classes, h, w)``).
+        num_classes: a number of classes for output (output shape - ``(batch, classes, h, w)``).
         activation: activation function to apply after final convolution;
             One of [``sigmoid``, ``softmax``, ``logsoftmax``, ``identity``, callable, None]
         aux_params: if specified model will have additional classification auxiliary output
@@ -50,11 +50,11 @@ class Unet(SegmentationModel):
         decoder_channels: List[int] = (256, 128, 64, 32, 16),
         decoder_attention_type: Optional[str] = None,
         in_channels: int = 3,
-        classes: int = 1,
+        num_classes: int = 1,
         activation: Optional[Union[str, callable]] = None,
         aux_params: Optional[dict] = None,
     ):
-        super().__init__()
+        super().__init__(num_classes=num_classes)
 
         self.encoder = get_encoder(
             encoder_name,
@@ -74,7 +74,7 @@ class Unet(SegmentationModel):
 
         self.segmentation_head = SegmentationHead(
             in_channels=decoder_channels[-1],
-            out_channels=classes,
+            out_channels=num_classes,
             activation=activation,
             kernel_size=3,
         )

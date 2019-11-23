@@ -46,11 +46,11 @@ class Linknet(SegmentationModel):
         encoder_weights: Optional[str] = "imagenet",
         decoder_use_batchnorm: bool = True,
         in_channels: int = 3,
-        classes: int = 1,
+        num_classes: int = 1,
         activation: Optional[Union[str, callable]] = None,
         aux_params: Optional[dict] = None,
     ):
-        super().__init__()
+        super().__init__(num_classes=num_classes)
 
         self.encoder = get_encoder(
             encoder_name,
@@ -67,7 +67,7 @@ class Linknet(SegmentationModel):
         )
 
         self.segmentation_head = SegmentationHead(
-            in_channels=32, out_channels=classes, activation=activation, kernel_size=1
+            in_channels=32, out_channels=num_classes, activation=activation, kernel_size=1
         )
 
         if aux_params is not None:

@@ -1,8 +1,64 @@
 import torch
+from torch import nn
 from . import initialization as init
+from ..layers import out_modules
 
 
-class SegmentationModel(torch.nn.Module):
+class Module(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+    def save(self, path='new_state_dict.pth'):
+        torch.save(self.state_dict(), path)
+        print('saving module in', path)
+
+    def load(self, path=None):
+        if not path:
+            path = 'new_state_dict.pth'
+        self.load_state_dict(torch.load(path))
+        print('loading module from', path)
+
+
+class Model(Module):
+    def __init__(self):
+        super().__init__()
+
+    def predict(self, x):
+        raise NotImplementedError
+
+
+class ANNModel(Model):
+    def __init__(self):
+        super().__init__()
+
+    def predict(self, x):
+        raise NotImplementedError
+
+    def predict_prob(self, x):
+        raise NotImplementedError
+
+
+class EnsembleModel(Model):
+    def __init__(self):
+        super().__init__()
+
+    def predict(self, x):
+        raise NotImplementedError
+
+
+class SegmentationModel(ANNModel):
+
+    def __init__(self, num_classes):
+        super().__init__()
+        self.num_classes = num_classes
+        self.out_channels = num_classes
+
+        if self.out_channels == 1:
+            self.prediction_layer = out_modules.OutSigmoid(threshold=0.5)
+            self.prediction_prob_layer = out_modules.OutSigmoid(threshold=None)
+        else:
+            self.prediction_layer = out_modules.OutSoftmax(take_argmax_flag=True)
+            self.prediction_prob_layer = out_modules.OutSoftmax(take_argmax_flag=False)
 
     def initialize(self):
         init.initialize_decoder(self.decoder)
@@ -37,6 +93,26 @@ class SegmentationModel(torch.nn.Module):
             self.eval()
 
         with torch.no_grad():
-            x = self.forward(x)
+            # x = self.forward(x)
+            x = self(x)
 
-        return x
+        return self.prediction_layer(x)
+
+    def predict_prob(self, x):
+        """Inference method. Switch model to `eval` mode, call `.forward(x)` with `torch.no_grad()`
+
+        Args:
+            x: 4D torch tensor with shape (batch_size, channels, height, width)
+
+        Return:
+            prediction: 4D torch tensor with shape (batch_size, classes, height, width)
+
+        """
+        if self.training:
+            self.eval()
+
+        with torch.no_grad():
+            # x = self.forward(x)
+            x = self(x)
+
+        return self.prediction_prob_layer(x)
