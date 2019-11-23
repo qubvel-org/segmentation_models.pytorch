@@ -14,6 +14,8 @@ from .mobilenet import mobilenet_encoders
 
 from ._preprocessing import preprocess_input
 
+encoders_weights = {'imagenet', 'imagenet+background', 'imagenet+5k', 'instagram'}
+
 encoders = {}
 encoders.update(resnet_encoders)
 encoders.update(dpn_encoders)

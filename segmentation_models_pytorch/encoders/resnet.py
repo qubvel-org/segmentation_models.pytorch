@@ -31,9 +31,10 @@ from torchvision.models.resnet import Bottleneck
 from pretrainedmodels.models.torchvision_models import pretrained_settings
 
 from ._base import EncoderMixin
+from ..base.module import Module
 
 
-class ResNetEncoder(ResNet, EncoderMixin):
+class ResNetEncoder(ResNet, EncoderMixin, Module):
     def __init__(self, out_channels, depth=5, **kwargs):
         super().__init__(**kwargs)
         self._depth = depth

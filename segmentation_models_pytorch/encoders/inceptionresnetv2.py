@@ -28,9 +28,10 @@ from pretrainedmodels.models.inceptionresnetv2 import InceptionResNetV2
 from pretrainedmodels.models.inceptionresnetv2 import pretrained_settings
 
 from ._base import EncoderMixin
+from ..base.module import Module
 
 
-class InceptionResNetV2Encoder(InceptionResNetV2, EncoderMixin):
+class InceptionResNetV2Encoder(InceptionResNetV2, EncoderMixin, Module):
     def __init__(self, out_channels, depth=5, **kwargs):
         super().__init__(**kwargs)
 

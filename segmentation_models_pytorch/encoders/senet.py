@@ -24,6 +24,8 @@ Methods:
 """
 
 import torch.nn as nn
+from ..base.module import Module
+
 
 from pretrainedmodels.models.senet import (
     SENet,
@@ -35,7 +37,7 @@ from pretrainedmodels.models.senet import (
 from ._base import EncoderMixin
 
 
-class SENetEncoder(SENet, EncoderMixin):
+class SENetEncoder(SENet, EncoderMixin, Module):
     def __init__(self, out_channels, depth=5, **kwargs):
         super().__init__(**kwargs)
 

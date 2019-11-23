@@ -30,9 +30,10 @@ from pretrainedmodels.models.torchvision_models import pretrained_settings
 from torchvision.models.densenet import DenseNet
 
 from ._base import EncoderMixin
+from ..base.module import Module
 
 
-class DenseNetEncoder(DenseNet, EncoderMixin):
+class DenseNetEncoder(DenseNet, EncoderMixin, Module):
     def __init__(self, out_channels, depth=5, **kwargs):
         super().__init__(**kwargs)
         self._out_channels = out_channels

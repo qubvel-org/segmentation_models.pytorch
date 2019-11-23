@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from ..base import modules
+from ..base.module import Module
 
 
 class PSPBlock(nn.Module):
@@ -37,7 +38,7 @@ class PSPModule(nn.Module):
         return x
 
 
-class PSPDecoder(nn.Module):
+class PSPDecoder(Module):
 
     def __init__(
             self,

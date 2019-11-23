@@ -27,9 +27,10 @@ from efficientnet_pytorch import EfficientNet
 from efficientnet_pytorch.utils import url_map, get_model_params
 
 from ._base import EncoderMixin
+from ..base.module import Module
 
 
-class EfficientNetEncoder(EfficientNet, EncoderMixin):
+class EfficientNetEncoder(EfficientNet, EncoderMixin, Module):
     def __init__(self, stage_idxs, out_channels, model_name, depth=5):
 
         blocks_args, global_params = get_model_params(model_name, override_params=None)

@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from ..base.module import Module
 
 
 class Conv3x3GNReLU(nn.Module):
@@ -72,7 +73,7 @@ class MergeBlock(nn.Module):
             )
 
 
-class FPNDecoder(nn.Module):
+class FPNDecoder(Module):
     def __init__(
             self,
             encoder_channels,

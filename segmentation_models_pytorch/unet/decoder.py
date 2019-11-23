@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from ..base import modules as md
+from ..base.module import Module
 
 
 class DecoderBlock(nn.Module):
@@ -62,7 +63,7 @@ class CenterBlock(nn.Sequential):
         super().__init__(conv1, conv2)
 
 
-class UnetDecoder(nn.Module):
+class UnetDecoder(Module):
     def __init__(
             self,
             encoder_channels,

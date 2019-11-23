@@ -27,9 +27,10 @@ import torchvision
 import torch.nn as nn
 
 from ._base import EncoderMixin
+from ..base.module import Module
 
 
-class MobileNetV2Encoder(torchvision.models.MobileNetV2, EncoderMixin):
+class MobileNetV2Encoder(torchvision.models.MobileNetV2, EncoderMixin, Module):
 
     def __init__(self, out_channels, depth=5, **kwargs):
         super().__init__(**kwargs)

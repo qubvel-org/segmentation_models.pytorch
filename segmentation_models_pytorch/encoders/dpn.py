@@ -31,9 +31,10 @@ from pretrainedmodels.models.dpn import DPN
 from pretrainedmodels.models.dpn import pretrained_settings
 
 from ._base import EncoderMixin
+from ..base.module import Module
 
 
-class DPNEncorder(DPN, EncoderMixin):
+class DPNEncorder(DPN, EncoderMixin, Module):
     def __init__(self, stage_idxs, out_channels, depth=5, **kwargs):
         super().__init__(**kwargs)
         self._stage_idxs = stage_idxs

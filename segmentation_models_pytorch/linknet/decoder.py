@@ -1,6 +1,7 @@
 import torch.nn as nn
 
 from ..base import modules
+from ..base.module import Module
 
 
 class TransposeX2(nn.Sequential):
@@ -35,7 +36,7 @@ class DecoderBlock(nn.Module):
         return x
 
 
-class LinknetDecoder(nn.Module):
+class LinknetDecoder(Module):
 
     def __init__(
             self,

@@ -29,6 +29,7 @@ from torchvision.models.vgg import make_layers
 from pretrainedmodels.models.torchvision_models import pretrained_settings
 
 from ._base import EncoderMixin
+from ..base.module import Module
 
 # fmt: off
 cfg = {
@@ -40,7 +41,7 @@ cfg = {
 # fmt: on
 
 
-class VGGEncoder(VGG, EncoderMixin):
+class VGGEncoder(VGG, EncoderMixin, Module):
     def __init__(self, out_channels, config, batch_norm=False, depth=5, **kwargs):
         super().__init__(make_layers(config, batch_norm=batch_norm), **kwargs)
         self._out_channels = out_channels

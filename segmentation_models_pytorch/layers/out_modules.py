@@ -1,8 +1,8 @@
-from segmentation_models_pytorch.base.model import NetModule
-from segmentation_models_pytorch.layers import activations
+from ..base.module import Module
+from . import activations
 
 
-class OutLayer(NetModule):
+class OutLayer(Module):
     def __init__(self):
         super().__init__()
 
