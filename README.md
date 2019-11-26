@@ -7,7 +7,7 @@ The main features of this library are:
 
  - High level API (just two lines to create neural network)
  - 4 models architectures for binary and multi class segmentation (including legendary Unet)
- - 31 available encoders for each architecture
+ - 32 available encoders for each architecture
  - All encoders have pre-trained weights for faster and better convergence
 
 ### Table of content
@@ -106,6 +106,7 @@ preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
 |efficientnet-b6                 |imagenet                        |40M                             |
 |efficientnet-b7                 |imagenet                        |63M                             |
 |mobilenet_v2                    |imagenet                        |2M                              |
+|xception                    |imagenet                        |22M                              |
 
 ### Models API <a name="api"></a>
  - `model.encoder` - pretrained backbone to extract features of different spatial resolution

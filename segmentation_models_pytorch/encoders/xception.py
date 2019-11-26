@@ -6,19 +6,19 @@ from pretrainedmodels.models.xception import Xception
 
 from ._base import EncoderMixin
 
-class XceptionEncoder(Xception,EncoderMixin):
+class XceptionEncoder(Xception, EncoderMixin):
 
-    def __init__(self, out_channels, depth=5, *args, **kwargs):
+    def __init__(self, out_channels, *args, depth=5, **kwargs):
         super().__init__(*args, **kwargs)
         
         self._out_channels = out_channels
         self._depth = depth
         self._in_channels = 3
-        #modify padding to maintain output shape
-        self.conv1 = nn.Conv2d(3, 32, 3, 2, 1, bias=False)
-        self.conv2 = nn.Conv2d(32, 64, 3, 1, 1, bias=False)
         
-        self.pretrained = False
+        #modify padding to maintain output shape
+        self.conv1.padding = 1
+        self.conv2.padding = 1
+        
         del self.fc
 
     @staticmethod
