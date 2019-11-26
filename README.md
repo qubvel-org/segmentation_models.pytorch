@@ -17,8 +17,13 @@ The main features of this library are:
     1. [Architectures](#architectires)
     2. [Encoders](#encoders)
  4. [Models API](#api)
+    1. [Input channels](#input-channels)
+    2. [Auxiliary classification output](#auxiliary-classification-output)
+    3. [Depth](#depth)
  5. [Installation](#installation)
- 6. [License](#license)
+ 6. [Competitions won with the library](#competitions-won-with-the-library)
+ 7. [License](#license)
+ 8. [Contributing](#contributing)
 
 ### Quick start <a name="start"></a>
 Since the library is built on the PyTorch framework, created segmentation model is just a PyTorch nn.Module, which can be created as easy as:
@@ -47,7 +52,7 @@ preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
 ```
 ### Examples <a name="examples"></a>
  - Training model for cars segmentation on CamVid dataset [here](https://github.com/qubvel/segmentation_models.pytorch/blob/master/examples/cars%20segmentation%20(camvid).ipynb).
- - Training model with [Catalyst](https://github.com/catalyst-team/catalyst) (high-level framework for PyTorch) - [here](https://colab.research.google.com/gist/Scitator/e3fd90eec05162e16b476de832500576/cars-segmentation-camvid.ipynb).
+ - Training SMP model with [Catalyst](https://github.com/catalyst-team/catalyst) (high-level framework for PyTorch), [Ttach](https://github.com/qubvel/ttach) (TTA library for PyTorch) and [Albumentations](https://github.com/albu/albumentations) (fast image augmentation library) - [here](https://github.com/catalyst-team/catalyst/blob/master/examples/notebooks/segmentation-tutorial.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/catalyst-team/catalyst/blob/master/examples/notebooks/segmentation-tutorial.ipynb)
 
 ### Models <a name="models"></a>
 
@@ -109,11 +114,46 @@ preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
 |xception                    |imagenet                        |22M                              |
 
 ### Models API <a name="api"></a>
+
  - `model.encoder` - pretrained backbone to extract features of different spatial resolution
- - `model.decoder` - segmentation head, depends on models architecture (`Unet`/`Linknet`/`PSPNet`/`FPN`)
- - `model.activation` - output activation function, one of `sigmoid`, `softmax`
- - `model.forward(x)` - sequentially pass `x` through model\`s encoder and decoder (return logits!)
- - `model.predict(x)` - inference method, switch model to `.eval()` mode, call `.forward(x)` and apply activation function with `torch.no_grad()`
+ - `model.decoder` - depends on models architecture (`Unet`/`Linknet`/`PSPNet`/`FPN`)
+ - `model.segmentation_head` - last block to produce required number of mask channels (include also optional upsampling and activation)
+ - `model.classification_head` - optional block which create classification head on top of encoder
+ - `model.forward(x)` - sequentially pass `x` through model\`s encoder, decoder and segmentation head (and classification head if specified)
+
+##### Input channels
+Input channels parameter allow you to create models, which process tensors with arbitrary number of channels.
+If you use pretrained weights from imagenet - weights of first convolution will be reused for
+1- or 2- channels inputs, for input channels > 4 weights of first convolution will be initialized randomly.
+```python
+model = smp.FPN('resnet34', in_channels=1)
+mask = model(torch.ones([1, 1, 64, 64]))
+```
+
+##### Auxiliary classification output  
+All models support `aux_params` parameters, which is default set to `None`. 
+If `aux_params = None` than classification auxiliary output is not created, else
+model produce not only `mask`, but also `label` output with shape `NC`.
+Classification head consist of GlobalPooling->Dropout(optional)->Linear->Activation(optional) layers, which can be 
+configured by `aux_params` as follows:
+```python
+aux_params=dict(
+    pooling='avg',             # one of 'avg', 'max'
+    dropout=0.5,               # dropout ratio, default is None
+    activation='sigmoid',      # activation function, default is None
+    classes=4,                 # define number of output labels
+)
+model = smp.Unet('resnet34', classes=4, aux_params=aux_params)
+mask, label = model(x)
+```
+
+##### Depth
+Depth parameter specify a number of downsampling operations in encoder, so you can make
+your model lighted if specify smaller `depth`.
+```python
+model = smp.FPN('resnet34', depth=4)
+```
+
 
 ### Installation <a name="installation"></a>
 PyPI version:
@@ -124,8 +164,16 @@ Latest version from source:
 ```bash
 $ pip install git+https://github.com/qubvel/segmentation_models.pytorch
 ````
+
+### Competitions won with the library
+
+`Segmentation Models` package is widely used in the image segmentation competitions.
+[Here](https://github.com/qubvel/segmentation_models.pytorch/blob/master/HALLOFFAME.md) you can find competitions, names of the winners and links to their solutions.
+
+
 ### License <a name="license"></a>
 Project is distributed under [MIT License](https://github.com/qubvel/segmentation_models.pytorch/blob/master/LICENSE)
+
 
 ### Contributing
 
