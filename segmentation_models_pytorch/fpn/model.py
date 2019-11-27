@@ -89,4 +89,3 @@ class FPN(SegmentationModel):
             self.classification_head = None
 
         self.name = "fpn-{}".format(encoder_name)
-        self.initialize()

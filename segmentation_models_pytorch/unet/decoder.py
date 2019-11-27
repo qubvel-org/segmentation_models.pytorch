@@ -5,6 +5,8 @@ import torch.nn.functional as F
 from ..base import modules as md
 from ..base.module import Module
 
+from ..base import initialize_decoder
+
 
 class DecoderBlock(nn.Module):
     def __init__(
@@ -105,6 +107,8 @@ class UnetDecoder(Module):
             for in_ch, skip_ch, out_ch in zip(in_channels, skip_channels, out_channels)
         ]
         self.blocks = nn.ModuleList(blocks)
+
+        initialize_decoder(self)
 
     def forward(self, *features):
 

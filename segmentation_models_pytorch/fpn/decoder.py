@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
+from ..base import initialize_decoder
 from ..base.module import Module
 
 
@@ -104,6 +106,8 @@ class FPNDecoder(Module):
 
         self.merge = MergeBlock(merge_policy)
         self.dropout = nn.Dropout2d(p=dropout, inplace=True)
+
+        initialize_decoder(self)
 
     def forward(self, *features):
         c2, c3, c4, c5 = features[-4:]

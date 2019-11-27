@@ -1,4 +1,5 @@
 import torch.nn as nn
+from ..base import initialize_decoder
 
 from ..base import modules
 from ..base.module import Module
@@ -56,6 +57,8 @@ class LinknetDecoder(Module):
             DecoderBlock(channels[i], channels[i + 1], use_batchnorm=use_batchnorm)
             for i in range(n_blocks)
         ])
+
+        initialize_decoder(self)
 
     def forward(self, *features):
         features = features[1:]  # remove first skip

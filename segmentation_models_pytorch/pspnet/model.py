@@ -89,4 +89,3 @@ class PSPNet(SegmentationModel):
             self.classification_head = None
 
         self.name = "psp-{}".format(encoder_name)
-        self.initialize()

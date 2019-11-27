@@ -78,4 +78,3 @@ class Linknet(SegmentationModel):
             self.classification_head = None
 
         self.name = "link-{}".format(encoder_name)
-        self.initialize()

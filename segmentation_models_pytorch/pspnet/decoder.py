@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from ..base import initialize_decoder
 
 from ..base import modules
 from ..base.module import Module
@@ -63,6 +64,8 @@ class PSPDecoder(Module):
         )
 
         self.dropout = nn.Dropout2d(p=dropout)
+
+        initialize_decoder(self)
 
     def forward(self, *features):
         x = features[-1]

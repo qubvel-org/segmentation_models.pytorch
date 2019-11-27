@@ -88,4 +88,3 @@ class Unet(SegmentationModel):
             self.classification_head = None
 
         self.name = "u-{}".format(encoder_name)
-        self.initialize()

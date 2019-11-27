@@ -45,12 +45,6 @@ class SegmentationModel(ANNModel):
             self.prediction_layer = out_modules.OutSoftmax(take_argmax_flag=True)
             self.prediction_prob_layer = out_modules.OutSoftmax(take_argmax_flag=False)
 
-    def initialize(self):
-        init.initialize_decoder(self.decoder)
-        init.initialize_head(self.segmentation_head)
-        if self.classification_head is not None:
-            init.initialize_head(self.classification_head)
-
     def forward(self, x):
         """Sequentially pass `x` trough model`s encoder, decoder and heads"""
         features = self.encoder(x)

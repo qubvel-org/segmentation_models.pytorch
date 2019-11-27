@@ -1,5 +1,6 @@
 import torch.nn as nn
 from .modules import Flatten, Activation
+from ..base import initialize_head
 
 
 class SegmentationHead(nn.Sequential):
@@ -9,6 +10,8 @@ class SegmentationHead(nn.Sequential):
         upsampling = nn.UpsamplingBilinear2d(scale_factor=upsampling) if upsampling > 1 else nn.Identity()
         activation = Activation(activation)
         super().__init__(conv2d, upsampling, activation)
+
+        initialize_head(self)
 
 
 class ClassificationHead(nn.Sequential):
@@ -22,3 +25,5 @@ class ClassificationHead(nn.Sequential):
         linear = nn.Linear(in_channels, classes, bias=True)
         activation = Activation(activation)
         super().__init__(pool, flatten, dropout, linear, activation)
+
+        initialize_head(self)
