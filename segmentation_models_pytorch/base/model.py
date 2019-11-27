@@ -78,7 +78,6 @@ class SegmentationModel(ANNModel):
             self.eval()
 
         with torch.no_grad():
-            # x = self.forward(x)
             x = self(x)
 
         return self.prediction_layer(x)
