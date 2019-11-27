@@ -10,3 +10,4 @@ from .heads import (
     ClassificationHead,
 )
 
+from .initialization import initialize_decoder, initialize_head
