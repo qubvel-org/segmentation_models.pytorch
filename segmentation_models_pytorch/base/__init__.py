@@ -1,3 +1,5 @@
+from .initialization import initialize_decoder, initialize_head
+
 from .model import SegmentationModel
 
 from .modules import (
@@ -9,5 +11,3 @@ from .heads import (
     SegmentationHead,
     ClassificationHead,
 )
-
-from .initialization import initialize_decoder, initialize_head
