@@ -67,8 +67,9 @@ class EfficientNetEncoder(EfficientNet, EncoderMixin, Module):
         return features
 
     def load_state_dict(self, state_dict, **kwargs):
-        state_dict.pop("_fc.bias")
-        state_dict.pop("_fc.weight")
+
+        state_dict.pop("_fc.bias") if '_fc.bias' in state_dict.keys() else print('fc.bias not in dict')
+        state_dict.pop("_fc.weight") if '_fc.weight' in state_dict.keys() else print('fc.weight not in dict')
         super().load_state_dict(state_dict, **kwargs)
 
 
