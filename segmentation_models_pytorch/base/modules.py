@@ -58,7 +58,7 @@ class SCSEModule(nn.Module):
             nn.Conv2d(in_channels // reduction, in_channels, 1),
             nn.Sigmoid(),
         )
-        self.sSE = nn.Sequential(nn.Conv2d(in_channels, in_channels, 1), nn.Sigmoid())
+        self.sSE = nn.Sequential(nn.Conv2d(in_channels, 1, 1), nn.Sigmoid())
 
     def forward(self, x):
         return x * self.cSE(x) + x * self.sSE(x)
