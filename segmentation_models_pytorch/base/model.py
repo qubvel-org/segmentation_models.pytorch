@@ -73,6 +73,8 @@ class SegmentationModel(ANNModel):
 
         with torch.no_grad():
             x = self(x)
+            if self.classification_head is not None:
+                x = x[0]
 
         return self.prediction_layer(x)
 
@@ -90,8 +92,9 @@ class SegmentationModel(ANNModel):
             self.eval()
 
         with torch.no_grad():
-            # x = self.forward(x)
             x = self(x)
+            if self.classification_head is not None:
+                x = x[0]
 
         return self.prediction_prob_layer(x)
 
