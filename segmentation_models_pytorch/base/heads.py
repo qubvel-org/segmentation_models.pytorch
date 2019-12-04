@@ -27,3 +27,17 @@ class ClassificationHead(nn.Sequential):
         super().__init__(pool, flatten, dropout, linear, activation)
 
         initialize_head(self)
+
+
+class SegmentationHeadMulti(nn.Sequential):
+
+    def __init__(self, in_channels, out_channels, kernel_size=3, activation=None, upsampling=1):
+        conv2d1 = nn.Conv2d(in_channels, in_channels, kernel_size=kernel_size, padding=kernel_size // 2)
+        relu1 = nn.ReLU(True)
+        conv2d2 = nn.Conv2d(in_channels, in_channels, kernel_size=kernel_size, padding=kernel_size // 2)
+        relu2 = nn.ReLU(True)
+        conv2d3 = nn.Conv2d(in_channels, in_channels, kernel_size=kernel_size, padding=kernel_size // 2)
+
+        super().__init__(conv2d, upsampling, activation)
+
+        initialize_head(self)

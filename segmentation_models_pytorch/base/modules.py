@@ -66,12 +66,13 @@ class SCSEModule(nn.Module):
 
 
 class EncoderDecoderAttention(nn.Module):
-    def _init_(self, encoder_channels, decoder_channels, out_channels):
+    def __init__(self, encoder_channels, decoder_channels, out_channels):
         super().__init__()
         self.encoder_channels = encoder_channels
         self.decoder_channels = decoder_channels
         self.out_channels = out_channels
         self.attention_weight = nn.Parameter(torch.Tensor(encoder_channels, out_channels, decoder_channels))
+        nn.init.xavier_uniform_(self.attention_weight)
 
     def forward(self, encoder_inp, decoder_inp):
         x1 = encoder_inp.permute(0, 2, 3, 1)

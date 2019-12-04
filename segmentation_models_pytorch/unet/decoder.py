@@ -46,6 +46,85 @@ class DecoderBlock(nn.Module):
         return x
 
 
+class AttentionDecoderBlock(nn.Module):
+    def __init__(
+            self,
+            in_channels,
+            skip_channels,
+            out_channels,
+            use_batchnorm=True,
+            attention_type=None,
+    ):
+        super().__init__()
+
+        attention_channels = skip_channels // 10
+        print(attention_channels)
+        print(skip_channels)
+        print(in_channels)
+        print('')
+
+        self.conv1 = md.Conv2dReLU(
+            in_channels + skip_channels + attention_channels,
+            out_channels,
+            kernel_size=3,
+            padding=1,
+            use_batchnorm=use_batchnorm,
+        )
+        self.conv2 = md.Conv2dReLU(
+            out_channels,
+            out_channels,
+            kernel_size=3,
+            padding=1,
+            use_batchnorm=use_batchnorm,
+        )
+        if skip_channels:
+            self.attention = md.EncoderDecoderAttention(skip_channels, in_channels, attention_channels)
+
+    def forward(self, x, skip=None):
+        x = F.interpolate(x, scale_factor=2, mode="nearest")
+        if skip is not None:
+            attention = self.attention(skip, x)
+            x = torch.cat([x, skip, attention], dim=1)
+        x = self.conv1(x)
+        x = self.conv2(x)
+        return x
+
+
+class NewDecoderBlock(nn.Module):
+    def __init__(
+            self,
+            in_channels,
+            skip_channels,
+            out_channels,
+            use_batchnorm=True,
+            attention_type=None,
+    ):
+        super().__init__()
+
+        self.conv1 = md.Conv2dReLU(
+            in_channels + skip_channels,
+            out_channels,
+            kernel_size=3,
+            padding=1,
+            use_batchnorm=use_batchnorm,
+        )
+        self.conv2 = md.Conv2dReLU(
+            out_channels,
+            out_channels,
+            kernel_size=3,
+            padding=1,
+            use_batchnorm=use_batchnorm,
+        )
+
+    def forward(self, x, skip=None):
+        x = F.interpolate(x, scale_factor=2, mode="nearest")
+        if skip is not None:
+            x = torch.cat([x, skip], dim=1)
+        x = self.conv1(x)
+        x = self.conv2(x)
+        return x
+
+
 class CenterBlock(nn.Sequential):
     def __init__(self, in_channels, out_channels, use_batchnorm=True):
         conv1 = md.Conv2dReLU(
