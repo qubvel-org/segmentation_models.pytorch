@@ -2,7 +2,8 @@ import torch
 from torch import nn
 
 
-activations = {'sigmoid': torch.nn.Sigmoid, 'softmax2d': torch.nn.Softmax2d, None: 'linear'}
+activations = {'sigmoid': torch.nn.Sigmoid, 'softmax2d': torch.nn.Softmax2d, None: 'linear',
+               'softmax': torch.nn.Softmax}
 
 
 class ActivationMaker(nn.Module):

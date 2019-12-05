@@ -1,3 +1,5 @@
+import torch
+
 from ..base.module import Module
 from . import activations
 
@@ -31,6 +33,17 @@ class OutSoftmax(OutLayer):
         return x
 
 
+class OutSoftmax1D(OutLayer):
+    def __init__(self, take_argmax_flag=True):
+        super().__init__()
+        self.activation_maker = torch.nn.Softmax(dim=1)
+
+    def forward(self, x):
+        x = self.activation_maker(x)
+        x = torch.argmax(x, dim=1)
+        return x
+
+
 class PredictionLayer(OutLayer):
     def __init__(self, activation_name):
         super().__init__()
@@ -38,6 +51,8 @@ class PredictionLayer(OutLayer):
             self.layer = OutSigmoid()
         elif activation_name == 'softmax2d':
             self.layer = OutSoftmax()
+        elif activation_name == 'softmax':
+            self.layer = OutSoftmax1D()
         else:
             self.layer = None
 

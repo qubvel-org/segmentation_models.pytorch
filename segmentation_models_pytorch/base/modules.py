@@ -72,6 +72,8 @@ class EncoderDecoderAttention(nn.Module):
         self.decoder_channels = decoder_channels
         self.out_channels = out_channels
         self.attention_weight = nn.Parameter(torch.Tensor(encoder_channels, out_channels, decoder_channels))
+        self.batchnorm = nn.BatchNorm2d(out_channels)
+        self.activation = nn.Tanh()
         nn.init.xavier_uniform_(self.attention_weight)
 
     def forward(self, encoder_inp, decoder_inp):
@@ -82,6 +84,8 @@ class EncoderDecoderAttention(nn.Module):
         result = result.view(-1, self.out_channels, self.decoder_channels)
         result = torch.bmm(result, x2.reshape(-1, self.decoder_channels, 1)).\
             reshape(batch_size, height, width, self.out_channels).permute(0, 3, 1, 2)
+        result = self.batchnorm(result)
+        result = self.activation(result)
         return result
 
 
@@ -119,6 +123,8 @@ class Attention(nn.Module):
             self.attention = nn.Identity(**params)
         elif name == 'scse':
             self.attention = SCSEModule(**params)
+        elif name == 'eda':
+            self.attention = EncoderDecoderAttention(**params)
         else:
             raise ValueError("Attention {} is not implemented".format(name))
 
