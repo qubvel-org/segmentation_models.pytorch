@@ -57,11 +57,7 @@ class AttentionDecoderBlock(nn.Module):
     ):
         super().__init__()
 
-        attention_channels = skip_channels // 10
-        print(attention_channels)
-        print(skip_channels)
-        print(in_channels)
-        print('')
+        attention_channels = skip_channels // 5
 
         self.conv1 = md.Conv2dReLU(
             in_channels + skip_channels + attention_channels,
