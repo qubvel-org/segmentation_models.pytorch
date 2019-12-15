@@ -1,7 +1,9 @@
 <div align="center">
  
 ![logo](https://i.ibb.co/dc1XdhT/Segmentation-Models-V2-Side-1-1.png)  
-**Segmentation Models** is python library with Neural Networks for Image Segmentation based on PyTorch.
+Python library with Neural Networks for Image  
+Segmentation based on [PyTorch](https://pytorch.org/).  
+
 ![PyPI version](https://badge.fury.io/py/segmentation-models-pytorch.svg) [![Build Status](https://travis-ci.com/qubvel/segmentation_models.pytorch.svg?branch=master)](https://travis-ci.com/qubvel/segmentation_models.pytorch) [![Generic badge](https://img.shields.io/badge/License-MIT-<COLOR>.svg)](https://shields.io/)
 
 </div>
