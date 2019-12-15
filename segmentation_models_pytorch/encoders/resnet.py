@@ -34,11 +34,12 @@ from ._base import EncoderMixin
 
 
 class ResNetEncoder(ResNet, EncoderMixin):
-    def __init__(self, out_channels, depth=5, **kwargs):
+    def __init__(self, out_channels, depth=5, strided_layers=None, **kwargs):
         super().__init__(**kwargs)
         self._depth = depth
         self._out_channels = out_channels
         self._in_channels = 3
+        self._strided_layers = strided_layers or dict()
         del self.fc
 
     def forward(self, x):
@@ -64,6 +65,18 @@ class ResNetEncoder(ResNet, EncoderMixin):
         super().load_state_dict(state_dict, **kwargs)
 
 
+strided_layers_basic_block = {
+    3: ('layer3.0.conv1', 'layer3.0.downsample.0'),
+    4: ('layer3.0.conv1', 'layer3.0.downsample.0'),
+    5: ('layer4.0.conv1', 'layer4.0.downsample.0'),
+}
+
+strided_layers_bottleneck_block = {
+    3: ('layer3.0.conv2', 'layer3.0.downsample.0'),
+    4: ('layer3.0.conv2', 'layer3.0.downsample.0'),
+    5: ('layer4.0.conv2', 'layer4.0.downsample.0'),
+}
+
 resnet_encoders = {
     "resnet18": {
         "encoder": ResNetEncoder,
@@ -72,6 +85,7 @@ resnet_encoders = {
             "out_channels": (3, 64, 64, 128, 256, 512),
             "block": BasicBlock,
             "layers": [2, 2, 2, 2],
+            "strided_layers": strided_layers_basic_block,
         },
     },
     "resnet34": {
@@ -81,6 +95,7 @@ resnet_encoders = {
             "out_channels": (3, 64, 64, 128, 256, 512),
             "block": BasicBlock,
             "layers": [3, 4, 6, 3],
+            "strided_layers": strided_layers_basic_block,
         },
     },
     "resnet50": {
@@ -90,6 +105,7 @@ resnet_encoders = {
             "out_channels": (3, 64, 256, 512, 1024, 2048),
             "block": Bottleneck,
             "layers": [3, 4, 6, 3],
+            "strided_layers": strided_layers_bottleneck_block,
         },
     },
     "resnet101": {
@@ -99,6 +115,7 @@ resnet_encoders = {
             "out_channels": (3, 64, 256, 512, 1024, 2048),
             "block": Bottleneck,
             "layers": [3, 4, 23, 3],
+            "strided_layers": strided_layers_bottleneck_block,
         },
     },
     "resnet152": {
@@ -108,6 +125,7 @@ resnet_encoders = {
             "out_channels": (3, 64, 256, 512, 1024, 2048),
             "block": Bottleneck,
             "layers": [3, 8, 36, 3],
+            "strided_layers": strided_layers_bottleneck_block,
         },
     },
     "resnext50_32x4d": {
@@ -129,6 +147,7 @@ resnet_encoders = {
             "layers": [3, 4, 6, 3],
             "groups": 32,
             "width_per_group": 4,
+            "strided_layers": strided_layers_bottleneck_block,
         },
     },
     "resnext101_32x8d": {
@@ -159,6 +178,7 @@ resnet_encoders = {
             "layers": [3, 4, 23, 3],
             "groups": 32,
             "width_per_group": 8,
+            "strided_layers": strided_layers_bottleneck_block,
         },
     },
     "resnext101_32x16d": {
@@ -180,6 +200,7 @@ resnet_encoders = {
             "layers": [3, 4, 23, 3],
             "groups": 32,
             "width_per_group": 16,
+            "strided_layers": strided_layers_bottleneck_block,
         },
     },
     "resnext101_32x32d": {
@@ -201,6 +222,7 @@ resnet_encoders = {
             "layers": [3, 4, 23, 3],
             "groups": 32,
             "width_per_group": 32,
+            "strided_layers": strided_layers_bottleneck_block,
         },
     },
     "resnext101_32x48d": {
@@ -222,6 +244,7 @@ resnet_encoders = {
             "layers": [3, 4, 23, 3],
             "groups": 32,
             "width_per_group": 48,
+            "strided_layers": strided_layers_bottleneck_block,
         },
     },
 }

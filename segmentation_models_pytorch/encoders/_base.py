@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 from typing import List
+from collections import OrderedDict
 
 
 class EncoderMixin:
@@ -8,8 +9,9 @@ class EncoderMixin:
         - output channels specification of feature tensors (produced by encoder)
         - patching first convolution for arbitrary input channels
     """
+
     @property
-    def out_channels(self) -> List:
+    def out_channels(self):
         """Return channels dimensions for each tensor of forward output of encoder"""
         return self._out_channels[: self._depth + 1]
 
@@ -23,6 +25,28 @@ class EncoderMixin:
             self._out_channels = tuple([in_channels] + list(self._out_channels)[1:])
 
         patch_first_conv(model=self, in_channels=in_channels)
+
+    def replace_strides_with_dilation(self, stages: List):
+
+        def get_layer_by_name(module, name):
+            for name in name.split('.'):
+                module = getattr(module, name)
+            return module
+
+        for i, stage in enumerate(stages, 1):
+            stage_strided_layers = self._strided_layers[stage]
+            stage_dilation_rate = (2 ** i, 2 ** i)
+            for layer_name in stage_strided_layers:
+                module = get_layer_by_name(self, layer_name)
+
+                # replace strides with dilation
+                module.dilation = stage_dilation_rate
+                module.stride = (1, 1)
+
+                # change padding
+                k = module.kernel_size
+                d = module.dilation
+                module.padding = ((k[0] // 2) * d[0], (k[1] // 2) * d[1])
 
 
 def patch_first_conv(model, in_channels):
