@@ -66,7 +66,8 @@ def test_aux_output(model_class):
     model = model_class(
         DEFAULT_ENCODER, encoder_weights=None, aux_params=dict(classes=2)
     )
-    sample, label_size = DEFAULT_PAN_SAMPLE, (2, 2) if model_class is smp.PAN else (DEFAULT_SAMPLE, (1, 2))
+    sample = DEFAULT_PAN_SAMPLE if model_class is smp.PAN else DEFAULT_SAMPLE
+    label_size = (2, 2) if model_class is smp.PAN else (1, 2)
     mask, label = model(sample)
     assert label.size() == label_size
 
