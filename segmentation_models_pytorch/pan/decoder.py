@@ -4,7 +4,6 @@ import torch.nn.functional as F
 
 
 class ConvBnRelu(nn.Module):
-
     def __init__(
             self,
             in_channels: int,
@@ -39,7 +38,6 @@ class ConvBnRelu(nn.Module):
 
 
 class FPABlock(nn.Module):
-
     def __init__(
             self,
             in_channels,
@@ -110,7 +108,6 @@ class FPABlock(nn.Module):
 
 
 class GAUBlock(nn.Module):
-
     def __init__(
             self,
             in_channels: int,
@@ -120,26 +117,21 @@ class GAUBlock(nn.Module):
         super(GAUBlock, self).__init__()
 
         self.upscale_mode = upscale_mode
-
-        if self.upscale_mode == 'bilinear':
-            self.align_corners = True
-        else:
-            self.align_corners = False
+        self.align_corners = True if upscale_mode == 'bilinear' else None
 
         self.conv1 = nn.Sequential(
             nn.AdaptiveAvgPool2d(1),
-            ConvBnRelu(
-                in_channels=out_channels, out_channels=out_channels, kernel_size=1, add_relu=False
-            ),
+            ConvBnRelu(in_channels=out_channels, out_channels=out_channels, kernel_size=1, add_relu=False),
             nn.Sigmoid()
         )
-        self.conv2 = ConvBnRelu(
-            in_channels=in_channels, out_channels=out_channels, kernel_size=3, padding=1
-        )
+        self.conv2 = ConvBnRelu(in_channels=in_channels, out_channels=out_channels, kernel_size=3, padding=1)
 
-    # x: low level feature
-    # y: high level feature
     def forward(self, x, y):
+        """
+        Args:
+            x: low level feature
+            y: high level feature
+        """
         h, w = x.size(2), x.size(3)
         y_up = F.interpolate(
             y, size=(h, w), mode=self.upscale_mode, align_corners=self.align_corners
