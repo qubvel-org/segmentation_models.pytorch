@@ -6,7 +6,10 @@ from ..base import SegmentationHead, ClassificationHead
 
 
 class PAN(SegmentationModel):
-    """ Implementation of _PAN (Pyramid Attention Network)
+    """ Implementation of _PAN (Pyramid Attention Network).
+    Currently works with shape of input tensor >= [B x C x 128 x 128] for pytorch <= 1.1.0
+    and with shape of input tensor >= [B x C x 256 x 256] for pytorch == 1.3.1
+
 
     Args:
         encoder_name: name of classification model (without last dense layers) used as feature
