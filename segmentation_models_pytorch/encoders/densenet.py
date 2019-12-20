@@ -54,6 +54,10 @@ class DenseNetEncoder(DenseNet, EncoderMixin):
         self._in_channels = 3
         del self.classifier
 
+    def make_dilated(self, stage_list, dilation_list):
+        raise ValueError("DenseNet encoders do not support dilated mode "
+                         "due to pooling operation for downsampling!")
+
     def get_stages(self):
         return [
             nn.Identity(),

@@ -90,6 +90,10 @@ def test_in_channels(model_class, encoder_name, in_channels):
 
 @pytest.mark.parametrize("encoder_name", ENCODERS)
 def test_dilation(encoder_name):
+    if (encoder_name in ['inceptionresnetv2', 'xception', 'inceptionv4'] or
+            encoder_name.startswith('vgg') or encoder_name.startswith('densenet')):
+        return
+
     encoder = smp.encoders.get_encoder(encoder_name)
     encoder.make_dilated(
         stage_list=[5],
@@ -101,7 +105,7 @@ def test_dilation(encoder_name):
         output = encoder(DEFAULT_SAMPLE)
 
     shapes = [out.shape[-1] for out in output]
-    assert shapes == (64, 32, 16, 8, 4, 4)  # last downsampling replaced with dilation
+    assert shapes == [64, 32, 16, 8, 4, 4]  # last downsampling replaced with dilation
 
 
 if __name__ == "__main__":
