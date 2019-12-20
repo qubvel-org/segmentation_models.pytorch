@@ -9,7 +9,6 @@ sys.modules["torchvision._C"] = mock.Mock()
 
 import segmentation_models_pytorch as smp
 
-
 IS_TRAVIS = os.environ.get("TRAVIS", False)
 
 
@@ -87,6 +86,26 @@ def test_in_channels(model_class, encoder_name, in_channels):
         model(sample)
 
     assert model.encoder._in_channels == in_channels
+
+
+@pytest.mark.parametrize("encoder_name", ENCODERS)
+def test_dilation(encoder_name):
+    if (encoder_name in ['inceptionresnetv2', 'xception', 'inceptionv4'] or
+            encoder_name.startswith('vgg') or encoder_name.startswith('densenet')):
+        return
+
+    encoder = smp.encoders.get_encoder(encoder_name)
+    encoder.make_dilated(
+        stage_list=[5],
+        dilation_list=[2],
+    )
+
+    encoder.eval()
+    with torch.no_grad():
+        output = encoder(DEFAULT_SAMPLE)
+
+    shapes = [out.shape[-1] for out in output]
+    assert shapes == [64, 32, 16, 8, 4, 4]  # last downsampling replaced with dilation
 
 
 if __name__ == "__main__":
