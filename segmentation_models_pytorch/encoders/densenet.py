@@ -32,6 +32,20 @@ from torchvision.models.densenet import DenseNet
 from ._base import EncoderMixin
 
 
+class TransitionWithSkip(nn.Module):
+
+    def __init__(self, module):
+        super().__init__()
+        self.module = module
+
+    def forward(self, x):
+        for module in self.module:
+            x = module(x)
+            if isinstance(module, nn.ReLU):
+                skip = x
+        return x, skip
+
+
 class DenseNetEncoder(DenseNet, EncoderMixin):
     def __init__(self, out_channels, depth=5, **kwargs):
         super().__init__(**kwargs)
@@ -40,44 +54,33 @@ class DenseNetEncoder(DenseNet, EncoderMixin):
         self._in_channels = 3
         del self.classifier
 
-    @staticmethod
-    def _transition(x, transition_block):
-        for module in transition_block:
-            x = module(x)
-            if isinstance(module, nn.ReLU):
-                skip = x
-        return x, skip
+    def make_dilated(self, stage_list, dilation_list):
+        raise ValueError("DenseNet encoders do not support dilated mode "
+                         "due to pooling operation for downsampling!")
+
+    def get_stages(self):
+        return [
+            nn.Identity(),
+            nn.Sequential(self.features.conv0, self.features.norm0, self.features.relu0),
+            nn.Sequential(self.features.pool0, self.features.denseblock1,
+                          TransitionWithSkip(self.features.transition1)),
+            nn.Sequential(self.features.denseblock2, TransitionWithSkip(self.features.transition2)),
+            nn.Sequential(self.features.denseblock3, TransitionWithSkip(self.features.transition3)),
+            nn.Sequential(self.features.denseblock4, self.features.norm5)
+        ]
 
     def forward(self, x):
 
-        features = [x]
+        stages = self.get_stages()
 
-        if self._depth > 0:
-            x = self.features.conv0(x)
-            x = self.features.norm0(x)
-            x = self.features.relu0(x)
-            features.append(x)
-
-        if self._depth > 1:
-            x = self.features.pool0(x)
-            x = self.features.denseblock1(x)
-            x, x1 = self._transition(x, self.features.transition1)
-            features.append(x1)
-
-        if self._depth > 2:
-            x = self.features.denseblock2(x)
-            x, x2 = self._transition(x, self.features.transition2)
-            features.append(x2)
-
-        if self._depth > 3:
-            x = self.features.denseblock3(x)
-            x, x3 = self._transition(x, self.features.transition3)
-            features.append(x3)
-
-        if self._depth > 4:
-            x = self.features.denseblock4(x)
-            x4 = self.features.norm5(x)
-            features.append(x4)
+        features = []
+        for i in range(self._depth + 1):
+            x = stages[i](x)
+            if isinstance(x, (list, tuple)):
+                x, skip = x
+                features.append(skip)
+            else:
+                features.append(x)
 
         return features
 

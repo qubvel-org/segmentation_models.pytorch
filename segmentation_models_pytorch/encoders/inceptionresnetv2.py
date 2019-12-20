@@ -50,9 +50,12 @@ class InceptionResNetV2Encoder(InceptionResNetV2, EncoderMixin):
         del self.avgpool_1a
         del self.last_linear
 
-    def forward(self, x):
+    def make_dilated(self, stage_list, dilation_list):
+        raise ValueError("InceptionResnetV2 encoder does not support dilated mode "
+                         "due to pooling operation for downsampling!")
 
-        stages = [
+    def get_stages(self):
+        return [
             nn.Identity(),
             nn.Sequential(self.conv2d_1a, self.conv2d_2a, self.conv2d_2b),
             nn.Sequential(self.maxpool_3a, self.conv2d_3b, self.conv2d_4a),
@@ -60,6 +63,10 @@ class InceptionResNetV2Encoder(InceptionResNetV2, EncoderMixin):
             nn.Sequential(self.mixed_6a, self.repeat_1),
             nn.Sequential(self.mixed_7a, self.repeat_2, self.block8, self.conv2d_7b),
         ]
+
+    def forward(self, x):
+
+        stages = self.get_stages()
 
         features = []
         for i in range(self._depth + 1):
