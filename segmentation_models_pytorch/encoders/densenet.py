@@ -32,6 +32,20 @@ from torchvision.models.densenet import DenseNet
 from ._base import EncoderMixin
 
 
+class TransitionWithSkip(nn.Module):
+
+    def __init__(self, module):
+        super().__init__()
+        self.module = module
+
+    def forward(self, x):
+        for module in self.module:
+            x = module(x)
+            if isinstance(module, nn.ReLU):
+                skip = x
+        return x, skip
+
+
 class DenseNetEncoder(DenseNet, EncoderMixin):
     def __init__(self, out_channels, depth=5, **kwargs):
         super().__init__(**kwargs)
@@ -39,6 +53,15 @@ class DenseNetEncoder(DenseNet, EncoderMixin):
         self._depth = depth
         self._in_channels = 3
         del self.classifier
+
+    def get_stages_modules(self):
+        return [
+            nn.Identity(),
+            nn.Sequential(self.features.conv0, self.features.norm0, self.features.relu0),
+            nn.Sequential(self.features.pool0, self.features.denseblock1, TransitionWithSkip(self.features.transition1)),
+            #nn.Sequential(self.features.pool0, self.features.denseblock1, TransitionWithSkip(self.features.transition1)),
+            #nn.Sequential(self.features.pool0, self.features.denseblock1, TransitionWithSkip(self.features.transition1)),
+        ]
 
     @staticmethod
     def _transition(x, transition_block):

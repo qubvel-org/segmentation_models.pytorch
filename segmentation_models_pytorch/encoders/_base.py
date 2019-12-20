@@ -25,6 +25,11 @@ class EncoderMixin:
         patch_first_conv(model=self, in_channels=in_channels)
 
 
+    def get_stages_modules(self):
+        """Method should be overridden in encoder"""
+        raise NotImplementedError
+
+
 def patch_first_conv(model, in_channels):
     """Change first convolution layer input channels.
     In case:

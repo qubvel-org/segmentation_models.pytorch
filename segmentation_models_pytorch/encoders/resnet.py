@@ -41,8 +41,8 @@ class ResNetEncoder(ResNet, EncoderMixin):
         self._in_channels = 3
         del self.fc
 
-    def forward(self, x):
-        stages = [
+    def get_stages_modules(self):
+        return [
             nn.Identity(),
             nn.Sequential(self.conv1, self.bn1, self.relu),
             nn.Sequential(self.maxpool, self.layer1),
@@ -50,6 +50,9 @@ class ResNetEncoder(ResNet, EncoderMixin):
             self.layer3,
             self.layer4,
         ]
+
+    def forward(self, x):
+        stages = self.get_stages_modules()
 
         features = []
         for i in range(self._depth + 1):
