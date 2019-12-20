@@ -50,7 +50,7 @@ class InceptionResNetV2Encoder(InceptionResNetV2, EncoderMixin):
         del self.avgpool_1a
         del self.last_linear
 
-    def get_stages_modules(self):
+    def get_stages(self):
         return [
             nn.Identity(),
             nn.Sequential(self.conv2d_1a, self.conv2d_2a, self.conv2d_2b),
@@ -62,7 +62,7 @@ class InceptionResNetV2Encoder(InceptionResNetV2, EncoderMixin):
 
     def forward(self, x):
 
-        stages = self.get_stages_modules()
+        stages = self.get_stages()
 
         features = []
         for i in range(self._depth + 1):

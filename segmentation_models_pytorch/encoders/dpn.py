@@ -43,7 +43,7 @@ class DPNEncorder(DPN, EncoderMixin):
 
         del self.last_linear
 
-    def get_stages_modules(self):
+    def get_stages(self):
         return [
             nn.Identity(),
             nn.Sequential(self.features[0].conv, self.features[0].bn, self.features[0].act),
@@ -55,7 +55,7 @@ class DPNEncorder(DPN, EncoderMixin):
 
     def forward(self, x):
 
-        stages = self.get_stages_modules()
+        stages = self.get_stages()
 
         features = []
         for i in range(self._depth + 1):

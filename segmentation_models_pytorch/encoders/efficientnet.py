@@ -42,7 +42,7 @@ class EfficientNetEncoder(EfficientNet, EncoderMixin):
 
         del self._fc
 
-    def get_stages_modules(self):
+    def get_stages(self):
         return [
             nn.Identity(),
             nn.Sequential(self._conv_stem, self._bn0, self._swish),
@@ -53,7 +53,7 @@ class EfficientNetEncoder(EfficientNet, EncoderMixin):
         ]
 
     def forward(self, x):
-        stages = self.get_stages_modules()
+        stages = self.get_stages()
 
         block_number = 0.
         drop_connect_rate = self._global_params.drop_connect_rate

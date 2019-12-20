@@ -49,7 +49,7 @@ class InceptionV4Encoder(InceptionV4, EncoderMixin):
         # remove linear layers
         del self.last_linear
 
-    def get_stages_modules(self):
+    def get_stages(self):
         return [
             nn.Identity(),
             self.features[: self._stage_idxs[0]],
@@ -61,7 +61,7 @@ class InceptionV4Encoder(InceptionV4, EncoderMixin):
 
     def forward(self, x):
 
-        stages = self.get_stages_modules()
+        stages = self.get_stages()
 
         features = []
         for i in range(self._depth + 1):

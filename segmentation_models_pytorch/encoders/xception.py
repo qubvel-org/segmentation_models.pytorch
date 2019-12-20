@@ -22,7 +22,7 @@ class XceptionEncoder(Xception, EncoderMixin):
 
         del self.fc
 
-    def get_stages_modules(self):
+    def get_stages(self):
         return [
             nn.Identity(),
             nn.Sequential(self.conv1, self.bn1, self.relu, self.conv2, self.bn2, self.relu),
@@ -34,7 +34,7 @@ class XceptionEncoder(Xception, EncoderMixin):
         ]
 
     def forward(self, x):
-        stages = self.get_stages_modules()
+        stages = self.get_stages()
 
         features = []
         for i in range(self._depth + 1):

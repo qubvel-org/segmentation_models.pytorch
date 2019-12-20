@@ -48,7 +48,7 @@ class VGGEncoder(VGG, EncoderMixin):
         self._in_channels = 3
         del self.classifier
 
-    def get_stages_modules(self):
+    def get_stages(self):
         stages = []
         stage_modules = []
         for module in self.features:
@@ -60,7 +60,7 @@ class VGGEncoder(VGG, EncoderMixin):
         return stages
 
     def forward(self, x):
-        stages = self.get_stages_modules()
+        stages = self.get_stages()
 
         features = []
         for i in range(self._depth + 1):

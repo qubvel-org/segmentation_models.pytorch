@@ -46,7 +46,7 @@ class SENetEncoder(SENet, EncoderMixin):
         del self.last_linear
         del self.avg_pool
 
-    def get_stages_modules(self):
+    def get_stages(self):
         return [
             nn.Identity(),
             self.layer0[:-1],
@@ -57,7 +57,7 @@ class SENetEncoder(SENet, EncoderMixin):
         ]
 
     def forward(self, x):
-        stages = self.get_stages_modules()
+        stages = self.get_stages()
 
         features = []
         for i in range(self._depth + 1):
