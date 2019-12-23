@@ -15,6 +15,8 @@ class PAN(SegmentationModel):
         encoder_name: name of classification model (without last dense layers) used as feature
             extractor to build segmentation model.
         encoder_weights: one of ``None`` (random initialization), ``imagenet`` (pre-training on ImageNet).
+        encoder_dilation: Flag to use dilation in encoder last layer.
+            Doesn't work with [``*ception*``, ``vgg*``, ``densenet*``] backbones, default is True.
         decoder_channels: Number of ``Conv2D`` layer filters in decoder blocks
         in_channels: number of input channels for model, default is 3.
         classes: a number of classes for output (output shape - ``(batch, classes, h, w)``).
@@ -22,6 +24,7 @@ class PAN(SegmentationModel):
             One of [``sigmoid``, ``softmax``, ``logsoftmax``, ``identity``, callable, None]
         upsampling: optional, final upsampling factor
             (default is 4 to preserve input -> output spatial shape identity)
+
         aux_params: if specified model will have additional classification auxiliary output
             build on top of encoder, supported params:
                 - classes (int): number of classes
@@ -41,6 +44,7 @@ class PAN(SegmentationModel):
             self,
             encoder_name: str = "resnet34",
             encoder_weights: str = "imagenet",
+            encoder_dilation: bool = True,
             decoder_channels: int = 32,
             in_channels: int = 3,
             classes: int = 1,
@@ -56,6 +60,12 @@ class PAN(SegmentationModel):
             depth=5,
             weights=encoder_weights,
         )
+
+        if encoder_dilation:
+            self.encoder.make_dilated(
+                stage_list=[5],
+                dilation_list=[2]
+            )
 
         self.decoder = PANDecoder(
             encoder_channels=self.encoder.out_channels,
@@ -77,5 +87,5 @@ class PAN(SegmentationModel):
         else:
             self.classification_head = None
 
-        self.name = "u-{}".format(encoder_name)
+        self.name = "pan-{}".format(encoder_name)
         self.initialize()
