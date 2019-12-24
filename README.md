@@ -11,7 +11,7 @@ Segmentation based on [PyTorch](https://pytorch.org/).**
 The main features of this library are:
 
  - High level API (just two lines to create neural network)
- - 4 models architectures for binary and multi class segmentation (including legendary Unet)
+ - 5 models architectures for binary and multi class segmentation (including legendary Unet)
  - 46 available encoders for each architecture
  - All encoders have pre-trained weights for faster and better convergence
 
@@ -66,6 +66,7 @@ preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
  - [Linknet](https://arxiv.org/abs/1707.03718)
  - [FPN](http://presentations.cocodataset.org/COCO17-Stuff-FAIR.pdf)
  - [PSPNet](https://arxiv.org/abs/1612.01105)
+ - [PAN](https://arxiv.org/abs/1805.10180)
 
 #### Encoders <a name="encoders"></a>
 

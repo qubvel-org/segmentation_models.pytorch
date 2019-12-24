@@ -28,6 +28,7 @@ def get_encoders():
 ENCODERS = get_encoders()
 DEFAULT_ENCODER = "resnet18"
 DEFAULT_SAMPLE = torch.ones([1, 3, 64, 64])
+DEFAULT_PAN_SAMPLE = torch.ones([2, 3, 256, 256])
 
 
 def _test_forward(model):
@@ -35,8 +36,8 @@ def _test_forward(model):
         model(DEFAULT_SAMPLE)
 
 
-def _test_forward_backward(model):
-    out = model(DEFAULT_SAMPLE)
+def _test_forward_backward(model, sample):
+    out = model(sample)
     out.mean().backward()
 
 
@@ -52,19 +53,22 @@ def test_forward(model_class, encoder_name, encoder_depth, **kwargs):
     _test_forward(model)
 
 
-@pytest.mark.parametrize("model_class", [smp.FPN, smp.PSPNet, smp.Linknet, smp.Unet])
+@pytest.mark.parametrize("model_class", [smp.PAN, smp.FPN, smp.PSPNet, smp.Linknet, smp.Unet])
 def test_forward_backward(model_class):
+    sample = DEFAULT_PAN_SAMPLE if model_class is smp.PAN else DEFAULT_SAMPLE
     model = model_class(DEFAULT_ENCODER, encoder_weights=None)
-    _test_forward_backward(model)
+    _test_forward_backward(model, sample)
 
 
-@pytest.mark.parametrize("model_class", [smp.FPN, smp.PSPNet, smp.Linknet, smp.Unet])
+@pytest.mark.parametrize("model_class", [smp.PAN, smp.FPN, smp.PSPNet, smp.Linknet, smp.Unet])
 def test_aux_output(model_class):
     model = model_class(
         DEFAULT_ENCODER, encoder_weights=None, aux_params=dict(classes=2)
     )
-    mask, label = model(DEFAULT_SAMPLE)
-    assert label.size() == (1, 2)
+    sample = DEFAULT_PAN_SAMPLE if model_class is smp.PAN else DEFAULT_SAMPLE
+    label_size = (2, 2) if model_class is smp.PAN else (1, 2)
+    mask, label = model(sample)
+    assert label.size() == label_size
 
 
 @pytest.mark.parametrize("upsampling", [2, 4, 8])
