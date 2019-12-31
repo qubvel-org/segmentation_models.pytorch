@@ -193,6 +193,7 @@ class BiFPNDecoder(nn.Module):
 
     def forward(self, *features):
         c3, c4, c5 = features[-3:]
+        
         p3_x = self.p3(c3)        
         p4_x = self.p4(c4)
         p5_x = self.p5(c5)
