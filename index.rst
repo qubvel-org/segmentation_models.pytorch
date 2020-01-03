@@ -3,15 +3,15 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+*****
 Welcome to segmentation_models_pytorch's documentation!
-=======================================================
+*****
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
    
    docs/api
-   docs/models
 
 .. container::
 
@@ -30,31 +30,10 @@ The main features of this library are:
 -  All encoders have pre-trained weights for faster and better
    convergence
 
-Table of content
-~~~~~~~~~~~~~~~~
-
-1. `Quick start <#start>`__
-2. `Examples <#examples>`__
-3. `Models <#models>`__
-
-   1. `Architectures <#architectires>`__
-   2. `Encoders <#encoders>`__
-
-4. `Models API <#api>`__
-
-   1. `Input channels <#input-channels>`__
-   2. `Auxiliary classification
-      output <#auxiliary-classification-output>`__
-   3. `Depth <#depth>`__
-
-5. `Installation <#installation>`__
-6. `Competitions won with the
-   library <#competitions-won-with-the-library>`__
-7. `License <#license>`__
-8. `Contributing <#contributing>`__
+.. contents::
 
 Quick start 
-~~~~~~~~~~~~
+============
 
 Since the library is built on the PyTorch framework, created
 segmentation model is just a PyTorch nn.Module, which can be created as
@@ -90,7 +69,7 @@ the same way as during weights pretraining:
    preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
 
 Examples 
-~~~~~~~~~
+=========
 
 -  Training model for cars segmentation on CamVid dataset
    `here <https://github.com/qubvel/segmentation_models.pytorch/blob/master/examples/cars%20segmentation%20(camvid).ipynb>`__.
@@ -103,9 +82,138 @@ Examples
    `here <https://github.com/catalyst-team/catalyst/blob/master/examples/notebooks/segmentation-tutorial.ipynb>`__
    |Open In Colab|
 
+Models 
+======
+
+Architectures 
+^^^^^^^^^^^^^^
+
+-  `Unet <https://arxiv.org/abs/1505.04597>`__
+-  `Linknet <https://arxiv.org/abs/1707.03718>`__
+-  `FPN <http://presentations.cocodataset.org/COCO17-Stuff-FAIR.pdf>`__
+-  `PSPNet <https://arxiv.org/abs/1612.01105>`__
+-  `PAN <https://arxiv.org/abs/1805.10180>`__
+
+.. autoclass:: segmentation_models_pytorch.Unet
+
+Encoders 
+^^^^^^^^^
+
+=================== =========================== =========
+Encoder             Weights                     Params, M
+=================== =========================== =========
+resnet18            imagenet                    11M
+resnet34            imagenet                    21M
+resnet50            imagenet                    23M
+resnet101           imagenet                    42M
+resnet152           imagenet                    58M
+resnext50_32x4d     imagenet                    22M
+resnext101_32x8d    imagenetinstagram           86M
+resnext101_32x16d   instagram                   191M
+resnext101_32x32d   instagram                   466M
+resnext101_32x48d   instagram                   826M
+dpn68               imagenet                    11M
+dpn68b              imagenet+5k                 11M
+dpn92               imagenet+5k                 34M
+dpn98               imagenet                    58M
+dpn107              imagenet+5k                 84M
+dpn131              imagenet                    76M
+vgg11               imagenet                    9M
+vgg11_bn            imagenet                    9M
+vgg13               imagenet                    9M
+vgg13_bn            imagenet                    9M
+vgg16               imagenet                    14M
+vgg16_bn            imagenet                    14M
+vgg19               imagenet                    20M
+vgg19_bn            imagenet                    20M
+senet154            imagenet                    113M
+se_resnet50         imagenet                    26M
+se_resnet101        imagenet                    47M
+se_resnet152        imagenet                    64M
+se_resnext50_32x4d  imagenet                    25M
+se_resnext101_32x4d imagenet                    46M
+densenet121         imagenet                    6M
+densenet169         imagenet                    12M
+densenet201         imagenet                    18M
+densenet161         imagenet                    26M
+inceptionresnetv2   imagenetimagenet+background 54M
+inceptionv4         imagenetimagenet+background 41M
+efficientnet-b0     imagenet                    4M
+efficientnet-b1     imagenet                    6M
+efficientnet-b2     imagenet                    7M
+efficientnet-b3     imagenet                    10M
+efficientnet-b4     imagenet                    17M
+efficientnet-b5     imagenet                    28M
+efficientnet-b6     imagenet                    40M
+efficientnet-b7     imagenet                    63M
+mobilenet_v2        imagenet                    2M
+xception            imagenet                    22M
+=================== =========================== =========
+
+
+Models API 
+==========
+
+-  ``model.encoder`` - pretrained backbone to extract features of
+   different spatial resolution
+-  ``model.decoder`` - depends on models architecture
+   (``Unet``/``Linknet``/``PSPNet``/``FPN``)
+-  ``model.segmentation_head`` - last block to produce required number
+   of mask channels (include also optional upsampling and activation)
+-  ``model.classification_head`` - optional block which create
+   classification head on top of encoder
+-  ``model.forward(x)`` - sequentially pass ``x`` through model`s
+   encoder, decoder and segmentation head (and classification head if
+   specified)
+
+Input channels
+--------------
+
+Input channels parameter allow you to create models, which process
+tensors with arbitrary number of channels. If you use pretrained weights
+from imagenet - weights of first convolution will be reused for 1- or 2-
+channels inputs, for input channels > 4 weights of first convolution
+will be initialized randomly.
+
+.. code:: python
+
+   model = smp.FPN('resnet34', in_channels=1)
+   mask = model(torch.ones([1, 1, 64, 64]))
+
+Auxiliary classification output
+-------------------------------
+
+All models support ``aux_params`` parameters, which is default set to
+``None``. If ``aux_params = None`` than classification auxiliary output
+is not created, else model produce not only ``mask``, but also ``label``
+output with shape ``NC``. Classification head consist of
+GlobalPooling->Dropout(optional)->Linear->Activation(optional) layers,
+which can be configured by ``aux_params`` as follows:
+
+.. code:: python
+
+   aux_params=dict(
+       pooling='avg',             # one of 'avg', 'max'
+       dropout=0.5,               # dropout ratio, default is None
+       activation='sigmoid',      # activation function, default is None
+       classes=4,                 # define number of output labels
+   )
+   model = smp.Unet('resnet34', classes=4, aux_params=aux_params)
+   mask, label = model(x)
+
+Depth
+-----
+
+Depth parameter specify a number of downsampling operations in encoder,
+so you can make your model lighted if specify smaller ``depth``.
+
+.. code:: python
+
+   model = smp.Unet('resnet34', encoder_depth=4)
+
 
 Installation 
-~~~~~~~~~~~~~
+=============
 
 PyPI version:
 
@@ -120,7 +228,7 @@ Latest version from source:
    $ pip install git+https://github.com/qubvel/segmentation_models.pytorch
 
 Competitions won with the library
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=================================
 
 ``Segmentation Models`` package is widely used in the image segmentation
 competitions.
@@ -129,23 +237,23 @@ you can find competitions, names of the winners and links to their
 solutions.
 
 License 
-~~~~~~~~
+========
 
 Project is distributed under `MIT
 License <https://github.com/qubvel/segmentation_models.pytorch/blob/master/LICENSE>`__
 
 Contributing
-~~~~~~~~~~~~
+============
 
 Run test
-''''''''
+-----
 
 .. code:: bash
 
    $ docker build -f docker/Dockerfile.dev -t smp:dev . && docker run --rm smp:dev pytest -p no:cacheprovider
 
 Generate table
-''''''''''''''
+--------------
 
 .. code:: bash
 
