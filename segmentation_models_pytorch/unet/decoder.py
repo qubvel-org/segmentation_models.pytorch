@@ -42,7 +42,6 @@ class DecoderBlock(nn.Module):
         x = self.attention2(x)
         return x
 
-
 class CenterBlock(nn.Sequential):
     def __init__(self, in_channels, out_channels, use_batchnorm=True):
         conv1 = md.Conv2dReLU(
@@ -104,6 +103,7 @@ class UnetDecoder(nn.Module):
             for in_ch, skip_ch, out_ch in zip(in_channels, skip_channels, out_channels)
         ]
         self.blocks = nn.ModuleList(blocks)
+        self.depthwise = nn.Conv2d(out_ch, kernel_size=3, padding=1, groups=out_ch)
 
     def forward(self, *features):
 
@@ -117,5 +117,5 @@ class UnetDecoder(nn.Module):
         for i, decoder_block in enumerate(self.blocks):
             skip = skips[i] if i < len(skips) else None
             x = decoder_block(x, skip)
-
+        x = self.depthwise(x)
         return x

@@ -38,7 +38,7 @@ class EfficientNetEncoder(EfficientNet, EncoderMixin):
         self._stage_idxs = stage_idxs
         self._out_channels = out_channels
         self._depth = depth
-        self._in_channels = 3
+        self._in_channels = 17
 
         del self._fc
 
