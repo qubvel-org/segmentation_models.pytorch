@@ -103,7 +103,7 @@ class UnetDecoder(nn.Module):
             for in_ch, skip_ch, out_ch in zip(in_channels, skip_channels, out_channels)
         ]
         self.blocks = nn.ModuleList(blocks)
-        self.depthwise = nn.Conv2d(out_ch, kernel_size=3, padding=1, groups=out_ch)
+        self.depthwise = nn.Conv2d(out_channels, kernel_size=3, padding=1, groups=out_channels)
 
     def forward(self, *features):
 
