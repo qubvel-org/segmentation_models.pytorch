@@ -38,7 +38,7 @@ class ResNetEncoder(ResNet, EncoderMixin):
         super().__init__(**kwargs)
         self._depth = depth
         self._out_channels = out_channels
-        self._in_channels = 3
+        self._in_channels = 17
 
         del self.fc
         del self.avgpool
