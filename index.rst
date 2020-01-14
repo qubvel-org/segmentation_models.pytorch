@@ -94,7 +94,6 @@ Architectures
 -  `PSPNet <https://arxiv.org/abs/1612.01105>`__
 -  `PAN <https://arxiv.org/abs/1805.10180>`__
 
-.. autoclass:: segmentation_models_pytorch.Unet
 
 Encoders 
 ^^^^^^^^^
