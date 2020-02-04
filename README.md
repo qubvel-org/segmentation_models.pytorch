@@ -27,8 +27,9 @@ The main features of this library are:
     3. [Depth](#depth)
  5. [Installation](#installation)
  6. [Competitions won with the library](#competitions-won-with-the-library)
- 7. [License](#license)
- 8. [Contributing](#contributing)
+ 7. [Contributing](#contributing)
+ 8. [Citing](#citing)
+ 9. [License](#license)
 
 ### Quick start <a name="start"></a>
 Since the library is built on the PyTorch framework, created segmentation model is just a PyTorch nn.Module, which can be created as easy as:
@@ -176,11 +177,6 @@ $ pip install git+https://github.com/qubvel/segmentation_models.pytorch
 `Segmentation Models` package is widely used in the image segmentation competitions.
 [Here](https://github.com/qubvel/segmentation_models.pytorch/blob/master/HALLOFFAME.md) you can find competitions, names of the winners and links to their solutions.
 
-
-### License <a name="license"></a>
-Project is distributed under [MIT License](https://github.com/qubvel/segmentation_models.pytorch/blob/master/LICENSE)
-
-
 ### Contributing
 
 ##### Run test
@@ -191,3 +187,18 @@ $ docker build -f docker/Dockerfile.dev -t smp:dev . && docker run --rm smp:dev 
 ```bash
 $ docker build -f docker/Dockerfile.dev -t smp:dev . && docker run --rm smp:dev python misc/generate_table.py
 ```
+
+### Citing
+```
+@misc{Yakubovskiy:2019,
+  Author = {Pavel Yakubovskiy},
+  Title = {Segmentation Models Pytorch},
+  Year = {2020},
+  Publisher = {GitHub},
+  Journal = {GitHub repository},
+  Howpublished = {\url{https://github.com/qubvel/segmentation_models.pytorch}}
+}
+```
+
+### License <a name="license"></a>
+Project is distributed under [MIT License](https://github.com/qubvel/segmentation_models.pytorch/blob/master/LICENSE)
