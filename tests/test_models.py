@@ -41,16 +41,18 @@ def get_sample(model_class):
     return sample
 
 
-def _test_forward(model, sample):
+def _test_forward(model, sample, test_shape=False):
     with torch.no_grad():
         out = model(sample)
-    assert out.shape[2:] == sample.shape[2:]
+    if test_shape:
+        assert out.shape[2:] == sample.shape[2:]
 
 
-def _test_forward_backward(model, sample):
+def _test_forward_backward(model, sample, test_shape=False):
     out = model(sample)
     out.mean().backward()
-    assert out.shape[2:] == sample.shape[2:]
+    if test_shape:
+        assert out.shape[2:] == sample.shape[2:]
 
 
 @pytest.mark.parametrize("encoder_name", ENCODERS)
@@ -63,7 +65,7 @@ def test_forward(model_class, encoder_name, encoder_depth, **kwargs):
         encoder_name, encoder_depth=encoder_depth, encoder_weights=None, **kwargs
     )
     sample = get_sample(model_class)
-    _test_forward(model, sample)
+    _test_forward(model, sample, test_shape=True if encoder_depth == 5 else False)
 
 
 @pytest.mark.parametrize(
@@ -123,7 +125,7 @@ def test_dilation(encoder_name):
 
     encoder.eval()
     with torch.no_grad():
-        sample = torch.ones([1, 3, 32, 32])
+        sample = torch.ones([1, 3, 64, 64])
         output = encoder(sample)
 
     shapes = [out.shape[-1] for out in output]
