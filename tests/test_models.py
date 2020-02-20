@@ -65,7 +65,13 @@ def test_forward(model_class, encoder_name, encoder_depth, **kwargs):
         encoder_name, encoder_depth=encoder_depth, encoder_weights=None, **kwargs
     )
     sample = get_sample(model_class)
-    _test_forward(model, sample, test_shape=True if encoder_depth == 5 else False)
+
+    if encoder_depth == 5 and model_class != smp.PSPNet:
+        test_shape = True
+    else:
+        test_shape = False
+
+    _test_forward(model, sample, test_shape)
 
 
 @pytest.mark.parametrize(
