@@ -1,25 +1,9 @@
 import torch.nn as nn
 
-from typing import Optional, Union
-from torchvision.models.segmentation import deeplabv3
-
+from typing import Optional
+from .decoder import DeepLabV3Decoder
 from ..base import SegmentationModel, SegmentationHead, ClassificationHead
 from ..encoders import get_encoder
-
-
-class DeepLabDecoder(nn.Sequential):
-    def __init__(self, in_channels, out_channels=256, atrous_rates=(12, 24, 36)):
-        super().__init__(
-            deeplabv3.ASPP(in_channels, atrous_rates),
-            nn.Conv2d(256, out_channels, 3, padding=1, bias=False),
-            nn.BatchNorm2d(out_channels),
-            nn.ReLU(),
-        )
-        self.out_channels = out_channels
-
-
-    def forward(self, *features):
-        return super().forward(features[-1])
 
 
 class DeepLabV3(SegmentationModel):
@@ -29,6 +13,7 @@ class DeepLabV3(SegmentationModel):
             encoder_name: str = "resnet34",
             encoder_depth: int = 5,
             encoder_weights: Optional[str] = "imagenet",
+            decoder_channels: int = 256,
             in_channels: int = 3,
             classes: int = 1,
             activation: Optional[str] = None,
@@ -43,10 +28,14 @@ class DeepLabV3(SegmentationModel):
             depth=encoder_depth,
             weights=encoder_weights,
         )
-        self.encoder.replace_strides_with_dilation(stages=[4, 5])
+        self.encoder.make_dilated(
+            stage_list=[4, 5],
+            dilation_list=[2, 4]
+        )
 
-        self.decoder = DeepLabDecoder(
+        self.decoder = DeepLabV3Decoder(
             in_channels=self.encoder.out_channels[-1],
+            out_channels=decoder_channels,
         )
 
         self.segmentation_head = SegmentationHead(

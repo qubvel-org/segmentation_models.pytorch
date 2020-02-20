@@ -1,12 +1,17 @@
-# Segmentation models
-[![Build Status](https://travis-ci.com/qubvel/segmentation_models.pytorch.svg?branch=master)](https://travis-ci.com/qubvel/segmentation_models.pytorch) [![Generic badge](https://img.shields.io/badge/License-MIT-<COLOR>.svg)](https://shields.io/)
+<div align="center">
+ 
+![logo](https://i.ibb.co/dc1XdhT/Segmentation-Models-V2-Side-1-1.png)  
+**Python library with Neural Networks for Image  
+Segmentation based on [PyTorch](https://pytorch.org/).**  
 
-Segmentation models is python library with Neural Networks for Image Segmentation based on PyTorch.
+![PyPI version](https://badge.fury.io/py/segmentation-models-pytorch.svg) [![Build Status](https://travis-ci.com/qubvel/segmentation_models.pytorch.svg?branch=master)](https://travis-ci.com/qubvel/segmentation_models.pytorch) [![Generic badge](https://img.shields.io/badge/License-MIT-<COLOR>.svg)](https://shields.io/)
+
+</div>
 
 The main features of this library are:
 
  - High level API (just two lines to create neural network)
- - 4 models architectures for binary and multi class segmentation (including legendary Unet)
+ - 5 models architectures for binary and multi class segmentation (including legendary Unet)
  - 46 available encoders for each architecture
  - All encoders have pre-trained weights for faster and better convergence
 
@@ -22,8 +27,9 @@ The main features of this library are:
     3. [Depth](#depth)
  5. [Installation](#installation)
  6. [Competitions won with the library](#competitions-won-with-the-library)
- 7. [License](#license)
- 8. [Contributing](#contributing)
+ 7. [Contributing](#contributing)
+ 8. [Citing](#citing)
+ 9. [License](#license)
 
 ### Quick start <a name="start"></a>
 Since the library is built on the PyTorch framework, created segmentation model is just a PyTorch nn.Module, which can be created as easy as:
@@ -61,6 +67,7 @@ preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
  - [Linknet](https://arxiv.org/abs/1707.03718)
  - [FPN](http://presentations.cocodataset.org/COCO17-Stuff-FAIR.pdf)
  - [PSPNet](https://arxiv.org/abs/1612.01105)
+ - [PAN](https://arxiv.org/abs/1805.10180)
 
 #### Encoders <a name="encoders"></a>
 
@@ -170,11 +177,6 @@ $ pip install git+https://github.com/qubvel/segmentation_models.pytorch
 `Segmentation Models` package is widely used in the image segmentation competitions.
 [Here](https://github.com/qubvel/segmentation_models.pytorch/blob/master/HALLOFFAME.md) you can find competitions, names of the winners and links to their solutions.
 
-
-### License <a name="license"></a>
-Project is distributed under [MIT License](https://github.com/qubvel/segmentation_models.pytorch/blob/master/LICENSE)
-
-
 ### Contributing
 
 ##### Run test
@@ -185,3 +187,18 @@ $ docker build -f docker/Dockerfile.dev -t smp:dev . && docker run --rm smp:dev 
 ```bash
 $ docker build -f docker/Dockerfile.dev -t smp:dev . && docker run --rm smp:dev python misc/generate_table.py
 ```
+
+### Citing
+```
+@misc{Yakubovskiy:2019,
+  Author = {Pavel Yakubovskiy},
+  Title = {Segmentation Models Pytorch},
+  Year = {2020},
+  Publisher = {GitHub},
+  Journal = {GitHub repository},
+  Howpublished = {\url{https://github.com/qubvel/segmentation_models.pytorch}}
+}
+```
+
+### License <a name="license"></a>
+Project is distributed under [MIT License](https://github.com/qubvel/segmentation_models.pytorch/blob/master/LICENSE)
