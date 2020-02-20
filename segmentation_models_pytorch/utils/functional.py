@@ -6,7 +6,7 @@ def _take_channels(*xs, ignore_channels=None):
         return xs
     else:
         channels = [channel for channel in range(xs[0].shape[1]) if channel not in ignore_channels]
-        xs = [torch.index_select(x, dim=1, index=torch.tensor(channels)) for x in xs]
+        xs = [torch.index_select(x, dim=1, index=torch.tensor(channels).to(x.device)) for x in xs]
         return xs
 
 
