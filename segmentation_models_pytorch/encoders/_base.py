@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 from typing import List
+from collections import OrderedDict
 
 from . import _utils as utils
 
@@ -12,7 +13,7 @@ class EncoderMixin:
     """
 
     @property
-    def out_channels(self) -> List:
+    def out_channels(self):
         """Return channels dimensions for each tensor of forward output of encoder"""
         return self._out_channels[: self._depth + 1]
 

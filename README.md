@@ -68,6 +68,7 @@ preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
  - [FPN](http://presentations.cocodataset.org/COCO17-Stuff-FAIR.pdf)
  - [PSPNet](https://arxiv.org/abs/1612.01105)
  - [PAN](https://arxiv.org/abs/1805.10180)
+ - [DeepLabV3](https://arxiv.org/abs/1706.05587)
 
 #### Encoders <a name="encoders"></a>
 
