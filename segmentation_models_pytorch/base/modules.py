@@ -64,6 +64,16 @@ class SCSEModule(nn.Module):
         return x * self.cSE(x) + x * self.sSE(x)
 
 
+class ArgMax(nn.Module):
+
+    def __init__(self, dim=None):
+        super().__init__()
+        self.dim = dim
+
+    def forward(self, x):
+        return torch.argmax(x, dim=dim)
+
+
 class Activation(nn.Module):
 
     def __init__(self, name, **params):
@@ -80,6 +90,10 @@ class Activation(nn.Module):
             self.activation = nn.Softmax(**params)
         elif name == 'logsoftmax':
             self.activation = nn.LogSoftmax(**params)
+        elif name == 'argmax':
+            self.activation = ArgMax(**params)
+        elif name == 'argmax2d':
+            self.activation = ArgMax(dim=1, **params)
         elif callable(name):
             self.activation = name(**params)
         else:
