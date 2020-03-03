@@ -24,8 +24,6 @@ class Conv2dReLU(nn.Sequential):
                 + "To install see: https://github.com/mapillary/inplace_abn"
             )
 
-        super().__init__()
-
         conv = nn.Conv2d(
             in_channels,
             out_channels,
