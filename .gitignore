@@ -103,4 +103,3 @@ venv.bak/
 
 # mypy
 .mypy_cache/
-/HRNet-Semantic-Segmentation/
