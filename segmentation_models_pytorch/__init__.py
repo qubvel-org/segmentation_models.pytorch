@@ -4,6 +4,7 @@ from .fpn import FPN
 from .pspnet import PSPNet
 from .deeplabv3 import DeepLabV3
 from .pan import PAN
+from .hrnet import HRNet
 
 from . import encoders
 from . import utils
