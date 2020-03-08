@@ -282,24 +282,24 @@ class HighResolutionNet(nn.Module):
         self.stage4, pre_stage_channels = self._make_stage(
             self.stage4_cfg, num_channels, multi_scale_output=True)
 
-        last_inp_channels = np.int(np.sum(pre_stage_channels))
-
-        self.last_layer = nn.Sequential(
-            nn.Conv2d(
-                in_channels=last_inp_channels,
-                out_channels=last_inp_channels,
-                kernel_size=1,
-                stride=1,
-                padding=0),
-            nn.BatchNorm2d(last_inp_channels, momentum=BN_MOMENTUM),
-            nn.ReLU(inplace=False),
-            nn.Conv2d(
-                in_channels=last_inp_channels,
-                out_channels=1000,
-                kernel_size=stages["FINAL_CONV_KERNEL"],
-                stride=1,
-                padding=1 if stages["FINAL_CONV_KERNEL"] == 3 else 0)
-        )
+        # last_inp_channels = np.int(np.sum(pre_stage_channels))
+        #
+        # self.last_layer = nn.Sequential(
+        #     nn.Conv2d(
+        #         in_channels=last_inp_channels,
+        #         out_channels=last_inp_channels,
+        #         kernel_size=1,
+        #         stride=1,
+        #         padding=0),
+        #     nn.BatchNorm2d(last_inp_channels, momentum=BN_MOMENTUM),
+        #     nn.ReLU(inplace=False),
+        #     nn.Conv2d(
+        #         in_channels=last_inp_channels,
+        #         out_channels=1000,
+        #         kernel_size=stages["FINAL_CONV_KERNEL"],
+        #         stride=1,
+        #         padding=1 if stages["FINAL_CONV_KERNEL"] == 3 else 0)
+        # )
 
     def _make_transition_layer(
             self, num_channels_pre_layer, num_channels_cur_layer):
@@ -476,18 +476,13 @@ class HRNetEncoder(HighResolutionNet, EncoderMixin):
 hrnet_encoders = {
     "hrnetv2_18_v1": {
         "encoder": HRNetEncoder,
-        "pretrained_setting": {
+        "pretrained_settings": {
             "imagenet": {
-                    "url": "hrnet_w18_small_model_v1.pth",
-                    "input_space": "RGB",
-                    "input_size": [3, 224, 224],
-                    "input_range": [0, 1],
-                    "mean": [0.485, 0.456, 0.406],
-                    "std": [0.229, 0.224, 0.225],
-                    "num_classes": 1000,
+                "url": "hrnet_w18_small_model_v1.pth",
             }
         },
         "params": {
+            "out_channels": [32, 16, 32, 64, 128],
             "stages": {
                 "FINAL_CONV_KERNEL": 1,
                 "STAGE1": {
@@ -529,16 +524,11 @@ hrnet_encoders = {
         "encoder": HRNetEncoder,
         "pretrained_settings": {
             "imagenet": {
-                    "url": "hrnet_w18_small_model_v2.pth",
-                    "input_space": "RGB",
-                    "input_size": [3, 224, 224],
-                    "input_range": [0, 1],
-                    "mean": [0.485, 0.456, 0.406],
-                    "std": [0.229, 0.224, 0.225],
-                    "num_classes": 1000,
+                "url": "hrnet_w18_small_model_v2.pth",
             }
         },
         "params": {
+            "out_channels": [64, 18, 36, 72, 144],
             "stages": {
                 "FINAL_CONV_KERNEL": 1,
                 "STAGE1": {
@@ -580,13 +570,7 @@ hrnet_encoders = {
         "encoder": HRNetEncoder,
         "pretrained_settings": {
             "imagenet": {
-                    "url": "hrnetv2_w32_imagenet_pretrained.pth",
-                    "input_space": "RGB",
-                    "input_size": [3, 224, 224],
-                    "input_range": [0, 1],
-                    "mean": [0.485, 0.456, 0.406],
-                    "std": [0.229, 0.224, 0.225],
-                    "num_classes": 1000,
+                "url": "hrnetv2_w32_imagenet_pretrained.pth",
             }
         },
         "params": {
@@ -632,16 +616,11 @@ hrnet_encoders = {
         "encoder": HRNetEncoder,
         "pretrained_settings": {
             "imagenet": {
-                    "url": "hrnetv2_w48_imagenet_pretrained.pth",
-                    "input_space": "RGB",
-                    "input_size": [3, 224, 224],
-                    "input_range": [0, 1],
-                    "mean": [0.485, 0.456, 0.406],
-                    "std": [0.229, 0.224, 0.225],
-                    "num_classes": 1000,
+                "url": "hrnetv2_w48_imagenet_pretrained.pth",
             }
         },
         "params": {
+            "out_channels": [64, 48, 96, 192, 384],
             "stages": {
                 "FINAL_CONV_KERNEL": 1,
                 "STAGE1": {

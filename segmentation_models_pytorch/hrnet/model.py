@@ -1,10 +1,11 @@
 from typing import Optional, Union
-import torch
 import os
 
+from .decoder import HRNetDecoder
 from ..base import SegmentationModel
-# from ..base import SegmentationHead, ClassificationHead
+from ..base import SegmentationHead, ClassificationHead
 from ..encoders.hrnet import hrnet_encoders
+
 encoders = {}
 encoders.update(hrnet_encoders)
 
@@ -36,6 +37,11 @@ class HRNet(SegmentationModel):
         encoder_depth: int = 4,
         encoder_weights: Optional[str] = "imagenet",
         in_channels: int = 3,
+        classes: int = 1,
+        activation: Optional[Union[str, callable]] = None,
+        hrnet_out_channels: int = 512,
+        hrnet_dropout: float = 0.0,
+        aux_params: Optional[dict] = None,
     ):
         super().__init__()
 
@@ -46,27 +52,26 @@ class HRNet(SegmentationModel):
             weights=encoder_weights,
         )
 
-        # self.decoder = HRNetDecoder(
-        #     encoder_channels=self.encoder.out_channels,
-        #     use_batchnorm=hrnet_use_batchnorm,
-        #     out_channels=hrnet_out_channels,
-        # )
+        self.decoder = HRNetDecoder(
+            encoder_channels=self.encoder.out_channels,
+            decoder_channels=hrnet_out_channels,
+            dropout=hrnet_dropout,
+        )
 
-        # self.segmentation_head = SegmentationHead(
-        #     in_channels=hrnet_out_channels,
-        #     out_channels=classes,
-        #     kernel_size=3,
-        #     activation=activation,
-        #     upsampling=upsampling,
-        # )
+        self.segmentation_head = SegmentationHead(
+            in_channels=hrnet_out_channels,
+            out_channels=classes,
+            kernel_size=3,
+            activation=activation,
+        )
 
-        # if aux_params:
-        #     self.classification_head = ClassificationHead(
-        #         in_channels=self.encoder.out_channels[-1],
-        #         **aux_params
-        #     )
-        # else:
-        #     self.classification_head = None
-        #
-        # self.name = encoder_name
-        # self.initialize()
+        if aux_params:
+            self.classification_head = ClassificationHead(
+                in_channels=self.encoder.out_channels[-1],
+                **aux_params
+            )
+        else:
+            self.classification_head = None
+
+        self.name = encoder_name
+        self.initialize()
