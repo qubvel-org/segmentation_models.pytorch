@@ -1,5 +1,6 @@
 import functools
 import torch.utils.model_zoo as model_zoo
+import os
 
 from .resnet import resnet_encoders
 from .dpn import dpn_encoders
@@ -11,6 +12,7 @@ from .inceptionv4 import inceptionv4_encoders
 from .efficientnet import efficient_net_encoders
 from .mobilenet import mobilenet_encoders
 from .xception import xception_encoders
+from .hrnet import hrnet_encoders
 
 
 from ._preprocessing import preprocess_input
@@ -26,6 +28,7 @@ encoders.update(inceptionv4_encoders)
 encoders.update(efficient_net_encoders)
 encoders.update(mobilenet_encoders)
 encoders.update(xception_encoders)
+encoders.update(hrnet_encoders)
 
 
 def get_encoder(name, in_channels=3, depth=5, weights=None):
@@ -36,7 +39,14 @@ def get_encoder(name, in_channels=3, depth=5, weights=None):
 
     if weights is not None:
         settings = encoders[name]["pretrained_settings"][weights]
-        encoder.load_state_dict(model_zoo.load_url(settings["url"]))
+        try:
+            if name[:7] == 'hrnetv2':
+                weights_path = os.path.join(os.getcwd(), settings["url"])
+                encoder.init_weights(weights_path)
+            else:
+                encoder.load_state_dict(model_zoo.load_url(settings["url"]))
+        except:
+            raise Exception("The problem with getting encoder")
 
     encoder.set_in_channels(in_channels)
 

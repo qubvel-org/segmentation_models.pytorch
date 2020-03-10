@@ -1,6 +1,5 @@
 import numpy as np
 import os
-from collections import OrderedDict
 
 import torch.nn as nn
 import torch
@@ -431,7 +430,7 @@ class HighResolutionNet(nn.Module):
 
         x = torch.cat([x[0], x1, x2, x3], 1)
 
-        x = self.last_layer(x)
+        # x = self.last_layer(x)
 
         return x
 
@@ -442,26 +441,6 @@ class HRNetEncoder(HighResolutionNet, EncoderMixin):
         self._depth = depth
         self._out_channels = out_channels
         self._in_channels = 3
-
-    # def get_stages(self):
-    #     return [
-    #         nn.Identity(),
-    #         nn.Sequential(self.conv1, self.bn1, self.relu),
-    #         nn.Sequential(self.maxpool, self.layer1),
-    #         self.layer2,
-    #         self.layer3,
-    #         self.layer4,
-    #     ]
-    #
-    # def forward(self, x):
-    #     stages = self.get_stages()
-    #
-    #     features = []
-    #     for i in range(self._depth + 1):
-    #         x = stages[i](x)
-    #         features.append(x)
-    #
-    #     return features
 
     def init_weights(self, weights_path, **kwargs):
         if os.path.isfile(weights_path):

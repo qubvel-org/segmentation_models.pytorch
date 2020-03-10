@@ -1,33 +1,9 @@
 from typing import Optional, Union
-import os
 
 from .decoder import HRNetDecoder
 from ..base import SegmentationModel
 from ..base import SegmentationHead, ClassificationHead
-from ..encoders.hrnet import hrnet_encoders
-
-encoders = {}
-encoders.update(hrnet_encoders)
-
-
-def get_encoder(name, in_channels=3, depth=5, weights=None):
-    """
-    temporary 'get_encoder' as weights are not on server,
-    but located locally
-    """
-    Encoder = encoders[name]["encoder"]
-    params = encoders[name]["params"]
-    params.update(depth=depth)
-    encoder = Encoder(**params)
-
-    if weights is not None:
-        settings = encoders[name]["pretrained_settings"][weights]
-        weights_path = os.path.join(os.getcwd(), settings["url"])
-        encoder.init_weights(weights_path)
-
-    encoder.set_in_channels(in_channels)
-
-    return encoder
+from ..encoders import get_encoder
 
 
 class HRNet(SegmentationModel):
