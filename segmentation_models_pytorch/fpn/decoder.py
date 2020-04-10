@@ -98,7 +98,7 @@ class FPNDecoder(nn.Module):
 
         self.seg_blocks = nn.ModuleList([
             SegmentationBlock(pyramid_channels, segmentation_channels, n_upsamples=n_upsamples)
-            for n_upsamples in [3, 2, 1, 0]
+            for n_upsamples in reversed(range(encoder_depth-1))
         ])
 
         self.merge = MergeBlock(merge_policy)
