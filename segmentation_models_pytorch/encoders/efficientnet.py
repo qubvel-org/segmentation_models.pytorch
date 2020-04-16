@@ -24,7 +24,7 @@ Methods:
 """
 import torch.nn as nn
 from efficientnet_pytorch import EfficientNet
-from efficientnet_pytorch.utils import url_map, get_model_params
+from efficientnet_pytorch.utils import url_map, url_map_advprop, get_model_params
 
 from ._base import EncoderMixin
 
@@ -88,6 +88,13 @@ def _get_pretrained_settings(encoder):
             "mean": [0.485, 0.456, 0.406],
             "std": [0.229, 0.224, 0.225],
             "url": url_map[encoder],
+            "input_space": "RGB",
+            "input_range": [0, 1],
+        },
+        "advprop": {
+            "mean": [0.5, 0.5, 0.5],
+            "std": [0.5, 0.5, 0.5],
+            "url": url_map_advprop[encoder],
             "input_space": "RGB",
             "input_range": [0, 1],
         }
