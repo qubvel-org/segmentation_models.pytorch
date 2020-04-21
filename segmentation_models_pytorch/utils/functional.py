@@ -77,7 +77,7 @@ def accuracy(pr, gt, threshold=0.5, ignore_channels=None):
     pr = _threshold(pr, threshold=threshold)
     pr, gt = _take_channels(pr, gt, ignore_channels=ignore_channels)
 
-    tp = torch.sum(gt == pr)
+    tp = torch.sum(gt == pr, dtype=pr.dtype)
     score = tp / gt.view(-1).shape[0]
     return score
 
