@@ -27,7 +27,7 @@ class Epoch:
         s = ', '.join(str_logs)
         return s
 
-    def batch_update(self, itr, x, y):
+    def batch_update(self, x, y, **kwargs):
         raise NotImplementedError
 
     def on_epoch_start(self):
@@ -43,10 +43,8 @@ class Epoch:
 
         with tqdm(dataloader, desc=self.stage_name, file=sys.stdout, disable=not (self.verbose)) as iterator:
             for itr, (x, y) in enumerate(iterator):
-                #print(f'x:{x.shape}')
-                #print(f'y:{y.shape}')
                 x, y = x.to(self.device), y.to(self.device)
-                loss, y_pred = self.batch_update(itr, x, y)
+                loss, y_pred = self.batch_update(x, y, itr=itr)
 
                 # update loss logs
                 loss_value = loss.cpu().detach().numpy()
@@ -85,11 +83,12 @@ class TrainEpoch(Epoch):
     def on_epoch_start(self):
         self.model.train()
 
-    def batch_update(self, itr, x, y):
+    def batch_update(self, x, y, **kwargs):
         self.optimizer.zero_grad()
         prediction = self.model.forward(x)
         loss = self.loss(prediction, y)
         if self.accumulation_steps is not None:
+            itr = kwargs['itr']
             bs = x.shape[0]
             assert type(self.accumulation_steps) == int, 'accumulation_steps is not a integer.'
             assert self.accumulation_steps > bs, 'accumulation_steps should larger than batch size.'
@@ -118,7 +117,7 @@ class ValidEpoch(Epoch):
     def on_epoch_start(self):
         self.model.eval()
 
-    def batch_update(self, itr, x, y):
+    def batch_update(self, x, y, **kwargs):
         with torch.no_grad():
             prediction = self.model.forward(x)
             loss = self.loss(prediction, y)
