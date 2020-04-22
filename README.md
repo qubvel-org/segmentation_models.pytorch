@@ -120,6 +120,10 @@ preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
 |efficientnet-b7                 |imagenet                        |63M                             |
 |mobilenet_v2                    |imagenet                        |2M                              |
 |xception                        |imagenet                        |22M                             |
+|resnest50                       |imagenet                        |25M                             |
+|resnest101                      |imagenet                        |46M                             |
+|resnest200                      |imagenet                        |68M                             |
+|resnest269                      |imagenet                        |108M                            |
 
 ### Models API <a name="api"></a>
 

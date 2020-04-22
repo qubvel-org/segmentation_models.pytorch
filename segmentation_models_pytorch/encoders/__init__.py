@@ -1,4 +1,5 @@
 import functools
+import warnings
 import torch.utils.model_zoo as model_zoo
 
 from .resnet import resnet_encoders
@@ -11,7 +12,18 @@ from .inceptionv4 import inceptionv4_encoders
 from .efficientnet import efficient_net_encoders
 from .mobilenet import mobilenet_encoders
 from .xception import xception_encoders
-from .resnest import resnest_encoders
+
+try:
+    from .resnest import resnest_encoders
+except ModuleNotFoundError:
+    warnings.warn(
+        (
+            "ResNeSt model is not installed. Use `$ pip install resnest`. It is not "
+            "included to requirements.txt due to strict `torch>=` version requirements. "
+            "You can avoid it using --no-deps flag for installation."
+        ), RuntimeWarning,
+    )
+    resnest_encoders = {}
 
 
 from ._preprocessing import preprocess_input
