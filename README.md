@@ -120,6 +120,16 @@ preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
 |efficientnet-b7                 |imagenet                        |63M                             |
 |mobilenet_v2                    |imagenet                        |2M                              |
 |xception                        |imagenet                        |22M                             |
+|timm-efficientnet-b0            |imagenet<br>advprop<br>noisy-student|4M                              |
+|timm-efficientnet-b1            |imagenet<br>advprop<br>noisy-student|6M                              |
+|timm-efficientnet-b2            |imagenet<br>advprop<br>noisy-student|7M                              |
+|timm-efficientnet-b3            |imagenet<br>advprop<br>noisy-student|10M                             |
+|timm-efficientnet-b4            |imagenet<br>advprop<br>noisy-student|17M                             |
+|timm-efficientnet-b5            |imagenet<br>advprop<br>noisy-student|28M                             |
+|timm-efficientnet-b6            |imagenet<br>advprop<br>noisy-student|40M                             |
+|timm-efficientnet-b7            |imagenet<br>advprop<br>noisy-student|63M                             |
+|timm-efficientnet-b8            |imagenet<br>advprop             |84M                             |
+|timm-efficientnet-l2            |noisy-student                   |474M                            |
 
 ### Models API <a name="api"></a>
 
