@@ -91,11 +91,13 @@ class EfficientNetEncoder(EfficientNet, EncoderMixin):
                 if isinstance(mod, nn.Conv2d):
                     kh, kw = utils.to_tuple(mod.kernel_size)
 
-                    if dilation > 1 and not utils.to_tuple(mod.kernel_size) == (1, 1):
-                        mod.dilation = (dilation, dilation)
+                    if not utils.to_tuple(mod.kernel_size) == (1, 1):
                         mod.padding = ((kh // 2) * dilation, (kw // 2) * dilation)
                         if hasattr(mod, "static_padding"):
                             mod.static_padding = nn.Identity()
+
+                        if dilation > 1:
+                            mod.dilation = (dilation, dilation)
 
                     if utils.to_tuple(mod.stride) == (2, 2):
                        mod.stride = (1, 1)
