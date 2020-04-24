@@ -27,10 +27,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from pretrainedmodels.models.dpn import DPN
+from pretrainedmodels.models.dpn import DPN, DualPathBlock
 from pretrainedmodels.models.dpn import pretrained_settings
 
 from ._base import EncoderMixin
+from . import _utils as utils
 
 
 class DPNEncorder(DPN, EncoderMixin):
@@ -71,6 +72,22 @@ class DPNEncorder(DPN, EncoderMixin):
         state_dict.pop("last_linear.bias")
         state_dict.pop("last_linear.weight")
         super().load_state_dict(state_dict, **kwargs)
+
+    def make_dilated(self, stage_list, dilation_list):
+        stages = self.get_stages()
+        dilation = 1
+        for stage_indx, stage_dilation in zip(stage_list, dilation_list):
+            # Patch Conv2d modules replacing strides with dilation
+            for dual_path_block in stages[stage_indx].children():
+                if isinstance(dual_path_block, DualPathBlock):
+                    if dilation > 1:
+                        dual_path_block.c3x3_b.conv.dilation = (dilation, dilation)
+                        dual_path_block.c3x3_b.conv.padding = (dilation, dilation)  # because kernel_size is (3, 3)
+
+                    if utils.to_tuple(dual_path_block.c3x3_b.conv.stride) == (2, 2):
+                        dual_path_block.c3x3_b.conv.stride = (1, 1)
+                        dual_path_block.c1x1_w_s2.conv.stride = (1, 1)
+                        dilation = stage_dilation  # for subsequent dual path blocks
 
 
 dpn_encoders = {

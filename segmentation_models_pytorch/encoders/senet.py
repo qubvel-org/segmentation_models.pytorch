@@ -33,6 +33,7 @@ from pretrainedmodels.models.senet import (
     pretrained_settings,
 )
 from ._base import EncoderMixin
+from . import _utils as utils
 
 
 class SENetEncoder(SENet, EncoderMixin):
@@ -70,6 +71,27 @@ class SENetEncoder(SENet, EncoderMixin):
         state_dict.pop("last_linear.bias")
         state_dict.pop("last_linear.weight")
         super().load_state_dict(state_dict, **kwargs)
+
+    def make_dilated(self, stage_list, dilation_list):
+        stages = self.get_stages()
+        dilation = 1
+        for stage_indx, stage_dilation in zip(stage_list, dilation_list):
+            # Patch Conv2d modules replacing strides with dilation
+            for residual_unit in stages[stage_indx].children():
+                for mod in residual_unit.children():
+                    if isinstance(mod, nn.Sequential):  # residue with downsample path
+                        mod[0].stride = (1, 1)
+                        # kernel_size is (1, 1)
+                    elif isinstance(mod, nn.Conv2d):
+                        kh, kw = utils.to_tuple(mod.kernel_size)
+
+                        if dilation > 1 and not utils.to_tuple(mod.kernel_size) == (1, 1):
+                            mod.dilation = (dilation, dilation)
+                            mod.padding = ((kh // 2) * dilation, (kw // 2) * dilation)
+
+                        if utils.to_tuple(mod.stride) == (2, 2):
+                            mod.stride = (1, 1)
+                            dilation = stage_dilation  # for subsequent layers
 
 
 senet_encoders = {

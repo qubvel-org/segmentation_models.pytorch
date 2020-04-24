@@ -27,6 +27,7 @@ from efficientnet_pytorch import EfficientNet
 from efficientnet_pytorch.utils import url_map, url_map_advprop, get_model_params
 
 from ._base import EncoderMixin
+from . import _utils as utils
 
 
 class EfficientNetEncoder(EfficientNet, EncoderMixin):
@@ -80,6 +81,25 @@ class EfficientNetEncoder(EfficientNet, EncoderMixin):
         state_dict.pop("_fc.bias")
         state_dict.pop("_fc.weight")
         super().load_state_dict(state_dict, **kwargs)
+
+    def make_dilated(self, stage_list, dilation_list):
+        stages = self.get_stages()
+        dilation = 1
+        for stage_indx, stage_dilation in zip(stage_list, dilation_list):
+            # Patch Conv2d modules replacing strides with dilation
+            for mod in stages[stage_indx].modules():
+                if isinstance(mod, nn.Conv2d):
+                    kh, kw = utils.to_tuple(mod.kernel_size)
+
+                    if dilation > 1 and not utils.to_tuple(mod.kernel_size) == (1, 1):
+                        mod.dilation = (dilation, dilation)
+                        mod.padding = ((kh // 2) * dilation, (kw // 2) * dilation)
+                        if hasattr(mod, "static_padding"):
+                            mod.static_padding = nn.Identity()
+
+                    if utils.to_tuple(mod.stride) == (2, 2):
+                       mod.stride = (1, 1)
+                       dilation = stage_dilation  # for subsequent layers
 
 
 def _get_pretrained_settings(encoder):

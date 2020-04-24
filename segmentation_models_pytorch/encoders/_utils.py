@@ -36,15 +36,12 @@ def patch_first_conv(model, in_channels):
         module.reset_parameters()
 
 
-def replace_strides_with_dilation(module, dilation_rate):
-    """Patch Conv2d modules replacing strides with dilation"""
-    for mod in module.modules():
-        if isinstance(mod, nn.Conv2d):
-            mod.stride = (1, 1)
-            mod.dilation = (dilation_rate, dilation_rate)
-            kh, kw = mod.kernel_size
-            mod.padding = ((kh // 2) * dilation_rate, (kw // 2) * dilation_rate)
-
-            # Kostyl for EfficientNet
-            if hasattr(mod, "static_padding"):
-                mod.static_padding = nn.Identity()
+def to_tuple(sequence_or_value):
+    if isinstance(sequence_or_value, int):
+        return (sequence_or_value, sequence_or_value)
+    elif isinstance(sequence_or_value, list):
+        return tuple(sequence_or_value)
+    elif isinstance(sequence_or_value, tuple):
+        return sequence_or_value
+    else:
+        raise NotImplementedError
