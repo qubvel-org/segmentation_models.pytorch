@@ -64,7 +64,9 @@ class MobileNetV2Encoder(torchvision.models.MobileNetV2, EncoderMixin):
         state_dict.pop("classifier.1.weight")
         super().load_state_dict(state_dict, **kwargs)
 
-    def make_dilated(self, stage_list, dilation_list):
+    def make_dilated(self, stage_list, dilation_list=None):
+        if dilation_list is None:
+            dilation_list = map(lambda x: 2**(x+1), range(len(stage_list)))
         stages = self.get_stages()
         dilation = 1
         for stage_indx, stage_dilation in zip(stage_list, dilation_list):
