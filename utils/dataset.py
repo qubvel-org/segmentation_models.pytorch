@@ -45,11 +45,12 @@ class SegmDataset(Dataset):
             sample = self.augmentations(image=img, mask=mask)
             img, mask = sample['image'], sample['mask']
 
+        mask = mask.transpose((2, 0, 1))
         if self.preprocessing:
             sample = self.preprocessing(image=img, mask=mask)
             img, mask = sample['image'], sample['mask']
 
-        return img, mask
+        return img.float(), mask
 
     def __len__(self):
         return len(self.ids)

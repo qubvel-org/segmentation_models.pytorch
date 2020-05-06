@@ -9,11 +9,11 @@ class System:
 
 @dataclass
 class DataSet:
-    root_dir: str = "./MoNuSAC/data"
-    img_dir: str = "./data/train/"
-    mask_dir: str = "./data/trainannot/"
-    img_val_dir: str = "./data/val/"
-    mask_val_dir: str = "./data/valannot/"
+    root_dir: str = "./data"
+    img_dir: str = "train"
+    mask_dir: str = "trainannot"
+    img_val_dir: str = "val"
+    mask_val_dir: str = "valannot"
     number_of_classes: int = 13
     classes: tuple = (
         'sky', 'building', 'pole', 'road', 'pavement', 'tree', 'signsymbol', 'fence', 'car', 'pedestrian',
@@ -24,7 +24,7 @@ class DataSet:
 @dataclass
 class DataLoader:
     batch_size: int = 16
-    num_workers: int = 6
+    num_workers: int = 4
 
 
 @dataclass
@@ -32,7 +32,7 @@ class Optimizer:
     learning_rate: float = 0.0005
     momentum: float = 0.9
     weight_decay: float = 4e-5
-    lr_step_milestones: Iterable = (300, )
+    lr_step_milestones: Iterable = (70, 90)
     lr_gamma: float = 0.1
 
 
