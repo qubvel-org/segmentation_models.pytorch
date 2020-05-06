@@ -1,0 +1,46 @@
+default_language_version:
+    python: python3.7
+
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.3.0
+    hooks:
+    -   id: trailing-whitespace
+    -   id: check-yaml
+    -   id: end-of-file-fixer
+        files: \.py$
+    -   id: end-of-file-fixer
+        files: \.md$
+    -   id: end-of-file-fixer
+        files: \.txt$
+    -   id: requirements-txt-fixer
+
+-   repo: local
+    hooks:
+    -   id: pylint
+        name: pylint
+        entry: python -m pylint.__main__
+        language: system
+        verbose: true
+        require_serial: true
+        files: \.py$
+        exclude: (^segmentation_models_pytorch/|^tests/)
+
+
+-   repo: https://github.com/asottile/seed-isort-config
+    rev: v1.9.1
+    hooks:
+    -   id: seed-isort-config
+
+-   repo: https://github.com/pre-commit/mirrors-isort
+    rev: v4.3.21
+    hooks:
+    -   id: isort
+
+-   repo: https://github.com/pre-commit/mirrors-yapf
+    rev: v0.28.0
+    hooks:
+    -   id: yapf
+        files: \.py$
+        exclude: models/ops.py
+
