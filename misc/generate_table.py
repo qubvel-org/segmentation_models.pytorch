@@ -2,7 +2,6 @@ import segmentation_models_pytorch as smp
 
 encoders = smp.encoders.encoders
 
-
 WIDTH = 32
 COLUMNS = [
     "Encoder",
@@ -10,8 +9,10 @@ COLUMNS = [
     "Params, M",
 ]
 
+
 def wrap_row(r):
     return "|{}|".format(r)
+
 
 header = "|".join([column.ljust(WIDTH, ' ') for column in COLUMNS])
 separator = "|".join(["-" * WIDTH] + [":" + "-" * (WIDTH - 2) + ":"] * (len(COLUMNS) - 1))

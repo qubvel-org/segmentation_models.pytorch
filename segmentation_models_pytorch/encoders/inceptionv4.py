@@ -24,8 +24,8 @@ Methods:
 """
 
 import torch.nn as nn
-from pretrainedmodels.models.inceptionv4 import InceptionV4, BasicConv2d
-from pretrainedmodels.models.inceptionv4 import pretrained_settings
+
+from pretrainedmodels.models.inceptionv4 import BasicConv2d, InceptionV4, pretrained_settings
 
 from ._base import EncoderMixin
 
@@ -50,16 +50,18 @@ class InceptionV4Encoder(InceptionV4, EncoderMixin):
         del self.last_linear
 
     def make_dilated(self, stage_list, dilation_list):
-        raise ValueError("InceptionV4 encoder does not support dilated mode "
-                         "due to pooling operation for downsampling!")
+        raise ValueError(
+            "InceptionV4 encoder does not support dilated mode "
+            "due to pooling operation for downsampling!"
+        )
 
     def get_stages(self):
         return [
             nn.Identity(),
-            self.features[: self._stage_idxs[0]],
-            self.features[self._stage_idxs[0]: self._stage_idxs[1]],
-            self.features[self._stage_idxs[1]: self._stage_idxs[2]],
-            self.features[self._stage_idxs[2]: self._stage_idxs[3]],
+            self.features[:self._stage_idxs[0]],
+            self.features[self._stage_idxs[0]:self._stage_idxs[1]],
+            self.features[self._stage_idxs[1]:self._stage_idxs[2]],
+            self.features[self._stage_idxs[2]:self._stage_idxs[3]],
             self.features[self._stage_idxs[3]:],
         ]
 

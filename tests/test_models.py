@@ -1,13 +1,14 @@
 import os
 import sys
+
 import mock
-import pytest
 import torch
+import pytest
+
+import segmentation_models_pytorch as smp
 
 # mock detection module
 sys.modules["torchvision._C"] = mock.Mock()
-
-import segmentation_models_pytorch as smp
 
 IS_TRAVIS = os.environ.get("TRAVIS", False)
 
@@ -61,9 +62,7 @@ def _test_forward_backward(model, sample, test_shape=False):
 def test_forward(model_class, encoder_name, encoder_depth, **kwargs):
     if model_class is smp.Unet:
         kwargs["decoder_channels"] = (16, 16, 16, 16, 16)[-encoder_depth:]
-    model = model_class(
-        encoder_name, encoder_depth=encoder_depth, encoder_weights=None, **kwargs
-    )
+    model = model_class(encoder_name, encoder_depth=encoder_depth, encoder_weights=None, **kwargs)
     sample = get_sample(model_class)
 
     if encoder_depth == 5 and model_class != smp.PSPNet:
@@ -74,10 +73,7 @@ def test_forward(model_class, encoder_name, encoder_depth, **kwargs):
     _test_forward(model, sample, test_shape)
 
 
-@pytest.mark.parametrize(
-    "model_class",
-    [smp.PAN, smp.FPN, smp.PSPNet, smp.Linknet, smp.Unet, smp.DeepLabV3]
-)
+@pytest.mark.parametrize("model_class", [smp.PAN, smp.FPN, smp.PSPNet, smp.Linknet, smp.Unet, smp.DeepLabV3])
 def test_forward_backward(model_class):
     sample = get_sample(model_class)
     model = model_class(DEFAULT_ENCODER, encoder_weights=None)
@@ -86,9 +82,7 @@ def test_forward_backward(model_class):
 
 @pytest.mark.parametrize("model_class", [smp.PAN, smp.FPN, smp.PSPNet, smp.Linknet, smp.Unet])
 def test_aux_output(model_class):
-    model = model_class(
-        DEFAULT_ENCODER, encoder_weights=None, aux_params=dict(classes=2)
-    )
+    model = model_class(DEFAULT_ENCODER, encoder_weights=None, aux_params=dict(classes=2))
     sample = get_sample(model_class)
     label_size = (sample.shape[0], 2)
     mask, label = model(sample)
@@ -119,8 +113,10 @@ def test_in_channels(model_class, encoder_name, in_channels):
 
 @pytest.mark.parametrize("encoder_name", ENCODERS)
 def test_dilation(encoder_name):
-    if (encoder_name in ['inceptionresnetv2', 'xception', 'inceptionv4'] or
-            encoder_name.startswith('vgg') or encoder_name.startswith('densenet')):
+    if (
+        encoder_name in ['inceptionresnetv2', 'xception', 'inceptionv4'] or encoder_name.startswith('vgg') or
+        encoder_name.startswith('densenet')
+    ):
         return
 
     encoder = smp.encoders.get_encoder(encoder_name)

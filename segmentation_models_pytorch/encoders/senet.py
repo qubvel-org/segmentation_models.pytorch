@@ -32,6 +32,7 @@ from pretrainedmodels.models.senet import (
     SEResNeXtBottleneck,
     pretrained_settings,
 )
+
 from ._base import EncoderMixin
 
 

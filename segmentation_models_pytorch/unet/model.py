@@ -1,8 +1,8 @@
-from typing import Optional, Union, List
+from typing import List, Union, Optional
+
+from ..base import SegmentationHead, SegmentationModel, ClassificationHead
 from .decoder import UnetDecoder
 from ..encoders import get_encoder
-from ..base import SegmentationModel
-from ..base import SegmentationHead, ClassificationHead
 
 
 class Unet(SegmentationModel):
@@ -40,7 +40,6 @@ class Unet(SegmentationModel):
         https://arxiv.org/pdf/1505.04597
 
     """
-
     def __init__(
         self,
         encoder_name: str = "resnet34",

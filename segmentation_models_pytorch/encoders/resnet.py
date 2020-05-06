@@ -25,9 +25,7 @@ Methods:
 
 import torch.nn as nn
 
-from torchvision.models.resnet import ResNet
-from torchvision.models.resnet import BasicBlock
-from torchvision.models.resnet import Bottleneck
+from torchvision.models.resnet import ResNet, BasicBlock, Bottleneck
 from pretrainedmodels.models.torchvision_models import pretrained_settings
 
 from ._base import EncoderMixin

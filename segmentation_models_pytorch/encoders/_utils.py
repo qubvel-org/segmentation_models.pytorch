@@ -25,11 +25,7 @@ def patch_first_conv(model, in_channels):
         weight = weight[:, :2] * (3.0 / 2.0)
     else:
         reset = True
-        weight = torch.Tensor(
-            module.out_channels,
-            module.in_channels // module.groups,
-            *module.kernel_size
-        )
+        weight = torch.Tensor(module.out_channels, module.in_channels // module.groups, *module.kernel_size)
 
     module.weight = nn.parameter.Parameter(weight)
     if reset:

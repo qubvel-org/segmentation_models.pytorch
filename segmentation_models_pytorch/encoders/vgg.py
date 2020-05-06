@@ -24,8 +24,8 @@ Methods:
 """
 
 import torch.nn as nn
-from torchvision.models.vgg import VGG
-from torchvision.models.vgg import make_layers
+
+from torchvision.models.vgg import VGG, make_layers
 from pretrainedmodels.models.torchvision_models import pretrained_settings
 
 from ._base import EncoderMixin
@@ -35,7 +35,9 @@ cfg = {
     'A': [64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
     'B': [64, 64, 'M', 128, 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
     'D': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 'M'],
-    'E': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M', 512, 512, 512, 512, 'M'],
+    'E': [
+        64, 64, 'M', 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M', 512, 512, 512, 512, 'M'
+    ],
 }
 # fmt: on
 
@@ -49,8 +51,10 @@ class VGGEncoder(VGG, EncoderMixin):
         del self.classifier
 
     def make_dilated(self, stage_list, dilation_list):
-        raise ValueError("'VGG' models do not support dilated mode due to Max Pooling"
-                         " operations for downsampling!")
+        raise ValueError(
+            "'VGG' models do not support dilated mode due to Max Pooling"
+            " operations for downsampling!"
+        )
 
     def get_stages(self):
         stages = []

@@ -1,10 +1,10 @@
 # This repo contains source code for "Deep learning in autonomous driving" HSE Course Work
 
 <div align="center">
- 
-![logo](https://i.ibb.co/dc1XdhT/Segmentation-Models-V2-Side-1-1.png)  
-**Python library with Neural Networks for Image  
-Segmentation based on [PyTorch](https://pytorch.org/).**  
+
+![logo](https://i.ibb.co/dc1XdhT/Segmentation-Models-V2-Side-1-1.png)
+**Python library with Neural Networks for Image
+Segmentation based on [PyTorch](https://pytorch.org/).**
 
 ![PyPI version](https://badge.fury.io/py/segmentation-models-pytorch.svg) [![Build Status](https://travis-ci.com/qubvel/segmentation_models.pytorch.svg?branch=master)](https://travis-ci.com/qubvel/segmentation_models.pytorch) [![Generic badge](https://img.shields.io/badge/License-MIT-<COLOR>.svg)](https://shields.io/)
 
@@ -150,11 +150,11 @@ model = smp.FPN('resnet34', in_channels=1)
 mask = model(torch.ones([1, 1, 64, 64]))
 ```
 
-##### Auxiliary classification output  
-All models support `aux_params` parameters, which is default set to `None`. 
+##### Auxiliary classification output
+All models support `aux_params` parameters, which is default set to `None`.
 If `aux_params = None` than classification auxiliary output is not created, else
 model produce not only `mask`, but also `label` output with shape `NC`.
-Classification head consist of GlobalPooling->Dropout(optional)->Linear->Activation(optional) layers, which can be 
+Classification head consist of GlobalPooling->Dropout(optional)->Linear->Activation(optional) layers, which can be
 configured by `aux_params` as follows:
 ```python
 aux_params=dict(

@@ -1,6 +1,7 @@
-from typing import Optional, Union
+from typing import Union, Optional
+
+from ..base import SegmentationHead, SegmentationModel, ClassificationHead
 from .decoder import FPNDecoder
-from ..base import SegmentationModel, SegmentationHead, ClassificationHead
 from ..encoders import get_encoder
 
 
@@ -39,7 +40,6 @@ class FPN(SegmentationModel):
         http://presentations.cocodataset.org/COCO17-Stuff-FAIR.pdf
 
     """
-
     def __init__(
         self,
         encoder_name: str = "resnet34",

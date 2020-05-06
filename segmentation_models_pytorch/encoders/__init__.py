@@ -1,19 +1,19 @@
 import functools
+
 import torch.utils.model_zoo as model_zoo
 
-from .resnet import resnet_encoders
 from .dpn import dpn_encoders
 from .vgg import vgg_encoders
 from .senet import senet_encoders
+from .resnet import resnet_encoders
 from .densenet import densenet_encoders
-from .inceptionresnetv2 import inceptionresnetv2_encoders
+from .xception import xception_encoders
+from .mobilenet import mobilenet_encoders
 from .inceptionv4 import inceptionv4_encoders
 from .efficientnet import efficient_net_encoders
-from .mobilenet import mobilenet_encoders
-from .xception import xception_encoders
-from .timm_efficientnet import timm_efficientnet_encoders
-
 from ._preprocessing import preprocess_input
+from .inceptionresnetv2 import inceptionresnetv2_encoders
+from .timm_efficientnet import timm_efficientnet_encoders
 
 encoders = {}
 encoders.update(resnet_encoders)

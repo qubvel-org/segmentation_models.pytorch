@@ -1,7 +1,8 @@
-import torch
-import torch.nn as nn
 from typing import List
 from collections import OrderedDict
+
+import torch
+import torch.nn as nn
 
 from . import _utils as utils
 
@@ -11,11 +12,10 @@ class EncoderMixin:
         - output channels specification of feature tensors (produced by encoder)
         - patching first convolution for arbitrary input channels
     """
-
     @property
     def out_channels(self):
         """Return channels dimensions for each tensor of forward output of encoder"""
-        return self._out_channels[: self._depth + 1]
+        return self._out_channels[:self._depth + 1]
 
     def set_in_channels(self, in_channels):
         """Change first convolution chennels"""

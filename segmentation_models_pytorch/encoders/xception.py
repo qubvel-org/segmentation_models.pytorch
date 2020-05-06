@@ -1,14 +1,13 @@
 import re
+
 import torch.nn as nn
 
-from pretrainedmodels.models.xception import pretrained_settings
-from pretrainedmodels.models.xception import Xception
+from pretrainedmodels.models.xception import Xception, pretrained_settings
 
 from ._base import EncoderMixin
 
 
 class XceptionEncoder(Xception, EncoderMixin):
-
     def __init__(self, out_channels, *args, depth=5, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -23,8 +22,10 @@ class XceptionEncoder(Xception, EncoderMixin):
         del self.fc
 
     def make_dilated(self, stage_list, dilation_list):
-        raise ValueError("Xception encoder does not support dilated mode "
-                         "due to pooling operation for downsampling!")
+        raise ValueError(
+            "Xception encoder does not support dilated mode "
+            "due to pooling operation for downsampling!"
+        )
 
     def get_stages(self):
         return [
@@ -32,8 +33,10 @@ class XceptionEncoder(Xception, EncoderMixin):
             nn.Sequential(self.conv1, self.bn1, self.relu, self.conv2, self.bn2, self.relu),
             self.block1,
             self.block2,
-            nn.Sequential(self.block3, self.block4, self.block5, self.block6, self.block7,
-                          self.block8, self.block9, self.block10, self.block11),
+            nn.Sequential(
+                self.block3, self.block4, self.block5, self.block6, self.block7, self.block8, self.block9,
+                self.block10, self.block11
+            ),
             nn.Sequential(self.block12, self.conv3, self.bn3, self.relu, self.conv4, self.bn4),
         ]
 

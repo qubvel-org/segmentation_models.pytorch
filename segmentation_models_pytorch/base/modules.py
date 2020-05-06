@@ -9,19 +9,19 @@ except ImportError:
 
 class Conv2dReLU(nn.Sequential):
     def __init__(
-            self,
-            in_channels,
-            out_channels,
-            kernel_size,
-            padding=0,
-            stride=1,
-            use_batchnorm=True,
+        self,
+        in_channels,
+        out_channels,
+        kernel_size,
+        padding=0,
+        stride=1,
+        use_batchnorm=True,
     ):
 
         if use_batchnorm == "inplace" and InPlaceABN is None:
             raise RuntimeError(
-                "In order to use `use_batchnorm='inplace'` inplace_abn package must be installed. "
-                + "To install see: https://github.com/mapillary/inplace_abn"
+                "In order to use `use_batchnorm='inplace'` inplace_abn package must be installed. " +
+                "To install see: https://github.com/mapillary/inplace_abn"
             )
 
         conv = nn.Conv2d(
@@ -64,7 +64,6 @@ class SCSEModule(nn.Module):
 
 
 class ArgMax(nn.Module):
-
     def __init__(self, dim=None):
         super().__init__()
         self.dim = dim
@@ -74,7 +73,6 @@ class ArgMax(nn.Module):
 
 
 class Activation(nn.Module):
-
     def __init__(self, name, **params):
 
         super().__init__()
@@ -96,14 +94,15 @@ class Activation(nn.Module):
         elif callable(name):
             self.activation = name(**params)
         else:
-            raise ValueError('Activation should be callable/sigmoid/softmax/logsoftmax/None; got {}'.format(name))
+            raise ValueError(
+                'Activation should be callable/sigmoid/softmax/logsoftmax/None; got {}'.format(name)
+            )
 
     def forward(self, x):
         return self.activation(x)
 
 
 class Attention(nn.Module):
-
     def __init__(self, name, **params):
         super().__init__()
 

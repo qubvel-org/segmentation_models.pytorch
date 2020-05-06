@@ -1,11 +1,8 @@
-from .unet import Unet
-from .linknet import Linknet
+from . import utils, encoders
 from .fpn import FPN
-from .pspnet import PSPNet
-from .deeplabv3 import DeepLabV3, DeepLabV3Plus
 from .pan import PAN
-
-from . import encoders
-from . import utils
-
+from .unet import Unet
+from .pspnet import PSPNet
+from .linknet import Linknet
+from .deeplabv3 import DeepLabV3, DeepLabV3Plus
 from .__version__ import __version__

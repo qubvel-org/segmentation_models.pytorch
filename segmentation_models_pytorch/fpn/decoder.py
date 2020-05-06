@@ -8,9 +8,7 @@ class Conv3x3GNReLU(nn.Module):
         super().__init__()
         self.upsample = upsample
         self.block = nn.Sequential(
-            nn.Conv2d(
-                in_channels, out_channels, (3, 3), stride=1, padding=1, bias=False
-            ),
+            nn.Conv2d(in_channels, out_channels, (3, 3), stride=1, padding=1, bias=False),
             nn.GroupNorm(32, out_channels),
             nn.ReLU(inplace=True),
         )
@@ -54,11 +52,7 @@ class MergeBlock(nn.Module):
     def __init__(self, policy):
         super().__init__()
         if policy not in ["add", "cat"]:
-            raise ValueError(
-                "`merge_policy` must be one of: ['add', 'cat'], got {}".format(
-                    policy
-                )
-            )
+            raise ValueError("`merge_policy` must be one of: ['add', 'cat'], got {}".format(policy))
         self.policy = policy
 
     def forward(self, x):
@@ -67,26 +61,26 @@ class MergeBlock(nn.Module):
         elif self.policy == 'cat':
             return torch.cat(x, dim=1)
         else:
-            raise ValueError(
-                "`merge_policy` must be one of: ['add', 'cat'], got {}".format(self.policy)
-            )
+            raise ValueError("`merge_policy` must be one of: ['add', 'cat'], got {}".format(self.policy))
 
 
 class FPNDecoder(nn.Module):
     def __init__(
-            self,
-            encoder_channels,
-            encoder_depth=5,
-            pyramid_channels=256,
-            segmentation_channels=128,
-            dropout=0.2,
-            merge_policy="add",
+        self,
+        encoder_channels,
+        encoder_depth=5,
+        pyramid_channels=256,
+        segmentation_channels=128,
+        dropout=0.2,
+        merge_policy="add",
     ):
         super().__init__()
 
         self.out_channels = segmentation_channels if merge_policy == "add" else segmentation_channels * 4
         if encoder_depth < 3:
-            raise ValueError("Encoder depth for FPN decoder cannot be less than 3, got {}.".format(encoder_depth))
+            raise ValueError(
+                "Encoder depth for FPN decoder cannot be less than 3, got {}.".format(encoder_depth)
+            )
 
         encoder_channels = encoder_channels[::-1]
         encoder_channels = encoder_channels[:encoder_depth + 1]

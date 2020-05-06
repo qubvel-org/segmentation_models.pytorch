@@ -24,8 +24,8 @@ Methods:
 """
 
 import torch.nn as nn
-from pretrainedmodels.models.inceptionresnetv2 import InceptionResNetV2
-from pretrainedmodels.models.inceptionresnetv2 import pretrained_settings
+
+from pretrainedmodels.models.inceptionresnetv2 import InceptionResNetV2, pretrained_settings
 
 from ._base import EncoderMixin
 
@@ -51,8 +51,10 @@ class InceptionResNetV2Encoder(InceptionResNetV2, EncoderMixin):
         del self.last_linear
 
     def make_dilated(self, stage_list, dilation_list):
-        raise ValueError("InceptionResnetV2 encoder does not support dilated mode "
-                         "due to pooling operation for downsampling!")
+        raise ValueError(
+            "InceptionResnetV2 encoder does not support dilated mode "
+            "due to pooling operation for downsampling!"
+        )
 
     def get_stages(self):
         return [
@@ -85,6 +87,9 @@ inceptionresnetv2_encoders = {
     "inceptionresnetv2": {
         "encoder": InceptionResNetV2Encoder,
         "pretrained_settings": pretrained_settings["inceptionresnetv2"],
-        "params": {"out_channels": (3, 64, 192, 320, 1088, 1536), "num_classes": 1000},
+        "params": {
+            "out_channels": (3, 64, 192, 320, 1088, 1536),
+            "num_classes": 1000
+        },
     }
 }

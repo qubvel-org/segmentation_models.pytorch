@@ -1,8 +1,8 @@
-from typing import Optional, Union
+from typing import Union, Optional
+
+from ..base import SegmentationHead, SegmentationModel, ClassificationHead
 from .decoder import PANDecoder
 from ..encoders import get_encoder
-from ..base import SegmentationModel
-from ..base import SegmentationHead, ClassificationHead
 
 
 class PAN(SegmentationModel):
@@ -39,18 +39,17 @@ class PAN(SegmentationModel):
         https://arxiv.org/abs/1805.10180
 
     """
-
     def __init__(
-            self,
-            encoder_name: str = "resnet34",
-            encoder_weights: str = "imagenet",
-            encoder_dilation: bool = True,
-            decoder_channels: int = 32,
-            in_channels: int = 3,
-            classes: int = 1,
-            activation: Optional[Union[str, callable]] = None,
-            upsampling: int = 4,
-            aux_params: Optional[dict] = None
+        self,
+        encoder_name: str = "resnet34",
+        encoder_weights: str = "imagenet",
+        encoder_dilation: bool = True,
+        decoder_channels: int = 32,
+        in_channels: int = 3,
+        classes: int = 1,
+        activation: Optional[Union[str, callable]] = None,
+        upsampling: int = 4,
+        aux_params: Optional[dict] = None
     ):
         super().__init__()
 
@@ -62,10 +61,7 @@ class PAN(SegmentationModel):
         )
 
         if encoder_dilation:
-            self.encoder.make_dilated(
-                stage_list=[5],
-                dilation_list=[2]
-            )
+            self.encoder.make_dilated(stage_list=[5], dilation_list=[2])
 
         self.decoder = PANDecoder(
             encoder_channels=self.encoder.out_channels,

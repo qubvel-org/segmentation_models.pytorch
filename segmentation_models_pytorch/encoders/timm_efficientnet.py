@@ -1,8 +1,7 @@
 import torch
 import torch.nn as nn
 
-from timm.models.efficientnet import EfficientNet, Swish
-from timm.models.efficientnet import decode_arch_def, round_channels, default_cfgs
+from timm.models.efficientnet import Swish, EfficientNet, default_cfgs, round_channels, decode_arch_def
 
 from ._base import EncoderMixin
 
@@ -50,17 +49,16 @@ def get_efficientnet_kwargs(channel_multiplier=1.0, depth_multiplier=1.0):
 
 
 class EfficientNetEncoder(EfficientNet, EncoderMixin):
-
     def __init__(self, stage_idxs, out_channels, depth=5, channel_multiplier=1.0, depth_multiplier=1.0):
-            kwargs = get_efficientnet_kwargs(channel_multiplier, depth_multiplier)
-            super().__init__(**kwargs)
+        kwargs = get_efficientnet_kwargs(channel_multiplier, depth_multiplier)
+        super().__init__(**kwargs)
 
-            self._stage_idxs = stage_idxs
-            self._out_channels = out_channels
-            self._depth = depth
-            self._in_channels = 3
+        self._stage_idxs = stage_idxs
+        self._out_channels = out_channels
+        self._depth = depth
+        self._in_channels = 3
 
-            del self.classifier
+        del self.classifier
 
     def get_stages(self):
         return [
@@ -99,7 +97,6 @@ def prepare_settings(settings):
 
 
 timm_efficientnet_encoders = {
-
     "timm-efficientnet-b0": {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
@@ -114,7 +111,6 @@ timm_efficientnet_encoders = {
             "depth_multiplier": 1.0,
         },
     },
-
     "timm-efficientnet-b1": {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
@@ -129,7 +125,6 @@ timm_efficientnet_encoders = {
             "depth_multiplier": 1.1,
         },
     },
-
     "timm-efficientnet-b2": {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
@@ -144,7 +139,6 @@ timm_efficientnet_encoders = {
             "depth_multiplier": 1.2,
         },
     },
-
     "timm-efficientnet-b3": {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
@@ -159,7 +153,6 @@ timm_efficientnet_encoders = {
             "depth_multiplier": 1.4,
         },
     },
-
     "timm-efficientnet-b4": {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
@@ -174,7 +167,6 @@ timm_efficientnet_encoders = {
             "depth_multiplier": 1.8,
         },
     },
-
     "timm-efficientnet-b5": {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
@@ -189,7 +181,6 @@ timm_efficientnet_encoders = {
             "depth_multiplier": 2.2,
         },
     },
-
     "timm-efficientnet-b6": {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
@@ -204,7 +195,6 @@ timm_efficientnet_encoders = {
             "depth_multiplier": 2.6,
         },
     },
-
     "timm-efficientnet-b7": {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
@@ -219,7 +209,6 @@ timm_efficientnet_encoders = {
             "depth_multiplier": 3.1,
         },
     },
-
     "timm-efficientnet-b8": {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
@@ -233,7 +222,6 @@ timm_efficientnet_encoders = {
             "depth_multiplier": 3.6,
         },
     },
-
     "timm-efficientnet-l2": {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {

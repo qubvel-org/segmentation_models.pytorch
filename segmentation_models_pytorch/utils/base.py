@@ -1,5 +1,6 @@
 import re
 import functools
+
 import torch
 import torch.nn as nn
 
@@ -21,8 +22,8 @@ class Activation(nn.Module):
     def forward(self, x):
         return self.activation(x)
 
-class BaseObject(nn.Module):
 
+class BaseObject(nn.Module):
     def __init__(self, name=None):
         super().__init__()
         self._name = name
@@ -42,7 +43,6 @@ class Metric(BaseObject):
 
 
 class Loss(BaseObject):
-
     def __add__(self, other):
         if isinstance(other, Loss):
             return SumOfLosses(self, other)
@@ -63,7 +63,6 @@ class Loss(BaseObject):
 
 
 class SumOfLosses(Loss):
-
     def __init__(self, l1, l2):
         name = '{} + {}'.format(l1.__name__, l2.__name__)
         super().__init__(name=name)
@@ -75,7 +74,6 @@ class SumOfLosses(Loss):
 
 
 class MultipliedLoss(Loss):
-
     def __init__(self, loss, multiplier):
 
         # resolve name

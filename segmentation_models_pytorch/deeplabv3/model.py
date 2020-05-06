@@ -1,8 +1,9 @@
+from typing import Optional
+
 import torch.nn as nn
 
-from typing import Optional
+from ..base import SegmentationHead, SegmentationModel, ClassificationHead
 from .decoder import DeepLabV3Decoder, DeepLabV3PlusDecoder
-from ..base import SegmentationModel, SegmentationHead, ClassificationHead
 from ..encoders import get_encoder
 
 
@@ -34,18 +35,17 @@ class DeepLabV3(SegmentationModel):
     .. _DeeplabV3:
         https://arxiv.org/abs/1706.05587
     """
-        
     def __init__(
-            self,
-            encoder_name: str = "resnet34",
-            encoder_depth: int = 5,
-            encoder_weights: Optional[str] = "imagenet",
-            decoder_channels: int = 256,
-            in_channels: int = 3,
-            classes: int = 1,
-            activation: Optional[str] = None,
-            upsampling: int = 8,
-            aux_params: Optional[dict] = None,
+        self,
+        encoder_name: str = "resnet34",
+        encoder_depth: int = 5,
+        encoder_weights: Optional[str] = "imagenet",
+        decoder_channels: int = 256,
+        in_channels: int = 3,
+        classes: int = 1,
+        activation: Optional[str] = None,
+        upsampling: int = 8,
+        aux_params: Optional[dict] = None,
     ):
         super().__init__()
 
@@ -55,10 +55,7 @@ class DeepLabV3(SegmentationModel):
             depth=encoder_depth,
             weights=encoder_weights,
         )
-        self.encoder.make_dilated(
-            stage_list=[4, 5],
-            dilation_list=[2, 4]
-        )
+        self.encoder.make_dilated(stage_list=[4, 5], dilation_list=[2, 4])
 
         self.decoder = DeepLabV3Decoder(
             in_channels=self.encoder.out_channels[-1],
@@ -113,18 +110,18 @@ Convolution for Semantic Image Segmentation"
         https://arxiv.org/abs/1802.02611v3
     """
     def __init__(
-            self,
-            encoder_name: str = "resnet34",
-            encoder_depth: int = 5,
-            encoder_weights: Optional[str] = "imagenet",
-            encoder_output_stride: int = 16,
-            decoder_channels: int = 256,
-            decoder_atrous_rates: tuple = (12, 24, 36),
-            in_channels: int = 3,
-            classes: int = 1,
-            activation: Optional[str] = None,
-            upsampling: int = 4,
-            aux_params: Optional[dict] = None,
+        self,
+        encoder_name: str = "resnet34",
+        encoder_depth: int = 5,
+        encoder_weights: Optional[str] = "imagenet",
+        encoder_output_stride: int = 16,
+        decoder_channels: int = 256,
+        decoder_atrous_rates: tuple = (12, 24, 36),
+        in_channels: int = 3,
+        classes: int = 1,
+        activation: Optional[str] = None,
+        upsampling: int = 4,
+        aux_params: Optional[dict] = None,
     ):
         super().__init__()
 
@@ -136,20 +133,12 @@ Convolution for Semantic Image Segmentation"
         )
 
         if encoder_output_stride == 8:
-            self.encoder.make_dilated(
-                stage_list=[4, 5],
-                dilation_list=[2, 4]
-            )
+            self.encoder.make_dilated(stage_list=[4, 5], dilation_list=[2, 4])
 
         elif encoder_output_stride == 16:
-            self.encoder.make_dilated(
-                stage_list=[5],
-                dilation_list=[2]
-            )
+            self.encoder.make_dilated(stage_list=[5], dilation_list=[2])
         else:
-            raise ValueError(
-                "Encoder output stride should be 8 or 16, got {}".format(encoder_output_stride)
-            )
+            raise ValueError("Encoder output stride should be 8 or 16, got {}".format(encoder_output_stride))
 
         self.decoder = DeepLabV3PlusDecoder(
             encoder_channels=self.encoder.out_channels,

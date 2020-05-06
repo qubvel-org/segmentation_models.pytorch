@@ -1,10 +1,8 @@
-from typing import Optional, Union
+from typing import Union, Optional
 
+from ..base import SegmentationHead, SegmentationModel, ClassificationHead
 from .decoder import PSPDecoder
 from ..encoders import get_encoder
-
-from ..base import SegmentationModel
-from ..base import SegmentationHead, ClassificationHead
 
 
 class PSPNet(SegmentationModel):
@@ -42,7 +40,6 @@ class PSPNet(SegmentationModel):
     .. _PSPNet:
         https://arxiv.org/pdf/1612.01105.pdf
     """
-
     def __init__(
         self,
         encoder_name: str = "resnet34",

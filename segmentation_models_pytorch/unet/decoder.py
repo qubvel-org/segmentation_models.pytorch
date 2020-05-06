@@ -7,12 +7,12 @@ from ..base import modules as md
 
 class DecoderBlock(nn.Module):
     def __init__(
-            self,
-            in_channels,
-            skip_channels,
-            out_channels,
-            use_batchnorm=True,
-            attention_type=None,
+        self,
+        in_channels,
+        skip_channels,
+        out_channels,
+        use_batchnorm=True,
+        attention_type=None,
     ):
         super().__init__()
         self.conv1 = md.Conv2dReLU(
@@ -64,13 +64,13 @@ class CenterBlock(nn.Sequential):
 
 class UnetDecoder(nn.Module):
     def __init__(
-            self,
-            encoder_channels,
-            decoder_channels,
-            n_blocks=5,
-            use_batchnorm=True,
-            attention_type=None,
-            center=False,
+        self,
+        encoder_channels,
+        decoder_channels,
+        n_blocks=5,
+        use_batchnorm=True,
+        attention_type=None,
+        center=False,
     ):
         super().__init__()
 
@@ -91,9 +91,7 @@ class UnetDecoder(nn.Module):
         out_channels = decoder_channels
 
         if center:
-            self.center = CenterBlock(
-                head_channels, head_channels, use_batchnorm=use_batchnorm
-            )
+            self.center = CenterBlock(head_channels, head_channels, use_batchnorm=use_batchnorm)
         else:
             self.center = nn.Identity()
 
@@ -107,7 +105,7 @@ class UnetDecoder(nn.Module):
 
     def forward(self, *features):
 
-        features = features[1:]    # remove first skip with same spatial resolution
+        features = features[1:]  # remove first skip with same spatial resolution
         features = features[::-1]  # reverse channels to start from head of encoder
 
         head = features[0]

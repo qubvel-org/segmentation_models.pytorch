@@ -1,6 +1,7 @@
-from typing import Optional, Union
-from .decoder import LinknetDecoder
+from typing import Union, Optional
+
 from ..base import SegmentationHead, SegmentationModel, ClassificationHead
+from .decoder import LinknetDecoder
 from ..encoders import get_encoder
 
 
@@ -38,7 +39,6 @@ class Linknet(SegmentationModel):
     .. _Linknet:
         https://arxiv.org/pdf/1707.03718.pdf
     """
-
     def __init__(
         self,
         encoder_name: str = "resnet34",

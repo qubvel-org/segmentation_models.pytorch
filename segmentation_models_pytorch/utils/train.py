@@ -1,11 +1,13 @@
 import sys
+
 import torch
+
 from tqdm import tqdm as tqdm
+
 from .meter import AverageValueMeter
 
 
 class Epoch:
-
     def __init__(self, model, loss, metrics, stage_name, device='cpu', verbose=True):
         self.model = model
         self.loss = loss
@@ -67,7 +69,6 @@ class Epoch:
 
 
 class TrainEpoch(Epoch):
-
     def __init__(self, model, loss, metrics, optimizer, device='cpu', verbose=True):
         super().__init__(
             model=model,
@@ -92,7 +93,6 @@ class TrainEpoch(Epoch):
 
 
 class ValidEpoch(Epoch):
-
     def __init__(self, model, loss, metrics, device='cpu', verbose=True):
         super().__init__(
             model=model,

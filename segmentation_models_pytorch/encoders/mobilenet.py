@@ -23,14 +23,13 @@ Methods:
         depth = 3 -> number of feature tensors = 4 (one with same resolution as input and 3 downsampled).
 """
 
-import torchvision
 import torch.nn as nn
+import torchvision
 
 from ._base import EncoderMixin
 
 
 class MobileNetV2Encoder(torchvision.models.MobileNetV2, EncoderMixin):
-
     def __init__(self, out_channels, depth=5, **kwargs):
         super().__init__(**kwargs)
         self._depth = depth

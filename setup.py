@@ -3,13 +3,14 @@
 
 # Note: To use the 'upload' functionality of this file, you must:
 #   $ pip install twine
-
+# pylint: skip-file
 import io
 import os
 import sys
+
 from shutil import rmtree
 
-from setuptools import find_packages, setup, Command
+from setuptools import Command, setup, find_packages
 
 # Package meta-data.
 NAME = 'segmentation_models_pytorch'
@@ -35,9 +36,7 @@ except:
     REQUIRED = []
 
 # What packages are optional?
-EXTRAS = {
-    'test': ['pytest']
-}
+EXTRAS = {'test': ['pytest']}
 
 # Import the README and use it as the long-description.
 # Note: this will only work if 'README.md' is present in your MANIFEST.in file!
