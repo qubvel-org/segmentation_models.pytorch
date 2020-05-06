@@ -1,7 +1,7 @@
 import os  # isort: skip
+import time
 
 from shutil import copyfile
-from datetime import datetime
 
 import torch
 
@@ -13,9 +13,9 @@ import segmentation_models_pytorch as smp
 from utils import configuration
 from utils.dataset import SegmDataset
 from utils.build_model import build_model
-from utils.augmentations import (
+
+from utils.augmentations import (  # apply_preprocessing,; apply_light_training_augmentation,
     get_preprocessing,
-    apply_preprocessing,
     apply_training_augmentation,
     apply_validation_augmentation,
 )
@@ -25,17 +25,17 @@ def setup_system(system_config: configuration.System) -> None:
     torch.manual_seed(system_config.seed)
 
 
-def console_initial_log(config, time):
+def console_initial_log(config, time_str):
     print(
         f'Initial LR: {config.Optimizer.learning_rate}\n', f'Batch Size: {config.DataLoader.batch_size}\n',
         f'Model Name: {config.Model.model_name}\n', f'Encoder: {config.Model.encoder}\n',
-        f'Start_time: {time}'
+        f'Start_time: {time_str}'
     )
 
 
 def main(system_config=configuration.System):
-    time = datetime.now()
-    output_path = f'./outputs/{configuration.Model.encoder}+{configuration.Model.model_name}_{time}'
+    time_str = time.strftime('%Y-%m-%d-%H-%M')
+    output_path = f'./outputs/{configuration.Model.encoder}+{configuration.Model.model_name}_{time_str}'
     os.makedirs(output_path, exist_ok=True)
     copyfile('./utils/configuration.py', os.path.join(output_path, 'configuration.py'))
     setup_system(system_config)
@@ -44,7 +44,7 @@ def main(system_config=configuration.System):
     gt_dir = os.path.join(configuration.DataSet.root_dir, configuration.DataSet.mask_dir)
     img_val_dir = os.path.join(configuration.DataSet.root_dir, configuration.DataSet.img_val_dir)
     gt_val_dir = os.path.join(configuration.DataSet.root_dir, configuration.DataSet.mask_val_dir)
-    console_initial_log(configuration, time)
+    console_initial_log(configuration, time_str)
     net = build_model(configuration)
     preprocessing_fn = smp.encoders.get_preprocessing_fn(
         configuration.Model.encoder, configuration.Model.encoder_weights
@@ -56,7 +56,7 @@ def main(system_config=configuration.System):
         img_dir,
         gt_dir,
         classes=configuration.DataSet.classes,
-        # apply_light_training_augmentation(),
+        # augmentations=apply_light_training_augmentation(),
         augmentations=apply_training_augmentation(),
         preprocessing=get_preprocessing(preprocessing_fn)
     )
@@ -65,7 +65,7 @@ def main(system_config=configuration.System):
         gt_val_dir,
         classes=configuration.DataSet.classes,
         augmentations=apply_validation_augmentation(),
-        preprocessing=apply_preprocessing()
+        preprocessing=get_preprocessing(preprocessing_fn)
     )
 
     dataloaders = {
@@ -87,6 +87,9 @@ def main(system_config=configuration.System):
     criterion = smp.utils.losses.DiceLoss(activation=configuration.Model.activation, ignore_channels=(0, ))
     metrics = [
         smp.utils.metrics.IoU(
+            threshold=0.5, activation=configuration.Model.activation, ignore_channels=(0, )
+        ),
+        smp.utils.metrics.Fscore(
             threshold=0.5, activation=configuration.Model.activation, ignore_channels=(0, )
         )
     ]
@@ -141,7 +144,7 @@ def main(system_config=configuration.System):
             writer.add_scalar(tag + '_train', value, epoch)
         for tag, value in valid_logs.items():
             writer.add_scalar(tag + '_val', value, epoch)
-        lr_scheduler.step(epoch)
+        lr_scheduler.step()
 
 
 if __name__ == '__main__':
