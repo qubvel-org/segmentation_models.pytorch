@@ -5,17 +5,20 @@ from dataclasses import dataclass
 @dataclass
 class System:
     seed: int = 42
-    cudnn_benchmark_enabled: bool = True
-    cudnn_deterministic: bool = True
 
 
 @dataclass
 class DataSet:
     root_dir: str = "./MoNuSAC/data"
-    img_dir: str = "MoNuSAC_images_and_annotations"
-    mask_dir: str = "annotations/MoNuSAC_masks_binary"
-    set_dir: str = "./"
-    number_of_classes: int = 4
+    img_dir: str = "./data/train/"
+    mask_dir: str = "./data/trainannot/"
+    img_val_dir: str = "./data/val/"
+    mask_val_dir: str = "./data/valannot/"
+    number_of_classes: int = 13
+    classes: tuple = (
+        'sky', 'building', 'pole', 'road', 'pavement', 'tree', 'signsymbol', 'fence', 'car', 'pedestrian',
+        'bicyclist', 'unlabelled'
+    )
 
 
 @dataclass
@@ -26,7 +29,7 @@ class DataLoader:
 
 @dataclass
 class Optimizer:
-    learning_rate: float = 0.00005
+    learning_rate: float = 0.0005
     momentum: float = 0.9
     weight_decay: float = 4e-5
     lr_step_milestones: Iterable = (300, )
@@ -35,13 +38,14 @@ class Optimizer:
 
 @dataclass
 class Trainer:
-    device: str = "cuda:0"
-    epoch_num: int = 400
+    device: str = "cuda:1"
+    epoch_num: int = 100
+    save_interval: int = 5
 
 
 @dataclass
 class Model:
     encoder = 'se_resnet50'
     encoder_weights = 'imagenet'
-    activation = 'sigmoid'
+    activation = 'softmax2d'
     model_name = 'fpn'

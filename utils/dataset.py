@@ -1,7 +1,5 @@
 import os
 
-from glob import glob
-
 import cv2
 import numpy as np
 
@@ -13,47 +11,45 @@ class SegmDataset(Dataset):
         self,
         imgs_dir,
         masks_dir,
-        imgs_set,
+        classes=None,
         augmentations=None,
         preprocessing=None,
     ):
-        classes = ['Epithelial', 'Lymphocyte', 'Macrophage', 'Neutrophil']
-        super().__init__()
-        with open(imgs_set, 'r') as file:
-            self.ids = [line.strip() for line in file.readlines()]
-        self.imgs = [
-            path for img_id in self.ids for path in glob(os.path.join(imgs_dir, '*', f'{img_id}.tif'))
+        self.possible_classes = [
+            'sky', 'building', 'pole', 'road', 'pavement', 'tree', 'signsymbol', 'fence', 'car', 'pedestrian',
+            'bicyclist', 'unlabelled'
         ]
-        self.masks = {img_id: [None, None, None, None] for img_id in self.ids}
-        for img_id in self.ids:
-            masks_paths = glob(os.path.join(masks_dir, '*', img_id, '*', '*.tif'))
-            for mask_path in masks_paths:
-                for i, cls in enumerate(classes):
-                    if cls in mask_path:
-                        self.masks[img_id][i] = mask_path
+        super().__init__()
+        imgs_dir = imgs_dir if imgs_dir[-1] == '/' else imgs_dir + '/'
+        masks_dir = masks_dir if masks_dir[-1] == '/' else masks_dir + '/'
+        self.ids = os.listdir(imgs_dir)
+        self.images_filenames = [os.path.join(imgs_dir, image_id) for image_id in self.ids]
+        self.masks_filenames = [os.path.join(masks_dir, image_id) for image_id in self.ids]
+        self.class_values = [self.possible_classes.index(cls.lower()) for cls in classes]
         self.augmentations = augmentations
         self.preprocessing = preprocessing
 
     def __getitem__(self, i):
-
-        # Read image
-        img = cv2.imread(self.imgs[i])
+        img = cv2.imread(self.images_filenames[i])
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        mask = [
-            cv2.imread(class_mask, cv2.IMREAD_ANYDEPTH)
-            if class_mask is not None else np.zeros(img.shape[:-1]) for class_mask in self.masks[self.ids[i]]
-        ]
-        mask = np.asarray(mask).transpose(1, 2, 0)
-        # background = 1 - mask.max(axis=-1, keepdims=True, initial=0)
-        sample = {'image': img, 'mask': mask}
-        if self.augmentations is not None:
-            sample = self.augmentations(**sample)
 
-        if self.preprocessing is not None:
-            sample = self.preprocessing(**sample)
-            sample["mask"] = sample["mask"].bool().permute(2, 0, 1)
+        mask = cv2.imread(self.masks_filenames[i], 0)
+        masks = [(mask == v) for v in self.class_values]
+        mask = np.stack(masks, axis=-1).astype('float')
 
-        return sample['image'].float(), sample['mask']
+        if mask.shape[-1] != 1:
+            background = 1 - mask.sum(axis=-1, keepdims=True)
+            mask = np.concatenate((background, mask), axis=-1)
+
+        if self.augmentations:
+            sample = self.augmentations(image=img, mask=mask)
+            img, mask = sample['image'], sample['mask']
+
+        if self.preprocessing:
+            sample = self.preprocessing(image=img, mask=mask)
+            img, mask = sample['image'], sample['mask']
+
+        return img, mask
 
     def __len__(self):
         return len(self.ids)

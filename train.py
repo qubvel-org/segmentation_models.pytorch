@@ -13,7 +13,12 @@ import segmentation_models_pytorch as smp
 from utils import configuration
 from utils.dataset import SegmDataset
 from utils.build_model import build_model
-from utils.augmentations import apply_preprocessing, apply_training_augmentation, apply_validation_augmentation
+from utils.augmentations import (
+    get_preprocessing,
+    apply_preprocessing,
+    apply_training_augmentation,
+    apply_validation_augmentation,
+)
 
 
 def setup_system(system_config: configuration.System) -> None:
@@ -30,31 +35,37 @@ def console_initial_log(config, time):
 
 def main(system_config=configuration.System):
     time = datetime.now()
-    copyfile(
-        './utils/configuration.py', f'./configs/{configuration.Model.encoder}+'
-        f'{configuration.Model.model_name}_{time}.py'
-    )
+    output_path = f'./outputs/{configuration.Model.encoder}+{configuration.Model.model_name}_{time}'
+    os.makedirs(output_path, exist_ok=True)
+    copyfile('./utils/configuration.py', os.path.join(output_path, 'configuration.py'))
     setup_system(system_config)
-    writer = SummaryWriter(f'runs/{configuration.Model.encoder}+{configuration.Model.model_name}_{time}')
+    writer = SummaryWriter(os.path.join(output_path, 'runs'))
     img_dir = os.path.join(configuration.DataSet.root_dir, configuration.DataSet.img_dir)
     gt_dir = os.path.join(configuration.DataSet.root_dir, configuration.DataSet.mask_dir)
-    set_dir = configuration.DataSet.set_dir
+    img_val_dir = os.path.join(configuration.DataSet.root_dir, configuration.DataSet.img_val_dir)
+    gt_val_dir = os.path.join(configuration.DataSet.root_dir, configuration.DataSet.mask_val_dir)
     console_initial_log(configuration, time)
     net = build_model(configuration)
+    preprocessing_fn = smp.encoders.get_preprocessing_fn(
+        configuration.Model.encoder, configuration.Model.encoder_weights
+    )
     # snapshot = torch.load('./snapshots/best_model_config_dpn92+unet_2020-02-14 14:58:33.803400.pth')
     # net.load_state_dict(snapshot['model_state_dict'])
     print(net)
     train_dataset = SegmDataset(
         img_dir,
         gt_dir,
-        os.path.join(set_dir, 'train.txt'),
+        classes=configuration.DataSet.classes,
         # apply_light_training_augmentation(),
-        apply_training_augmentation(),
-        apply_preprocessing()
+        augmentations=apply_training_augmentation(),
+        preprocessing=get_preprocessing(preprocessing_fn)
     )
     val_dataset = SegmDataset(
-        img_dir, gt_dir, os.path.join(set_dir, 'val.txt'), apply_validation_augmentation(),
-        apply_preprocessing()
+        img_val_dir,
+        gt_val_dir,
+        classes=configuration.DataSet.classes,
+        augmentations=apply_validation_augmentation(),
+        preprocessing=apply_preprocessing()
     )
 
     dataloaders = {
@@ -73,8 +84,12 @@ def main(system_config=configuration.System):
                 num_workers=configuration.DataLoader.num_workers
             )
     }
-    criterion = smp.utils.losses.DiceLoss(activation=configuration.Model.activation)
-    metrics = [smp.utils.metrics.IoU(threshold=0.5, activation=configuration.Model.activation)]
+    criterion = smp.utils.losses.DiceLoss(activation=configuration.Model.activation, ignore_channels=(0, ))
+    metrics = [
+        smp.utils.metrics.IoU(
+            threshold=0.5, activation=configuration.Model.activation, ignore_channels=(0, )
+        )
+    ]
 
     optimizer = torch.optim.Adam(
         net.parameters(),
@@ -104,6 +119,14 @@ def main(system_config=configuration.System):
         print('\nEpoch: {}'.format(epoch))
         train_logs = train_epoch.run(dataloaders['train'])
         valid_logs = valid_epoch.run(dataloaders['val'])
+        if epoch % configuration.Trainer.save_interval == 0:
+            torch.save({
+                'epoch': epoch,
+                'model_state_dict': net.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'metric': valid_logs['iou_score']
+            }, os.path.join(output_path, f'model_{epoch}.pth'))
+            print('Model saved!')
         # do something (save model, change lr, etc.)
         if max_score < valid_logs['iou_score']:
             max_score = valid_logs['iou_score']
@@ -112,8 +135,7 @@ def main(system_config=configuration.System):
                 'model_state_dict': net.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
                 'metric': max_score
-            }, f'./snapshots/best_model_config_{configuration.Model.encoder}+{configuration.Model.model_name}_{time}.pth'
-                      )
+            }, os.path.join(output_path, 'best_model.pth'))
             print('Model saved!')
         for tag, value in train_logs.items():
             writer.add_scalar(tag + '_train', value, epoch)
