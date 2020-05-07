@@ -1,6 +1,6 @@
 dependencies = [
     'torch', 'torchvision', 'pretrainedmodels',
-    'efficientnet-pytorch', 'timm'
+    'efficientnet_pytorch', 'timm'
 ]
 
 
