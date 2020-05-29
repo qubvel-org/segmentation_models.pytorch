@@ -43,8 +43,7 @@ class ResNetEncoder(ResNet, EncoderMixin):
         del self.fc
         del self.avgpool
 
-    def get_stages(self):
-        return [
+        self.stages = [
             nn.Identity(),
             nn.Sequential(self.conv1, self.bn1, self.relu),
             nn.Sequential(self.maxpool, self.layer1),
@@ -52,7 +51,20 @@ class ResNetEncoder(ResNet, EncoderMixin):
             self.layer3,
             self.layer4,
         ]
-
+        
+    def get_stages(self):
+        if not hasattr(self, "stages"): 
+            print("creating stages ...")
+            self.stages = [
+                nn.Identity(),
+                nn.Sequential(self.conv1, self.bn1, self.relu),
+                nn.Sequential(self.maxpool, self.layer1),
+                self.layer2,
+                self.layer3,
+                self.layer4,
+            ]
+        return self.stages 
+    
     def forward(self, x):
         stages = self.get_stages()
 
