@@ -53,15 +53,16 @@ class VGGEncoder(VGG, EncoderMixin):
                          " operations for downsampling!")
 
     def get_stages(self):
-        stages = []
-        stage_modules = []
-        for module in self.features:
-            if isinstance(module, nn.MaxPool2d):
-                stages.append(nn.Sequential(*stage_modules))
-                stage_modules = []
-            stage_modules.append(module)
-        stages.append(nn.Sequential(*stage_modules))
-        return stages
+        if not hasattr(self, "stages"):   
+            self.stages = []
+            stage_modules = []
+            for module in self.features:
+                if isinstance(module, nn.MaxPool2d):
+                    self.stages.append(nn.Sequential(*stage_modules))
+                    stage_modules = []
+                stage_modules.append(module)
+            self.stages.append(nn.Sequential(*stage_modules))
+        return self.stages
 
     def forward(self, x):
         stages = self.get_stages()

@@ -53,8 +53,7 @@ class ResNetEncoder(ResNet, EncoderMixin):
         ]
         
     def get_stages(self):
-        if not hasattr(self, "stages"): 
-            print("creating stages ...")
+        if not hasattr(self, "stages"):  
             self.stages = [
                 nn.Identity(),
                 nn.Sequential(self.conv1, self.bn1, self.relu),

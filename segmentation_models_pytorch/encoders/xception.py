@@ -27,15 +27,17 @@ class XceptionEncoder(Xception, EncoderMixin):
                          "due to pooling operation for downsampling!")
 
     def get_stages(self):
-        return [
-            nn.Identity(),
-            nn.Sequential(self.conv1, self.bn1, self.relu, self.conv2, self.bn2, self.relu),
-            self.block1,
-            self.block2,
-            nn.Sequential(self.block3, self.block4, self.block5, self.block6, self.block7,
-                          self.block8, self.block9, self.block10, self.block11),
-            nn.Sequential(self.block12, self.conv3, self.bn3, self.relu, self.conv4, self.bn4),
-        ]
+        if not hasattr(self, "stages"): 
+            self.stages = [
+                nn.Identity(),
+                nn.Sequential(self.conv1, self.bn1, self.relu, self.conv2, self.bn2, self.relu),
+                self.block1,
+                self.block2,
+                nn.Sequential(self.block3, self.block4, self.block5, self.block6, self.block7,
+                              self.block8, self.block9, self.block10, self.block11),
+                nn.Sequential(self.block12, self.conv3, self.bn3, self.relu, self.conv4, self.bn4),
+            ]
+        return self.stages
 
     def forward(self, x):
         stages = self.get_stages()

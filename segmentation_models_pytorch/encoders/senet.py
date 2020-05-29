@@ -47,14 +47,16 @@ class SENetEncoder(SENet, EncoderMixin):
         del self.avg_pool
 
     def get_stages(self):
-        return [
-            nn.Identity(),
-            self.layer0[:-1],
-            nn.Sequential(self.layer0[-1], self.layer1),
-            self.layer2,
-            self.layer3,
-            self.layer4,
-        ]
+        if not hasattr(self, "stages"):  
+            self.stages =  [ 
+                nn.Identity(),
+                self.layer0[:-1],
+                nn.Sequential(self.layer0[-1], self.layer1),
+                self.layer2,
+                self.layer3,
+                self.layer4,
+            ]
+        return self.stages
 
     def forward(self, x):
         stages = self.get_stages()

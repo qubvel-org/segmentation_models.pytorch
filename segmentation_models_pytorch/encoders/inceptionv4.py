@@ -54,14 +54,16 @@ class InceptionV4Encoder(InceptionV4, EncoderMixin):
                          "due to pooling operation for downsampling!")
 
     def get_stages(self):
-        return [
-            nn.Identity(),
-            self.features[: self._stage_idxs[0]],
-            self.features[self._stage_idxs[0]: self._stage_idxs[1]],
-            self.features[self._stage_idxs[1]: self._stage_idxs[2]],
-            self.features[self._stage_idxs[2]: self._stage_idxs[3]],
-            self.features[self._stage_idxs[3]:],
-        ]
+        if not hasattr(self, "stages"):  
+            self.stages =  [
+                nn.Identity(),
+                self.features[: self._stage_idxs[0]],
+                self.features[self._stage_idxs[0]: self._stage_idxs[1]],
+                self.features[self._stage_idxs[1]: self._stage_idxs[2]],
+                self.features[self._stage_idxs[2]: self._stage_idxs[3]],
+                self.features[self._stage_idxs[3]:],
+            ]
+        return self.stages
 
     def forward(self, x):
 

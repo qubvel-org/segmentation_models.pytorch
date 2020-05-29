@@ -58,16 +58,18 @@ class DenseNetEncoder(DenseNet, EncoderMixin):
         raise ValueError("DenseNet encoders do not support dilated mode "
                          "due to pooling operation for downsampling!")
 
-    def get_stages(self):
-        return [
-            nn.Identity(),
-            nn.Sequential(self.features.conv0, self.features.norm0, self.features.relu0),
-            nn.Sequential(self.features.pool0, self.features.denseblock1,
-                          TransitionWithSkip(self.features.transition1)),
-            nn.Sequential(self.features.denseblock2, TransitionWithSkip(self.features.transition2)),
-            nn.Sequential(self.features.denseblock3, TransitionWithSkip(self.features.transition3)),
-            nn.Sequential(self.features.denseblock4, self.features.norm5)
-        ]
+    def get_stages(self): 
+        if not hasattr(self, "stages"):  
+            self.stages =  [
+                nn.Identity(),
+                nn.Sequential(self.features.conv0, self.features.norm0, self.features.relu0),
+                nn.Sequential(self.features.pool0, self.features.denseblock1,
+                              TransitionWithSkip(self.features.transition1)),
+                nn.Sequential(self.features.denseblock2, TransitionWithSkip(self.features.transition2)),
+                nn.Sequential(self.features.denseblock3, TransitionWithSkip(self.features.transition3)),
+                nn.Sequential(self.features.denseblock4, self.features.norm5)
+            ]
+        return self.stages
 
     def forward(self, x):
 
