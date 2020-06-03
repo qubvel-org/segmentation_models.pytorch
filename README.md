@@ -1,3 +1,5 @@
+# This repo contains source code for "Deep learning in autonomous driving" HSE Course Work
+
 <div align="center">
  
 ![logo](https://i.ibb.co/dc1XdhT/Segmentation-Models-V2-Side-1-1.png)  
