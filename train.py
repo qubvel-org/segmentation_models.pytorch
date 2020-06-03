@@ -13,11 +13,11 @@ import segmentation_models_pytorch as smp
 from utils import configuration
 from utils.dataset import SegmDataset
 from utils.build_model import build_model
-
-from utils.augmentations import (  # apply_preprocessing,; apply_light_training_augmentation,
+from utils.augmentations import (  # apply_preprocessing,
     get_preprocessing,
     apply_training_augmentation,
     apply_validation_augmentation,
+    apply_light_training_augmentation,
 )
 
 
@@ -34,6 +34,7 @@ def console_initial_log(config, time_str):
 
 
 def main(system_config=configuration.System):
+    # os.environ['CUDA_VISIBLE_DEVICES'] = '0'
     time_str = time.strftime('%Y-%m-%d-%H-%M')
     output_path = f'./outputs/{configuration.Model.encoder}+{configuration.Model.model_name}_{time_str}'
     os.makedirs(output_path, exist_ok=True)
@@ -56,8 +57,8 @@ def main(system_config=configuration.System):
         img_dir,
         gt_dir,
         classes=configuration.DataSet.classes,
-        # augmentations=apply_light_training_augmentation(),
-        augmentations=apply_training_augmentation(),
+        augmentations=apply_light_training_augmentation(),
+        # augmentations=apply_training_augmentation(),
         preprocessing=get_preprocessing(preprocessing_fn)
     )
     val_dataset = SegmDataset(
@@ -84,20 +85,19 @@ def main(system_config=configuration.System):
                 num_workers=configuration.DataLoader.num_workers
             )
     }
-    criterion = smp.utils.losses.DiceLoss(activation=configuration.Model.activation, ignore_channels=(0, ))
+    criterion = smp.utils.losses.DiceLoss(activation=configuration.Model.activation)
+    #criterion = smp.utils.losses.FocalLoss(12) + smp.utils.losses.DiceLoss(activation=configuration.Model.activation)
+    # criterion = SemanticSegmentationLoss(configuration.DataSet.number_of_classes)
     metrics = [
-        smp.utils.metrics.IoU(
-            threshold=0.5, activation=configuration.Model.activation, ignore_channels=(0, )
-        ),
-        smp.utils.metrics.Fscore(
-            threshold=0.5, activation=configuration.Model.activation, ignore_channels=(0, )
-        )
+        smp.utils.metrics.IoU(threshold=0.5, activation=configuration.Model.activation),
+        smp.utils.metrics.Fscore(threshold=0.5, activation=configuration.Model.activation)
     ]
-
+    import torch_optimizer as optim
     optimizer = torch.optim.Adam(
         net.parameters(),
         lr=configuration.Optimizer.learning_rate,
-        weight_decay=configuration.Optimizer.weight_decay
+        weight_decay=configuration.Optimizer.weight_decay,
+        #momentum=configuration.Optimizer.momentum
     )
 
     lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(

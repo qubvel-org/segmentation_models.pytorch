@@ -14,7 +14,7 @@ class DataSet:
     mask_dir: str = "trainannot"
     img_val_dir: str = "val"
     mask_val_dir: str = "valannot"
-    number_of_classes: int = 13
+    number_of_classes: int = 12
     classes: tuple = (
         'sky', 'building', 'pole', 'road', 'pavement', 'tree', 'signsymbol', 'fence', 'car', 'pedestrian',
         'bicyclist', 'unlabelled'
@@ -32,20 +32,20 @@ class Optimizer:
     learning_rate: float = 0.0005
     momentum: float = 0.9
     weight_decay: float = 4e-5
-    lr_step_milestones: Iterable = (70, 90)
+    lr_step_milestones: Iterable = (75, 170)
     lr_gamma: float = 0.1
 
 
 @dataclass
 class Trainer:
-    device: str = "cuda:1"
-    epoch_num: int = 100
+    device: str = "cuda:0"
+    epoch_num: int = 200
     save_interval: int = 5
 
 
 @dataclass
 class Model:
-    encoder = 'se_resnet50'
+    encoder = 'mobilenet_v2'
     encoder_weights = 'imagenet'
     activation = 'softmax2d'
-    model_name = 'fpn'
+    model_name = 'deeplab_v3+'

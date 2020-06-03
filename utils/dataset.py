@@ -37,7 +37,7 @@ class SegmDataset(Dataset):
         masks = [(mask == v) for v in self.class_values]
         mask = np.stack(masks, axis=-1).astype('float')
 
-        if mask.shape[-1] != 1:
+        if mask.shape[-1] != 1 and mask.shape[-1] != 12:
             background = 1 - mask.sum(axis=-1, keepdims=True)
             mask = np.concatenate((background, mask), axis=-1)
 
