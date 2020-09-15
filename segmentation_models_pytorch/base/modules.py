@@ -70,7 +70,7 @@ class ArgMax(nn.Module):
         self.dim = dim
 
     def forward(self, x):
-        return torch.argmax(x, dim=dim)
+        return torch.argmax(x, dim=self.dim)
 
 
 class Activation(nn.Module):
