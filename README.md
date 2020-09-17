@@ -74,14 +74,15 @@ preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
 
 |Encoder                         |Weights                         |Params, M                       |
 |--------------------------------|:------------------------------:|:------------------------------:|
-|resnet18                        |imagenet                        |11M                             |
+|resnet18                        |imagenet<br>ssl*<br>swsl*        |11M                             |
 |resnet34                        |imagenet                        |21M                             |
-|resnet50                        |imagenet                        |23M                             |
+|resnet50                        |imagenet<br>ssl*<br>swsl*        |23M                             |
 |resnet101                       |imagenet                        |42M                             |
 |resnet152                       |imagenet                        |58M                             |
-|resnext50_32x4d                 |imagenet                        |22M                             |
-|resnext101_32x8d                |imagenet<br>instagram           |86M                             |
-|resnext101_32x16d               |instagram                       |191M                            |
+|resnext50_32x4d                 |imagenet<br>ssl*<br>swsl*        |22M                             |
+|resnext101_32x4d                |ssl<br>swsl                     |42M                             |
+|resnext101_32x8d                |imagenet<br>instagram<br>ssl*<br>swsl*|86M                         |
+|resnext101_32x16d               |instagram<br>ssl*<br>swsl*        |191M                            |
 |resnext101_32x32d               |instagram                       |466M                            |
 |resnext101_32x48d               |instagram                       |826M                            |
 |dpn68                           |imagenet                        |11M                             |
@@ -130,6 +131,8 @@ preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
 |timm-efficientnet-b7            |imagenet<br>advprop<br>noisy-student|63M                             |
 |timm-efficientnet-b8            |imagenet<br>advprop             |84M                             |
 |timm-efficientnet-l2            |noisy-student                   |474M                            |
+
+\* `ssl`, `wsl` from [here](https://github.com/facebookresearch/semi-supervised-ImageNet1K-models).
 
 ### Models API <a name="api"></a>
 
