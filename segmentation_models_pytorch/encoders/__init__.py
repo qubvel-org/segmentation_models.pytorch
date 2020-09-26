@@ -12,6 +12,7 @@ from .inceptionv4 import inceptionv4_encoders
 from .efficientnet import efficient_net_encoders
 from .mobilenet import mobilenet_encoders
 from .xception import xception_encoders
+from .timm_efficientnet import timm_efficientnet_encoders
 
 try:
     from .resnest import resnest_encoders
@@ -24,7 +25,6 @@ except ModuleNotFoundError:
         ), RuntimeWarning,
     )
     resnest_encoders = {}
-
 
 from ._preprocessing import preprocess_input
 
@@ -40,6 +40,7 @@ encoders.update(efficient_net_encoders)
 encoders.update(mobilenet_encoders)
 encoders.update(xception_encoders)
 encoders.update(resnest_encoders)
+encoders.update(timm_efficientnet_encoders)
 
 
 def get_encoder(name, in_channels=3, depth=5, weights=None):
