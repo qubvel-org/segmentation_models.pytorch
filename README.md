@@ -68,7 +68,7 @@ preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
  - [FPN](http://presentations.cocodataset.org/COCO17-Stuff-FAIR.pdf)
  - [PSPNet](https://arxiv.org/abs/1612.01105)
  - [PAN](https://arxiv.org/abs/1805.10180)
- - [DeepLabV3](https://arxiv.org/abs/1706.05587) [DeepLabV3+](https://arxiv.org/abs/1802.02611)
+ - [DeepLabV3](https://arxiv.org/abs/1706.05587) and [DeepLabV3+](https://arxiv.org/abs/1802.02611)
 
 #### Encoders <a name="encoders"></a>
 
@@ -132,7 +132,7 @@ preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
 |timm-efficientnet-b8            |imagenet<br>advprop             |84M                             |
 |timm-efficientnet-l2            |noisy-student                   |474M                            |
 
-\* `ssl`, `wsl` from [here](https://github.com/facebookresearch/semi-supervised-ImageNet1K-models).
+\* `ssl`, `wsl` - semi-supervised and weakly-supervised learning on ImageNet ([repo](https://github.com/facebookresearch/semi-supervised-ImageNet1K-models)).
 
 ### Models API <a name="api"></a>
 
