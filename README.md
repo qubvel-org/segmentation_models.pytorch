@@ -11,8 +11,8 @@ Segmentation based on [PyTorch](https://pytorch.org/).**
 The main features of this library are:
 
  - High level API (just two lines to create neural network)
- - 5 models architectures for binary and multi class segmentation (including legendary Unet)
- - 46 available encoders for each architecture
+ - 7 models architectures for binary and multi class segmentation (including legendary Unet)
+ - 57 available encoders for each architecture
  - All encoders have pre-trained weights for faster and better convergence
 
 ### Table of content
@@ -68,7 +68,7 @@ preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
  - [FPN](http://presentations.cocodataset.org/COCO17-Stuff-FAIR.pdf)
  - [PSPNet](https://arxiv.org/abs/1612.01105)
  - [PAN](https://arxiv.org/abs/1805.10180)
- - [DeepLabV3](https://arxiv.org/abs/1706.05587)
+ - [DeepLabV3](https://arxiv.org/abs/1706.05587) and [DeepLabV3+](https://arxiv.org/abs/1802.02611)
 
 #### Encoders <a name="encoders"></a>
 
@@ -132,7 +132,7 @@ preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
 |timm-efficientnet-b8            |imagenet<br>advprop             |84M                             |
 |timm-efficientnet-l2            |noisy-student                   |474M                            |
 
-\* `ssl`, `wsl` from [here](https://github.com/facebookresearch/semi-supervised-ImageNet1K-models).
+\* `ssl`, `wsl` - semi-supervised and weakly-supervised learning on ImageNet ([repo](https://github.com/facebookresearch/semi-supervised-ImageNet1K-models)).
 
 ### Models API <a name="api"></a>
 
