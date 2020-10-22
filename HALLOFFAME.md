@@ -74,3 +74,9 @@ Please, follow these rules, when adding a solution to the "Hall of Fame":
 - 55th place.
 [Pavel Yakubovskiy](https://www.linkedin.com/in/pavel-yakubovskiy/)  
 [[description](https://www.kaggle.com/c/understanding_cloud_organization/discussion/118019#latest-678626)]
+
+### [MICCAI 2020 TN-SCUI challenge](https://tn-scui2020.grand-challenge.org/Home/)
+- 1st place.
+[Mingyu Wang](https://github.com/WAMAWAMA)  
+[[description](https://github.com/WAMAWAMA/TNSCUI2020-Seg-Rank1st)]
+[[code](https://github.com/WAMAWAMA/TNSCUI2020-Seg-Rank1st)]
