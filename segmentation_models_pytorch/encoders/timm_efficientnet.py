@@ -1,8 +1,9 @@
 import torch
 import torch.nn as nn
 
-from timm.models.efficientnet import EfficientNet, Swish
+from timm.models.efficientnet import EfficientNet
 from timm.models.efficientnet import decode_arch_def, round_channels, default_cfgs
+from timm.models.layers.activations import Swish
 
 from ._base import EncoderMixin
 
