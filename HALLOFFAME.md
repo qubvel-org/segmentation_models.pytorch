@@ -75,8 +75,16 @@ Please, follow these rules, when adding a solution to the "Hall of Fame":
 [Pavel Yakubovskiy](https://www.linkedin.com/in/pavel-yakubovskiy/)  
 [[description](https://www.kaggle.com/c/understanding_cloud_organization/discussion/118019#latest-678626)]
 
-### [MICCAI 2020 TN-SCUI challenge](https://tn-scui2020.grand-challenge.org/Home/)
+## Other platforms
+
+### [MICCAI 2020 TN-SCUI challenge](https://tn-scui2020.grand-challenge.org/Home/)  
 - 1st place.
 [Mingyu Wang](https://github.com/WAMAWAMA)  
 [[description](https://github.com/WAMAWAMA/TNSCUI2020-Seg-Rank1st)]
 [[code](https://github.com/WAMAWAMA/TNSCUI2020-Seg-Rank1st)]
+
+### [Open Cities AI Challenge: Segmenting Buildings for Disaster Resilience](https://www.drivendata.org/competitions/60/building-segmentation-disaster-resilience/)
+ - 1st place.
+[Pavel Yakubovskiy](https://www.linkedin.com/in/pavel-yakubovskiy/).  
+[[code and description](https://github.com/qubvel/open-cities-challenge)]
+
