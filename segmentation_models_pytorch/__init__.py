@@ -1,4 +1,5 @@
 from .unet import Unet
+from .unetplusplus import UnetPlusPlus
 from .linknet import Linknet
 from .fpn import FPN
 from .pspnet import PSPNet
