@@ -34,7 +34,7 @@ class UnetPlusPlus(SegmentationModel):
                 - activation (str): activation function to apply "sigmoid"/"softmax" (could be None to return logits)
 
     Returns:
-        ``torch.nn.Module``: **Unet**
+        ``torch.nn.Module``: **Unet++**
 
     .. _UnetPlusPlus:
         https://arxiv.org/pdf/1807.10165.pdf
