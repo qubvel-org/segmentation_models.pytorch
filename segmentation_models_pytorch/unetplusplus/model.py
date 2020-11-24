@@ -86,5 +86,5 @@ class UnetPlusPlus(SegmentationModel):
         else:
             self.classification_head = None
 
-        self.name = "u-{}".format(encoder_name)
+        self.name = "unetplusplus-{}".format(encoder_name)
         self.initialize()
