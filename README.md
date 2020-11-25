@@ -32,6 +32,7 @@ The main features of this library are:
  9. [License](#license)
 
 ### ⏳ Quick start <a name="start"></a>
+
 #### 1. Create your first Segmentation model with SMP
 
 Segmentation model is just a PyTorch nn.Module, which can be created as easy as:
@@ -39,32 +40,17 @@ Segmentation model is just a PyTorch nn.Module, which can be created as easy as:
 ```python
 import segmentation_models_pytorch as smp
 
-model = smp.Unet()
+model = smp.Unet(
+    encoder_name="resnet34",        # choose encoder, e.g. mobilenet_v2 or efficientnet-b7
+    encoder_weights="imagenet",     # use `imagenet` pretreined weights for encoder initialization
+    in_channels=1,                  # model input channels (1 for grayscale images, 3 for RGB, etc.)
+    classes=3,                      # model output channels (number of classes in your dataset)
+)
 ```
-see [table](#architectires) below to get available model architectures.
+[table](#architectires) with available model architectures
+[table](#encoders) with avaliable encoders and its corresponding weights
 
-#### 2. Configure encoder and its weights initialization
-
-Depending on the task, you can change the network architecture by choosing encoders with fewer or more parameters and use pretrainded weights to initialize it:
-
-```python
-model = smp.Unet('resnet34', encoder_weights='imagenet')
-```
-see [table](#encoders) below to get avaliable encoders and its corresponding weights.
-
-#### 3. Configure number of input channels and number of output classes
-
-Suppose we have grayscale (1-channel) images and want to detect 3 different classes with our segmentation model:
-
-```python
-# shape of input tensor:  (N, 1, H, W)
-# shape of output tensor: (N, 3, H, W)
-
-model = smp.Unet('resnet34', in_channels=1, classes=3)
-```
-Default number of input channels for all models is 3, because all encoders have been pretrained with regular RGB images.
-
-#### 4. Configure data preprocessing
+#### 2. Configure data preprocessing
 
 All encoders have pretrained weights. Preparing your data the same way as during weights pretraining may give your better results (higher metric score and faster convergence). But it is relevant only for 1-2-3-channels images and **not necessary** in case you train the whole model, not only decoder.
 
