@@ -43,7 +43,7 @@ model = smp.Unet()
 ```
 see [table](#architectires) below to get available model architectures.
 
-#### 2. Configure encoder and its weights initialization.
+#### 2. Configure encoder and its weights initialization
 
 Depending on the task, you can change the network architecture by choosing encoders with fewer or more parameters and use pretrainded weights to initialize it:
 
@@ -52,7 +52,7 @@ model = smp.Unet('resnet34', encoder_weights='imagenet')
 ```
 see [table](#encoders) below to get avaliable encoders and its corresponding weights.
 
-#### 3. Configure number of input channels and number of output classes.
+#### 3. Configure number of input channels and number of output classes
 
 Suppose we have grayscale (1-channel) images and want to detect 3 different classes with our segmentation model:
 
@@ -64,7 +64,7 @@ model = smp.Unet('resnet34', in_channels=1, classes=3)
 ```
 Default number of input channels for all models is 3, because all encoders have been pretrained with regular RGB images.
 
-#### 4. Configure data preprocessing.
+#### 4. Configure data preprocessing
 
 All encoders have pretrained weights. Preparing your data the same way as during weights pretraining may give your better results (higher metric score and faster convergence). But it is relevant only for 1-2-3-channels images and **not necessary** in case you train the whole model, not only decoder.
 
@@ -91,6 +91,9 @@ Congratulations! You are done! Now you can train your model with your favorite f
  - [DeepLabV3](https://arxiv.org/abs/1706.05587) and [DeepLabV3+](https://arxiv.org/abs/1802.02611)
 
 #### Encoders <a name="encoders"></a>
+
+<details>
+<summary>Table with Encoders</summary>
 
 |Encoder                         |Weights                         |Params, M                       |
 |--------------------------------|:------------------------------:|:------------------------------:|
@@ -153,6 +156,8 @@ Congratulations! You are done! Now you can train your model with your favorite f
 |timm-efficientnet-l2            |noisy-student                   |474M                            |
 
 \* `ssl`, `wsl` - semi-supervised and weakly-supervised learning on ImageNet ([repo](https://github.com/facebookresearch/semi-supervised-ImageNet1K-models)).
+
+</details>
 
 ### 🔁 Models API <a name="api"></a>
 
