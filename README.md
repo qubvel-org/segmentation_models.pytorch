@@ -11,11 +11,11 @@ Segmentation based on [PyTorch](https://pytorch.org/).**
 The main features of this library are:
 
  - High level API (just two lines to create neural network)
- - 7 models architectures for binary and multi class segmentation (including legendary Unet)
+ - 8 models architectures for binary and multi class segmentation (including legendary Unet)
  - 57 available encoders for each architecture
  - All encoders have pre-trained weights for faster and better convergence
 
-### Table of content
+### 📋 Table of content
  1. [Quick start](#start)
  2. [Examples](#examples)
  3. [Models](#models)
@@ -31,36 +31,56 @@ The main features of this library are:
  8. [Citing](#citing)
  9. [License](#license)
 
-### Quick start <a name="start"></a>
-Since the library is built on the PyTorch framework, created segmentation model is just a PyTorch nn.Module, which can be created as easy as:
+### ⏳ Quick start <a name="start"></a>
+#### 1. Create your first Segmentation model with SMP
+
+Segmentation model is just a PyTorch nn.Module, which can be created as easy as:
+
 ```python
 import segmentation_models_pytorch as smp
 
 model = smp.Unet()
 ```
-Depending on the task, you can change the network architecture by choosing backbones with fewer or more parameters and use pretrainded weights to initialize it:
+see [table](#architectires) below to get available model architectures.
+
+#### 2. Configure encoder and its weights initialization.
+
+Depending on the task, you can change the network architecture by choosing encoders with fewer or more parameters and use pretrainded weights to initialize it:
 
 ```python
 model = smp.Unet('resnet34', encoder_weights='imagenet')
 ```
+see [table](#encoders) below to get avaliable encoders and its corresponding weights.
 
-Change number of output classes in the model:
+#### 3. Configure number of input channels and number of output classes.
+
+Suppose we have grayscale (1-channel) images and want to detect 3 different classes with our segmentation model:
 
 ```python
-model = smp.Unet('resnet34', classes=3, activation='softmax')
-```
+# shape of input tensor:  (N, 1, H, W)
+# shape of output tensor: (N, 3, H, W)
 
-All models have pretrained encoders, so you have to prepare your data the same way as during weights pretraining:
+model = smp.Unet('resnet34', in_channels=1, classes=3)
+```
+Default number of input channels for all models is 3, because all encoders have been pretrained with regular RGB images.
+
+#### 4. Configure data preprocessing.
+
+All encoders have pretrained weights. Preparing your data the same way as during weights pretraining may give your better results (higher metric score and faster convergence). But it is relevant only for 1-2-3-channels images and **not necessary** in case you train the whole model, not only decoder.
+
 ```python
 from segmentation_models_pytorch.encoders import get_preprocessing_fn
 
 preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
 ```
-### Examples <a name="examples"></a>
- - Training model for cars segmentation on CamVid dataset [here](https://github.com/qubvel/segmentation_models.pytorch/blob/master/examples/cars%20segmentation%20(camvid).ipynb).
- - Training SMP model with [Catalyst](https://github.com/catalyst-team/catalyst) (high-level framework for PyTorch), [Ttach](https://github.com/qubvel/ttach) (TTA library for PyTorch) and [Albumentations](https://github.com/albu/albumentations) (fast image augmentation library) - [here](https://github.com/catalyst-team/catalyst/blob/master/examples/notebooks/segmentation-tutorial.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/catalyst-team/catalyst/blob/master/examples/notebooks/segmentation-tutorial.ipynb)
 
-### Models <a name="models"></a>
+Congratulations! You are done! Now you can train your model with your favorite framework!
+
+### 💡 Examples <a name="examples"></a>
+ - Training model for cars segmentation on CamVid dataset [here](https://github.com/qubvel/segmentation_models.pytorch/blob/master/examples/cars%20segmentation%20(camvid).ipynb).
+ - Training SMP model with [Catalyst](https://github.com/catalyst-team/catalyst) (high-level framework for PyTorch), [TTAch](https://github.com/qubvel/ttach) (TTA library for PyTorch) and [Albumentations](https://github.com/albu/albumentations) (fast image augmentation library) - [here](https://github.com/catalyst-team/catalyst/blob/master/examples/notebooks/segmentation-tutorial.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/catalyst-team/catalyst/blob/master/examples/notebooks/segmentation-tutorial.ipynb)
+
+### 📦 Models <a name="models"></a>
 
 #### Architectures <a name="architectires"></a>
  - [Unet](https://arxiv.org/abs/1505.04597) and [Unet++](https://arxiv.org/pdf/1807.10165.pdf)
@@ -134,7 +154,7 @@ preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
 
 \* `ssl`, `wsl` - semi-supervised and weakly-supervised learning on ImageNet ([repo](https://github.com/facebookresearch/semi-supervised-ImageNet1K-models)).
 
-### Models API <a name="api"></a>
+### 🔁 Models API <a name="api"></a>
 
  - `model.encoder` - pretrained backbone to extract features of different spatial resolution
  - `model.decoder` - depends on models architecture (`Unet`/`Linknet`/`PSPNet`/`FPN`)
@@ -176,7 +196,7 @@ model = smp.Unet('resnet34', encoder_depth=4)
 ```
 
 
-### Installation <a name="installation"></a>
+### 🛠 Installation <a name="installation"></a>
 PyPI version:
 ```bash
 $ pip install segmentation-models-pytorch
@@ -186,12 +206,12 @@ Latest version from source:
 $ pip install git+https://github.com/qubvel/segmentation_models.pytorch
 ````
 
-### Competitions won with the library
+### 🏆 Competitions won with the library
 
 `Segmentation Models` package is widely used in the image segmentation competitions.
 [Here](https://github.com/qubvel/segmentation_models.pytorch/blob/master/HALLOFFAME.md) you can find competitions, names of the winners and links to their solutions.
 
-### Contributing
+### 🤝 Contributing
 
 ##### Run test
 ```bash
@@ -202,7 +222,7 @@ $ docker build -f docker/Dockerfile.dev -t smp:dev . && docker run --rm smp:dev 
 $ docker build -f docker/Dockerfile.dev -t smp:dev . && docker run --rm smp:dev python misc/generate_table.py
 ```
 
-### Citing
+### 📝 Citing
 ```
 @misc{Yakubovskiy:2019,
   Author = {Pavel Yakubovskiy},
@@ -214,5 +234,5 @@ $ docker build -f docker/Dockerfile.dev -t smp:dev . && docker run --rm smp:dev 
 }
 ```
 
-### License <a name="license"></a>
+### 🛡️ License <a name="license"></a>
 Project is distributed under [MIT License](https://github.com/qubvel/segmentation_models.pytorch/blob/master/LICENSE)
