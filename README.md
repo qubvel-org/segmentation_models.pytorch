@@ -93,19 +93,19 @@ Congratulations! You are done! Now you can train your model with your favorite f
 #### Encoders <a name="encoders"></a>
 
 <details>
-<summary>Table with Encoders</summary>
+<summary>Table with ALL avaliable encoders (click to expand)</summary>
 
 |Encoder                         |Weights                         |Params, M                       |
 |--------------------------------|:------------------------------:|:------------------------------:|
-|resnet18                        |imagenet<br>ssl*<br>swsl*        |11M                             |
+|resnet18                        |imagenet / ssl / swsl           |11M                             |
 |resnet34                        |imagenet                        |21M                             |
-|resnet50                        |imagenet<br>ssl*<br>swsl*        |23M                             |
+|resnet50                        |imagenet / ssl / swsl           |23M                             |
 |resnet101                       |imagenet                        |42M                             |
 |resnet152                       |imagenet                        |58M                             |
-|resnext50_32x4d                 |imagenet<br>ssl*<br>swsl*        |22M                             |
-|resnext101_32x4d                |ssl<br>swsl                     |42M                             |
-|resnext101_32x8d                |imagenet<br>instagram<br>ssl*<br>swsl*|86M                         |
-|resnext101_32x16d               |instagram<br>ssl*<br>swsl*        |191M                            |
+|resnext50_32x4d                 |imagenet / ssl / swsl           |22M                             |
+|resnext101_32x4d                |ssl / swsl                      |42M                             |
+|resnext101_32x8d                |imagenet / instagram / ssl / swsl|86M                         |
+|resnext101_32x16d               |instagram / ssl / swsl          |191M                            |
 |resnext101_32x32d               |instagram                       |466M                            |
 |resnext101_32x48d               |instagram                       |826M                            |
 |dpn68                           |imagenet                        |11M                             |
@@ -132,8 +132,8 @@ Congratulations! You are done! Now you can train your model with your favorite f
 |densenet169                     |imagenet                        |12M                             |
 |densenet201                     |imagenet                        |18M                             |
 |densenet161                     |imagenet                        |26M                             |
-|inceptionresnetv2               |imagenet<br>imagenet+background |54M                             |
-|inceptionv4                     |imagenet<br>imagenet+background |41M                             |
+|inceptionresnetv2               |imagenet /  imagenet+background |54M                             |
+|inceptionv4                     |imagenet /  imagenet+background |41M                             |
 |efficientnet-b0                 |imagenet                        |4M                              |
 |efficientnet-b1                 |imagenet                        |6M                              |
 |efficientnet-b2                 |imagenet                        |7M                              |
@@ -144,20 +144,50 @@ Congratulations! You are done! Now you can train your model with your favorite f
 |efficientnet-b7                 |imagenet                        |63M                             |
 |mobilenet_v2                    |imagenet                        |2M                              |
 |xception                        |imagenet                        |22M                             |
-|timm-efficientnet-b0            |imagenet<br>advprop<br>noisy-student|4M                              |
-|timm-efficientnet-b1            |imagenet<br>advprop<br>noisy-student|6M                              |
-|timm-efficientnet-b2            |imagenet<br>advprop<br>noisy-student|7M                              |
-|timm-efficientnet-b3            |imagenet<br>advprop<br>noisy-student|10M                             |
-|timm-efficientnet-b4            |imagenet<br>advprop<br>noisy-student|17M                             |
-|timm-efficientnet-b5            |imagenet<br>advprop<br>noisy-student|28M                             |
-|timm-efficientnet-b6            |imagenet<br>advprop<br>noisy-student|40M                             |
-|timm-efficientnet-b7            |imagenet<br>advprop<br>noisy-student|63M                             |
-|timm-efficientnet-b8            |imagenet<br>advprop             |84M                             |
+|timm-efficientnet-b0            |imagenet / advprop / noisy-student|4M                              |
+|timm-efficientnet-b1            |imagenet / advprop / noisy-student|6M                              |
+|timm-efficientnet-b2            |imagenet / advprop / noisy-student|7M                              |
+|timm-efficientnet-b3            |imagenet / advprop / noisy-student|10M                             |
+|timm-efficientnet-b4            |imagenet / advprop / noisy-student|17M                             |
+|timm-efficientnet-b5            |imagenet / advprop / noisy-student|28M                             |
+|timm-efficientnet-b6            |imagenet / advprop / noisy-student|40M                             |
+|timm-efficientnet-b7            |imagenet / advprop / noisy-student|63M                             |
+|timm-efficientnet-b8            |imagenet / advprop             |84M                             |
 |timm-efficientnet-l2            |noisy-student                   |474M                            |
 
 \* `ssl`, `wsl` - semi-supervised and weakly-supervised learning on ImageNet ([repo](https://github.com/facebookresearch/semi-supervised-ImageNet1K-models)).
 
 </details>
+
+Just commonly used encoders
+
+|Encoder                         |Weights                         |Params, M                       |
+|--------------------------------|:------------------------------:|:------------------------------:|
+|resnet18                        |imagenet / ssl / swsl           |11M                             |
+|resnet34                        |imagenet                        |21M                             |
+|resnet50                        |imagenet / ssl / swsl           |23M                             |
+|resnet101                       |imagenet                        |42M                             |
+|resnext50_32x4d                 |imagenet / ssl / swsl           |22M                             |
+|resnext101_32x4d                |ssl / swsl                      |42M                             |
+|resnext101_32x8d                |imagenet / instagram / ssl / swsl|86M                         |
+|senet154                        |imagenet                        |113M                            |
+|se_resnext50_32x4d              |imagenet                        |25M                             |
+|se_resnext101_32x4d             |imagenet                        |46M                             |
+|densenet121                     |imagenet                        |6M                              |
+|densenet169                     |imagenet                        |12M                             |
+|densenet201                     |imagenet                        |18M                             |
+|inceptionresnetv2               |imagenet /  imagenet+background |54M                             |
+|inceptionv4                     |imagenet /  imagenet+background |41M                             |
+|mobilenet_v2                    |imagenet                        |2M                              |
+|timm-efficientnet-b0            |imagenet / advprop / noisy-student|4M                              |
+|timm-efficientnet-b1            |imagenet / advprop / noisy-student|6M                              |
+|timm-efficientnet-b2            |imagenet / advprop / noisy-student|7M                              |
+|timm-efficientnet-b3            |imagenet / advprop / noisy-student|10M                             |
+|timm-efficientnet-b4            |imagenet / advprop / noisy-student|17M                             |
+|timm-efficientnet-b5            |imagenet / advprop / noisy-student|28M                             |
+|timm-efficientnet-b6            |imagenet / advprop / noisy-student|40M                             |
+|timm-efficientnet-b7            |imagenet / advprop / noisy-student|63M                             |
+
 
 ### 🔁 Models API <a name="api"></a>
 
