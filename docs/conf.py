@@ -68,4 +68,5 @@ autodoc_mock_imports = [
     'timm',
     'pretrainedmodels',
     'torchvision',
+    'efficientnet-pytorch',
 ]
