@@ -34,6 +34,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.coverage',
     'sphinx.ext.napoleon',
+    'sphinx.ext.viewcode',
+    'sphinx.ext.mathjax', 
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -63,13 +65,17 @@ html_static_path = ['_static']
 
 # -- Extension configuration -------------------------------------------------
 
+
 autodoc_mock_imports = [
     'torch',
+    'tqdm',
     'timm',
     'pretrainedmodels',
     'torchvision',
     'efficientnet-pytorch',
     'segmentation_models_pytorch.encoders',
     'segmentation_models_pytorch.utils',
-    'segmentation_models_pytorch.base',
+    # 'segmentation_models_pytorch.base',
 ]
+
+autoclass_content = 'both'

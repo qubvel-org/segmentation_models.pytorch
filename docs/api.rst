@@ -3,34 +3,37 @@ Segmentation Models Python API
 
 Unet
 ~~~~
-.. autofunction:: segmentation_models_pytorch.Unet
+.. autoclass:: segmentation_models_pytorch.Unet
+:members: 
+
+   .. automethod:: __init__
 
 Unet++
-~~~~
-.. autofunction:: segmentation_models_pytorch.UnetPlusPlus
+~~~~~~
+.. autoclass:: segmentation_models_pytorch.UnetPlusPlus
 
 Linknet
 ~~~~~~~
-.. autofunction:: segmentation_models_pytorch.Linknet
+.. autoclass:: segmentation_models_pytorch.Linknet
 
 FPN
 ~~~
-.. autofunction:: segmentation_models_pytorch.FPN
+.. autoclass:: segmentation_models_pytorch.FPN
 
 PSPNet
 ~~~~~~
-.. autofunction:: segmentation_models_pytorch.PSPNet
+.. autoclass:: segmentation_models_pytorch.PSPNet
 
 PAN
-~~~~~~
-.. autofunction:: segmentation_models_pytorch.PAN
+~~~
+.. autoclass:: segmentation_models_pytorch.PAN
 
 DeepLabV3
-~~~~~~
-.. autofunction:: segmentation_models_pytorch.DeepLabV3
+~~~~~~~~~
+.. autoclass:: segmentation_models_pytorch.DeepLabV3
 
 DeepLabV3+
-~~~~~~
-.. autofunction:: segmentation_models_pytorch.DeepLabV3Plus
+~~~~~~~~~~
+.. autoclass:: segmentation_models_pytorch.DeepLabV3Plus
 
 
