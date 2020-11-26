@@ -22,7 +22,7 @@ Methods:
         number of feature tensors = 6 (one with same resolution as input and 5 downsampled),
         depth = 3 -> number of feature tensors = 4 (one with same resolution as input and 3 downsampled).
 """
-from copy import copy
+from copy import deepcopy
 
 import torch.nn as nn
 
@@ -107,7 +107,7 @@ new_settings = {
     }
 }
 
-pretrained_settings = copy(pretrained_settings)
+pretrained_settings = deepcopy(pretrained_settings)
 for model_name, sources in new_settings.items():
     if model_name not in pretrained_settings:
         pretrained_settings[model_name] = {}
