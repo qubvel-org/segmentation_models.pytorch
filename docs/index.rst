@@ -10,7 +10,9 @@ Welcome to Segmentation Models's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   api
+   install
+   models
+   encoders
 
 
 Indices and tables

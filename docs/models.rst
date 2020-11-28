@@ -1,12 +1,9 @@
-Segmentation Models Python API
+📦 Segmentation Models
 ==============================
 
 Unet
 ~~~~
 .. autoclass:: segmentation_models_pytorch.Unet
-:members: 
-
-   .. automethod:: __init__
 
 Unet++
 ~~~~~~

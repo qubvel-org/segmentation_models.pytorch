@@ -14,15 +14,25 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+import os
+import re
 import sys
+import datetime
 sys.path.append('..')
 
 # -- Project information -----------------------------------------------------
 
 project = 'Segmentation Models'
-copyright = '2020, Pavel Yakubovskiy'
+copyright = '{}, Pavel Yakubovskiy'.format(datetime.datetime.now().year)
 author = 'Pavel Yakubovskiy'
 
+def get_version():
+    sys.path.append('../segmentation_models_pytorch')
+    from __version__ import __version__ as version
+    sys.path.pop(-1)
+    return version
+
+version = get_version()
 
 # -- General configuration ---------------------------------------------------
 
@@ -54,9 +64,14 @@ exclude_patterns = []
 #
 
 import sphinx_rtd_theme
-
-html_theme = 'sphinx_rtd_theme'
+html_theme = "sphinx_rtd_theme"
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+
+# import catalyst_sphinx_theme
+# html_theme = "catalyst_sphinx_theme"
+# html_theme_path = [catalyst_sphinx_theme.get_html_theme_path()]
+
+html_logo = "logo.png"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -65,6 +80,10 @@ html_static_path = ['_static']
 
 # -- Extension configuration -------------------------------------------------
 
+autodoc_inherit_docstrings = False
+napoleon_google_docstring = True
+napoleon_include_init_with_doc = True
+napoleon_numpy_docstring = False
 
 autodoc_mock_imports = [
     'torch',
@@ -79,3 +98,17 @@ autodoc_mock_imports = [
 ]
 
 autoclass_content = 'both'
+autodoc_typehints = 'description'
+
+# --- Work around to make autoclass signatures not (*args, **kwargs) ----------
+
+class FakeSignature():
+    def __getattribute__(self, *args):
+        raise ValueError
+
+def f(app, obj, bound_method):
+    if "__new__" in obj.__name__:
+        obj.__signature__ = FakeSignature()
+
+def setup(app):
+    app.connect('autodoc-before-process-signature', f)
