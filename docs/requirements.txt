@@ -1,1 +1,2 @@
 faculty-sphinx-theme
+six
