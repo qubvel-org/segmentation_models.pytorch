@@ -67,6 +67,10 @@ import sphinx_rtd_theme
 html_theme = "sphinx_rtd_theme"
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
+import faculty_sphinx_theme
+html_theme = "faculty_sphinx_theme"
+# html_theme_path = [faculty_sphinx_theme.get_html_theme_path()]
+
 # import catalyst_sphinx_theme
 # html_theme = "catalyst_sphinx_theme"
 # html_theme_path = [catalyst_sphinx_theme.get_html_theme_path()]
