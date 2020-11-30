@@ -11,6 +11,7 @@ Welcome to Segmentation Models's documentation!
    :caption: Contents:
 
    install
+   quickstart
    models
    encoders
 
