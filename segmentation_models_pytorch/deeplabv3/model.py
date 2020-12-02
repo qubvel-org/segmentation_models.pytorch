@@ -43,7 +43,6 @@ class DeepLabV3(SegmentationModel):
             decoder_channels: int = 256,
             in_channels: int = 3,
             classes: int = 1,
-            encoder_dilation: bool = True,
             activation: Optional[str] = None,
             upsampling: int = 8,
             aux_params: Optional[dict] = None,
@@ -56,28 +55,10 @@ class DeepLabV3(SegmentationModel):
             depth=encoder_depth,
             weights=encoder_weights,
         )
-        if encoder_dilation:
-            assert encoder_name not in [
-                'timm-res2net50_26w_4s',
-                'timm-res2net50_48w_2s',
-                'timm-res2net50_14w_8s',
-                'timm-res2net50_26w_6s',
-                'timm-res2net50_26w_8s',
-                'timm-res2net101_26w_4s',
-                'timm-res2next50',
-                'timm-resnest14d',
-                'timm-resnest26d',
-                'timm-resnest50d',
-                'timm-resnest101e',
-                'timm-resnest200e',
-                'timm-resnest269e',
-                'timm-resnest50d_4s2x40d',
-                'timm-resnest50d_1s4x24d'
-            ], f'{encoder_name} is not supported for dilation'
-            self.encoder.make_dilated(
-                stage_list=[4, 5],
-                dilation_list=[2, 4]
-            )
+        self.encoder.make_dilated(
+            stage_list=[4, 5],
+            dilation_list=[2, 4]
+        )
 
         self.decoder = DeepLabV3Decoder(
             in_channels=self.encoder.out_channels[-1],
@@ -155,46 +136,12 @@ Convolution for Semantic Image Segmentation"
         )
 
         if encoder_output_stride == 8:
-            assert encoder_name not in [
-                'timm-res2net50_26w_4s',
-                'timm-res2net50_48w_2s',
-                'timm-res2net50_14w_8s',
-                'timm-res2net50_26w_6s',
-                'timm-res2net50_26w_8s',
-                'timm-res2net101_26w_4s',
-                'timm-res2next50',
-                'timm-resnest14d',
-                'timm-resnest26d',
-                'timm-resnest50d',
-                'timm-resnest101e',
-                'timm-resnest200e',
-                'timm-resnest269e',
-                'timm-resnest50d_4s2x40d',
-                'timm-resnest50d_1s4x24d'
-            ], f'{encoder_name} is not supported for dilation'            
             self.encoder.make_dilated(
                 stage_list=[4, 5],
                 dilation_list=[2, 4]
             )
 
         elif encoder_output_stride == 16:
-            assert encoder_name not in [
-                'timm-res2net50_26w_4s',
-                'timm-res2net50_48w_2s',
-                'timm-res2net50_14w_8s',
-                'timm-res2net50_26w_6s',
-                'timm-res2net50_26w_8s',
-                'timm-res2net101_26w_4s',
-                'timm-res2next50',
-                'timm-resnest14d',
-                'timm-resnest26d',
-                'timm-resnest50d',
-                'timm-resnest101e',
-                'timm-resnest200e',
-                'timm-resnest269e',
-                'timm-resnest50d_4s2x40d',
-                'timm-resnest50d_1s4x24d'
-            ], f'{encoder_name} is not supported for dilation'
             self.encoder.make_dilated(
                 stage_list=[5],
                 dilation_list=[2]

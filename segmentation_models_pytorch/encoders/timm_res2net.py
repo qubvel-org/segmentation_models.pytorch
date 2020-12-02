@@ -24,6 +24,9 @@ class Res2NetEncoder(ResNet, EncoderMixin):
             self.layer4,
         ]
 
+    def make_dilated(self, stage_list, dilation_list):
+        raise ValueError("Res2Net encoders do not support dilated mode")
+
     def forward(self, x):
         stages = self.get_stages()
 
