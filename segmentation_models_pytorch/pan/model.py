@@ -62,23 +62,6 @@ class PAN(SegmentationModel):
         )
 
         if encoder_dilation:
-            assert encoder_name not in [
-                'timm-res2net50_26w_4s',
-                'timm-res2net50_48w_2s',
-                'timm-res2net50_14w_8s',
-                'timm-res2net50_26w_6s',
-                'timm-res2net50_26w_8s',
-                'timm-res2net101_26w_4s',
-                'timm-res2next50',
-                'timm-resnest14d',
-                'timm-resnest26d',
-                'timm-resnest50d',
-                'timm-resnest101e',
-                'timm-resnest200e',
-                'timm-resnest269e',
-                'timm-resnest50d_4s2x40d',
-                'timm-resnest50d_1s4x24d'
-            ], f'{encoder_name} is not supported for dilation'
             self.encoder.make_dilated(
                 stage_list=[5],
                 dilation_list=[2]
