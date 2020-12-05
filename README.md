@@ -81,7 +81,7 @@ Congratulations! You are done! Now you can train your model with your favorite f
 #### Encoders <a name="encoders"></a>
 
 <details>
-<summary>Table with ALL avaliable encoders (click to expand)</summary>
+<summary>ResNet</summary>
 
 |Encoder                         |Weights                         |Params, M                       |
 |--------------------------------|:------------------------------:|:------------------------------:|
@@ -90,18 +90,42 @@ Congratulations! You are done! Now you can train your model with your favorite f
 |resnet50                        |imagenet / ssl / swsl           |23M                             |
 |resnet101                       |imagenet                        |42M                             |
 |resnet152                       |imagenet                        |58M                             |
+
+</details>
+
+<details>
+<summary>ResNeXt</summary>
+
+|Encoder                         |Weights                         |Params, M                       |
+|--------------------------------|:------------------------------:|:------------------------------:|
 |resnext50_32x4d                 |imagenet / ssl / swsl           |22M                             |
 |resnext101_32x4d                |ssl / swsl                      |42M                             |
 |resnext101_32x8d                |imagenet / instagram / ssl / swsl|86M                         |
 |resnext101_32x16d               |instagram / ssl / swsl          |191M                            |
 |resnext101_32x32d               |instagram                       |466M                            |
 |resnext101_32x48d               |instagram                       |826M                            |
+
+</details>
+
+<details>
+<summary>DPN</summary>
+
+|Encoder                         |Weights                         |Params, M                       |
+|--------------------------------|:------------------------------:|:------------------------------:|
 |dpn68                           |imagenet                        |11M                             |
 |dpn68b                          |imagenet+5k                     |11M                             |
 |dpn92                           |imagenet+5k                     |34M                             |
 |dpn98                           |imagenet                        |58M                             |
 |dpn107                          |imagenet+5k                     |84M                             |
 |dpn131                          |imagenet                        |76M                             |
+
+</details>
+
+<details>
+<summary>VGG</summary>
+
+|Encoder                         |Weights                         |Params, M                       |
+|--------------------------------|:------------------------------:|:------------------------------:|
 |vgg11                           |imagenet                        |9M                              |
 |vgg11_bn                        |imagenet                        |9M                              |
 |vgg13                           |imagenet                        |9M                              |
@@ -110,18 +134,51 @@ Congratulations! You are done! Now you can train your model with your favorite f
 |vgg16_bn                        |imagenet                        |14M                             |
 |vgg19                           |imagenet                        |20M                             |
 |vgg19_bn                        |imagenet                        |20M                             |
+
+</details>
+
+<details>
+<summary>SE-Net</summary>
+
+|Encoder                         |Weights                         |Params, M                       |
+|--------------------------------|:------------------------------:|:------------------------------:|
 |senet154                        |imagenet                        |113M                            |
 |se_resnet50                     |imagenet                        |26M                             |
 |se_resnet101                    |imagenet                        |47M                             |
 |se_resnet152                    |imagenet                        |64M                             |
 |se_resnext50_32x4d              |imagenet                        |25M                             |
 |se_resnext101_32x4d             |imagenet                        |46M                             |
+
+</details>
+
+<details>
+<summary>DenseNet</summary>
+
+|Encoder                         |Weights                         |Params, M                       |
+|--------------------------------|:------------------------------:|:------------------------------:|
 |densenet121                     |imagenet                        |6M                              |
 |densenet169                     |imagenet                        |12M                             |
 |densenet201                     |imagenet                        |18M                             |
 |densenet161                     |imagenet                        |26M                             |
+
+</details>
+
+<details>
+<summary>Inception</summary>
+
+|Encoder                         |Weights                         |Params, M                       |
+|--------------------------------|:------------------------------:|:------------------------------:|
 |inceptionresnetv2               |imagenet /  imagenet+background |54M                             |
 |inceptionv4                     |imagenet /  imagenet+background |41M                             |
+|xception                        |imagenet                        |22M                             |
+
+</details>
+
+<details>
+<summary>EfficientNet</summary>
+
+|Encoder                         |Weights                         |Params, M                       |
+|--------------------------------|:------------------------------:|:------------------------------:|
 |efficientnet-b0                 |imagenet                        |4M                              |
 |efficientnet-b1                 |imagenet                        |6M                              |
 |efficientnet-b2                 |imagenet                        |7M                              |
@@ -130,8 +187,6 @@ Congratulations! You are done! Now you can train your model with your favorite f
 |efficientnet-b5                 |imagenet                        |28M                             |
 |efficientnet-b6                 |imagenet                        |40M                             |
 |efficientnet-b7                 |imagenet                        |63M                             |
-|mobilenet_v2                    |imagenet                        |2M                              |
-|xception                        |imagenet                        |22M                             |
 |timm-efficientnet-b0            |imagenet / advprop / noisy-student|4M                              |
 |timm-efficientnet-b1            |imagenet / advprop / noisy-student|6M                              |
 |timm-efficientnet-b2            |imagenet / advprop / noisy-student|7M                              |
@@ -142,6 +197,23 @@ Congratulations! You are done! Now you can train your model with your favorite f
 |timm-efficientnet-b7            |imagenet / advprop / noisy-student|63M                             |
 |timm-efficientnet-b8            |imagenet / advprop             |84M                             |
 |timm-efficientnet-l2            |noisy-student                   |474M                            |
+
+</details>
+
+<details>
+<summary>MobileNet</summary>
+
+|Encoder                         |Weights                         |Params, M                       |
+|--------------------------------|:------------------------------:|:------------------------------:|
+|mobilenet_v2                    |imagenet                        |2M                              |
+
+</details>
+
+<details>
+<summary>ResNeSt</summary>
+
+|Encoder                         |Weights                         |Params, M                       |
+|--------------------------------|:------------------------------:|:------------------------------:|
 |timm-resnest14d                 |imagenet                        |8M                              |
 |timm-resnest26d                 |imagenet                        |15M                             |
 |timm-resnest50d                 |imagenet                        |25M                             |
@@ -150,6 +222,14 @@ Congratulations! You are done! Now you can train your model with your favorite f
 |timm-resnest269e                |imagenet                        |108M                            |
 |timm-resnest50d_4s2x40d         |imagenet                        |28M                             |
 |timm-resnest50d_1s4x24d         |imagenet                        |23M                             |
+
+</details>
+
+<details>
+<summary>Res2Ne(X)t</summary>
+
+|Encoder                         |Weights                         |Params, M                       |
+|--------------------------------|:------------------------------:|:------------------------------:|
 |timm-res2net50_26w_4s           |imagenet                        |23M                             |
 |timm-res2net101_26w_4s          |imagenet                        |43M                             |
 |timm-res2net50_26w_6s           |imagenet                        |35M                             |
@@ -157,6 +237,14 @@ Congratulations! You are done! Now you can train your model with your favorite f
 |timm-res2net50_48w_2s           |imagenet                        |23M                             |
 |timm-res2net50_14w_8s           |imagenet                        |23M                             |
 |timm-res2next50                 |imagenet                        |22M                             |
+
+</details>
+
+<details>
+<summary>RegNet(x/y)</summary>
+
+|Encoder                         |Weights                         |Params, M                       |
+|--------------------------------|:------------------------------:|:------------------------------:|
 |timm-regnetx_002                |imagenet                        |2M                              |
 |timm-regnetx_004                |imagenet                        |4M                              |
 |timm-regnetx_006                |imagenet                        |5M                              |
@@ -181,42 +269,21 @@ Congratulations! You are done! Now you can train your model with your favorite f
 |timm-regnety_120                |imagenet                        |49M                             |
 |timm-regnety_160                |imagenet                        |80M                             |
 |timm-regnety_320                |imagenet                        |141M                            |
+
+</details>
+
+<details>
+<summary>SK-ResNe(X)t</summary>
+
+|Encoder                         |Weights                         |Params, M                       |
+|--------------------------------|:------------------------------:|:------------------------------:|
 |timm-skresnet18                 |imagenet                        |11M                             |
 |timm-skresnet34                 |imagenet                        |21M                             |
 |timm-skresnext50_32x4d          |imagenet                        |25M                             |
 
-\* `ssl`, `wsl` - semi-supervised and weakly-supervised learning on ImageNet ([repo](https://github.com/facebookresearch/semi-supervised-ImageNet1K-models)).
-
 </details>
-
-Just commonly used encoders
-
-|Encoder                         |Weights                         |Params, M                       |
-|--------------------------------|:------------------------------:|:------------------------------:|
-|resnet18                        |imagenet / ssl / swsl           |11M                             |
-|resnet34                        |imagenet                        |21M                             |
-|resnet50                        |imagenet / ssl / swsl           |23M                             |
-|resnet101                       |imagenet                        |42M                             |
-|resnext50_32x4d                 |imagenet / ssl / swsl           |22M                             |
-|resnext101_32x4d                |ssl / swsl                      |42M                             |
-|resnext101_32x8d                |imagenet / instagram / ssl / swsl|86M                         |
-|senet154                        |imagenet                        |113M                            |
-|se_resnext50_32x4d              |imagenet                        |25M                             |
-|se_resnext101_32x4d             |imagenet                        |46M                             |
-|densenet121                     |imagenet                        |6M                              |
-|densenet169                     |imagenet                        |12M                             |
-|densenet201                     |imagenet                        |18M                             |
-|inceptionresnetv2               |imagenet /  imagenet+background |54M                             |
-|inceptionv4                     |imagenet /  imagenet+background |41M                             |
-|mobilenet_v2                    |imagenet                        |2M                              |
-|timm-efficientnet-b0            |imagenet / advprop / noisy-student|4M                              |
-|timm-efficientnet-b1            |imagenet / advprop / noisy-student|6M                              |
-|timm-efficientnet-b2            |imagenet / advprop / noisy-student|7M                              |
-|timm-efficientnet-b3            |imagenet / advprop / noisy-student|10M                             |
-|timm-efficientnet-b4            |imagenet / advprop / noisy-student|17M                             |
-|timm-efficientnet-b5            |imagenet / advprop / noisy-student|28M                             |
-|timm-efficientnet-b6            |imagenet / advprop / noisy-student|40M                             |
-|timm-efficientnet-b7            |imagenet / advprop / noisy-student|63M                             |
+<br>
+\* `ssl`, `wsl` - semi-supervised and weakly-supervised learning on ImageNet ([repo](https://github.com/facebookresearch/semi-supervised-ImageNet1K-models)).
 
 
 ### 🔁 Models API <a name="api"></a>
