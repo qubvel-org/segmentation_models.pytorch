@@ -38,7 +38,7 @@ class DeepLabV3(SegmentationModel):
         https://arxiv.org/abs/1706.05587
 
     """
-        
+
     def __init__(
             self,
             encoder_name: str = "resnet34",

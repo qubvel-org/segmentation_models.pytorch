@@ -6,7 +6,6 @@ import torch
 
 # mock detection module
 sys.modules["torchvision._C"] = mock.Mock()
-
 import segmentation_models_pytorch as smp
 
 IS_TRAVIS = os.environ.get("TRAVIS", False)
@@ -65,7 +64,7 @@ def test_forward(model_class, encoder_name, encoder_depth, **kwargs):
         encoder_name, encoder_depth=encoder_depth, encoder_weights=None, **kwargs
     )
     sample = get_sample(model_class)
-
+    model.eval()
     if encoder_depth == 5 and model_class != smp.PSPNet:
         test_shape = True
     else:
@@ -111,6 +110,7 @@ def test_upsample(model_class, upsampling):
 def test_in_channels(model_class, encoder_name, in_channels):
     sample = torch.ones([1, in_channels, 64, 64])
     model = model_class(DEFAULT_ENCODER, encoder_weights=None, in_channels=in_channels)
+    model.eval()
     with torch.no_grad():
         model(sample)
 
@@ -120,7 +120,8 @@ def test_in_channels(model_class, encoder_name, in_channels):
 @pytest.mark.parametrize("encoder_name", ENCODERS)
 def test_dilation(encoder_name):
     if (encoder_name in ['inceptionresnetv2', 'xception', 'inceptionv4'] or
-            encoder_name.startswith('vgg') or encoder_name.startswith('densenet')):
+            encoder_name.startswith('vgg') or encoder_name.startswith('densenet') or
+            encoder_name.startswith('timm-res')):
         return
 
     encoder = smp.encoders.get_encoder(encoder_name)
