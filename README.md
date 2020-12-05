@@ -140,6 +140,48 @@ Congratulations! You are done! Now you can train your model with your favorite f
 |timm-efficientnet-b7            |imagenet / advprop / noisy-student|63M                             |
 |timm-efficientnet-b8            |imagenet / advprop             |84M                             |
 |timm-efficientnet-l2            |noisy-student                   |474M                            |
+|timm-resnest14d                 |imagenet                        |8M                              |
+|timm-resnest26d                 |imagenet                        |15M                             |
+|timm-resnest50d                 |imagenet                        |25M                             |
+|timm-resnest101e                |imagenet                        |46M                             |
+|timm-resnest200e                |imagenet                        |68M                             |
+|timm-resnest269e                |imagenet                        |108M                            |
+|timm-resnest50d_4s2x40d         |imagenet                        |28M                             |
+|timm-resnest50d_1s4x24d         |imagenet                        |23M                             |
+|timm-res2net50_26w_4s           |imagenet                        |23M                             |
+|timm-res2net101_26w_4s          |imagenet                        |43M                             |
+|timm-res2net50_26w_6s           |imagenet                        |35M                             |
+|timm-res2net50_26w_8s           |imagenet                        |46M                             |
+|timm-res2net50_48w_2s           |imagenet                        |23M                             |
+|timm-res2net50_14w_8s           |imagenet                        |23M                             |
+|timm-res2next50                 |imagenet                        |22M                             |
+|timm-regnetx_002                |imagenet                        |2M                              |
+|timm-regnetx_004                |imagenet                        |4M                              |
+|timm-regnetx_006                |imagenet                        |5M                              |
+|timm-regnetx_008                |imagenet                        |6M                              |
+|timm-regnetx_016                |imagenet                        |8M                              |
+|timm-regnetx_032                |imagenet                        |14M                             |
+|timm-regnetx_040                |imagenet                        |20M                             |
+|timm-regnetx_064                |imagenet                        |24M                             |
+|timm-regnetx_080                |imagenet                        |37M                             |
+|timm-regnetx_120                |imagenet                        |43M                             |
+|timm-regnetx_160                |imagenet                        |52M                             |
+|timm-regnetx_320                |imagenet                        |105M                            |
+|timm-regnety_002                |imagenet                        |2M                              |
+|timm-regnety_004                |imagenet                        |3M                              |
+|timm-regnety_006                |imagenet                        |5M                              |
+|timm-regnety_008                |imagenet                        |5M                              |
+|timm-regnety_016                |imagenet                        |10M                             |
+|timm-regnety_032                |imagenet                        |17M                             |
+|timm-regnety_040                |imagenet                        |19M                             |
+|timm-regnety_064                |imagenet                        |29M                             |
+|timm-regnety_080                |imagenet                        |37M                             |
+|timm-regnety_120                |imagenet                        |49M                             |
+|timm-regnety_160                |imagenet                        |80M                             |
+|timm-regnety_320                |imagenet                        |141M                            |
+|timm-skresnet18                 |imagenet                        |11M                             |
+|timm-skresnet34                 |imagenet                        |21M                             |
+|timm-skresnext50_32x4d          |imagenet                        |25M                             |
 
 \* `ssl`, `wsl` - semi-supervised and weakly-supervised learning on ImageNet ([repo](https://github.com/facebookresearch/semi-supervised-ImageNet1K-models)).
 
