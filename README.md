@@ -12,7 +12,7 @@ The main features of this library are:
 
  - High level API (just two lines to create neural network)
  - 8 models architectures for binary and multi class segmentation (including legendary Unet)
- - 57 available encoders for each architecture
+ - 99 available encoders
  - All encoders have pre-trained weights for faster and better convergence
 
 ### 📋 Table of content
