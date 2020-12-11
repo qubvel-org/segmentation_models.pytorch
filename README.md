@@ -81,7 +81,8 @@ Congratulations! You are done! Now you can train your model with your favorite f
 #### Encoders <a name="encoders"></a>
 
 <details>
-<summary>ResNet</summary>
+<summary style="margin-left: 25px;">ResNet</summary>
+<div style="margin-left: 25px;">
 
 |Encoder                         |Weights                         |Params, M                       |
 |--------------------------------|:------------------------------:|:------------------------------:|
@@ -91,10 +92,12 @@ Congratulations! You are done! Now you can train your model with your favorite f
 |resnet101                       |imagenet                        |42M                             |
 |resnet152                       |imagenet                        |58M                             |
 
+</div>
 </details>
 
 <details>
-<summary>ResNeXt</summary>
+<summary style="margin-left: 25px;">ResNeXt</summary>
+<div style="margin-left: 25px;">
 
 |Encoder                         |Weights                         |Params, M                       |
 |--------------------------------|:------------------------------:|:------------------------------:|
@@ -105,10 +108,12 @@ Congratulations! You are done! Now you can train your model with your favorite f
 |resnext101_32x32d               |instagram                       |466M                            |
 |resnext101_32x48d               |instagram                       |826M                            |
 
+</div>
 </details>
 
 <details>
-<summary>ResNeSt</summary>
+<summary style="margin-left: 25px;">ResNeSt</summary>
+<div style="margin-left: 25px;">
 
 |Encoder                         |Weights                         |Params, M                       |
 |--------------------------------|:------------------------------:|:------------------------------:|
@@ -121,10 +126,12 @@ Congratulations! You are done! Now you can train your model with your favorite f
 |timm-resnest50d_4s2x40d         |imagenet                        |28M                             |
 |timm-resnest50d_1s4x24d         |imagenet                        |23M                             |
 
+</div>
 </details>
 
 <details>
-<summary>Res2Ne(X)t</summary>
+<summary style="margin-left: 25px;">Res2Ne(X)t</summary>
+<div style="margin-left: 25px;">
 
 |Encoder                         |Weights                         |Params, M                       |
 |--------------------------------|:------------------------------:|:------------------------------:|
@@ -136,10 +143,12 @@ Congratulations! You are done! Now you can train your model with your favorite f
 |timm-res2net50_14w_8s           |imagenet                        |23M                             |
 |timm-res2next50                 |imagenet                        |22M                             |
 
+</div>
 </details>
 
 <details>
-<summary>RegNet(x/y)</summary>
+<summary style="margin-left: 25px;">RegNet(x/y)</summary>
+<div style="margin-left: 25px;">
 
 |Encoder                         |Weights                         |Params, M                       |
 |--------------------------------|:------------------------------:|:------------------------------:|
@@ -168,10 +177,12 @@ Congratulations! You are done! Now you can train your model with your favorite f
 |timm-regnety_160                |imagenet                        |80M                             |
 |timm-regnety_320                |imagenet                        |141M                            |
 
+</div>
 </details>
 
 <details>
-<summary>SE-Net</summary>
+<summary style="margin-left: 25px;">SE-Net</summary>
+<div style="margin-left: 25px;">
 
 |Encoder                         |Weights                         |Params, M                       |
 |--------------------------------|:------------------------------:|:------------------------------:|
@@ -182,10 +193,12 @@ Congratulations! You are done! Now you can train your model with your favorite f
 |se_resnext50_32x4d              |imagenet                        |25M                             |
 |se_resnext101_32x4d             |imagenet                        |46M                             |
 
+</div>
 </details>
 
 <details>
-<summary>SK-ResNe(X)t</summary>
+<summary style="margin-left: 25px;">SK-ResNe(X)t</summary>
+<div style="margin-left: 25px;">
 
 |Encoder                         |Weights                         |Params, M                       |
 |--------------------------------|:------------------------------:|:------------------------------:|
@@ -193,10 +206,12 @@ Congratulations! You are done! Now you can train your model with your favorite f
 |timm-skresnet34                 |imagenet                        |21M                             |
 |timm-skresnext50_32x4d          |imagenet                        |25M                             |
 
+</div>
 </details>
 
 <details>
-<summary>DenseNet</summary>
+<summary style="margin-left: 25px;">DenseNet</summary>
+<div style="margin-left: 25px;">
 
 |Encoder                         |Weights                         |Params, M                       |
 |--------------------------------|:------------------------------:|:------------------------------:|
@@ -205,10 +220,12 @@ Congratulations! You are done! Now you can train your model with your favorite f
 |densenet201                     |imagenet                        |18M                             |
 |densenet161                     |imagenet                        |26M                             |
 
+</div>
 </details>
 
 <details>
-<summary>Inception</summary>
+<summary style="margin-left: 25px;">Inception</summary>
+<div style="margin-left: 25px;">
 
 |Encoder                         |Weights                         |Params, M                       |
 |--------------------------------|:------------------------------:|:------------------------------:|
@@ -216,10 +233,12 @@ Congratulations! You are done! Now you can train your model with your favorite f
 |inceptionv4                     |imagenet /  imagenet+background |41M                             |
 |xception                        |imagenet                        |22M                             |
 
+</div>
 </details>
 
 <details>
-<summary>EfficientNet</summary>
+<summary style="margin-left: 25px;">EfficientNet</summary>
+<div style="margin-left: 25px;">
 
 |Encoder                         |Weights                         |Params, M                       |
 |--------------------------------|:------------------------------:|:------------------------------:|
@@ -242,19 +261,23 @@ Congratulations! You are done! Now you can train your model with your favorite f
 |timm-efficientnet-b8            |imagenet / advprop             |84M                             |
 |timm-efficientnet-l2            |noisy-student                   |474M                            |
 
+</div>
 </details>
 
 <details>
-<summary>MobileNet</summary>
+<summary style="margin-left: 25px;">MobileNet</summary>
+<div style="margin-left: 25px;">
 
 |Encoder                         |Weights                         |Params, M                       |
 |--------------------------------|:------------------------------:|:------------------------------:|
 |mobilenet_v2                    |imagenet                        |2M                              |
 
+</div>
 </details>
 
 <details>
-<summary>DPN</summary>
+<summary style="margin-left: 25px;">DPN</summary>
+<div style="margin-left: 25px;">
 
 |Encoder                         |Weights                         |Params, M                       |
 |--------------------------------|:------------------------------:|:------------------------------:|
@@ -265,10 +288,12 @@ Congratulations! You are done! Now you can train your model with your favorite f
 |dpn107                          |imagenet+5k                     |84M                             |
 |dpn131                          |imagenet                        |76M                             |
 
+</div>
 </details>
 
 <details>
-<summary>VGG</summary>
+<summary style="margin-left: 25px;">VGG</summary>
+<div style="margin-left: 25px;">
 
 |Encoder                         |Weights                         |Params, M                       |
 |--------------------------------|:------------------------------:|:------------------------------:|
@@ -281,6 +306,7 @@ Congratulations! You are done! Now you can train your model with your favorite f
 |vgg19                           |imagenet                        |20M                             |
 |vgg19_bn                        |imagenet                        |20M                             |
 
+</div>
 </details>
 
 
