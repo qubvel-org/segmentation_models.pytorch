@@ -44,7 +44,7 @@ def get_encoder(name, in_channels=3, depth=5, weights=None):
 
     if weights is not None:
         settings = encoders[name]["pretrained_settings"][weights]
-        encoder.load_state_dict(model_zoo.load_url(settings["url"]))
+        encoder.load_state_dict(model_zoo.load_url(settings["url"], model_dir='~/.torch/'))
 
     encoder.set_in_channels(in_channels)
 
