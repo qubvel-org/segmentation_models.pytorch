@@ -87,8 +87,8 @@ For better understanding see more examples of encoder in smp.encoders module.
 
     If it works fine, don`t forget to contribute your work and make a PR to SMP 😉
 
-3. Classification head
-~~~~~~~~~~~~~~~~~~~~~~
+3. Aux classification output
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 All models support ``aux_params`` parameter, which is default set to ``None``. 
 If ``aux_params = None`` than classification auxiliary output is not created, else
