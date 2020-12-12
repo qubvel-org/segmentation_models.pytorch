@@ -84,6 +84,8 @@ Congratulations! You are done! Now you can train your model with your favorite f
 
 #### Encoders <a name="encoders"></a>
 
+The following is a list of supported encoders in the SMP. Select the appropriate family of encoders and click to expand the table and select a specific encoder and its pre-trained weights (`encoder_name` and `encoder_weights` parameters).
+
 <details>
 <summary style="margin-left: 25px;">ResNet</summary>
 <div style="margin-left: 25px;">
