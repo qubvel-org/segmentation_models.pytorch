@@ -14,6 +14,10 @@ The main features of this library are:
  - 8 models architectures for binary and multi class segmentation (including legendary Unet)
  - 99 available encoders
  - All encoders have pre-trained weights for faster and better convergence
+ 
+### [📚 Project Documentation 📚](http://smp.readthedocs.io/)
+
+Visit [Read The Docs Project Page](https://smp.readthedocs.io/) or read following README to know more about Segmentation Models Pytorch (SMP for short) library
 
 ### 📋 Table of content
  1. [Quick start](#start)
