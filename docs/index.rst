@@ -14,7 +14,7 @@ Welcome to Segmentation Models's documentation!
    quickstart
    models
    encoders
-   advanced
+   insights
 
 
 Indices and tables

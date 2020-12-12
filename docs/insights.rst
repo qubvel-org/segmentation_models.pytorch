@@ -1,14 +1,15 @@
-🔧 Advanced
+🔧 Insights
 ===========
 
 1. Models architecture
 ~~~~~~~~~~~~~~~~~~~~~~
 
-All segmentation models in SMP (this library short name) are made of
- - encoder (feature extractor, a.k.a backbone)
- - decoder (features fusion block to create segmentation *mask*)
- - segmentation head (final head to reduce number of channels from decoder and upsample mask to preserve input-output spatial resolution identity)
- - classification head (optional head which build on top of deepest encoder features)
+All segmentation models in SMP (this library short name) are made of:
+
+- encoder (feature extractor, a.k.a backbone)
+- decoder (features fusion block to create segmentation *mask*)
+- segmentation head (final head to reduce number of channels from decoder and upsample mask to preserve input-output spatial resolution identity)
+- classification head (optional head which build on top of deepest encoder features)
 
 
 2. Creating your own encoder
