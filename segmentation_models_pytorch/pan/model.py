@@ -44,7 +44,7 @@ class PAN(SegmentationModel):
     def __init__(
             self,
             encoder_name: str = "resnet34",
-            encoder_weights: str = "imagenet",
+            encoder_weights: Optional[str] = "imagenet",
             encoder_dilation: bool = True,
             decoder_channels: int = 32,
             in_channels: int = 3,
