@@ -17,16 +17,18 @@ import torch
 
 def create_model(
     arch: str,
-    encoder_name: str,
-    encoder_weights: Optional[str],
-    in_channels: int,
-    classes: int,
+    encoder_name: str = "resnet34",
+    encoder_weights: Optional[str] = "imagenet",
+    in_channels: int = 3,
+    classes: int = 1,
     **kwargs,
 ) -> torch.nn.Module:
-    """Models wrapper. Allows to create any model just with parametes"""
+    """Models wrapper. Allows to create any model just with parametes
+    
+    """
     
     archs = [Unet, UnetPlusPlus, Linknet, FPN, PSPNet, DeepLabV3, DeepLabV3Plus, PAN]
-    archs_dict = [a.__class__.__name__.lower() for a in archs]
+    archs_dict = {a.__class__.__name__.lower(): a for a in archs}
     try:
         model_class = archs_dict[arch.lower()]
     except KeyError:
