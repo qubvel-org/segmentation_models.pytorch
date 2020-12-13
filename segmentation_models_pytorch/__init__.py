@@ -28,7 +28,7 @@ def create_model(
     """
     
     archs = [Unet, UnetPlusPlus, Linknet, FPN, PSPNet, DeepLabV3, DeepLabV3Plus, PAN]
-    archs_dict = {a.__class__.__name__.lower(): a for a in archs}
+    archs_dict = {a.__name__.lower(): a for a in archs}
     try:
         model_class = archs_dict[arch.lower()]
     except KeyError:
