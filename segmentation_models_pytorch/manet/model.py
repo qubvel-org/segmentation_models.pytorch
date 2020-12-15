@@ -6,7 +6,11 @@ from ..base import SegmentationHead, ClassificationHead
 
 
 class MAnet(SegmentationModel):
-    """MAnet_ is a fully convolution neural network for image semantic segmentation
+    """MAnet_ :  Multi-scale Attention Net.
+       The MA-Net can capture rich contextual dependencies based on the attention mechanism, using two blocks:
+       Position-wise Attention Block (PAB, which captures the spatial dependencies between pixels in a global view)
+       and Multi-scale Fusion Attention Block (MFAB, which  captures the channel dependencies between any feature map by
+       multi-scale semantic feature fusion)
 
     Args:
         encoder_name: name of classification model (without last dense layers) used as feature
@@ -20,7 +24,7 @@ class MAnet(SegmentationModel):
         decoder_use_batchnorm: if ``True``, ``BatchNormalisation`` layer between ``Conv2D`` and ``Activation`` layers
             is used. If 'inplace' InplaceABN will be used, allows to decrease memory consumption.
             One of [True, False, 'inplace']
-        decoder_channels: number of layers for PAB layer
+        decoder_im_channels: number of layers for PAB layer.
         in_channels: number of input channels for model, default is 3.
         classes: a number of classes for output (output shape - ``(batch, classes, h, w)``).
         activation: activation function to apply after final convolution;
@@ -36,7 +40,7 @@ class MAnet(SegmentationModel):
         ``torch.nn.Module``: **MAnet**
 
     .. _MAnet:
-        doi:10.1109/ACCESS.2020.3025372
+        https://ieeexplore.ieee.org/abstract/document/9201310
 
     """
 
