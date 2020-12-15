@@ -5,13 +5,13 @@ from ..base import modules as md
 
 
 class PAB(nn.Module):
-    def __init__(self, in_channels, out_channels, im_channels=64):
+    def __init__(self, in_channels, out_channels, pab_channels=64):
         super(PAB, self).__init__()
         # Series of 1x1 conv to generate attention feature maps
-        self.im_channels = im_channels
+        self.pab_channels = pab_channels
         self.in_channels = in_channels
-        self.top_conv = nn.Conv2d(in_channels, im_channels, kernel_size=1)
-        self.center_conv = nn.Conv2d(in_channels, im_channels, kernel_size=1)
+        self.top_conv = nn.Conv2d(in_channels, pab_channels, kernel_size=1)
+        self.center_conv = nn.Conv2d(in_channels, pab_channels, kernel_size=1)
         self.bottom_conv = nn.Conv2d(in_channels, in_channels, kernel_size=3, padding=1)
         self.map_softmax = nn.Softmax(dim=1)
         self.out_conv = nn.Conv2d(in_channels, in_channels, kernel_size=3, padding=1)
@@ -140,7 +140,7 @@ class MAnetDecoder(nn.Module):
             n_blocks=5,
             reduction=16,
             use_batchnorm=True,
-            im_channels=64
+            pab_channels=64
     ):
         super().__init__()
 
@@ -160,7 +160,7 @@ class MAnetDecoder(nn.Module):
         skip_channels = list(encoder_channels[1:]) + [0]
         out_channels = decoder_channels
 
-        self.center = PAB(head_channels, head_channels, im_channels=im_channels)
+        self.center = PAB(head_channels, head_channels, pab_channels=pab_channels)
 
         # combine decoder keyword arguments
         kwargs = dict(use_batchnorm=use_batchnorm)  # no attention type here
