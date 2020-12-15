@@ -9,6 +9,10 @@ Unet++
 ~~~~~~
 .. autoclass:: segmentation_models_pytorch.UnetPlusPlus
 
+MAnet
+~~~~~~
+.. autoclass:: segmentation_models_pytorch.MAnet
+
 Linknet
 ~~~~~~~
 .. autoclass:: segmentation_models_pytorch.Linknet
