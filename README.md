@@ -12,7 +12,7 @@ The main features of this library are:
 
  - High level API (just two lines to create neural network)
  - 9 models architectures for binary and multi class segmentation (including legendary Unet)
- - 99 available encoders
+ - 104 available encoders
  - All encoders have pre-trained weights for faster and better convergence
  
 ### [📚 Project Documentation 📚](http://smp.readthedocs.io/)
@@ -268,6 +268,11 @@ The following is a list of supported encoders in the SMP. Select the appropriate
 |timm-efficientnet-b7            |imagenet / advprop / noisy-student|63M                             |
 |timm-efficientnet-b8            |imagenet / advprop             |84M                             |
 |timm-efficientnet-l2            |noisy-student                   |474M                            |
+|timm-efficientnet-lite0         |imagenet                        |4M                              |
+|timm-efficientnet-lite1         |imagenet                        |6M                              |
+|timm-efficientnet-lite2         |imagenet                        |7M                              |
+|timm-efficientnet-lite3         |imagenet                        |10M                             |
+|timm-efficientnet-lite4         |imagenet                        |17M                             |
 
 </div>
 </details>
