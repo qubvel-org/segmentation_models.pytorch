@@ -240,13 +240,13 @@ EfficientNet
 +------------------------+--------------------------------------+-------------+
 | timm-efficientnet-lite0| imagenet                             | 4M          |
 +------------------------+--------------------------------------+-------------+
-| timm-efficientnet-lite1| imagenet                             | 6M          |
+| timm-efficientnet-lite1| imagenet                             | 4M          |
 +------------------------+--------------------------------------+-------------+
-| timm-efficientnet-lite2| imagenet                             | 7M          |
+| timm-efficientnet-lite2| imagenet                             | 6M          |
 +------------------------+--------------------------------------+-------------+
-| timm-efficientnet-lite3| imagenet                             | 10M         |
+| timm-efficientnet-lite3| imagenet                             | 8M         |
 +------------------------+--------------------------------------+-------------+
-| timm-efficientnet-lite4| imagenet                             | 17M         |
+| timm-efficientnet-lite4| imagenet                             | 13M         |
 +------------------------+--------------------------------------+-------------+
 
 MobileNet

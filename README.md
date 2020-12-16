@@ -269,10 +269,10 @@ The following is a list of supported encoders in the SMP. Select the appropriate
 |timm-efficientnet-b8            |imagenet / advprop             |84M                             |
 |timm-efficientnet-l2            |noisy-student                   |474M                            |
 |timm-efficientnet-lite0         |imagenet                        |4M                              |
-|timm-efficientnet-lite1         |imagenet                        |6M                              |
-|timm-efficientnet-lite2         |imagenet                        |7M                              |
-|timm-efficientnet-lite3         |imagenet                        |10M                             |
-|timm-efficientnet-lite4         |imagenet                        |17M                             |
+|timm-efficientnet-lite1         |imagenet                        |5M                              |
+|timm-efficientnet-lite2         |imagenet                        |6M                              |
+|timm-efficientnet-lite3         |imagenet                        |8M                             |
+|timm-efficientnet-lite4         |imagenet                        |13M                             |
 
 </div>
 </details>
