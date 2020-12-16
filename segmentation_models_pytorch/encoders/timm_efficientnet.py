@@ -358,7 +358,7 @@ timm_efficientnet_encoders = {
             "imagenet": prepare_settings(default_cfgs["tf_efficientnet_lite3"]),
         },
         "params": {
-            "out_channels": (3, 40, 32, 48, 136, 384),
+            "out_channels": (3, 32, 32, 48, 136, 384),
             "stage_idxs": (2, 3, 5),
             "channel_multiplier": 1.2,
             "depth_multiplier": 1.4,
@@ -372,7 +372,7 @@ timm_efficientnet_encoders = {
             "imagenet": prepare_settings(default_cfgs["tf_efficientnet_lite4"]),
         },
         "params": {
-            "out_channels": (3, 48, 32, 56, 160, 448),
+            "out_channels": (3, 32, 32, 56, 160, 448),
             "stage_idxs": (2, 3, 5),
             "channel_multiplier": 1.4,
             "depth_multiplier": 1.8,
