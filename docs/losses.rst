@@ -1,0 +1,28 @@
+
+JaccardLoss
+~~~~~~
+.. autoclass:: segmentation_models_pytorch.losses.JaccardLoss
+
+DiceLoss
+~~~~~~
+.. autoclass:: segmentation_models_pytorch.losses.DiceLoss
+
+FocalLoss
+~~~~~~
+.. autoclass:: segmentation_models_pytorch.losses.FocalLoss
+
+LovaszLoss
+~~~~~~
+.. autoclass:: segmentation_models_pytorch.losses.LovaszLoss
+
+SoftBCEWithLogitsLoss
+~~~~~~
+.. autoclass:: segmentation_models_pytorch.losses.SoftBCEWithLogitsLoss
+
+SoftCrossEntropyLoss
+~~~~~~
+.. autoclass:: segmentation_models_pytorch.losses.SoftCrossEntropyLoss
+
+JaccardLoss
+~~~~~~
+.. autoclass:: segmentation_models_pytorch.losses.JaccardLoss
