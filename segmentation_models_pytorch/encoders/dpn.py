@@ -33,7 +33,7 @@ from pretrainedmodels.models.dpn import pretrained_settings
 from ._base import EncoderMixin
 
 
-class DPNEncorder(DPN, EncoderMixin):
+class DPNEncoder(DPN, EncoderMixin):
     def __init__(self, stage_idxs, out_channels, depth=5, **kwargs):
         super().__init__(**kwargs)
         self._stage_idxs = stage_idxs
@@ -75,7 +75,7 @@ class DPNEncorder(DPN, EncoderMixin):
 
 dpn_encoders = {
     "dpn68": {
-        "encoder": DPNEncorder,
+        "encoder": DPNEncoder,
         "pretrained_settings": pretrained_settings["dpn68"],
         "params": {
             "stage_idxs": (4, 8, 20, 24),
@@ -91,7 +91,7 @@ dpn_encoders = {
         },
     },
     "dpn68b": {
-        "encoder": DPNEncorder,
+        "encoder": DPNEncoder,
         "pretrained_settings": pretrained_settings["dpn68b"],
         "params": {
             "stage_idxs": (4, 8, 20, 24),
@@ -108,7 +108,7 @@ dpn_encoders = {
         },
     },
     "dpn92": {
-        "encoder": DPNEncorder,
+        "encoder": DPNEncoder,
         "pretrained_settings": pretrained_settings["dpn92"],
         "params": {
             "stage_idxs": (4, 8, 28, 32),
@@ -123,7 +123,7 @@ dpn_encoders = {
         },
     },
     "dpn98": {
-        "encoder": DPNEncorder,
+        "encoder": DPNEncoder,
         "pretrained_settings": pretrained_settings["dpn98"],
         "params": {
             "stage_idxs": (4, 10, 30, 34),
@@ -138,7 +138,7 @@ dpn_encoders = {
         },
     },
     "dpn107": {
-        "encoder": DPNEncorder,
+        "encoder": DPNEncoder,
         "pretrained_settings": pretrained_settings["dpn107"],
         "params": {
             "stage_idxs": (5, 13, 33, 37),
@@ -153,7 +153,7 @@ dpn_encoders = {
         },
     },
     "dpn131": {
-        "encoder": DPNEncorder,
+        "encoder": DPNEncoder,
         "pretrained_settings": pretrained_settings["dpn131"],
         "params": {
             "stage_idxs": (5, 13, 41, 45),
