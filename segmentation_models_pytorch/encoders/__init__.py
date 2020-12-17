@@ -51,7 +51,7 @@ def get_encoder(name, in_channels=3, depth=5, weights=None):
         try:
             settings = encoders[name]["pretrained_settings"][weights]
         except KeyError:
-            raise KeyError("Wrong pretrained weights `{}` for encoder `{}`. Avaliable options are: {}".format(
+            raise KeyError("Wrong pretrained weights `{}` for encoder `{}`. Available options are: {}".format(
                 weights, name, list(encoders[name]["pretrained_settings"].keys()),
             ))
         encoder.load_state_dict(model_zoo.load_url(settings["url"]))
@@ -69,7 +69,7 @@ def get_preprocessing_params(encoder_name, pretrained="imagenet"):
     settings = encoders[encoder_name]["pretrained_settings"]
 
     if pretrained not in settings.keys():
-        raise ValueError("Avaliable pretrained options {}".format(settings.keys()))
+        raise ValueError("Available pretrained options {}".format(settings.keys()))
 
     formatted_settings = {}
     formatted_settings["input_space"] = settings[pretrained].get("input_space")
