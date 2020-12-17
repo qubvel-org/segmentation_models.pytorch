@@ -4,14 +4,9 @@ from functools import partial
 import torch
 from torch.nn.modules.loss import _Loss
 from ._functional import focal_loss_with_logits
-
+from ._constants import BINARY_MODE, MULTICLASS_MODE, MULTILABEL_MODE
 
 __all__ = ["FocalLoss"]
-
-
-BINARY_MODE = "binary"
-MULTICLASS_MODE = "multiclass"
-MULTILABEL_MODE = "multilabel"
 
 
 class FocalLoss(_Loss):

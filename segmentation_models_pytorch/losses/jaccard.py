@@ -4,14 +4,9 @@ import torch
 import torch.nn.functional as F
 from torch.nn.modules.loss import _Loss
 from ._functional import soft_jaccard_score, to_tensor
-
+from ._constants import BINARY_MODE, MULTICLASS_MODE, MULTILABEL_MODE
 
 __all__ = ["JaccardLoss"]
-
-
-BINARY_MODE = "binary"
-MULTICLASS_MODE = "multiclass"
-MULTILABEL_MODE = "multilabel"
 
 
 class JaccardLoss(_Loss):

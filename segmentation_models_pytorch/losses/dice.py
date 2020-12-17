@@ -4,14 +4,9 @@ import torch
 import torch.nn.functional as F
 from torch.nn.modules.loss import _Loss
 from ._functional import soft_dice_score, to_tensor
-
+from ._constants import BINARY_MODE, MULTICLASS_MODE, MULTILABEL_MODE
 
 __all__ = ["DiceLoss"]
-
-
-BINARY_MODE = "binary"
-MULTICLASS_MODE = "multiclass"
-MULTILABEL_MODE = "multilabel"
 
 
 class DiceLoss(_Loss):

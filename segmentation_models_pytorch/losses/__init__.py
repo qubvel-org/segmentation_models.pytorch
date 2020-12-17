@@ -1,9 +1,10 @@
 from __future__ import absolute_import
 
-from .dice import *
-from .focal import *
-from .jaccard import *
-from .lovasz import *
-from .soft_bce import *
-from .soft_ce import *
-# from .wing_loss import *
+from .dice import DiceLoss
+from .focal import FocalLoss
+from .jaccard import JaccardLoss
+from .lovasz import LovaszLoss
+from .soft_bce import SoftBCEWithLogitsLoss
+from .soft_ce import SoftCrossEntropyLoss
+
+from ._constants import BINARY_MODE, MULTICLASS_MODE, MULTILABEL_MODE

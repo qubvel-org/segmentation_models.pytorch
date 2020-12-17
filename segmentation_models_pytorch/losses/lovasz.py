@@ -10,6 +10,7 @@ import torch
 import torch.nn.functional as F
 from torch.autograd import Variable
 from torch.nn.modules.loss import _Loss
+from ._constants import BINARY_MODE, MULTICLASS_MODE, MULTILABEL_MODE
 
 try:
     from itertools import ifilterfalse
@@ -17,11 +18,6 @@ except ImportError:  # py3k
     from itertools import filterfalse as ifilterfalse
 
 __all__ = ["LovaszLoss"]
-
-
-BINARY_MODE = "binary"
-MULTICLASS_MODE = "multiclass"
-MULTILABEL_MODE = "multilabel"
 
 
 def _lovasz_grad(gt_sorted):
