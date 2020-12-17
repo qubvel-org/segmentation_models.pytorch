@@ -22,7 +22,7 @@ class PSPNet(SegmentationModel):
             Default is 5
         encoder_weights: One of **None** (random initialization), **"imagenet"** (pre-training on ImageNet) and 
             other pretrained weights (see table with available weights for each encoder_name)
-        psp_out_channels: A number of filters in Saptial Pyramid
+        psp_out_channels: A number of filters in Spatial Pyramid
         psp_use_batchnorm: If **True**, BatchNorm2d layer between Conv2D and Activation layers
             is used. If **"inplace"** InplaceABN will be used, allows to decrease memory consumption.
             Available options are **True, False, "inplace"**
