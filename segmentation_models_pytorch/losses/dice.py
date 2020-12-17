@@ -4,7 +4,7 @@ import torch
 import torch.nn.functional as F
 from torch.nn.modules.loss import _Loss
 from ._functional import soft_dice_score, to_tensor
-from ._constants import BINARY_MODE, MULTICLASS_MODE, MULTILABEL_MODE
+from .constants import BINARY_MODE, MULTICLASS_MODE, MULTILABEL_MODE
 
 __all__ = ["DiceLoss"]
 
@@ -35,8 +35,8 @@ class DiceLoss(_Loss):
                 (denominator wiil be always greater or equal to eps)
 
         Shape:
-            y_pred: torch.Tensor of shape NxCxHxW
-            y_true: torch.Tensor of shape NxHxW or Nx1xHxW
+             - **y_pred** - torch.Tensor of shape NxCxHxW
+             - **y_true** - torch.Tensor of shape NxHxW or NxCxHxW
 
         Reference:
             https://github.com/BloodAxe/pytorch-toolbelt
@@ -55,18 +55,8 @@ class DiceLoss(_Loss):
         self.log_loss = log_loss
 
     def forward(self, y_pred: torch.Tensor, y_true: torch.Tensor) -> torch.Tensor:
-        """
-        Args:
-            y_pred: torch.Tensor of shape NxCxHxW
-            y_true: torch.Tensor of shape NxHxW or Nx1xHxW
-        
-        Returns:
-            loss: torch.Tensor
-        """
+
         assert y_true.size(0) == y_pred.size(0)
-        if y_true.ndim == 4:
-            assert y_true.shape[1] == 1
-            y_true.squeeze(1)
 
         if self.from_logits:
             # Apply activations to get [0..1] class probabilities

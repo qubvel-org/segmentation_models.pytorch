@@ -4,7 +4,7 @@ from functools import partial
 import torch
 from torch.nn.modules.loss import _Loss
 from ._functional import focal_loss_with_logits
-from ._constants import BINARY_MODE, MULTICLASS_MODE, MULTILABEL_MODE
+from .constants import BINARY_MODE, MULTICLASS_MODE, MULTILABEL_MODE
 
 __all__ = ["FocalLoss"]
 
@@ -33,8 +33,8 @@ class FocalLoss(_Loss):
             reduced_threshold: Switch to reduced focal loss. Note, when using this mode you should use `reduction="sum"`.
         
         Shape:
-            y_pred: torch.Tensor of shape NxCxHxW
-            y_true: torch.Tensor of shape NxHxW or Nx1xHxW
+             - **y_pred** - torch.Tensor of shape NxCxHxW
+             - **y_true** - torch.Tensor of shape NxHxW or NxCxHxW
 
         Reference:
             https://github.com/BloodAxe/pytorch-toolbelt
@@ -55,14 +55,6 @@ class FocalLoss(_Loss):
         )
 
     def forward(self, y_pred: torch.Tensor, y_true: torch.Tensor) -> torch.Tensor:
-        """
-        Args:
-            y_pred: torch.Tensor of shape NxCxHxW
-            y_true: torch.Tensor of shape NxHxW or NxCxHxW
-        
-        Returns:
-            loss: torch.Tensor
-        """
 
         if self.mode in {BINARY_MODE, MULTILABEL_MODE}:
             y_true = y_true.view(-1)

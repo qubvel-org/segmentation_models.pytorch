@@ -10,7 +10,7 @@ import torch
 import torch.nn.functional as F
 from torch.autograd import Variable
 from torch.nn.modules.loss import _Loss
-from ._constants import BINARY_MODE, MULTICLASS_MODE, MULTILABEL_MODE
+from .constants import BINARY_MODE, MULTICLASS_MODE, MULTILABEL_MODE
 
 try:
     from itertools import ifilterfalse
@@ -203,8 +203,8 @@ class LovaszLoss(_Loss):
             per_image: If True loss computed per each image and then averaged, else computed per whole batch
         
         Shape:
-            y_pred: torch.Tensor of shape NxCxHxW
-            y_true: torch.Tensor of shape NxHxW or Nx1xHxW
+             - **y_pred** - torch.Tensor of shape NxCxHxW
+             - **y_true** - torch.Tensor of shape NxHxW or NxCxHxW
 
         Reference:
             https://github.com/BloodAxe/pytorch-toolbelt
@@ -217,14 +217,7 @@ class LovaszLoss(_Loss):
         self.per_image = per_image
 
     def forward(self, y_pred, y_true):
-        """
-        Args:
-            y_pred: torch.Tensor of shape NxCxHxW
-            y_true: torch.Tensor of shape NxHxW or Nx1xHxW
-        
-        Returns:
-            loss: torch.Tensor
-        """
+
         if self.mode in {BINARY_MODE, MULTILABEL_MODE}:
             loss = _lovasz_hinge(y_pred, y_true, per_image=self.per_image, ignore=self.ignore_index)
         elif self.mode == MULTICLASS_MODE:

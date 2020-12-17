@@ -24,9 +24,8 @@ class SoftCrossEntropyLoss(nn.Module):
             smooth_factor: Factor to smooth target (e.g. if smooth_factor=0.1 then [1, 0, 1] -> [0.9, 0.1, 0.9])
         
         Shape:
-
-             - y_pred: torch.Tensor of shape NxCxHxW
-             - y_true: torch.Tensor of shape NxHxW
+             - **y_pred** - torch.Tensor of shape NxCxHxW
+             - **y_true** - torch.Tensor of shape NxHxW
 
         Reference:
             https://github.com/BloodAxe/pytorch-toolbelt

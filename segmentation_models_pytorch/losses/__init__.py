@@ -1,4 +1,4 @@
-from ._constants import BINARY_MODE, MULTICLASS_MODE, MULTILABEL_MODE
+from .constants import BINARY_MODE, MULTICLASS_MODE, MULTILABEL_MODE
 
 from .jaccard import JaccardLoss
 from .dice import DiceLoss
