@@ -1,7 +1,8 @@
-Losses
-======
+📉 Losses
+=========
 
-Collection of popular semantic segementation losses.
+Collection of popular semantic segmentation losses. Adapted from 
+an awesome repo with pytorch utils https://github.com/BloodAxe/pytorch-toolbelt
 
 Constants
 ~~~~~~~~~

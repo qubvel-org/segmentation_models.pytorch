@@ -34,11 +34,11 @@ class DiceLoss(_Loss):
             eps: A small epsilon for numerical stability to avoid zero divison error 
                 (denominator wiil be always greater or equal to eps)
 
-        Shape:
-             - **y_pred** - torch.Tensor of shape NxCxHxW
-             - **y_true** - torch.Tensor of shape NxHxW or NxCxHxW
+        Shape
+             - **y_pred** - torch.Tensor of shape (N, C, H, W)
+             - **y_true** - torch.Tensor of shape (N, H, W) or (N, C, H, W)
 
-        Reference:
+        Reference
             https://github.com/BloodAxe/pytorch-toolbelt
         """
         assert mode in {BINARY_MODE, MULTILABEL_MODE, MULTICLASS_MODE}

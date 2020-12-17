@@ -32,11 +32,11 @@ class FocalLoss(_Loss):
             normalized: Compute normalized focal loss (https://arxiv.org/pdf/1909.07829.pdf).
             reduced_threshold: Switch to reduced focal loss. Note, when using this mode you should use `reduction="sum"`.
         
-        Shape:
-             - **y_pred** - torch.Tensor of shape NxCxHxW
-             - **y_true** - torch.Tensor of shape NxHxW or NxCxHxW
+        Shape
+             - **y_pred** - torch.Tensor of shape (N, C, H, W)
+             - **y_true** - torch.Tensor of shape (N, H, W) or (N, C, H, W)
 
-        Reference:
+        Reference
             https://github.com/BloodAxe/pytorch-toolbelt
 
         """

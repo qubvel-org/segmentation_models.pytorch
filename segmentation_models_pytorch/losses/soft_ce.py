@@ -21,13 +21,13 @@ class SoftCrossEntropyLoss(nn.Module):
         """Drop-in replacement for torch.nn.CrossEntropyLoss with label_smoothing
         
         Args:
-            smooth_factor: Factor to smooth target (e.g. if smooth_factor=0.1 then [1, 0, 1] -> [0.9, 0.1, 0.9])
+            smooth_factor: Factor to smooth target (e.g. if smooth_factor=0.1 then [1, 0, 0] -> [0.9, 0.05, 0.05])
         
-        Shape:
-             - **y_pred** - torch.Tensor of shape NxCxHxW
-             - **y_true** - torch.Tensor of shape NxHxW
+        Shape
+             - **y_pred** - torch.Tensor of shape (N, C, H, W)
+             - **y_true** - torch.Tensor of shape (N, H, W)
 
-        Reference:
+        Reference
             https://github.com/BloodAxe/pytorch-toolbelt
         """
         super().__init__()
@@ -37,14 +37,6 @@ class SoftCrossEntropyLoss(nn.Module):
         self.dim = dim
 
     def forward(self, y_pred: torch.Tensor, y_true: torch.Tensor) -> torch.Tensor:
-        """
-        Args:
-            y_pred: torch.Tensor of shape NxCxHxW
-            y_true: torch.Tensor of shape NxHxW
-        
-        Returns:
-            loss: torch.Tensor
-        """
         log_prob = F.log_softmax(y_pred, dim=self.dim)
         return label_smoothed_nll_loss(
             log_prob,

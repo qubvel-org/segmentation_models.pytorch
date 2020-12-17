@@ -25,11 +25,11 @@ class SoftBCEWithLogitsLoss(nn.Module):
             ignore_index: Specifies a target value that is ignored and does not contribute to the input gradient. 
             smooth_factor: Factor to smooth target (e.g. if smooth_factor=0.1 then [1, 0, 1] -> [0.9, 0.1, 0.9])
         
-        Shape:
+        Shape
              - **y_pred** - torch.Tensor of shape NxCxHxW
              - **y_true** - torch.Tensor of shape NxHxW or Nx1xHxW
 
-        Reference:
+        Reference
             https://github.com/BloodAxe/pytorch-toolbelt
 
         """
@@ -43,8 +43,8 @@ class SoftBCEWithLogitsLoss(nn.Module):
     def forward(self, y_pred: torch.Tensor, y_true: torch.Tensor) -> torch.Tensor:
         """
         Args:
-            y_pred: torch.Tensor of shape NxCxHxW
-            y_true: torch.Tensor of shape NxHxW  or Nx1xHxW
+            y_pred: torch.Tensor of shape (N, C, H, W)
+            y_true: torch.Tensor of shape (N, H, W)  or (N, 1, H, W)
         
         Returns:
             loss: torch.Tensor
