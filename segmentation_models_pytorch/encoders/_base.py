@@ -18,7 +18,7 @@ class EncoderMixin:
         return self._out_channels[: self._depth + 1]
 
     def set_in_channels(self, in_channels):
-        """Change first convolution chennels"""
+        """Change first convolution channels"""
         if in_channels == 3:
             return
 
