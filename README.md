@@ -10,9 +10,9 @@ Segmentation based on [PyTorch](https://pytorch.org/).**
 
 The main features of this library are:
 
- - High level API (just two lines to create neural network)
+ - High level API (just two lines to create a neural network)
  - 9 models architectures for binary and multi class segmentation (including legendary Unet)
- - 99 available encoders
+ - 104 available encoders
  - All encoders have pre-trained weights for faster and better convergence
  
 ### [📚 Project Documentation 📚](http://smp.readthedocs.io/)
@@ -23,7 +23,7 @@ Visit [Read The Docs Project Page](https://smp.readthedocs.io/) or read followin
  1. [Quick start](#start)
  2. [Examples](#examples)
  3. [Models](#models)
-    1. [Architectures](#architectires)
+    1. [Architectures](#architectures)
     2. [Encoders](#encoders)
  4. [Models API](#api)
     1. [Input channels](#input-channels)
@@ -46,13 +46,13 @@ import segmentation_models_pytorch as smp
 
 model = smp.Unet(
     encoder_name="resnet34",        # choose encoder, e.g. mobilenet_v2 or efficientnet-b7
-    encoder_weights="imagenet",     # use `imagenet` pretreined weights for encoder initialization
+    encoder_weights="imagenet",     # use `imagenet` pretrained weights for encoder initialization
     in_channels=1,                  # model input channels (1 for grayscale images, 3 for RGB, etc.)
     classes=3,                      # model output channels (number of classes in your dataset)
 )
 ```
  - see [table](#architectires) with available model architectures
- - see [table](#encoders) with avaliable encoders and its corresponding weights
+ - see [table](#encoders) with available encoders and their corresponding weights
 
 #### 2. Configure data preprocessing
 
@@ -73,7 +73,7 @@ Congratulations! You are done! Now you can train your model with your favorite f
 
 ### 📦 Models <a name="models"></a>
 
-#### Architectures <a name="architectires"></a>
+#### Architectures <a name="architectures"></a>
  - Unet [[paper](https://arxiv.org/abs/1505.04597)] [[docs](https://smp.readthedocs.io/en/latest/models.html#unet)]
  - Unet++ [[paper](https://arxiv.org/pdf/1807.10165.pdf)] [[docs](https://smp.readthedocs.io/en/latest/models.html#id2)]
  - MAnet [[paper](https://ieeexplore.ieee.org/abstract/document/9201310)] [[docs](https://smp.readthedocs.io/en/latest/models.html#manet)]
@@ -268,6 +268,11 @@ The following is a list of supported encoders in the SMP. Select the appropriate
 |timm-efficientnet-b7            |imagenet / advprop / noisy-student|63M                             |
 |timm-efficientnet-b8            |imagenet / advprop             |84M                             |
 |timm-efficientnet-l2            |noisy-student                   |474M                            |
+|timm-efficientnet-lite0         |imagenet                        |4M                              |
+|timm-efficientnet-lite1         |imagenet                        |5M                              |
+|timm-efficientnet-lite2         |imagenet                        |6M                              |
+|timm-efficientnet-lite3         |imagenet                        |8M                             |
+|timm-efficientnet-lite4         |imagenet                        |13M                             |
 
 </div>
 </details>
@@ -330,7 +335,7 @@ The following is a list of supported encoders in the SMP. Select the appropriate
  - `model.forward(x)` - sequentially pass `x` through model\`s encoder, decoder and segmentation head (and classification head if specified)
 
 ##### Input channels
-Input channels parameter allow you to create models, which process tensors with arbitrary number of channels.
+Input channels parameter allows you to create models, which process tensors with arbitrary number of channels.
 If you use pretrained weights from imagenet - weights of first convolution will be reused for
 1- or 2- channels inputs, for input channels > 4 weights of first convolution will be initialized randomly.
 ```python
@@ -340,9 +345,9 @@ mask = model(torch.ones([1, 1, 64, 64]))
 
 ##### Auxiliary classification output  
 All models support `aux_params` parameters, which is default set to `None`. 
-If `aux_params = None` than classification auxiliary output is not created, else
+If `aux_params = None` then classification auxiliary output is not created, else
 model produce not only `mask`, but also `label` output with shape `NC`.
-Classification head consist of GlobalPooling->Dropout(optional)->Linear->Activation(optional) layers, which can be 
+Classification head consists of GlobalPooling->Dropout(optional)->Linear->Activation(optional) layers, which can be 
 configured by `aux_params` as follows:
 ```python
 aux_params=dict(
@@ -357,7 +362,7 @@ mask, label = model(x)
 
 ##### Depth
 Depth parameter specify a number of downsampling operations in encoder, so you can make
-your model lighted if specify smaller `depth`.
+your model lighter if specify smaller `depth`.
 ```python
 model = smp.Unet('resnet34', encoder_depth=4)
 ```
