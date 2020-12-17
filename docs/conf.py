@@ -93,6 +93,7 @@ napoleon_numpy_docstring = False
 autodoc_mock_imports = [
     'torch',
     'tqdm',
+    'numpy',
     'timm',
     'pretrainedmodels',
     'torchvision',
