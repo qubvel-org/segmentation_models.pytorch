@@ -5,8 +5,8 @@ Collection of popular semantic segementation losses.
 
 Constants
 ~~~~~~~~~
-.. automodule:: segmentation_models_pytorch.losses
-        :members: BINARY_MODE, MULTILABEL_MODE, MULTICLASS_MODE
+.. automodule:: segmentation_models_pytorch.losses.constants
+        :members:
 
 JaccardLoss
 ~~~~~~~~~~~
