@@ -119,7 +119,7 @@ class UnetPlusPlusDecoder(nn.Module):
 
         features = features[1:]    # remove first skip with same spatial resolution
         features = features[::-1]  # reverse channels to start from head of encoder
-        # start bulding dense connections
+        # start building dense connections
         dense_x = {}
         for layer_idx in range(len(self.in_channels)-1):
             for depth_idx in range(self.depth-layer_idx):

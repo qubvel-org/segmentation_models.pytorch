@@ -11,19 +11,19 @@ class FPN(SegmentationModel):
         encoder_name: Name of the classification model that will be used as an encoder (a.k.a backbone)
             to extract features of different spatial resolution
         encoder_depth: A number of stages used in encoder in range [3, 5]. Each stage generate features 
-            two times smaller in spatial dimentions than previous one (e.g. for depth 0 we will have features 
+            two times smaller in spatial dimensions than previous one (e.g. for depth 0 we will have features
             with shapes [(N, C, H, W),], for depth 1 - [(N, C, H, W), (N, C, H // 2, W // 2)] and so on).
             Default is 5
         encoder_weights: One of **None** (random initialization), **"imagenet"** (pre-training on ImageNet) and 
             other pretrained weights (see table with available weights for each encoder_name)
         decoder_pyramid_channels: A number of convolution filters in Feature Pyramid of FPN_
         decoder_segmentation_channels: A number of convolution filters in segmentation blocks of FPN_
-        decoder_merge_policy: Determines how to merge pyramid features inside FPN. Avaliable options are **add** and **cat**
+        decoder_merge_policy: Determines how to merge pyramid features inside FPN. Available options are **add** and **cat**
         decoder_dropout: Spatial dropout rate in range (0, 1) for feature pyramid in FPN_
         in_channels: A number of input channels for the model, default is 3 (RGB images)
         classes: A number of classes for output mask (or you can think as a number of channels of output mask)
         activation: An activation function to apply after the final convolution layer.
-            Avaliable options are **"sigmoid"**, **"softmax"**, **"logsoftmax"**, **"identity"**, **callable** and **None**.
+            Available options are **"sigmoid"**, **"softmax"**, **"logsoftmax"**, **"tanh"**, **"identity"**, **callable** and **None**.
             Default is **None**
         upsampling: Final upsampling factor. Default is 4 to preserve input-output spatial shape identity
         aux_params: Dictionary with parameters of the auxiliary output (classification head). Auxiliary output is build 
