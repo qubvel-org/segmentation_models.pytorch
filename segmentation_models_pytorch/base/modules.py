@@ -63,6 +63,46 @@ class SCSEModule(nn.Module):
         return x * self.cSE(x) + x * self.sSE(x)
 
 
+class EcaModule(nn.Module):
+    def __init__(self, channels=None, kernel_size=3, gamma=2, beta=1):
+        super(EcaModule, self).__init__()
+        assert kernel_size % 2 == 1
+        if channels is not None:
+            t = int(abs(math.log(channels, 2) + beta) / gamma)
+            kernel_size = max(t if t % 2 else t + 1, 3)
+
+        self.conv = nn.Conv1d(1, 1, kernel_size=kernel_size, padding=(kernel_size - 1) // 2, bias=False)
+
+    def forward(self, x):
+        y = x.mean((2, 3)).view(x.shape[0], 1, -1)  # view for 1d conv
+        y = self.conv(y)
+        y = y.view(x.shape[0], -1, 1, 1).sigmoid()
+        return x * y.expand_as(x)
+
+
+class CecaModule(nn.Module):
+    def __init__(self, channels=None, kernel_size=3, gamma=2, beta=1):
+        super(CecaModule, self).__init__()
+        assert kernel_size % 2 == 1
+        if channels is not None:
+            t = int(abs(math.log(channels, 2) + beta) / gamma)
+            kernel_size = max(t if t % 2 else t + 1, 3)
+
+        # PyTorch circular padding mode is buggy as of pytorch 1.4
+        # see https://github.com/pytorch/pytorch/pull/17240
+        # implement manual circular padding
+        self.conv = nn.Conv1d(1, 1, kernel_size=kernel_size, padding=0, bias=False)
+        self.padding = (kernel_size - 1) // 2
+
+    def forward(self, x):
+        y = x.mean((2, 3)).view(x.shape[0], 1, -1)
+        # Manually implement circular padding, F.pad does not seemed to be bugged
+        y = F.pad(y, (self.padding, self.padding), mode='circular')
+        y = self.conv(y)
+        y = y.view(x.shape[0], -1, 1, 1).sigmoid()
+        return x * y.expand_as(x)
+
+
 class ArgMax(nn.Module):
 
     def __init__(self, dim=None):
@@ -113,6 +153,10 @@ class Attention(nn.Module):
             self.attention = nn.Identity(**params)
         elif name == 'scse':
             self.attention = SCSEModule(**params)
+        elif name == 'eca':
+            self.attention = EcaModule(**params)
+        elif name == 'ceca':
+            self.attention = CecaModule(**params)
         else:
             raise ValueError("Attention {} is not implemented".format(name))
 
