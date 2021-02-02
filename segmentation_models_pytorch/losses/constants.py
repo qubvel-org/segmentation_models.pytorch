@@ -1,6 +1,6 @@
 #: Loss binary mode suppose you are solving binary segmentation task.
 #: That mean yor have only one class which pixels are labled as **1**,
-#: the rest pixels are backgroud and labeled as **0**.
+#: the rest pixels are background and labeled as **0**.
 #: Target mask shape - (N, H, W), model output mask shape (N, 1, H, W).
 BINARY_MODE: str = "binary"
 

@@ -30,8 +30,8 @@ class JaccardLoss(_Loss):
             from_logits: If True, assumes input is raw logits
             smooth: Smoothness constant for dice coefficient
             ignore_index: Label that indicates ignored pixels (does not contribute to loss)
-            eps: A small epsilon for numerical stability to avoid zero divison error 
-                (denominator wiil be always greater or equal to eps)
+            eps: A small epsilon for numerical stability to avoid zero division error 
+                (denominator will be always greater or equal to eps)
 
         Shape
              - **y_pred** - torch.Tensor of shape (N, C, H, W)

@@ -15,8 +15,8 @@ All segmentation models in SMP (this library short name) are made of:
 2. Creating your own encoder
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Encoder is a "classification model" which extarct features from image and pass it to decoder.
-Each encoder should have following attributes and methods and be inherited from `segmetation_models_pytorch.encoders._base.EncoderMixin`
+Encoder is a "classification model" which extract features from image and pass it to decoder.
+Each encoder should have following attributes and methods and be inherited from `segmentation_models_pytorch.encoders._base.EncoderMixin`
 
 .. code-block:: python
 
@@ -29,13 +29,13 @@ Each encoder should have following attributes and methods and be inherited from 
             self._out_channels: List[int] = [3, 16, 64, 128, 256, 512]
 
             # A number of stages in decoder (in other words number of downsampling operations), integer
-            # use in in forward pass to reduce number of returning fatures
+            # use in in forward pass to reduce number of returning features
             self._depth: int = 5 
 
             # Default number of input channels in first Conv2d layer for encoder (usually 3)
             self._in_channels: int = 3 
             
-            # Define enoder modules below
+            # Define encoder modules below
             ...
 
         def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
@@ -60,7 +60,7 @@ When you write your own Encoder class register its build parameters
 .. code-block:: python
 
     smp.encoders.encoders["my_awesome_encoder"] = {
-        "encoder": MyEncoder, # enocoder class here
+        "encoder": MyEncoder, # encoder class here
         "pretrained_settings": {
             "imagenet": {
                 "mean": [0.485, 0.456, 0.406],

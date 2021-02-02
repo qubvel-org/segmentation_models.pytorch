@@ -55,7 +55,7 @@ def _lovasz_hinge(logits, labels, per_image=True, ignore=None):
 def _lovasz_hinge_flat(logits, labels):
     """Binary Lovasz hinge loss
     Args:
-        logits: [P] Variable, logits at each prediction (between -iinfinity and +iinfinity)
+        logits: [P] Variable, logits at each prediction (between -infinity and +infinity)
         labels: [P] Tensor, binary ground truth labels (0 or 1)
         ignore: label to ignore
     """

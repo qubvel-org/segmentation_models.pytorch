@@ -26,7 +26,7 @@ class FocalLoss(_Loss):
         Args:
             mode: Loss mode 'binary', 'multiclass' or 'multilabel'
             alpha: Prior probability of having positive value in target.
-            gamma: Power factor for dampening weight (focal strenght).
+            gamma: Power factor for dampening weight (focal strength).
             ignore_index: If not None, targets may contain values to be ignored.
                 Target values equal to ignore_index will be ignored from loss computation.
             normalized: Compute normalized focal loss (https://arxiv.org/pdf/1909.07829.pdf).
