@@ -57,7 +57,6 @@ for model_name, sources in regnet_weights.items():
     for source_name, source_url in sources.items():
         pretrained_settings[model_name][source_name] = {
             "url": source_url,
-            'input_size': [3, 224, 224] if not model_name == 'timm-gernet_l' else [3, 256, 256],
             'input_range': [0, 1],
             'mean': [0.485, 0.456, 0.406],
             'std': [0.229, 0.224, 0.225],
