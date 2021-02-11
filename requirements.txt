@@ -1,4 +1,4 @@
 torchvision>=0.3.0
 pretrainedmodels==0.7.4
 efficientnet-pytorch==0.6.3
-timm==0.3.2
+git+https://github.com/rwightman/pytorch-image-models@d8e69206be253892b2956341fea09fdebfaae4e3
