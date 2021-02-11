@@ -189,7 +189,7 @@ The following is a list of supported encoders in the SMP. Select the appropriate
 </details>
 
 <details>
-<summary style="margin-left: 25px;">RegNet(x/y)</summary>
+<summary style="margin-left: 25px;">GERNet</summary>
 <div style="margin-left: 25px;">
 
 |Encoder                         |Weights                         |Params, M                       |
