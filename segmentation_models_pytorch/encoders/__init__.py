@@ -16,7 +16,13 @@ from .timm_resnest import timm_resnest_encoders
 from .timm_res2net import timm_res2net_encoders
 from .timm_regnet import timm_regnet_encoders
 from .timm_sknet import timm_sknet_encoders
-from .timm_gernet import timm_gernet_encoders
+try:
+    from .timm_gernet import timm_gernet_encoders
+except ImportError as e:
+    timm_gernet_encoders = {}
+    print("Current timm version doesn't support GERNet."
+          "If GERNet support is needed please update timm")
+
 from ._preprocessing import preprocess_input
 
 encoders = {}

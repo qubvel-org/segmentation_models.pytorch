@@ -5,7 +5,7 @@ import torch.nn as nn
 
 
 class GERNetEncoder(ByobNet, EncoderMixin):
-    def __init__(self, out_channels, depth=6, **kwargs):
+    def __init__(self, out_channels, depth=5, **kwargs):
         super().__init__(**kwargs)
         self._depth = depth
         self._out_channels = out_channels
@@ -17,8 +17,10 @@ class GERNetEncoder(ByobNet, EncoderMixin):
         return [
             nn.Identity(),
             self.stem,
-            *self.stages[:-1],
-            nn.Sequential(self.stages[-1], self.final_conv)
+            self.stages[0],
+            self.stages[1],
+            self.stages[2],
+            nn.Sequential(self.stages[3], self.stages[4], self.final_conv)
         ]
 
     def forward(self, x):
@@ -67,7 +69,7 @@ timm_gernet_encoders = {
         'encoder': GERNetEncoder,
         "pretrained_settings": pretrained_settings["timm-gernet_s"],
         'params': {
-            'out_channels': (3, 13, 48, 48, 384, 560, 1920),
+            'out_channels': (3, 13, 48, 48, 384, 1920),
             'cfg': ByobCfg(
                 blocks=(
                     BlocksCfg(type='basic', d=1, c=48, s=2, gs=0, br=1.),
@@ -85,7 +87,7 @@ timm_gernet_encoders = {
         'encoder': GERNetEncoder,
         "pretrained_settings": pretrained_settings["timm-gernet_m"],
         'params': {
-            'out_channels': (3, 32, 128, 192, 640, 640, 2560),
+            'out_channels': (3, 32, 128, 192, 640, 2560),
             'cfg': ByobCfg(
                 blocks=(
                     BlocksCfg(type='basic', d=1, c=128, s=2, gs=0, br=1.),
@@ -103,7 +105,7 @@ timm_gernet_encoders = {
         'encoder': GERNetEncoder,
         "pretrained_settings": pretrained_settings["timm-gernet_l"],
         'params': {
-            'out_channels': (3, 32, 128, 192, 640, 640, 2560),
+            'out_channels': (3, 32, 128, 192, 640, 2560),
             'cfg': ByobCfg(
                 blocks=(
                     BlocksCfg(type='basic', d=1, c=128, s=2, gs=0, br=1.),
