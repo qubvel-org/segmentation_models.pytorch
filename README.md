@@ -4,7 +4,7 @@
 **Python library with Neural Networks for Image  
 Segmentation based on [PyTorch](https://pytorch.org/).**  
 
-![PyPI version](https://badge.fury.io/py/segmentation-models-pytorch.svg) [![Build Status](https://travis-ci.com/qubvel/segmentation_models.pytorch.svg?branch=master)](https://travis-ci.com/qubvel/segmentation_models.pytorch) [![Documentation Status](https://readthedocs.org/projects/smp/badge/?version=latest)](https://smp.readthedocs.io/en/latest/?badge=latest) <br>[![Downloads](https://static.pepy.tech/personalized-badge/segmentation-models-pytorch?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads)](https://pepy.tech/project/segmentation-models-pytorch) [![Generic badge](https://img.shields.io/badge/License-MIT-<COLOR>.svg)](https://shields.io/)
+![PyPI version](https://badge.fury.io/py/segmentation-models-pytorch.svg) [![Build Status](https://travis-ci.com/qubvel/segmentation_models.pytorch.svg?branch=master)](https://travis-ci.com/qubvel/segmentation_models.pytorch) [![Documentation Status](https://readthedocs.org/projects/smp/badge/?version=latest)](https://smp.readthedocs.io/en/latest/?badge=latest) <br>[![Downloads](https://pepy.tech/badge/segmentation-models-pytorch)] [![Generic badge](https://img.shields.io/badge/License-MIT-<COLOR>.svg)](https://shields.io/)
 
 </div>
 
