@@ -34,7 +34,7 @@ def create_model(
     try:
         model_class = archs_dict[arch.lower()]
     except KeyError:
-        raise KeyError("Wrong architecture type `{}`. Avalibale options are: {}".format(
+        raise KeyError("Wrong architecture type `{}`. Available options are: {}".format(
             arch, list(archs_dict.keys()),
         ))
     return model_class(
