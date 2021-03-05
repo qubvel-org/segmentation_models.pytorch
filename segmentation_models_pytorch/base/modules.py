@@ -6,6 +6,43 @@ try:
 except ImportError:
     InPlaceABN = None
 
+class PreActivatedConv2dReLU(nn.Sequential):
+    def __init__(
+            self,
+            in_channels, 
+            out_channels,
+            kernel_size,
+            padding=0,
+            stride=1,
+            use_batchnorm=True,
+    ):
+
+        if use_batchnorm == "inplace" and InPlaceABN is None:
+            raise RuntimeError(
+                "In order to use `use_batchnorm='inplace'` inplace_abn package must be installed. "
+                + "To install see: https://github.com/mapillary/inplace_abn"
+            )
+
+        if use_batchnorm == "inplace":
+            bn = InPlaceABN(out_channels, activation="leaky_relu", activation_param=0.0)
+            relu = nn.Identity()
+        elif use_batchnorm and use_batchnorm != "inplace":
+            bn = nn.BatchNorm2d(out_channels)
+        else:
+            bn = nn.Identity()
+
+        relu = nn.ReLU(inplace=True)
+
+        conv = nn.Conv2d(
+            in_channels,
+            out_channels,
+            kernel_size,
+            stride=stride,
+            padding=padding,
+            bias=not (use_batchnorm),
+        )
+        super(PreActivatedConv2dReLU, self).__init__(conv, bn, relu)
+
 
 class Conv2dReLU(nn.Sequential):
     def __init__(
@@ -46,7 +83,6 @@ class Conv2dReLU(nn.Sequential):
 
         super(Conv2dReLU, self).__init__(conv, bn, relu)
 
-
 class SCSEModule(nn.Module):
     def __init__(self, in_channels, reduction=16):
         super().__init__()
@@ -61,7 +97,6 @@ class SCSEModule(nn.Module):
 
     def forward(self, x):
         return x * self.cSE(x) + x * self.sSE(x)
-
 
 class ArgMax(nn.Module):
 

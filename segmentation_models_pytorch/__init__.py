@@ -6,6 +6,8 @@ from .fpn import FPN
 from .pspnet import PSPNet
 from .deeplabv3 import DeepLabV3, DeepLabV3Plus
 from .pan import PAN
+from .resunet import ResUnet
+from .resunetplusplus import ResUnetPlusPlus
 
 from . import encoders
 from . import utils
