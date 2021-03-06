@@ -37,4 +37,12 @@ DeepLabV3+
 ~~~~~~~~~~
 .. autoclass:: segmentation_models_pytorch.DeepLabV3Plus
 
+ResUNet
+~~~~~~~~~~
+.. autoclass: segmentation_models_pytorch.ResUNet
+
+ResUNet++
+~~~~~~~~~~
+.. autoclass: segmentation_models_pytorch.ResUNetPlusPlus
+
 
