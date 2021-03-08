@@ -1,6 +1,6 @@
 from timm import create_model
 import torch.nn as nn
-from segmentation_models_pytorch.encoders._base import EncoderMixin
+from ._base import EncoderMixin
 
 
 def make_divisible(x, divisible_by=8):
