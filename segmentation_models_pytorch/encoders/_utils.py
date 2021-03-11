@@ -38,7 +38,7 @@ def patch_first_conv(model, in_channels, weights_init_mode):
 
     # change input channels for first conv
     if in_channels % module.groups > 0:
-        raise ValueError(f"Try to change layer input channels to {in_channels} that is not divisible by groups={module.groups}")
+        raise ValueError(f"Couldn't change layer input channels to {in_channels} that is not divisible by groups={module.groups}")
 
     module.in_channels = in_channels
     weight = module.weight.detach()
