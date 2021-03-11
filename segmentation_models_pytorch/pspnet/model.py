@@ -51,6 +51,7 @@ class PSPNet(SegmentationModel):
         self,
         encoder_name: str = "resnet34",
         encoder_weights: Optional[str] = "imagenet",
+        encoder_weights_init_mode: Optional[str] = None,
         encoder_depth: int = 3,
         psp_out_channels: int = 512,
         psp_use_batchnorm: bool = True,
@@ -68,6 +69,7 @@ class PSPNet(SegmentationModel):
             in_channels=in_channels,
             depth=encoder_depth,
             weights=encoder_weights,
+            weights_init_mode=encoder_weights_init_mode,
         )
 
         self.decoder = PSPDecoder(

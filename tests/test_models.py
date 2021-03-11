@@ -118,6 +118,23 @@ def test_in_channels(model_class, encoder_name, in_channels):
 
 
 @pytest.mark.parametrize("encoder_name", ENCODERS)
+@pytest.mark.parametrize("encoder_weights_init_mode", [None, "copy_init"])
+@pytest.mark.parametrize("in_channels", [1, 2, 3, 4, 5, 6])
+def test_weights_init_mode(model_class, encoder_name, encoder_weights_init_mode, in_channels):
+    encoder = smp.encoders.get_encoder(
+        encoder_name,
+        in_channels=in_channels,
+        encoder_weights_init_mode=encoder_weights_init_mode)
+
+    encoder.eval()
+    with torch.no_grad():
+        sample = torch.ones([1, in_channels, 64, 64])
+        output = encoder(sample)
+
+    assert model.encoder._in_channels == in_channels
+
+
+@pytest.mark.parametrize("encoder_name", ENCODERS)
 def test_dilation(encoder_name):
     if (encoder_name in ['inceptionresnetv2', 'xception', 'inceptionv4'] or
             encoder_name.startswith('vgg') or encoder_name.startswith('densenet') or

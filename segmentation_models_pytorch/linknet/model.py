@@ -49,6 +49,7 @@ class Linknet(SegmentationModel):
         encoder_name: str = "resnet34",
         encoder_depth: int = 5,
         encoder_weights: Optional[str] = "imagenet",
+        encoder_weights_init_mode: Optional[str] = None,
         decoder_use_batchnorm: bool = True,
         in_channels: int = 3,
         classes: int = 1,
@@ -62,6 +63,7 @@ class Linknet(SegmentationModel):
             in_channels=in_channels,
             depth=encoder_depth,
             weights=encoder_weights,
+            weights_init_mode=encoder_weights_init_mode,
         )
 
         self.decoder = LinknetDecoder(

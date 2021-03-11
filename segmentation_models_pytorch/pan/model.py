@@ -45,6 +45,7 @@ class PAN(SegmentationModel):
             self,
             encoder_name: str = "resnet34",
             encoder_weights: Optional[str] = "imagenet",
+            encoder_weights_init_mode: Optional[str] = None,
             encoder_dilation: bool = True,
             decoder_channels: int = 32,
             in_channels: int = 3,
@@ -60,6 +61,7 @@ class PAN(SegmentationModel):
             in_channels=in_channels,
             depth=5,
             weights=encoder_weights,
+            weights_init_mode=encoder_weights_init_mode,
         )
 
         if encoder_dilation:
