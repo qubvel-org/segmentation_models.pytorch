@@ -53,9 +53,9 @@ def patch_first_conv(model, in_channels, weights_init_mode):
         new_weight = _get_copied_weights(1, dst_in_size, module)
     else:  # module.groups == 1
         if in_channels == 1:
-            weight = weight.sum(1, keepdim=True)
+            new_weight = weight.sum(1, keepdim=True)
         elif in_channels == 2:
-            weight = weight[:, :2] * (3.0 / 2.0)
+            new_weight = weight[:, :2] * (3.0 / 2.0)
         else:
             if weights_init_mode is None:
                 reset = True
