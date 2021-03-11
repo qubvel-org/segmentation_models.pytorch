@@ -17,7 +17,7 @@ class EncoderMixin:
         """Return channels dimensions for each tensor of forward output of encoder"""
         return self._out_channels[: self._depth + 1]
 
-    def set_in_channels(self, in_channels, weights_init_mode=None):
+    def set_in_channels(self, in_channels, weights_init_mode):
         """Change first convolution channels"""
         if in_channels == 3:
             return

@@ -64,7 +64,7 @@ def patch_first_conv(model, in_channels, weights_init_mode):
                     dst_in_size,
                     *module.kernel_size
                 )
-            elif weights_init_mode == 'copy_init':
+            elif weights_init_mode == "copy_init":
                 new_weight = _get_copied_weights(3, dst_in_size, module)
             else:
                 raise ValueError("Wrong weights initialization mode. Available options are: 'copy_init' or None")
