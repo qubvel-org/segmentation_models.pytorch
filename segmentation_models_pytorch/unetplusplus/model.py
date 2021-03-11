@@ -20,6 +20,9 @@ class UnetPlusPlus(SegmentationModel):
             Default is 5
         encoder_weights: One of **None** (random initialization), **"imagenet"** (pre-training on ImageNet) and 
             other pretrained weights (see table with available weights for each encoder_name)
+        encoder_weights_init_mode: Encoder weights initialization mode.
+            Available options are **"copy_init"** and **None**.
+            Default is **None**
         decoder_channels: List of integers which specify **in_channels** parameter for convolutions used in decoder.
             Length of the list should be the same as **encoder_depth**
         decoder_use_batchnorm: If **True**, BatchNorm2d layer between Conv2D and Activation layers

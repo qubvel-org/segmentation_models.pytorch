@@ -17,6 +17,9 @@ class PAN(SegmentationModel):
             to extract features of different spatial resolution
         encoder_weights: One of **None** (random initialization), **"imagenet"** (pre-training on ImageNet) and 
             other pretrained weights (see table with available weights for each encoder_name)
+        encoder_weights_init_mode: Encoder weights initialization mode.
+            Available options are **"copy_init"** and **None**.
+            Default is **None**
         encoder_dilation: Flag to use dilation in encoder last layer. Doesn't work with ***ception***, **vgg***, 
             **densenet*`** backbones, default is **True**
         decoder_channels: A number of convolution layer filters in decoder blocks
