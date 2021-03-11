@@ -120,7 +120,7 @@ def test_in_channels(model_class, encoder_name, in_channels):
 @pytest.mark.parametrize("encoder_name", ENCODERS)
 @pytest.mark.parametrize("encoder_weights_init_mode", [None, "copy_init"])
 @pytest.mark.parametrize("in_channels", [1, 2, 3, 4, 5, 6])
-def test_weights_init_mode(model_class, encoder_name, encoder_weights_init_mode, in_channels):
+def test_weights_init_mode(encoder_name, encoder_weights_init_mode, in_channels):
     encoder = smp.encoders.get_encoder(
         encoder_name,
         in_channels=in_channels,
