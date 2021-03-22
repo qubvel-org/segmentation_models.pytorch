@@ -15,6 +15,8 @@ class DecoderBlock(nn.Module):
             attention_type=None,
     ):
         super().__init__()
+        self.up = nn.Upsample(scale_factor=2, mode='bilinear')
+        #self.up = nn.ConvTranspose2d(in_channels, in_channels // 2, kernel_size=2, stride=2)
         self.conv1 = md.Conv2dReLU(
             in_channels + skip_channels,
             out_channels,
@@ -33,7 +35,8 @@ class DecoderBlock(nn.Module):
         self.attention2 = md.Attention(attention_type, in_channels=out_channels)
 
     def forward(self, x, skip=None):
-        x = F.interpolate(x, scale_factor=2, mode="nearest")
+        x = self.up(x)
+        #x = F.interpolate(x, scale_factor=2, mode="nearest")
         if skip is not None:
             x = torch.cat([x, skip], dim=1)
             x = self.attention1(x)
@@ -99,21 +102,35 @@ class UnetPlusPlusDecoder(nn.Module):
         kwargs = dict(use_batchnorm=use_batchnorm, attention_type=attention_type)
 
         blocks = {}
-        for layer_idx in range(len(self.in_channels) - 1):
+        self.depth = len(self.in_channels)
+        for layer_idx in range(len(self.in_channels)):
             for depth_idx in range(layer_idx+1):
                 if depth_idx == 0:
                     in_ch = self.in_channels[layer_idx]
-                    skip_ch = self.skip_channels[layer_idx] * (layer_idx+1)
                     out_ch = self.out_channels[layer_idx]
+                    if layer_idx == self.depth-1:
+                        skip_ch = out_ch * (layer_idx - depth_idx)
+                    else:
+                        skip_ch = self.skip_channels[layer_idx] * (layer_idx+1)
                 else:
-                    out_ch = self.skip_channels[layer_idx]
-                    skip_ch = self.skip_channels[layer_idx] * (layer_idx+1-depth_idx)
+                    if layer_idx == self.depth-1:
+                        out_ch = self.out_channels[layer_idx]
+                        if depth_idx == layer_idx:
+                            skip_ch = 0
+                        else:
+                            skip_ch = out_ch * (layer_idx - depth_idx)
+                    else:
+                        skip_ch = self.skip_channels[layer_idx] * (layer_idx+1-depth_idx)
+                        out_ch = self.skip_channels[layer_idx]
                     in_ch = self.skip_channels[layer_idx - 1]
                 blocks[f'x_{depth_idx}_{layer_idx}'] = DecoderBlock(in_ch, skip_ch, out_ch, **kwargs)
-        blocks[f'x_{0}_{len(self.in_channels)-1}'] =\
-            DecoderBlock(self.in_channels[-1], 0, self.out_channels[-1], **kwargs)
+
+
+        #blocks[f'x_{0}_{len(self.in_channels)-1}'] =\
+        #    DecoderBlock(self.in_channels[-1], 0, self.out_channels[-1], **kwargs)
         self.blocks = nn.ModuleDict(blocks)
-        self.depth = len(self.in_channels) - 1
+        
+
 
     def forward(self, *features):
 
@@ -121,16 +138,28 @@ class UnetPlusPlusDecoder(nn.Module):
         features = features[::-1]  # reverse channels to start from head of encoder
         # start building dense connections
         dense_x = {}
-        for layer_idx in range(len(self.in_channels)-1):
+        for layer_idx in range(len(self.in_channels)):
             for depth_idx in range(self.depth-layer_idx):
                 if layer_idx == 0:
-                    output = self.blocks[f'x_{depth_idx}_{depth_idx}'](features[depth_idx], features[depth_idx+1])
+                    if depth_idx == self.depth - 1:
+                        output = self.blocks[f'x_{depth_idx}_{depth_idx}'](features[depth_idx], None)
+                    else:
+                        output = self.blocks[f'x_{depth_idx}_{depth_idx}'](features[depth_idx], features[depth_idx+1])
                     dense_x[f'x_{depth_idx}_{depth_idx}'] = output
                 else:
                     dense_l_i = depth_idx + layer_idx
                     cat_features = [dense_x[f'x_{idx}_{dense_l_i}'] for idx in range(depth_idx+1, dense_l_i+1)]
-                    cat_features = torch.cat(cat_features + [features[dense_l_i+1]], dim=1)
+                    if layer_idx != self.depth:
+                        if dense_l_i == self.depth - 1:
+                            cat_features = torch.cat(cat_features, dim=1)
+                        else:
+                            cat_features = torch.cat(cat_features + [features[dense_l_i+1]], dim=1)
                     dense_x[f'x_{depth_idx}_{dense_l_i}'] =\
                         self.blocks[f'x_{depth_idx}_{dense_l_i}'](dense_x[f'x_{depth_idx}_{dense_l_i-1}'], cat_features)
-        dense_x[f'x_{0}_{self.depth}'] = self.blocks[f'x_{0}_{self.depth}'](dense_x[f'x_{0}_{self.depth-1}'])
-        return dense_x[f'x_{0}_{self.depth}']
+        #dense_x[f'x_{0}_{self.depth}'] = self.blocks[f'x_{0}_{self.depth}'](dense_x[f'x_{0}_{self.depth-1}'])
+        #return dense_x[f'x_{0}_{self.depth}']
+        output = []
+        for i in range(self.depth):
+            output.append(dense_x[f'x_{i}_{self.depth-1}'])
+        return output
+        

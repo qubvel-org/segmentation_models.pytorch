@@ -3,9 +3,11 @@ from .decoder import UnetPlusPlusDecoder
 from ..encoders import get_encoder
 from ..base import SegmentationModel
 from ..base import SegmentationHead, ClassificationHead
+from ..base import initialization as init
+import torch
 
 
-class UnetPlusPlus(SegmentationModel):
+class DSUnetPlusPlus(SegmentationModel):
     """Unet++ is a fully convolution neural network for image semantic segmentation. Consist of *encoder* 
     and *decoder* parts connected with *skip connections*. Encoder extract features of different spatial 
     resolution (skip connections) which are used by decoder to define accurate segmentation mask. Decoder of
@@ -47,6 +49,15 @@ class UnetPlusPlus(SegmentationModel):
 
     """
 
+    def initialize(self):
+        init.initialize_decoder(self.decoder)
+        init.initialize_head(self.segmentation_head1)
+        init.initialize_head(self.segmentation_head2)
+        init.initialize_head(self.segmentation_head3)
+        init.initialize_head(self.segmentation_head4)
+        if self.classification_head is not None:
+            init.initialize_head(self.classification_head)
+
     def __init__(
         self,
         encoder_name: str = "resnet34",
@@ -78,11 +89,29 @@ class UnetPlusPlus(SegmentationModel):
             attention_type=decoder_attention_type,
         )
 
-        self.segmentation_head = SegmentationHead(
+        self.segmentation_head1 = SegmentationHead(
             in_channels=decoder_channels[-1],
             out_channels=classes,
             activation=activation,
-            kernel_size=3,
+            kernel_size=1,
+        )
+        self.segmentation_head2 = SegmentationHead(
+            in_channels=decoder_channels[-1],
+            out_channels=classes,
+            activation=activation,
+            kernel_size=1,
+        )
+        self.segmentation_head3 = SegmentationHead(
+            in_channels=decoder_channels[-1],
+            out_channels=classes,
+            activation=activation,
+            kernel_size=1,
+        )
+        self.segmentation_head4 = SegmentationHead(
+            in_channels=decoder_channels[-1],
+            out_channels=classes,
+            activation=activation,
+            kernel_size=1,
         )
 
         if aux_params is not None:
@@ -94,3 +123,42 @@ class UnetPlusPlus(SegmentationModel):
 
         self.name = "unetplusplus-{}".format(encoder_name)
         self.initialize()
+
+    def forward(self, x):
+        """Sequentially pass `x` trough model`s encoder, decoder and heads"""
+        features = self.encoder(x)
+        decoder_output = self.decoder(*features)
+
+        #masks = self.segmentation_head(decoder_output)
+
+        mask1 = self.segmentation_head1(decoder_output[3])
+        mask2 = self.segmentation_head2(decoder_output[2])
+        mask3 = self.segmentation_head3(decoder_output[1])
+        mask4 = self.segmentation_head4(decoder_output[0])
+
+        masks = torch.cat([mask1, mask2, mask3, mask4], dim=0)
+
+        if self.classification_head is not None:
+            labels = self.classification_head(features[-1])
+            return masks, labels
+
+        #return masks
+        return mask4
+
+    def predict(self, x):
+        """Inference method. Switch model to `eval` mode, call `.forward(x)` with `torch.no_grad()`
+
+        Args:
+            x: 4D torch tensor with shape (batch_size, channels, height, width)
+
+        Return:
+            prediction: 4D torch tensor with shape (batch_size, classes, height, width)
+
+        """
+        if self.training:
+            self.eval()
+
+        with torch.no_grad():
+            x = self.forward(x)[-1]
+
+        return x

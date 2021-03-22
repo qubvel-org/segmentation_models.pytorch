@@ -11,7 +11,7 @@ Segmentation based on [PyTorch](https://pytorch.org/).**
 The main features of this library are:
 
  - High level API (just two lines to create a neural network)
- - 9 models architectures for binary and multi class segmentation (including legendary Unet)
+ - 11 models architectures for binary and multi class segmentation (including legendary Unet)
  - 104 available encoders
  - All encoders have pre-trained weights for faster and better convergence
  
@@ -83,6 +83,8 @@ Congratulations! You are done! Now you can train your model with your favorite f
  - PAN [[paper](https://arxiv.org/abs/1805.10180)] [[docs](https://smp.readthedocs.io/en/latest/models.html#pan)]
  - DeepLabV3 [[paper](https://arxiv.org/abs/1706.05587)] [[docs](https://smp.readthedocs.io/en/latest/models.html#deeplabv3)]
  - DeepLabV3+ [[paper](https://arxiv.org/abs/1802.02611)] [[docs](https://smp.readthedocs.io/en/latest/models.html#id9)]
+ - ResUNet [[paper](https://arxiv.org/abs/1711.1)]
+ - ResUNet++ [[paper](https://arxiv.org/abs/1911.0706)]
 
 #### Encoders <a name="encoders"></a>
 

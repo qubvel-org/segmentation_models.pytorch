@@ -8,6 +8,8 @@ from .deeplabv3 import DeepLabV3, DeepLabV3Plus
 from .pan import PAN
 from .resunet import ResUnet
 from .resunetplusplus import ResUnetPlusPlus
+from .double_unet import DoubleUnet
+from .DSunetplusplus import DSUnetPlusPlus
 
 from . import encoders
 from . import utils
@@ -31,7 +33,7 @@ def create_model(
 
     """
 
-    archs = [Unet, UnetPlusPlus, MAnet, Linknet, FPN, PSPNet, DeepLabV3, DeepLabV3Plus, PAN, ResUnet, ResUnetPlusPlus]
+    archs = [Unet, UnetPlusPlus, MAnet, Linknet, FPN, PSPNet, DeepLabV3, DeepLabV3Plus, PAN, ResUnet, ResUnetPlusPlus, DoubleUnet, DSunetplusplus]
     archs_dict = {a.__name__.lower(): a for a in archs}
     try:
         model_class = archs_dict[arch.lower()]

@@ -93,6 +93,8 @@ class DecoderBlock(nn.Module):
         super().__init__()
         #if skip_channels != 0:
         #    self.attention0 = AttentionBlock(skip_channels, in_channels, in_channels)
+        self.up = nn.Upsample(scale_factor=2, mode='bilinear')
+        #self.up = nn.ConvTranspose2d(in_channels, in_channels // 2, kernel_size=2, stride=2)
         self.conv1 = md.PreActivatedConv2dReLU(
             in_channels + skip_channels,
             out_channels,
@@ -114,7 +116,8 @@ class DecoderBlock(nn.Module):
     def forward(self, x, skip=None):
         #if skip is not None:
         #    x = self.attention0(x, skip)
-        x = F.interpolate(x, scale_factor=2, mode="nearest")
+        #x = F.interpolate(x, scale_factor=2, mode="nearest")
+        x = self.up(x)
         if skip is not None:
             x = torch.cat([x, skip], dim=1)
             identity = x
