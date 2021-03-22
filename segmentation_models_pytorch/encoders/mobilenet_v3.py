@@ -95,13 +95,13 @@ mobilenet_v3_encoders = {
             "imagenet": {
                 "mean": [0.485, 0.456, 0.406],
                 "std": [0.229, 0.224, 0.225],
-                "url": "https://download.pytorch.org/models/mobilenet_v2_small-047dcff4.pth",
+                "url": "https://download.pytorch.org/models/mobilenet_v3_small-047dcff4.pth",
                 "input_space": "RGB",
                 "input_range": [0, 1],
             },
         },
         "params": {
-            "out_channels": (3, 16, 16, 24, 48, 576),
+            "out_channels": (3, 16, 16, 24, 40, 576),
             "stage_idxs": (1, 2, 4, 7),
             "model_name": "mobilenet_v3_small",
         },
