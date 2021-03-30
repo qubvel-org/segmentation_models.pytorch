@@ -16,6 +16,7 @@ from .timm_resnest import timm_resnest_encoders
 from .timm_res2net import timm_res2net_encoders
 from .timm_regnet import timm_regnet_encoders
 from .timm_sknet import timm_sknet_encoders
+from .timm_universal import timm_universal_encoders, TimmUniversalEncoder
 from ._preprocessing import preprocess_input
 
 encoders = {}
@@ -38,10 +39,16 @@ encoders.update(timm_sknet_encoders)
 
 def get_encoder(name, in_channels=3, depth=5, weights=None):
 
+    if name in timm_universal_encoders:
+        encoder = TimmUniversalEncoder(model=name, in_channels=in_channels, depth=depth, pretrained=weights is not None)
+        global timm_setting
+        timm_setting = encoder.formatted_settings
+        return encoder
+
     try:
         Encoder = encoders[name]["encoder"]
     except KeyError:
-        raise KeyError("Wrong encoder name `{}`, supported encoders: {}".format(name, list(encoders.keys())))
+        raise KeyError("Wrong encoder name `{}`, supported encoders: {}".format(name, get_encoder_names()))
 
     params = encoders[name]["params"]
     params.update(depth=depth)
@@ -62,10 +69,13 @@ def get_encoder(name, in_channels=3, depth=5, weights=None):
 
 
 def get_encoder_names():
-    return list(encoders.keys())
+    return list(encoders.keys()) + timm_universal_encoders
 
 
 def get_preprocessing_params(encoder_name, pretrained="imagenet"):
+    if encoder_name in timm_universal_encoders:
+        return timm_setting
+
     settings = encoders[encoder_name]["pretrained_settings"]
 
     if pretrained not in settings.keys():
