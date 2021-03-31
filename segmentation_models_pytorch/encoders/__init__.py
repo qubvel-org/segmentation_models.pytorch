@@ -40,7 +40,7 @@ encoders.update(timm_sknet_encoders)
 def get_encoder(name, in_channels=3, depth=5, weights=None):
 
     if name in timm_universal_encoders:
-        encoder = TimmUniversalEncoder(model=name, in_channels=in_channels, depth=depth, pretrained=weights is not None)
+        encoder = TimmUniversalEncoder(encoder_name=name, in_channels=in_channels, depth=depth, pretrained=weights is not None)
         global timm_setting
         timm_setting = encoder.formatted_settings
         return encoder
