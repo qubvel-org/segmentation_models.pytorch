@@ -9,7 +9,7 @@ class TimmUniversalEncoder(nn.Module, EncoderMixin):
         self._depth = depth
         self._in_channels = in_channels
 
-        self.encoder = create_model(model_name=encoder_name,
+        self.encoder = create_model(model_name=encoder_name[len(timm_universal_prefix):],
                              in_chans=in_channels,
                              exportable=True,   # onnx export
                              features_only=True,
@@ -31,5 +31,5 @@ class TimmUniversalEncoder(nn.Module, EncoderMixin):
         return [x] + features
 
 
-
-timm_universal_encoders = list_models()
+timm_universal_prefix = 'timm-u-'
+timm_universal_encoders = [f'{timm_universal_prefix}{i}' for i in list_models()]
