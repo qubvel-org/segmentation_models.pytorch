@@ -51,7 +51,7 @@ model = smp.Unet(
     classes=3,                      # model output channels (number of classes in your dataset)
 )
 ```
- - see [table](#architectires) with available model architectures
+ - see [table](#architectures) with available model architectures
  - see [table](#encoders) with available encoders and their corresponding weights
 
 #### 2. Configure data preprocessing
