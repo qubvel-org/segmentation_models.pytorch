@@ -18,13 +18,23 @@ def get_encoders():
         "resnext101_32x32d",
         "resnext101_32x48d",
     ]
-    encoders = smp.encoders.get_encoder_names()
+    encoders = list(smp.encoders.encoders.keys())
     if IS_TRAVIS:
         encoders = [e for e in encoders if e not in travis_exclude_encoders]
     return encoders
 
+def get_timm_u_encoders():
+    timm_exclude_encoders = [
+        'vit_*', 'tnt_*', 'pit_*',
+        '*iabn*', 'tresnet*',  # models using inplace abn
+        'dla*', 'hrnet*',  # hopefully fix at some point
+    ]
+
+    return smp.encoders.timm_universal_encoders(exclude_filters=timm_exclude_encoders)
+
 
 ENCODERS = get_encoders()
+ENCODERS_TIMM_U = get_timm_u_encoders()
 DEFAULT_ENCODER = "resnet18"
 
 
@@ -54,24 +64,26 @@ def _test_forward_backward(model, sample, test_shape=False):
         assert out.shape[2:] == sample.shape[2:]
 
 
-@pytest.mark.parametrize("encoder_name", ENCODERS)
+@pytest.mark.parametrize("encoder_name", ENCODERS + ENCODERS_TIMM_U)
 @pytest.mark.parametrize("encoder_depth", [3, 5])
 @pytest.mark.parametrize("model_class", [smp.FPN, smp.PSPNet, smp.Linknet, smp.Unet, smp.UnetPlusPlus])
 def test_forward(model_class, encoder_name, encoder_depth, **kwargs):
-    if model_class is smp.Unet or model_class is smp.UnetPlusPlus or model_class is smp.MAnet:
-        kwargs["decoder_channels"] = (16, 16, 16, 16, 16)[-encoder_depth:]
-    model = model_class(
-        encoder_name, encoder_depth=encoder_depth, encoder_weights=None, **kwargs
-    )
-    sample = get_sample(model_class)
-    model.eval()
-    if encoder_depth == 5 and model_class != smp.PSPNet:
-        test_shape = True
-    else:
-        test_shape = False
-
-    _test_forward(model, sample, test_shape)
-
+    try:
+        if model_class is smp.Unet or model_class is smp.UnetPlusPlus or model_class is smp.MAnet:
+            kwargs["decoder_channels"] = (16, 16, 16, 16, 16)[-encoder_depth:]
+        model = model_class(
+            encoder_name, encoder_depth=encoder_depth, encoder_weights=None, **kwargs
+        )
+        sample = get_sample(model_class)
+        model.eval()
+        if encoder_depth == 5 and model_class != smp.PSPNet:
+            test_shape = True
+        else:
+            test_shape = False
+        _test_forward(model, sample, test_shape)
+    except Exception as e:
+        print('\n\r{}-{}: Exception {}'.format(model_class.__name__, encoder_name, e))
+        assert False, 'Exception {}'.format(e)
 
 @pytest.mark.parametrize(
     "model_class",

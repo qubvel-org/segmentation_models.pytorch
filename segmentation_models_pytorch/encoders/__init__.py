@@ -39,8 +39,11 @@ encoders.update(timm_sknet_encoders)
 
 def get_encoder(name, in_channels=3, depth=5, weights=None):
 
-    if name in timm_universal_encoders:
-        encoder = TimmUniversalEncoder(encoder_name=name, in_channels=in_channels, depth=depth, pretrained=weights is not None)
+    if name in timm_universal_encoders():
+        pretrained = weights is not None
+        if pretrained and name not in timm_universal_encoders(pretrained=True):
+            raise KeyError("No pretrained weights for encoder `{}`.".format(name))
+        encoder = TimmUniversalEncoder(encoder_name=name, in_channels=in_channels, depth=depth, pretrained=pretrained)
         global timm_setting
         timm_setting = encoder.formatted_settings
         return encoder
@@ -69,11 +72,11 @@ def get_encoder(name, in_channels=3, depth=5, weights=None):
 
 
 def get_encoder_names():
-    return list(encoders.keys()) + timm_universal_encoders
+    return list(encoders.keys()) + timm_universal_encoders()
 
 
 def get_preprocessing_params(encoder_name, pretrained="imagenet"):
-    if encoder_name in timm_universal_encoders:
+    if encoder_name in timm_universal_encoders():
         return timm_setting
 
     settings = encoders[encoder_name]["pretrained_settings"]
