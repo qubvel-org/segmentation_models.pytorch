@@ -8,7 +8,6 @@ from typing import Optional
 
 import torch
 import torch.nn.functional as F
-from torch.autograd import Variable
 from torch.nn.modules.loss import _Loss
 from .constants import BINARY_MODE, MULTICLASS_MODE, MULTILABEL_MODE
 
@@ -37,7 +36,7 @@ def _lovasz_grad(gt_sorted):
 def _lovasz_hinge(logits, labels, per_image=True, ignore=None):
     """
     Binary Lovasz hinge loss
-        logits: [B, H, W] Variable, logits at each pixel (between -infinity and +infinity)
+        logits: [B, H, W] Logits at each pixel (between -infinity and +infinity)
         labels: [B, H, W] Tensor, binary ground truth masks (0 or 1)
         per_image: compute the loss per image instead of per batch
         ignore: void class id
@@ -55,7 +54,7 @@ def _lovasz_hinge(logits, labels, per_image=True, ignore=None):
 def _lovasz_hinge_flat(logits, labels):
     """Binary Lovasz hinge loss
     Args:
-        logits: [P] Variable, logits at each prediction (between -infinity and +infinity)
+        logits: [P] Logits at each prediction (between -infinity and +infinity)
         labels: [P] Tensor, binary ground truth labels (0 or 1)
         ignore: label to ignore
     """
@@ -63,12 +62,12 @@ def _lovasz_hinge_flat(logits, labels):
         # only void pixels, the gradients should be 0
         return logits.sum() * 0.0
     signs = 2.0 * labels.float() - 1.0
-    errors = 1.0 - logits * Variable(signs)
+    errors = 1.0 - logits * signs
     errors_sorted, perm = torch.sort(errors, dim=0, descending=True)
     perm = perm.data
     gt_sorted = labels[perm]
     grad = _lovasz_grad(gt_sorted)
-    loss = torch.dot(F.relu(errors_sorted), Variable(grad))
+    loss = torch.dot(F.relu(errors_sorted), grad)
     return loss
 
 
@@ -92,7 +91,7 @@ def _flatten_binary_scores(scores, labels, ignore=None):
 def _lovasz_softmax(probas, labels, classes="present", per_image=False, ignore=None):
     """Multi-class Lovasz-Softmax loss
     Args:
-        @param probas: [B, C, H, W] Variable, class probabilities at each prediction (between 0 and 1).
+        @param probas: [B, C, H, W] Class probabilities at each prediction (between 0 and 1).
         Interpreted as binary (sigmoid) output with outputs of size [B, H, W].
         @param labels: [B, H, W] Tensor, ground truth labels (between 0 and C - 1)
         @param classes: 'all' for all, 'present' for classes present in labels, or a list of classes to average.
@@ -112,7 +111,7 @@ def _lovasz_softmax(probas, labels, classes="present", per_image=False, ignore=N
 def _lovasz_softmax_flat(probas, labels, classes="present"):
     """Multi-class Lovasz-Softmax loss
     Args:
-        @param probas: [P, C] Variable, class probabilities at each prediction (between 0 and 1)
+        @param probas: [P, C] Class probabilities at each prediction (between 0 and 1)
         @param labels: [P] Tensor, ground truth labels (between 0 and C - 1)
         @param classes: 'all' for all, 'present' for classes present in labels, or a list of classes to average.
     """
