@@ -53,6 +53,7 @@ class DiceLoss(_Loss):
         self.smooth = smooth
         self.eps = eps
         self.log_loss = log_loss
+        self.ignore_index = ignore_index
 
     def forward(self, y_pred: torch.Tensor, y_true: torch.Tensor) -> torch.Tensor:
 
@@ -75,16 +76,33 @@ class DiceLoss(_Loss):
             y_true = y_true.view(bs, 1, -1)
             y_pred = y_pred.view(bs, 1, -1)
 
+            if self.ignore_index is not None:
+                mask = y_true != self.ignore_index
+                y_pred = y_pred * mask
+                y_true = y_true * mask
+
         if self.mode == MULTICLASS_MODE:
             y_true = y_true.view(bs, -1)
             y_pred = y_pred.view(bs, num_classes, -1)
 
-            y_true = F.one_hot(y_true, num_classes)  # N,H*W -> N,H*W, C
-            y_true = y_true.permute(0, 2, 1)  # H, C, H*W
+            if self.ignore_index is not None:
+                mask = y_true != self.ignore_index
+                y_pred = y_pred * mask.unsqueeze(1)
+
+                y_true = F.one_hot((y_true * mask).to(torch.long), num_classes)  # N,H*W -> N,H*W, C
+                y_true = y_true.permute(0, 2, 1) * mask.unsqueeze(1)  # H, C, H*W
+            else:
+                y_true = F.one_hot(y_true, num_classes)  # N,H*W -> N,H*W, C
+                y_true = y_true.permute(0, 2, 1)  # H, C, H*W
 
         if self.mode == MULTILABEL_MODE:
             y_true = y_true.view(bs, num_classes, -1)
             y_pred = y_pred.view(bs, num_classes, -1)
+
+            if self.ignore_index is not None:
+                mask = y_true != self.ignore_index
+                y_pred = y_pred * mask
+                y_true = y_true * mask
 
         scores = soft_dice_score(y_pred, y_true.type_as(y_pred), smooth=self.smooth, eps=self.eps, dims=dims)
 
