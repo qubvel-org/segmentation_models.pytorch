@@ -12,9 +12,9 @@ from shutil import rmtree
 from setuptools import find_packages, setup, Command
 
 # Package meta-data.
-NAME = 'segmentation_models_pytorch'
+NAME = 'medsegm'
 DESCRIPTION = 'Image segmentation models with pre-trained backbones. PyTorch.'
-URL = 'https://github.com/qubvel/segmentation_models.pytorch'
+URL = 'https://github.com/evgeniishch/med_segm'
 EMAIL = 'qubvel@gmail.com'
 AUTHOR = 'Pavel Yakubovskiy'
 REQUIRES_PYTHON = '>=3.0.0'
