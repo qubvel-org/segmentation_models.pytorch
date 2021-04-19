@@ -97,3 +97,99 @@ class Precision(base.Metric):
             threshold=self.threshold,
             ignore_channels=self.ignore_channels,
         )
+
+
+class Specificity(base.Metric):
+
+    def __init__(self, eps=1e-7, threshold=0.5, activation=None, ignore_channels=None, **kwargs):
+        super().__init__(**kwargs)
+        self.eps = eps
+        self.threshold = threshold
+        self.activation = Activation(activation)
+        self.ignore_channels = ignore_channels
+
+    def forward(self, y_pr, y_gt):
+        y_pr = self.activation(y_pr)
+        return F.specificity(
+            y_pr, y_gt,
+            eps=self.eps,
+            threshold=self.threshold,
+            ignore_channels=self.ignore_channels,
+        )
+
+
+class PositiveLikelihoodRatio(base.Metric):
+
+    def __init__(self, eps=1e-7, threshold=0.5, activation=None, ignore_channels=None, **kwargs):
+        super().__init__(**kwargs)
+        self.eps = eps
+        self.threshold = threshold
+        self.activation = Activation(activation)
+        self.ignore_channels = ignore_channels
+
+    def forward(self, y_pr, y_gt):
+        y_pr = self.activation(y_pr)
+        return F.lr_pos(
+            y_pr, y_gt,
+            eps=self.eps,
+            threshold=self.threshold,
+            ignore_channels=self.ignore_channels,
+        )
+
+
+class NegativeLikelihoodRatio(base.Metric):
+
+    def __init__(self, eps=1e-7, threshold=0.5, activation=None, ignore_channels=None, **kwargs):
+        super().__init__(**kwargs)
+        self.eps = eps
+        self.threshold = threshold
+        self.activation = Activation(activation)
+        self.ignore_channels = ignore_channels
+
+    def forward(self, y_pr, y_gt):
+        y_pr = self.activation(y_pr)
+        return F.lr_neg(
+            y_pr, y_gt,
+            eps=self.eps,
+            threshold=self.threshold,
+            ignore_channels=self.ignore_channels,
+        )
+
+
+class NegativePredictiveValue(base.Metric):
+
+    def __init__(self, eps=1e-7, threshold=0.5, activation=None, ignore_channels=None, **kwargs):
+        super().__init__(**kwargs)
+        self.eps = eps
+        self.threshold = threshold
+        self.activation = Activation(activation)
+        self.ignore_channels = ignore_channels
+
+    def forward(self, y_pr, y_gt):
+        y_pr = self.activation(y_pr)
+        return F.npv(
+            y_pr, y_gt,
+            eps=self.eps,
+            threshold=self.threshold,
+            ignore_channels=self.ignore_channels,
+        )
+
+
+class SorensenDiceCoeff(base.Metric):
+
+    def __init__(self, eps=1e-7, threshold=0.5, activation=None, ignore_channels=None, **kwargs):
+        super().__init__(**kwargs)
+        self.eps = eps
+        self.threshold = threshold
+        self.activation = Activation(activation)
+        self.ignore_channels = ignore_channels
+
+    def forward(self, y_pr, y_gt):
+        y_pr = self.activation(y_pr)
+        return F.dsc(
+            y_pr, y_gt,
+            eps=self.eps,
+            threshold=self.threshold,
+            ignore_channels=self.ignore_channels,
+        )
+        

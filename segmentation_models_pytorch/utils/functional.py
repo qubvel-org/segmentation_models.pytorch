@@ -124,3 +124,119 @@ def recall(pr, gt, eps=1e-7, threshold=None, ignore_channels=None):
     score = (tp + eps) / (tp + fn + eps)
 
     return score
+
+
+def specificity(pr, gt, eps=1e-7, threshold=None, ignore_channels=None):
+    """Calculate Specificity between ground truth and prediction
+    Args:
+        pr (torch.Tensor): A list of predicted elements
+        gt (torch.Tensor):  A list of elements that are to be predicted
+        eps (float): epsilon to avoid zero division
+        threshold: threshold for outputs binarization
+    Returns:
+        float: specificity score
+    """
+
+    pr = _threshold(pr, threshold=threshold)
+    pr, gt = _take_channels(pr, gt, ignore_channels=ignore_channels)
+
+    tp = torch.sum(gt * pr)
+    fp = torch.sum(pr) - tp
+    tn = gt.shape[0] - torch.sum(gt) - fp
+
+    score = (tn + eps) / (tn + fp + eps)
+
+    return score
+
+
+def lr_pos(pr, gt, eps=1e-7, threshold=None, ignore_channels=None):
+    """Calculate Positive Likelihood Ratio between ground truth and prediction
+    Args:
+        pr (torch.Tensor): A list of predicted elements
+        gt (torch.Tensor):  A list of elements that are to be predicted
+        eps (float): epsilon to avoid zero division
+        threshold: threshold for outputs binarization
+    Returns:
+        float: positive likelihood ratio score
+    """
+
+    pr = _threshold(pr, threshold=threshold)
+    pr, gt = _take_channels(pr, gt, ignore_channels=ignore_channels)
+
+
+    sensitivity = recall(pr, gt, eps=eps, threshold=threshold, ignore_channels=ignore_channels)
+    specificity = specificity(pr, gt, eps=eps, threshold=threshold, ignore_channels=ignore_channels)
+
+    score = (sensitivity + eps) / (1 - specificity + eps)
+
+    return score
+
+
+def lr_neg(pr, gt, eps=1e-7, threshold=None, ignore_channels=None):
+    """Calculate Negative Likelihood Ratio between ground truth and prediction
+    Args:
+        pr (torch.Tensor): A list of predicted elements
+        gt (torch.Tensor):  A list of elements that are to be predicted
+        eps (float): epsilon to avoid zero division
+        threshold: threshold for outputs binarization
+    Returns:
+        float: negative likelihood ratio score
+    """
+
+    pr = _threshold(pr, threshold=threshold)
+    pr, gt = _take_channels(pr, gt, ignore_channels=ignore_channels)
+
+
+    sensitivity = recall(pr, gt, eps=eps, threshold=threshold, ignore_channels=ignore_channels)
+    specificity = specificity(pr, gt, eps=eps, threshold=threshold, ignore_channels=ignore_channels)
+
+    score = (1 - sensitivity + eps) / (specificity + eps)
+
+    return score
+
+
+def npv(pr, gt, eps=1e-7, threshold=None, ignore_channels=None):
+    """Calculate Negative Predictive Value between ground truth and prediction
+    Args:
+        pr (torch.Tensor): A list of predicted elements
+        gt (torch.Tensor):  A list of elements that are to be predicted
+        eps (float): epsilon to avoid zero division
+        threshold: threshold for outputs binarization
+    Returns:
+        float: Negative predictive value score
+    """
+
+    pr = _threshold(pr, threshold=threshold)
+    pr, gt = _take_channels(pr, gt, ignore_channels=ignore_channels)
+
+    tp = torch.sum(gt * pr)
+    fn = torch.sum(gt) - tp
+    fp = torch.sum(pr) - tp
+    tn = gt.shape[0] - torch.sum(gt) - fp
+
+    score = (tn + eps) / (tn + fn + eps)
+
+    return score
+
+
+def dsc(pr, gt, eps=1e-7, threshold=None, ignore_channels=None):
+    """Calculate Sørensen–Dice coefficient between ground truth and prediction
+    Args:
+        pr (torch.Tensor): A list of predicted elements
+        gt (torch.Tensor):  A list of elements that are to be predicted
+        eps (float): epsilon to avoid zero division
+        threshold: threshold for outputs binarization
+    Returns:
+        float: Sørensen–Dice coefficient score
+    """
+
+    pr = _threshold(pr, threshold=threshold)
+    pr, gt = _take_channels(pr, gt, ignore_channels=ignore_channels)
+
+    tp = torch.sum(gt * pr)
+    fn = torch.sum(gt) - tp
+    fp = torch.sum(pr) - tp
+
+    score = (2 * tp) / (2 * tp + fp + fn + eps)
+
+    return score
