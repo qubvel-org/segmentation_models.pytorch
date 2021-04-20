@@ -140,9 +140,11 @@ def specificity(pr, gt, eps=1e-7, threshold=None, ignore_channels=None):
     pr = _threshold(pr, threshold=threshold)
     pr, gt = _take_channels(pr, gt, ignore_channels=ignore_channels)
 
+    shape = gt.shape[0] * gt.shape[1] * gt.shape[2] * gt.shape[3]
+
     tp = torch.sum(gt * pr)
     fp = torch.sum(pr) - tp
-    tn = gt.shape[0] - torch.sum(gt) - fp
+    tn = shape - torch.sum(gt) - fp
 
     score = (tn + eps) / (tn + fp + eps)
 
@@ -164,10 +166,10 @@ def lr_pos(pr, gt, eps=1e-7, threshold=None, ignore_channels=None):
     pr, gt = _take_channels(pr, gt, ignore_channels=ignore_channels)
 
 
-    sensitivity = recall(pr, gt, eps=eps, threshold=threshold, ignore_channels=ignore_channels)
-    specificity = specificity(pr, gt, eps=eps, threshold=threshold, ignore_channels=ignore_channels)
+    sens = recall(pr, gt, eps=eps, threshold=threshold, ignore_channels=ignore_channels)
+    spec = specificity(pr, gt, eps=eps, threshold=threshold, ignore_channels=ignore_channels)
 
-    score = (sensitivity + eps) / (1 - specificity + eps)
+    score = (sens + eps) / (1 - spec + eps)
 
     return score
 
@@ -187,10 +189,10 @@ def lr_neg(pr, gt, eps=1e-7, threshold=None, ignore_channels=None):
     pr, gt = _take_channels(pr, gt, ignore_channels=ignore_channels)
 
 
-    sensitivity = recall(pr, gt, eps=eps, threshold=threshold, ignore_channels=ignore_channels)
-    specificity = specificity(pr, gt, eps=eps, threshold=threshold, ignore_channels=ignore_channels)
+    sens = recall(pr, gt, eps=eps, threshold=threshold, ignore_channels=ignore_channels)
+    spec = specificity(pr, gt, eps=eps, threshold=threshold, ignore_channels=ignore_channels)
 
-    score = (1 - sensitivity + eps) / (specificity + eps)
+    score = (1 - sens + eps) / (spec + eps)
 
     return score
 
@@ -209,12 +211,12 @@ def npv(pr, gt, eps=1e-7, threshold=None, ignore_channels=None):
     pr = _threshold(pr, threshold=threshold)
     pr, gt = _take_channels(pr, gt, ignore_channels=ignore_channels)
 
-    print(pr.shape, gt.shape)
+    shape = gt.shape[0] * gt.shape[1] * gt.shape[2] * gt.shape[3]
 
     tp = torch.sum(gt * pr)
     fn = torch.sum(gt) - tp
     fp = torch.sum(pr) - tp
-    tn = gt.shape[0] - torch.sum(gt) - fp
+    tn = shape - torch.sum(gt) - fp
 
     score = (tn + eps) / (tn + fn + eps)
 
