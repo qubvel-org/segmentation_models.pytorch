@@ -209,6 +209,8 @@ def npv(pr, gt, eps=1e-7, threshold=None, ignore_channels=None):
     pr = _threshold(pr, threshold=threshold)
     pr, gt = _take_channels(pr, gt, ignore_channels=ignore_channels)
 
+    print(pr.shape, gt.shape)
+
     tp = torch.sum(gt * pr)
     fn = torch.sum(gt) - tp
     fp = torch.sum(pr) - tp
