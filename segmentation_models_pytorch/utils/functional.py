@@ -36,7 +36,26 @@ def iou(pr, gt, eps=1e-7, threshold=None, ignore_channels=None):
     return (intersection + eps) / union
 
 
-jaccard = iou
+def categorical_focal_loss(gt, pr, gamma=2.0, alpha=0.25, ignore_channels=None, eps=1e-7, **kwargs):
+    pr, gt = _take_channels(pr, gt, ignore_channels=ignore_channels)
+
+    # clip to prevent NaN's and Inf's
+    pr = torch.clip(pr, eps, 1.0 - eps)
+
+    # Calculate focal loss
+    loss = - gt * (alpha * torch.pow((1 - pr), gamma) * torch.log(pr))
+
+    return torch.mean(loss)
+
+
+def binary_focal_loss(gt, pr, gamma=2.0, alpha=0.25, eps=1e-7, **kwargs):
+    # clip to prevent NaN's and Inf's
+    pr = torch.clip(pr, eps, 1.0 - eps)
+
+    loss_1 = - gt * (alpha * torch.pow((1 - pr), gamma) * torch.log(pr))
+    loss_0 = - (1 - gt) * (alpha * torch.pow((pr), gamma) * torch.log(1 - pr))
+    loss = torch.mean(loss_0 + loss_1)
+    return loss
 
 
 def f_score(pr, gt, beta=1, eps=1e-7, threshold=None, ignore_channels=None):
@@ -124,3 +143,6 @@ def recall(pr, gt, eps=1e-7, threshold=None, ignore_channels=None):
     score = (tp + eps) / (tp + fn + eps)
 
     return score
+
+
+jaccard = iou
