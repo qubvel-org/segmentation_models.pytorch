@@ -1,13 +1,6 @@
 🛠 Installation
 ===============
 
-PyPI version:
-
-.. code-block:: bash
-
-    $ pip install -U segmentation-models-pytorch
-
-
 Latest version from source:
 
 .. code-block:: bash
