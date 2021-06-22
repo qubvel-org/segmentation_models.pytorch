@@ -75,7 +75,7 @@ Congratulations! You are done! Now you can train your model with your favorite f
 
 #### Architectures <a name="architectures"></a>
  - Unet [[paper](https://arxiv.org/abs/1505.04597)] [[docs](https://smp.readthedocs.io/en/latest/models.html#unet)]
- - Unet++ [[paper](https://arxiv.org/pdf/1807.10165.pdf)] [[docs](https://smp.readthedocs.io/en/latest/models.html#id2)]
+ - Unet++ [[paper1](https://arxiv.org/abs/1807.10165),[paper2](https://arxiv.org/abs/1912.05074)] [[docs](https://smp.readthedocs.io/en/latest/models.html#id2)]
  - EfficientUNet++ [[paper]()] [[docs](https://segmentation-models-pytorch.readthedocs.io/en/latest/models.html#efficientunet)]
  - ResUnet [[paper](https://arxiv.org/abs/1711.10684)] [[docs](https://segmentation-models-pytorch.readthedocs.io/en/latest/models.html#resunet)]
  - ResUnet++ [[paper](https://arxiv.org/abs/1911.07067)] [[docs](https://segmentation-models-pytorch.readthedocs.io/en/latest/models.html#id4)]
