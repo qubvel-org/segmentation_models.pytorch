@@ -38,9 +38,6 @@ class FPN(SegmentationModel):
 
     .. _FPN:
         http://presentations.cocodataset.org/COCO17-Stuff-FAIR.pdf
-
-    Reference:
-        http://presentations.cocodataset.org/COCO17-Stuff-FAIR.pdf
     """
 
     def __init__(

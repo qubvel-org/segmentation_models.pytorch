@@ -49,9 +49,6 @@ class ResUnetPlusPlus(SegmentationModel):
 
     .. _ResUnet++:
         https://arxiv.org/abs/1911.07067
-
-    Reference:
-        https://arxiv.org/abs/1911.07067
     """
 
     def __init__(

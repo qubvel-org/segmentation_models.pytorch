@@ -34,10 +34,7 @@ class DeepLabV3(SegmentationModel):
     Returns:
         ``torch.nn.Module``: **DeepLabV3**
 
-    .. _DeeplabV3:
-        https://arxiv.org/abs/1706.05587
-
-    Reference:
+    .. _DeepLabV3:
         https://arxiv.org/abs/1706.05587
     """
 
@@ -88,7 +85,7 @@ class DeepLabV3(SegmentationModel):
 
 
 class DeepLabV3Plus(SegmentationModel):
-    """DeepLabV3+ implementation from "Encoder-Decoder with Atrous Separable
+    """DeepLabV3+_ implementation from "Encoder-Decoder with Atrous Separable
     Convolution for Semantic Image Segmentation"
     
     Args:
@@ -118,7 +115,7 @@ class DeepLabV3Plus(SegmentationModel):
     Returns:
         ``torch.nn.Module``: **DeepLabV3Plus**
     
-    Reference:
+    .. _DeepLabV3+:
         https://arxiv.org/abs/1802.02611v3
 
     """
