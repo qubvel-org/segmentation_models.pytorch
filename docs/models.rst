@@ -11,7 +11,7 @@ Unet++
 
 EfficientUNet++
 ~~~~~~
-.. autoclass:: segmentation_models_pytorch.EfficientUNetPlusPlus
+.. autoclass:: segmentation_models_pytorch.EfficientUnetPlusPlus
 
 ResUnet
 ~~~~~~
