@@ -6,14 +6,15 @@ from ..base import SegmentationHead, ClassificationHead
 from torchvision import transforms
 
 class EfficientUnetPlusPlus(SegmentationModel):
-    """EfficientUnetPlusPlus_ is a fully convolution neural network for image semantic segmentation. Consist of *encoder* 
-    and *decoder* parts connected with *skip connections*. The encoder extracts features of different spatial 
-    resolution (skip connections) which are used by decoder to define accurate segmentation mask. 
-    
-    Applies attention to the skip connection feature maps, based on themselves and the decoder feature maps. 
-    The skip connection feature maps are then fused with the decoder feature maps through *concatenation*. 
-    Uses an Atrous Spatial Pyramid Pooling (ASPP) bridge module and residual connections inside each decoder 
-    blocks.
+    """The EfficientUNet++_ is a fully convolutional neural network for ordinary and medical image semantic segmentation. 
+    Consists of an *encoder* and a *decoder*, connected by *skip connections*. The encoder extracts features of 
+    different spatial resolutions, which are fed to the decoder through skip connections. The decoder combines its 
+    own feature maps with the ones from skip connections to produce accurate segmentations masks.  The EfficientUNet++ 
+    decoder architecture is based on the UNet++, a model composed of nested U-Net-like decoder sub-networks. To 
+    increase performance and computational efficiency, the EfficientUNet++ replaces the UNet++'s blocks with 
+    inverted residual blocks with depthwise convolutions and embedded spatial and channel attention mechanisms.
+    Synergizes well with EfficientNet encoders. Due to their efficient visual representations (i.e., using few channels
+    to represent extracted features), EfficientNet encoders require few computation from the decoder.
 
     Args:
         encoder_name: Name of the classification model that will be used as an encoder (a.k.a backbone) to extract features
@@ -25,33 +26,19 @@ class EfficientUnetPlusPlus(SegmentationModel):
             other pretrained weights (see table with available weights for each encoder_name)
         decoder_channels: List of integers which specify **in_channels** parameter for convolutions used in the decoder.
             Length of the list should be the same as **encoder_depth**
-        decoder_use_batchnorm: If **True**, BatchNorm2d layer between Conv2D and Activation layers
-            is used. If **"inplace"** InplaceABN will be used, allows to decrease memory consumption.
-            Available options are **True, False, "inplace"**
-        decoder_attention_type: Attention module used in decoder of the model (in addition to the built-in attention used to
-            process skip connection feature maps). Available options are **None**, **se** and **scse**.
-            SE paper - https://arxiv.org/abs/1709.01507
-            SCSE paper - https://arxiv.org/abs/1808.08127
         in_channels: The number of input channels of the model, default is 3 (RGB images)
         classes: The number of classes of the output mask. Can be thought of as the number of channels of the mask
         activation: An activation function to apply after the final convolution layer.
             Available options are **"sigmoid"**, **"softmax"**, **"logsoftmax"**, **"tanh"**, **"identity"**, **callable** and **None**.
             Default is **None**
-        aux_params: Dictionary with parameters of the auxiliary output (classification head). Auxiliary output is build 
+        aux_params: Dictionary with parameters of the auxiliary output (classification head). Auxiliary output is built 
             on top of encoder if **aux_params** is not **None** (default). Supported params:
                 - classes (int): A number of classes
                 - pooling (str): One of "max", "avg". Default is "avg"
                 - dropout (float): Dropout factor in [0, 1)
                 - activation (str): An activation function to apply "sigmoid"/"softmax" (could be **None** to return logits)
-
     Returns:
-        ``torch.nn.Module``: ResUnetPlusPlus
-
-    .. _EfficientUnetPlusPlus:
-        https://arxiv.org/abs/1911.07067
-
-    Reference:
-        https://arxiv.org/abs/1911.07067
+        ``torch.nn.Module``: **EfficientUnet++**
     """
 
     def __init__(
