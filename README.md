@@ -11,7 +11,7 @@ Segmentation based on [PyTorch](https://pytorch.org/).**
 The main features of this library are:
 
  - High level API (just two lines to create a neural network)
- - 9 models architectures for binary and multi class segmentation (including legendary Unet)
+ - 12 models architectures for binary and multi class segmentation (including legendary Unet)
  - 104 available encoders
  - All encoders have pre-trained weights for faster and better convergence
  

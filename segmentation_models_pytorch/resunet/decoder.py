@@ -4,7 +4,6 @@ import torch.nn.functional as F
 
 from ..base import modules as md
 
-
 class DecoderBlock(nn.Module):
     def __init__(
             self,
@@ -15,8 +14,7 @@ class DecoderBlock(nn.Module):
             attention_type=None,
     ):
         super().__init__()
-
-        self.conv1 = md.Conv2dReLU(
+        self.conv1 = md.PreActivatedConv2dReLU(
             in_channels + skip_channels,
             out_channels,
             kernel_size=3,
@@ -24,7 +22,7 @@ class DecoderBlock(nn.Module):
             use_batchnorm=use_batchnorm,
         )
         self.attention1 = md.Attention(attention_type, in_channels=in_channels + skip_channels)
-        self.conv2 = md.Conv2dReLU(
+        self.conv2 = md.PreActivatedConv2dReLU(
             out_channels,
             out_channels,
             kernel_size=3,
@@ -32,28 +30,32 @@ class DecoderBlock(nn.Module):
             use_batchnorm=use_batchnorm,
         )
         self.attention2 = md.Attention(attention_type, in_channels=out_channels)
+        self.identity_conv = nn.Conv2d(in_channels + skip_channels, out_channels, kernel_size=1)
 
     def forward(self, x, skip=None):
         x = F.interpolate(x, scale_factor=2, mode="nearest")
         if skip is not None:
             x = torch.cat([x, skip], dim=1)
+            identity = x
             x = self.attention1(x)
+        else:
+            identity = x
         x = self.conv1(x)
         x = self.conv2(x)
         x = self.attention2(x)
-        return x
-
+        identity = self.identity_conv(identity)
+        return x + identity
 
 class CenterBlock(nn.Sequential):
     def __init__(self, in_channels, out_channels, use_batchnorm=True):
-        conv1 = md.Conv2dReLU(
+        conv1 = md.PreActivatedConv2dReLU(
             in_channels,
             out_channels,
             kernel_size=3,
             padding=1,
             use_batchnorm=use_batchnorm,
         )
-        conv2 = md.Conv2dReLU(
+        conv2 = md.PreActivatedConv2dReLU(
             out_channels,
             out_channels,
             kernel_size=3,
@@ -62,8 +64,7 @@ class CenterBlock(nn.Sequential):
         )
         super().__init__(conv1, conv2)
 
-
-class UnetDecoder(nn.Module):
+class ResUnetDecoder(nn.Module):
     def __init__(
             self,
             encoder_channels,

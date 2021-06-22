@@ -6,6 +6,9 @@ from .fpn import FPN
 from .pspnet import PSPNet
 from .deeplabv3 import DeepLabV3, DeepLabV3Plus
 from .pan import PAN
+from .resunet import ResUnet
+from .resunetplusplus import ResUnetPlusPlus
+from .efficientunetplusplus import EfficientUnetPlusPlus
 
 from . import encoders
 from . import utils
@@ -29,12 +32,12 @@ def create_model(
 
     """
 
-    archs = [Unet, UnetPlusPlus, MAnet, Linknet, FPN, PSPNet, DeepLabV3, DeepLabV3Plus, PAN]
+    archs = [Unet, UnetPlusPlus, MAnet, Linknet, FPN, PSPNet, DeepLabV3, DeepLabV3Plus, PAN, ResUnet, ResUnetPlusPlus, EfficientUnetPlusPlus]
     archs_dict = {a.__name__.lower(): a for a in archs}
     try:
         model_class = archs_dict[arch.lower()]
     except KeyError:
-        raise KeyError("Wrong architecture type `{}`. Available options are: {}".format(
+        raise KeyError("Wrong architecture type `{}`. Avalibale options are: {}".format(
             arch, list(archs_dict.keys()),
         ))
     return model_class(

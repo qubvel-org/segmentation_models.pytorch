@@ -1,90 +1,95 @@
 import torch
+from torch.functional import norm
 import torch.nn as nn
 import torch.nn.functional as F
 
 from ..base import modules as md
 
-class BilinearAdditiveUpsampling(nn.Module):
-    def __init__(self, channel_factor=2, scale_factor=2):
+class InvertedResidual(nn.Module):
+    """
+    Inverted bottleneck residual block with an scSE block embedded into the residual layer, after the 
+    depthwise convolution. By default, uses batch normalization and Hardswish activation.
+    """
+    def __init__(self, in_channels, out_channels, kernel_size = 3, stride = 1, expansion_ratio = 1, squeeze_ratio = 1, \
+        activation = nn.Hardswish(True), normalization = nn.BatchNorm2d):
         super().__init__()
-        self.up = nn.Upsample(scale_factor=2, mode="bilinear", align_corners=False)
-        self.channel_factor = channel_factor
-        self.scale_factor = 2
-
+        self.same_shape = in_channels == out_channels
+        self.mid_channels = expansion_ratio*in_channels
+        self.block = nn.Sequential(
+            md.PointWiseConv2d(in_channels, self.mid_channels),
+            normalization(self.mid_channels),
+            activation,
+            md.DepthWiseConv2d(self.mid_channels, kernel_size=kernel_size, stride=stride),
+            normalization(self.mid_channels),
+            activation,
+            #md.sSEModule(self.mid_channels),
+            md.SCSEModule(self.mid_channels, reduction = squeeze_ratio),
+            #md.SEModule(self.mid_channels, reduction = squeeze_ratio),
+            md.PointWiseConv2d(self.mid_channels, out_channels),
+            normalization(out_channels)
+        )
+        
+        if not self.same_shape:
+            # 1x1 convolution used to match the number of channels in the skip feature maps with that 
+            # of the residual feature maps
+            self.skip_conv = nn.Sequential(
+                nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=1),
+                normalization(out_channels)
+            )
+          
     def forward(self, x):
-        x = self.up(x)
-        n, c, h, w = x.size()
-        x = x.reshape(n, c//self.channel_factor, self.channel_factor, h, w).sum(2)
-        return x
-
+        residual = self.block(x)
+        
+        if not self.same_shape:
+            x = self.skip_conv(x)
+        return x + residual
+        
 class DecoderBlock(nn.Module):
     def __init__(
             self,
             in_channels,
             skip_channels,
             out_channels,
-            use_batchnorm=True,
-            attention_type=None,
-            weight_standardization=False
+            squeeze_ratio=1,
+            expansion_ratio=1
     ):
         super().__init__()
-        self.conv1 = md.Conv2dReLU(
-            in_channels + skip_channels,
-            out_channels,
-            kernel_size=3,
-            padding=1,
-            use_batchnorm=use_batchnorm,
+
+        # Inverted Residual block convolutions
+        self.conv1 = InvertedResidual(
+            in_channels=in_channels+skip_channels, 
+            out_channels=out_channels, 
+            kernel_size=3, 
+            stride=1, 
+            expansion_ratio=expansion_ratio, 
+            squeeze_ratio=squeeze_ratio
         )
-        self.attention1 = md.Attention(attention_type, in_channels=in_channels + skip_channels)
-        self.conv2 = md.Conv2dReLU(
-            out_channels,
-            out_channels,
-            kernel_size=3,
-            padding=1,
-            use_batchnorm=use_batchnorm,
+        self.conv2 = InvertedResidual(
+            in_channels=out_channels, 
+            out_channels=out_channels, 
+            kernel_size=3, 
+            stride=1, 
+            expansion_ratio=expansion_ratio, 
+            squeeze_ratio=squeeze_ratio
         )
-        self.attention2 = md.Attention(attention_type, in_channels=out_channels)
 
     def forward(self, x, skip=None):
         x = F.interpolate(x, scale_factor=2, mode="nearest")
+
         if skip is not None:
             x = torch.cat([x, skip], dim=1)
-            x = self.attention1(x)
         x = self.conv1(x)
         x = self.conv2(x)
-        x = self.attention2(x)
         return x
 
-
-class CenterBlock(nn.Sequential):
-    def __init__(self, in_channels, out_channels, use_batchnorm=True):
-        conv1 = md.Conv2dReLU(
-            in_channels,
-            out_channels,
-            kernel_size=3,
-            padding=1,
-            use_batchnorm=use_batchnorm,
-        )
-        conv2 = md.Conv2dReLU(
-            out_channels,
-            out_channels,
-            kernel_size=3,
-            padding=1,
-            use_batchnorm=use_batchnorm,
-        )
-        super().__init__(conv1, conv2)
-
-
-class UnetPlusPlusDecoder(nn.Module):
+class EfficientUnetPlusPlusDecoder(nn.Module):
     def __init__(
             self,
             encoder_channels,
             decoder_channels,
             n_blocks=5,
-            use_batchnorm=True,
-            attention_type=None,
-            center=False,
-            weight_standardization=False,
+            squeeze_ratio=1,
+            expansion_ratio=1
     ):
         super().__init__()
         if n_blocks != len(decoder_channels):
@@ -101,15 +106,9 @@ class UnetPlusPlusDecoder(nn.Module):
         self.in_channels = [head_channels] + list(decoder_channels[:-1])
         self.skip_channels = list(encoder_channels[1:]) + [0]
         self.out_channels = decoder_channels
-        if center:
-            self.center = CenterBlock(
-                head_channels, head_channels, use_batchnorm=use_batchnorm
-            )
-        else:
-            self.center = nn.Identity()
 
         # combine decoder keyword arguments
-        kwargs = dict(use_batchnorm=use_batchnorm, attention_type=attention_type, weight_standardization=weight_standardization)
+        kwargs = dict(squeeze_ratio=squeeze_ratio, expansion_ratio=expansion_ratio)
 
         blocks = {}
         for layer_idx in range(len(self.in_channels) - 1):

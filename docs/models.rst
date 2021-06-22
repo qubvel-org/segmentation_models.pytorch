@@ -9,6 +9,18 @@ Unet++
 ~~~~~~
 .. autoclass:: segmentation_models_pytorch.UnetPlusPlus
 
+EfficientUNet++
+~~~~~~
+.. autoclass:: segmentation_models_pytorch.EfficientUNetPlusPlus
+
+ResUnet
+~~~~~~
+.. autoclass:: segmentation_models_pytorch.ResUnet
+
+ResUnet++
+~~~~~~
+.. autoclass:: segmentation_models_pytorch.ResUnetPlusPlus
+
 MAnet
 ~~~~~~
 .. autoclass:: segmentation_models_pytorch.MAnet

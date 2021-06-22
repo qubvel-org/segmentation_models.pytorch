@@ -25,7 +25,8 @@ class Unet(SegmentationModel):
         decoder_use_batchnorm: If **True**, BatchNorm2d layer between Conv2D and Activation layers
             is used. If **"inplace"** InplaceABN will be used, allows to decrease memory consumption.
             Available options are **True, False, "inplace"**
-        decoder_attention_type: Attention module used in decoder of the model. Available options are **None** and **scse**.
+        decoder_attention_type: Attention module used in decoder of the model. Available options are **None**, **se** and **scse**.
+            SE paper - https://arxiv.org/abs/1709.01507
             SCSE paper - https://arxiv.org/abs/1808.08127
         in_channels: A number of input channels for the model, default is 3 (RGB images)
         classes: A number of classes for output mask (or you can think as a number of channels of output mask)
