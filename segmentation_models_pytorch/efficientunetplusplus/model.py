@@ -10,11 +10,10 @@ class EfficientUnetPlusPlus(SegmentationModel):
     The EfficientUNet++_ is a fully convolutional neural network for ordinary and medical image semantic segmentation. 
     Consists of an *encoder* and a *decoder*, connected by *skip connections*. The encoder extracts features of 
     different spatial resolutions, which are fed to the decoder through skip connections. The decoder combines its 
-    own feature maps with the ones from skip connections to produce accurate segmentations masks.  
-
-    The EfficientUNet++ decoder architecture is based on the UNet++, a model composed of nested U-Net-like decoder 
-    sub-networks. To increase performance and computational efficiency, the EfficientUNet++ replaces the UNet++'s 
-    blocks with inverted residual blocks with depthwise convolutions and embedded spatial and channel attention mechanisms.
+    own feature maps with the ones from skip connections to produce accurate segmentations masks.  The EfficientUNet++ 
+    decoder architecture is based on the UNet++, a model composed of nested U-Net-like decoder sub-networks. To 
+    increase performance and computational efficiency, the EfficientUNet++ replaces the UNet++'s blocks with 
+    inverted residual blocks with depthwise convolutions and embedded spatial and channel attention mechanisms.
     Synergizes well with EfficientNet encoders. Due to their efficient visual representations (i.e., using few channels
     to represent extracted features), EfficientNet encoders require few computation from the decoder.
 
@@ -47,7 +46,7 @@ class EfficientUnetPlusPlus(SegmentationModel):
     
     Reference:
 
-    
+
     """
 
     def __init__(
