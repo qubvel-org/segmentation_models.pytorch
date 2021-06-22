@@ -6,7 +6,7 @@ from ..base import SegmentationHead, ClassificationHead
 
 
 class ResUnetPlusPlus(SegmentationModel):
-    """ResUnet++_ is a fully convolution neural network for image semantic segmentation. Consist of *encoder* 
+    """ResUnet++ is a fully convolution neural network for image semantic segmentation. Consist of *encoder* 
     and *decoder* parts connected with *skip connections*. The encoder extracts features of different spatial 
     resolution (skip connections) which are used by decoder to define accurate segmentation mask. 
     
@@ -47,7 +47,7 @@ class ResUnetPlusPlus(SegmentationModel):
     Returns:
         ``torch.nn.Module``: ResUnetPlusPlus
 
-    .. _ResUnet++:
+    Reference:
         https://arxiv.org/abs/1911.07067
     """
 

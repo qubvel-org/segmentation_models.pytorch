@@ -39,6 +39,9 @@ class EfficientUnetPlusPlus(SegmentationModel):
                 - activation (str): An activation function to apply "sigmoid"/"softmax" (could be **None** to return logits)
     Returns:
         ``torch.nn.Module``: **EfficientUnet++**
+
+    Reference:
+        Waiting for publishment
     """
 
     def __init__(
