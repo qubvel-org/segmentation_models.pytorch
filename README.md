@@ -76,6 +76,9 @@ Congratulations! You are done! Now you can train your model with your favorite f
 #### Architectures <a name="architectures"></a>
  - Unet [[paper](https://arxiv.org/abs/1505.04597)] [[docs](https://smp.readthedocs.io/en/latest/models.html#unet)]
  - Unet++ [[paper](https://arxiv.org/pdf/1807.10165.pdf)] [[docs](https://smp.readthedocs.io/en/latest/models.html#id2)]
+ - EfficientUNet++ [[paper]()] [[docs](https://segmentation-models-pytorch.readthedocs.io/en/latest/models.html#efficientunet)]
+ - ResUnet [[paper](https://arxiv.org/abs/1711.10684)] [[docs](https://segmentation-models-pytorch.readthedocs.io/en/latest/models.html#resunet)]
+ - ResUnet++ [[paper](https://arxiv.org/abs/1911.07067)] [[docs](https://segmentation-models-pytorch.readthedocs.io/en/latest/models.html#id4)]
  - MAnet [[paper](https://ieeexplore.ieee.org/abstract/document/9201310)] [[docs](https://smp.readthedocs.io/en/latest/models.html#manet)]
  - Linknet [[paper](https://arxiv.org/abs/1707.03718)] [[docs](https://smp.readthedocs.io/en/latest/models.html#linknet)]
  - FPN [[paper](http://presentations.cocodataset.org/COCO17-Stuff-FAIR.pdf)] [[docs](https://smp.readthedocs.io/en/latest/models.html#fpn)]
@@ -375,7 +378,7 @@ $ pip install segmentation-models-pytorch
 ````
 Latest version from source:
 ```bash
-$ pip install git+https://github.com/qubvel/segmentation_models.pytorch
+$ pip install git+https://github.com/jlcsilva/segmentation_models.pytorch
 ````
 
 ### 🏆 Competitions won with the library
