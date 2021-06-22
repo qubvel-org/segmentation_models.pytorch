@@ -44,6 +44,7 @@ class UnetPlusPlus(SegmentationModel):
 
     Reference:
         https://arxiv.org/abs/1807.10165
+        https://arxiv.org/abs/1912.05074
     """
 
     def __init__(

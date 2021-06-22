@@ -45,6 +45,9 @@ class PSPNet(SegmentationModel):
 
     .. _PSPNet:
         https://arxiv.org/abs/1612.01105
+
+    Reference:
+        https://arxiv.org/abs/1612.01105
     """
 
     def __init__(

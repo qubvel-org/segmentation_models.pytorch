@@ -42,6 +42,9 @@ class Linknet(SegmentationModel):
 
     .. _Linknet:
         https://arxiv.org/abs/1707.03718
+
+    Reference:
+        https://arxiv.org/abs/1707.03718
     """
 
     def __init__(
