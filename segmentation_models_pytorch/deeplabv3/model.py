@@ -88,7 +88,7 @@ class DeepLabV3(SegmentationModel):
 
 
 class DeepLabV3Plus(SegmentationModel):
-    """DeepLabV3+_ implementation from "Encoder-Decoder with Atrous Separable
+    """DeepLabV3+ implementation from "Encoder-Decoder with Atrous Separable
     Convolution for Semantic Image Segmentation"
     
     Args:
@@ -117,9 +117,6 @@ class DeepLabV3Plus(SegmentationModel):
                 - activation (str): An activation function to apply "sigmoid"/"softmax" (could be **None** to return logits)
     Returns:
         ``torch.nn.Module``: **DeepLabV3Plus**
-    
-    .. _DeepLabV3+:
-        https://arxiv.org/abs/1802.02611v3
 
     Reference:
         https://arxiv.org/abs/1802.02611v3
