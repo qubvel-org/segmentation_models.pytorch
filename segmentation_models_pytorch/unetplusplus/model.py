@@ -43,7 +43,8 @@ class UnetPlusPlus(SegmentationModel):
         ``torch.nn.Module``: **Unet++**
 
     Reference:
-        https://arxiv.org/abs/1807.10165, https://arxiv.org/abs/1912.05074
+        https://arxiv.org/abs/1807.10165
+        https://arxiv.org/abs/1912.05074
     """
 
     def __init__(
