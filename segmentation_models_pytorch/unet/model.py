@@ -46,6 +46,8 @@ class Unet(SegmentationModel):
     .. _Unet:
         https://arxiv.org/abs/1505.04597
 
+    Reference:
+        https://arxiv.org/abs/1505.04597
     """
 
     def __init__(

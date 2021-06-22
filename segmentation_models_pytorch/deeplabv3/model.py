@@ -37,6 +37,8 @@ class DeepLabV3(SegmentationModel):
     .. _DeeplabV3:
         https://arxiv.org/abs/1706.05587
 
+    Reference:
+        https://arxiv.org/abs/1706.05587
     """
 
     def __init__(

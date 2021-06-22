@@ -7,7 +7,7 @@ from torchvision import transforms
 
 class EfficientUnetPlusPlus(SegmentationModel):
     """
-    The EfficientUNet++ is a fully convolutional neural network for ordinary and medical image semantic segmentation. 
+    The EfficientUNet++_ is a fully convolutional neural network for ordinary and medical image semantic segmentation. 
     Consists of an *encoder* and a *decoder*, connected by *skip connections*. The encoder extracts features of 
     different spatial resolutions, which are fed to the decoder through skip connections. The decoder combines its 
     own feature maps with the ones from skip connections to produce accurate segmentations masks.  
@@ -41,6 +41,13 @@ class EfficientUnetPlusPlus(SegmentationModel):
                 - activation (str): An activation function to apply "sigmoid"/"softmax" (could be **None** to return logits)
     Returns:
         ``torch.nn.Module``: **EfficientUnet++**
+
+    .. _EfficientUNet++:
+
+    
+    Reference:
+
+    
     """
 
     def __init__(

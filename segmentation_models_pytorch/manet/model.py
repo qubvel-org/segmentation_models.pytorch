@@ -46,6 +46,8 @@ class MAnet(SegmentationModel):
     .. _MAnet:
         https://ieeexplore.ieee.org/abstract/document/9201310
 
+    Reference:
+        https://ieeexplore.ieee.org/abstract/document/9201310
     """
 
     def __init__(
