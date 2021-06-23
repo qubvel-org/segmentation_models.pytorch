@@ -41,7 +41,7 @@ class EfficientUnetPlusPlus(SegmentationModel):
         ``torch.nn.Module``: **EfficientUnet++**
 
     Reference:
-        Waiting for publishment
+        https://arxiv.org/abs/2106.11447
     """
 
     def __init__(
