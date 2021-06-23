@@ -17,7 +17,7 @@ The main features of this library are:
  
 ### [📚 Project Documentation 📚](http://smp.readthedocs.io/)
 
-Visit [Read The Docs Project Page](https://smp.readthedocs.io/) or read following README to know more about Segmentation Models Pytorch (SMP for short) library
+Visit [Read The Docs Project Page](https://segmentation-models-pytorch.readthedocs.io/en/latest/) or read following README to know more about Segmentation Models Pytorch (SMP for short) library
 
 ### 📋 Table of content
  1. [Quick start](#start)
