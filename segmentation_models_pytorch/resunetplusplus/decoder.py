@@ -112,6 +112,7 @@ class DecoderBlock(nn.Module):
             padding=1,
             use_batchnorm=use_batchnorm,
         )
+        self.attention2 = md.Attention(attention_type, in_channels=out_channels)
         self.identity_conv = nn.Conv2d(in_channels + skip_channels, out_channels, kernel_size=1)
 
     def forward(self, x, skip=None):
