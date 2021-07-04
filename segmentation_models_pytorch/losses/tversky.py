@@ -50,6 +50,7 @@ class TverskyLoss(DiceLoss):
         super().__init__(mode, classes, log_loss, from_logits, smooth, ignore_index, eps)
         self.alpha = alpha
         self.beta = beta
+        self.gamma = gamma
 
     def aggregate_loss(self, loss):
         return loss.mean() ** self.gamma
