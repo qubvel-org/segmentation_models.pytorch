@@ -26,7 +26,7 @@ def to_tensor(x, dtype=None) -> torch.Tensor:
             x = x.type(dtype)
         return x
     if isinstance(x, (list, tuple)):
-        x = np.ndarray(x)
+        x = np.array(x)
         x = torch.from_numpy(x)
         if dtype is not None:
             x = x.type(dtype)
