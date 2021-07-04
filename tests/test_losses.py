@@ -2,7 +2,8 @@ import pytest
 import torch
 import segmentation_models_pytorch as smp
 import segmentation_models_pytorch.losses._functional as F
-from segmentation_models_pytorch.losses import DiceLoss, JaccardLoss, SoftBCEWithLogitsLoss, SoftCrossEntropyLoss
+from segmentation_models_pytorch.losses import DiceLoss, JaccardLoss, SoftBCEWithLogitsLoss, SoftCrossEntropyLoss, \
+    TverskyLoss, TverskyLossFocal
 
 
 def test_focal_loss_with_logits():
@@ -71,10 +72,64 @@ def test_soft_dice_score(y_true, y_pred, expected, eps):
     assert float(actual) == pytest.approx(expected, eps)
 
 
+@pytest.mark.parametrize(
+    ["y_true", "y_pred", "expected", "eps", "alpha", "beta"],
+    [
+        [[1, 1, 1, 1], [1, 1, 1, 1], 1.0, 1e-5, 0.5, 0.5],
+        [[0, 1, 1, 0], [0, 1, 1, 0], 1.0, 1e-5, 0.5, 0.5],
+        [[1, 1, 1, 1], [1, 1, 0, 0], 2.0 / 3.0, 1e-5, 0.5, 0.5],
+    ],
+)
+def test_soft_tversky_score(y_true, y_pred, expected, eps, alpha, beta):
+    y_true = torch.tensor(y_true, dtype=torch.float32)
+    y_pred = torch.tensor(y_pred, dtype=torch.float32)
+    actual = F.soft_tversky_score(y_pred, y_true, eps=eps, alpha=alpha, beta=beta)
+    assert float(actual) == pytest.approx(expected, eps)
+
+
 @torch.no_grad()
 def test_dice_loss_binary():
     eps = 1e-5
     criterion = DiceLoss(mode=smp.losses.BINARY_MODE, from_logits=False)
+
+    # Ideal case
+    y_pred = torch.tensor([1.0, 1.0, 1.0]).view(1, 1, 1, -1)
+    y_true = torch.tensor(([1, 1, 1])).view(1, 1, 1, -1)
+    loss = criterion(y_pred, y_true)
+    assert float(loss) == pytest.approx(0.0, abs=eps)
+
+    y_pred = torch.tensor([1.0, 0.0, 1.0]).view(1, 1, 1, -1)
+    y_true = torch.tensor(([1, 0, 1])).view(1, 1, 1, -1)
+    loss = criterion(y_pred, y_true)
+    assert float(loss) == pytest.approx(0.0, abs=eps)
+
+    y_pred = torch.tensor([0.0, 0.0, 0.0]).view(1, 1, 1, -1)
+    y_true = torch.tensor(([0, 0, 0])).view(1, 1, 1, -1)
+    loss = criterion(y_pred, y_true)
+    assert float(loss) == pytest.approx(0.0, abs=eps)
+
+    # Worst case
+    y_pred = torch.tensor([1.0, 1.0, 1.0]).view(1, 1, -1)
+    y_true = torch.tensor([0, 0, 0]).view(1, 1, 1, -1)
+    loss = criterion(y_pred, y_true)
+    assert float(loss) == pytest.approx(0.0, abs=eps)
+
+    y_pred = torch.tensor([1.0, 0.0, 1.0]).view(1, 1, -1)
+    y_true = torch.tensor([0, 1, 0]).view(1, 1, 1, -1)
+    loss = criterion(y_pred, y_true)
+    assert float(loss) == pytest.approx(1.0, abs=eps)
+
+    y_pred = torch.tensor([0.0, 0.0, 0.0]).view(1, 1, -1)
+    y_true = torch.tensor([1, 1, 1]).view(1, 1, 1, -1)
+    loss = criterion(y_pred, y_true)
+    assert float(loss) == pytest.approx(1.0, abs=eps)
+
+
+@torch.no_grad()
+def test_tversky_loss_binary():
+    eps = 1e-5
+    # with alpha=0.5; beta=0.5 it is equal to DiceLoss
+    criterion = TverskyLoss(mode=smp.losses.BINARY_MODE, from_logits=False, alpha=0.5, beta=0.5)
 
     # Ideal case
     y_pred = torch.tensor([1.0, 1.0, 1.0]).view(1, 1, 1, -1)

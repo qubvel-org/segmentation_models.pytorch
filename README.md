@@ -4,7 +4,7 @@
 **Python library with Neural Networks for Image  
 Segmentation based on [PyTorch](https://pytorch.org/).**  
 
-![PyPI version](https://badge.fury.io/py/segmentation-models-pytorch.svg) [![Build Status](https://travis-ci.com/qubvel/segmentation_models.pytorch.svg?branch=master)](https://travis-ci.com/qubvel/segmentation_models.pytorch) [![Documentation Status](https://readthedocs.org/projects/smp/badge/?version=latest)](https://smp.readthedocs.io/en/latest/?badge=latest) <br>[![Downloads](https://static.pepy.tech/personalized-badge/segmentation-models-pytorch?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads)](https://pepy.tech/project/segmentation-models-pytorch) [![Generic badge](https://img.shields.io/badge/License-MIT-<COLOR>.svg)](https://shields.io/)
+![PyPI version](https://badge.fury.io/py/segmentation-models-pytorch.svg) [![Build Status](https://travis-ci.com/qubvel/segmentation_models.pytorch.svg?branch=master)](https://travis-ci.com/qubvel/segmentation_models.pytorch) [![Documentation Status](https://readthedocs.org/projects/smp/badge/?version=latest)](https://smp.readthedocs.io/en/latest/?badge=latest) <br> ![Downloads](https://pepy.tech/badge/segmentation-models-pytorch) [![Generic badge](https://img.shields.io/badge/License-MIT-<COLOR>.svg)](https://shields.io/)
 
 </div>
 
@@ -12,7 +12,7 @@ The main features of this library are:
 
  - High level API (just two lines to create a neural network)
  - 9 models architectures for binary and multi class segmentation (including legendary Unet)
- - 107 available encoders
+ - 109 available encoders
  - All encoders have pre-trained weights for faster and better convergence
  
 ### [📚 Project Documentation 📚](http://smp.readthedocs.io/)
@@ -51,7 +51,7 @@ model = smp.Unet(
     classes=3,                      # model output channels (number of classes in your dataset)
 )
 ```
- - see [table](#architectires) with available model architectures
+ - see [table](#architectures) with available model architectures
  - see [table](#encoders) with available encoders and their corresponding weights
 
 #### 2. Configure data preprocessing
@@ -297,6 +297,8 @@ The following is a list of supported encoders in the SMP. Select the appropriate
 |Encoder                         |Weights                         |Params, M                       |
 |--------------------------------|:------------------------------:|:------------------------------:|
 |mobilenet_v2                    |imagenet                        |2M                              |
+|mobilenet_v3_large              |imagenet                        |3M                              |
+|mobilenet_v3_small              |imagenet                        |1M                              |
 
 </div>
 </details>
