@@ -17,6 +17,7 @@ from .timm_resnest import timm_resnest_encoders
 from .timm_res2net import timm_res2net_encoders
 from .timm_regnet import timm_regnet_encoders
 from .timm_sknet import timm_sknet_encoders
+from .timm_mobilenetv3 import timm_mobilenetv3_encoders
 try:
     from .timm_gernet import timm_gernet_encoders
 except ImportError as e:
@@ -43,6 +44,7 @@ encoders.update(timm_resnest_encoders)
 encoders.update(timm_res2net_encoders)
 encoders.update(timm_regnet_encoders)
 encoders.update(timm_sknet_encoders)
+encoders.update(timm_mobilenetv3_encoders)
 encoders.update(timm_gernet_encoders)
 
 
