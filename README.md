@@ -12,7 +12,7 @@ The main features of this library are:
 
  - High level API (just two lines to create a neural network)
  - 9 models architectures for binary and multi class segmentation (including legendary Unet)
- - 104 available encoders
+ - 106 available encoders
  - All encoders have pre-trained weights for faster and better convergence
  
 ### [📚 Project Documentation 📚](http://smp.readthedocs.io/)
@@ -284,6 +284,8 @@ The following is a list of supported encoders in the SMP. Select the appropriate
 |Encoder                         |Weights                         |Params, M                       |
 |--------------------------------|:------------------------------:|:------------------------------:|
 |mobilenet_v2                    |imagenet                        |2M                              |
+|mobilenet_v3_large              |imagenet                        |3M                              |
+|mobilenet_v3_small              |imagenet                        |1M                              |
 
 </div>
 </details>
