@@ -257,9 +257,9 @@ MobileNet
 +=====================+============+=============+
 | mobilenet\_v2       | imagenet   | 2M          |
 +---------------------+------------+-------------+
-| mobilenet\_v3_large | imagenet   | 3M          |
+| mobilenet\_v3_small | imagenet   | 1M          |
 +---------------------+------------+-------------+
-| mobilenet\_v2_small | imagenet   | 1M          |
+| mobilenet\_v3_large | imagenet   | 3M          |
 +---------------------+------------+-------------+
 
 DPN
