@@ -1,3 +1,5 @@
+from functools import partial
+
 import torch
 import torch.nn as nn
 
@@ -41,9 +43,8 @@ def get_efficientnet_kwargs(channel_multiplier=1.0, depth_multiplier=1.0, drop_r
         block_args=decode_arch_def(arch_def, depth_multiplier),
         num_features=round_channels(1280, channel_multiplier, 8, None),
         stem_size=32,
-        channel_multiplier=channel_multiplier,
+        round_chs_fn=partial(round_channels, multiplier=channel_multiplier),
         act_layer=Swish,
-        norm_kwargs={},  # TODO: check
         drop_rate=drop_rate,
         drop_path_rate=0.2,
     )
@@ -81,9 +82,8 @@ def gen_efficientnet_lite_kwargs(channel_multiplier=1.0, depth_multiplier=1.0, d
         num_features=1280,
         stem_size=32,
         fix_stem=True,
-        channel_multiplier=channel_multiplier,
+        round_chs_fn=partial(round_channels, multiplier=channel_multiplier),
         act_layer=nn.ReLU6,
-        norm_kwargs={},
         drop_rate=drop_rate,
         drop_path_rate=0.2,
     )
