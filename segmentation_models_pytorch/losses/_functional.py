@@ -6,7 +6,6 @@ from typing import Optional
 import torch
 import torch.nn.functional as F
 
-
 __all__ = [
     "focal_loss_with_logits",
     "softmax_focal_loss_with_logits",
@@ -27,7 +26,7 @@ def to_tensor(x, dtype=None) -> torch.Tensor:
             x = x.type(dtype)
         return x
     if isinstance(x, (list, tuple)):
-        x = np.ndarray(x)
+        x = np.array(x)
         x = torch.from_numpy(x)
         if dtype is not None:
             x = x.type(dtype)
@@ -35,14 +34,14 @@ def to_tensor(x, dtype=None) -> torch.Tensor:
 
 
 def focal_loss_with_logits(
-    output: torch.Tensor,
-    target: torch.Tensor,
-    gamma: float = 2.0,
-    alpha: Optional[float] = 0.25,
-    reduction: str = "mean",
-    normalized: bool = False,
-    reduced_threshold: Optional[float] = None,
-    eps: float = 1e-6,
+        output: torch.Tensor,
+        target: torch.Tensor,
+        gamma: float = 2.0,
+        alpha: Optional[float] = 0.25,
+        reduction: str = "mean",
+        normalized: bool = False,
+        reduced_threshold: Optional[float] = None,
+        eps: float = 1e-6,
 ) -> torch.Tensor:
     """Compute binary focal loss between target and output logits.
     See :class:`~pytorch_toolbelt.losses.FocalLoss` for details.
@@ -98,13 +97,13 @@ def focal_loss_with_logits(
 
 
 def softmax_focal_loss_with_logits(
-    output: torch.Tensor,
-    target: torch.Tensor,
-    gamma: float = 2.0,
-    reduction="mean",
-    normalized=False,
-    reduced_threshold: Optional[float] = None,
-    eps: float = 1e-6,
+        output: torch.Tensor,
+        target: torch.Tensor,
+        gamma: float = 2.0,
+        reduction="mean",
+        normalized=False,
+        reduced_threshold: Optional[float] = None,
+        eps: float = 1e-6,
 ) -> torch.Tensor:
     """Softmax version of focal loss between target and output logits.
     See :class:`~pytorch_toolbelt.losses.FocalLoss` for details.
@@ -151,7 +150,7 @@ def softmax_focal_loss_with_logits(
 
 
 def soft_jaccard_score(
-    output: torch.Tensor, target: torch.Tensor, smooth: float = 0.0, eps: float = 1e-7, dims=None
+        output: torch.Tensor, target: torch.Tensor, smooth: float = 0.0, eps: float = 1e-7, dims=None
 ) -> torch.Tensor:
     assert output.size() == target.size()
     if dims is not None:
@@ -167,7 +166,7 @@ def soft_jaccard_score(
 
 
 def soft_dice_score(
-    output: torch.Tensor, target: torch.Tensor, smooth: float = 0.0, eps: float = 1e-7, dims=None
+        output: torch.Tensor, target: torch.Tensor, smooth: float = 0.0, eps: float = 1e-7, dims=None
 ) -> torch.Tensor:
     assert output.size() == target.size()
     if dims is not None:
@@ -178,6 +177,22 @@ def soft_dice_score(
         cardinality = torch.sum(output + target)
     dice_score = (2.0 * intersection + smooth) / (cardinality + smooth).clamp_min(eps)
     return dice_score
+
+
+def soft_tversky_score(output: torch.Tensor, target: torch.Tensor, alpha: float, beta: float,
+                       smooth: float = 0.0, eps: float = 1e-7, dims=None) -> torch.Tensor:
+    assert output.size() == target.size()
+    if dims is not None:
+        intersection = torch.sum(output * target, dim=dims)  # TP
+        fp = torch.sum(output * (1. - target), dim=dims)
+        fn = torch.sum((1 - output) * target, dim=dims)
+    else:
+        intersection = torch.sum(output * target)  # TP
+        fp = torch.sum(output * (1. - target))
+        fn = torch.sum((1 - output) * target)
+
+    tversky_score = (intersection + smooth) / (intersection + alpha * fp + beta * fn + smooth).clamp_min(eps)
+    return tversky_score
 
 
 def wing_loss(output: torch.Tensor, target: torch.Tensor, width=5, curvature=0.5, reduction="mean"):
@@ -211,7 +226,7 @@ def wing_loss(output: torch.Tensor, target: torch.Tensor, width=5, curvature=0.5
 
 
 def label_smoothed_nll_loss(
-    lprobs: torch.Tensor, target: torch.Tensor, epsilon: float, ignore_index=None, reduction="mean", dim=-1
+        lprobs: torch.Tensor, target: torch.Tensor, epsilon: float, ignore_index=None, reduction="mean", dim=-1
 ) -> torch.Tensor:
     """
     Source: https://github.com/pytorch/fairseq/blob/master/fairseq/criterions/label_smoothed_cross_entropy.py
