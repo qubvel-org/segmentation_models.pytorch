@@ -284,8 +284,8 @@ The following is a list of supported encoders in the SMP. Select the appropriate
 |Encoder                         |Weights                         |Params, M                       |
 |--------------------------------|:------------------------------:|:------------------------------:|
 |mobilenet_v2                    |imagenet                        |2M                              |
-|mobilenet_v3_large              |imagenet                        |3M                              |
 |mobilenet_v3_small              |imagenet                        |1M                              |
+|mobilenet_v3_large              |imagenet                        |3M                              |
 
 </div>
 </details>

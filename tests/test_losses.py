@@ -2,8 +2,13 @@ import pytest
 import torch
 import segmentation_models_pytorch as smp
 import segmentation_models_pytorch.losses._functional as F
-from segmentation_models_pytorch.losses import DiceLoss, JaccardLoss, SoftBCEWithLogitsLoss, SoftCrossEntropyLoss, \
-    TverskyLoss, TverskyLossFocal
+from segmentation_models_pytorch.losses import (
+    DiceLoss,
+    JaccardLoss,
+    SoftBCEWithLogitsLoss,
+    SoftCrossEntropyLoss,
+    TverskyLoss,
+)
 
 
 def test_focal_loss_with_logits():
