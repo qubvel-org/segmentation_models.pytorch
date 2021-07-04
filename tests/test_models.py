@@ -123,8 +123,7 @@ def test_dilation(encoder_name):
         encoder_name in ['inceptionresnetv2', 'xception', 'inceptionv4'] or
         encoder_name.startswith('vgg') or 
         encoder_name.startswith('densenet') or
-        encoder_name.startswith('timm-res') or
-        encoder_name.startswith("mobilenetv3")
+        encoder_name.startswith('timm-res')
     ):
         return
 

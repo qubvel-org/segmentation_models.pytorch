@@ -33,7 +33,7 @@ from ._base import EncoderMixin
 class MobileNetV3Encoder(torchvision.models.MobileNetV3, EncoderMixin):
 
     def __init__(self, out_channels, stage_idxs, model_name, depth=5, **kwargs):
-        inverted_residual_setting, last_channel = _mobilenet_v3_conf(model_name, kwargs)
+        inverted_residual_setting, last_channel = _mobilenet_v3_conf(model_name, **kwargs)
         super().__init__(inverted_residual_setting, last_channel, **kwargs)
         
         self._depth = depth
@@ -62,9 +62,6 @@ class MobileNetV3Encoder(torchvision.models.MobileNetV3, EncoderMixin):
             features.append(x)
 
         return features
-
-    def make_dilated(self, stage_list, dilation_list):
-        raise ValueError("MobilenetV3 encoder does not support dilated mode!")
 
     def load_state_dict(self, state_dict, **kwargs):
         state_dict.pop("classifier.0.bias")
