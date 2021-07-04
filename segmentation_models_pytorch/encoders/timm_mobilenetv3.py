@@ -24,7 +24,7 @@ class MobileNetV3Encoder(nn.Module, EncoderMixin):
 
         # minimal models replace hardswish with relu
         self.model = timm.create_model(
-            model_name=model,
+            model_name=model_name,
             scriptable=True,   # torch.jit scriptable
             exportable=True,   # onnx export
             features_only=True,
@@ -84,7 +84,7 @@ class MobileNetV3Encoder(nn.Module, EncoderMixin):
         state_dict.pop('conv_head.bias', None)
         state_dict.pop('classifier.weight', None)
         state_dict.pop('classifier.bias', None)
-        super().load_state_dict(state_dict, **kwargs)
+        self.model.load_state_dict(state_dict, **kwargs)
 
 
 mobilenetv3_weights = {
