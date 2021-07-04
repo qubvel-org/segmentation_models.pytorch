@@ -63,6 +63,9 @@ class MobileNetV3Encoder(torchvision.models.MobileNetV3, EncoderMixin):
 
         return features
 
+    def make_dilated(self, stage_list, dilation_list):
+        raise ValueError("MobilenetV3 encoder does not support dilated mode!")
+
     def load_state_dict(self, state_dict, **kwargs):
         state_dict.pop("classifier.0.bias")
         state_dict.pop("classifier.0.weight")
