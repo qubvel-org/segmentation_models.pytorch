@@ -77,7 +77,7 @@ class VGGEncoder(VGG, EncoderMixin):
         keys = list(state_dict.keys())
         for k in keys:
             if k.startswith("classifier"):
-                state_dict.pop(k)
+                state_dict.pop(k, None)
         super().load_state_dict(state_dict, **kwargs)
 
 

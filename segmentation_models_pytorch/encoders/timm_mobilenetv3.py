@@ -12,9 +12,9 @@ def _make_divisible(x, divisible_by=8):
 class MobileNetV3Encoder(nn.Module, EncoderMixin):
     def __init__(self, model_name, width_mult, depth=5, **kwargs):
         super().__init__()
-        if "large" not in model_name or "small" not in model_name:
+        if "large" not in model_name and "small" not in model_name:
             raise ValueError(
-                'MobileNetV3 mode should be small or large, got {}'.format(self.mode)
+                'MobileNetV3 wrong model name {}'.format(model_name)
             )
 
         self._mode = "small" if "small" in model_name else "large"
@@ -67,7 +67,7 @@ class MobileNetV3Encoder(nn.Module, EncoderMixin):
                 self.model.blocks[5:],
             ]
         else:
-            ValueError('MobileNetV3 mode should be small or large, got {}'.format(self.mode))
+            ValueError('MobileNetV3 mode should be small or large, got {}'.format(self._mode))
 
     def forward(self, x):
         stages = self.get_stages()
@@ -80,10 +80,10 @@ class MobileNetV3Encoder(nn.Module, EncoderMixin):
         return features
 
     def load_state_dict(self, state_dict, **kwargs):
-        state_dict.pop('conv_head.weight')
-        state_dict.pop('conv_head.bias')
-        state_dict.pop('classifier.weight')
-        state_dict.pop('classifier.bias')
+        state_dict.pop('conv_head.weight', None)
+        state_dict.pop('conv_head.bias', None)
+        state_dict.pop('classifier.weight', None)
+        state_dict.pop('classifier.bias', None)
         super().load_state_dict(state_dict, **kwargs)
 
 

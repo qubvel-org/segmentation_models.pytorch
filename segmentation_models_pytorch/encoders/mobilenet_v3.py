@@ -64,10 +64,10 @@ class MobileNetV3Encoder(torchvision.models.MobileNetV3, EncoderMixin):
         return features
 
     def load_state_dict(self, state_dict, **kwargs):
-        state_dict.pop("classifier.0.bias")
-        state_dict.pop("classifier.0.weight")
-        state_dict.pop("classifier.3.bias")
-        state_dict.pop("classifier.3.weight")
+        state_dict.pop("classifier.0.bias", None)
+        state_dict.pop("classifier.0.weight", None)
+        state_dict.pop("classifier.3.bias", None)
+        state_dict.pop("classifier.3.weight", None)
         super().load_state_dict(state_dict, **kwargs)
 
 

@@ -49,8 +49,8 @@ class XceptionEncoder(Xception, EncoderMixin):
 
     def load_state_dict(self, state_dict):
         # remove linear
-        state_dict.pop('fc.bias')
-        state_dict.pop('fc.weight')
+        state_dict.pop('fc.bias', None)
+        state_dict.pop('fc.weight', None)
 
         super().load_state_dict(state_dict)
 

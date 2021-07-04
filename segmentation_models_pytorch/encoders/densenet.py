@@ -96,8 +96,8 @@ class DenseNetEncoder(DenseNet, EncoderMixin):
                 del state_dict[key]
 
         # remove linear
-        state_dict.pop("classifier.bias")
-        state_dict.pop("classifier.weight")
+        state_dict.pop("classifier.bias", None)
+        state_dict.pop("classifier.weight", None)
 
         super().load_state_dict(state_dict)
 

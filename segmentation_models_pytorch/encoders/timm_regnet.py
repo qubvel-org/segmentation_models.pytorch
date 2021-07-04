@@ -33,8 +33,8 @@ class RegNetEncoder(RegNet, EncoderMixin):
         return features
 
     def load_state_dict(self, state_dict, **kwargs):
-        state_dict.pop("head.fc.weight")
-        state_dict.pop("head.fc.bias")
+        state_dict.pop("head.fc.weight", None)
+        state_dict.pop("head.fc.bias", None)
         super().load_state_dict(state_dict, **kwargs)
 
 
