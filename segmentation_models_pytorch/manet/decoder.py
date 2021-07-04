@@ -56,18 +56,19 @@ class MFAB(nn.Module):
                 use_batchnorm=use_batchnorm,
             )
         )
+        reduced_channels = max(1, skip_channels // reduction)
         self.SE_ll = nn.Sequential(
             nn.AdaptiveAvgPool2d(1),
-            nn.Conv2d(skip_channels, skip_channels // reduction, 1),
+            nn.Conv2d(skip_channels, reduced_channels, 1),
             nn.ReLU(inplace=True),
-            nn.Conv2d(skip_channels // reduction, skip_channels, 1),
+            nn.Conv2d(reduced_channels, skip_channels, 1),
             nn.Sigmoid(),
         )
         self.SE_hl = nn.Sequential(
             nn.AdaptiveAvgPool2d(1),
-            nn.Conv2d(skip_channels, skip_channels // reduction, 1),
+            nn.Conv2d(skip_channels, reduced_channels, 1),
             nn.ReLU(inplace=True),
-            nn.Conv2d(skip_channels // reduction, skip_channels, 1),
+            nn.Conv2d(reduced_channels, skip_channels, 1),
             nn.Sigmoid(),
         )
         self.conv1 = md.Conv2dReLU(

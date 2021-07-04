@@ -12,7 +12,7 @@ The main features of this library are:
 
  - High level API (just two lines to create a neural network)
  - 9 models architectures for binary and multi class segmentation (including legendary Unet)
- - 106 available encoders
+ - 109 available encoders
  - All encoders have pre-trained weights for faster and better convergence
  
 ### [📚 Project Documentation 📚](http://smp.readthedocs.io/)
@@ -184,6 +184,19 @@ The following is a list of supported encoders in the SMP. Select the appropriate
 |timm-regnety_120                |imagenet                        |49M                             |
 |timm-regnety_160                |imagenet                        |80M                             |
 |timm-regnety_320                |imagenet                        |141M                            |
+
+</div>
+</details>
+
+<details>
+<summary style="margin-left: 25px;">GERNet</summary>
+<div style="margin-left: 25px;">
+
+|Encoder                         |Weights                         |Params, M                       |
+|--------------------------------|:------------------------------:|:------------------------------:|
+|timm-gernet_s                   |imagenet                        |6M                              |
+|timm-gernet_m                   |imagenet                        |18M                             |
+|timm-gernet_l                   |imagenet                        |28M                             |
 
 </div>
 </details>
