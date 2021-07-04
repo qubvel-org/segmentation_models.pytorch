@@ -12,7 +12,7 @@ The main features of this library are:
 
  - High level API (just two lines to create a neural network)
  - 9 models architectures for binary and multi class segmentation (including legendary Unet)
- - 115 available encoders
+ - 113 available encoders
  - All encoders have pre-trained weights for faster and better convergence
  
 ### [📚 Project Documentation 📚](http://smp.readthedocs.io/)
@@ -297,8 +297,12 @@ The following is a list of supported encoders in the SMP. Select the appropriate
 |Encoder                         |Weights                         |Params, M                       |
 |--------------------------------|:------------------------------:|:------------------------------:|
 |mobilenet_v2                    |imagenet                        |2M                              |
-|mobilenet_v3_small              |imagenet                        |1M                              |
-|mobilenet_v3_large              |imagenet                        |3M                              |
+|timm-mobilenetv3_large_075      |imagenet                        |1.78M                       |
+|timm-mobilenetv3_large_100      |imagenet                        |2.97M                       |
+|timm-mobilenetv3_large_minimal_100|imagenet                        |1.41M                       |
+|timm-mobilenetv3_small_075      |imagenet                        |0.57M                        |
+|timm-mobilenetv3_small_100      |imagenet                        |0.93M                       |
+|timm-mobilenetv3_small_minimal_100|imagenet                        |0.43M                       |
 
 </div>
 </details>
@@ -333,22 +337,6 @@ The following is a list of supported encoders in the SMP. Select the appropriate
 |vgg16_bn                        |imagenet                        |14M                             |
 |vgg19                           |imagenet                        |20M                             |
 |vgg19_bn                        |imagenet                        |20M                             |
-
-</div>
-</details>
-
-<details>
-<summary style="margin-left: 25px;">MobileNetV3</summary>
-<div style="margin-left: 25px;">
-
-|Encoder                         |Weights                         |Params, M                       |
-|--------------------------------|:------------------------------:|:------------------------------:|
-|timm-mobilenetv3_large_075      |imagenet                        |1.78M                       |
-|timm-mobilenetv3_large_100      |imagenet                        |2.97M                       |
-|timm-mobilenetv3_large_minimal_100|imagenet                        |1.41M                       |
-|timm-mobilenetv3_small_075      |imagenet                        |0.57M                        |
-|timm-mobilenetv3_small_100      |imagenet                        |0.93M                       |
-|timm-mobilenetv3_small_minimal_100|imagenet                        |0.43M                       |
 
 </div>
 </details>
