@@ -78,6 +78,7 @@ timm_gernet_encoders = {
                     ByoBlockCfg(type='bottle', d=1, c=256, s=1, gs=1, br=3.),
                 ),
                 stem_chs=13,
+                stem_pool=None,
                 num_features=1920,
             )
         },
@@ -96,6 +97,7 @@ timm_gernet_encoders = {
                     ByoBlockCfg(type='bottle', d=1, c=640, s=1, gs=1, br=3.),
                 ),
                 stem_chs=32,
+                stem_pool=None,
                 num_features=2560,
             )
         },
@@ -114,6 +116,7 @@ timm_gernet_encoders = {
                     ByoBlockCfg(type='bottle', d=4, c=640, s=1, gs=1, br=3.),
                 ),
                 stem_chs=32,
+                stem_pool=None,
                 num_features=2560,
             )
         },
