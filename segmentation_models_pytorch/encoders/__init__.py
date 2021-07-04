@@ -66,7 +66,7 @@ def get_encoder(name, in_channels=3, depth=5, weights=None):
             ))
         encoder.load_state_dict(model_zoo.load_url(settings["url"]))
 
-    encoder.set_in_channels(in_channels)
+    encoder.set_in_channels(in_channels, pretrained=weights is not None)
 
     return encoder
 
