@@ -367,8 +367,9 @@ The following is a list of supported encoders in the SMP. Select the appropriate
 
 ##### Input channels
 Input channels parameter allows you to create models, which process tensors with arbitrary number of channels.
-If you use pretrained weights from imagenet - weights of first convolution will be reused for
-1- or 2- channels inputs, for input channels > 4 weights of first convolution will be initialized randomly.
+If you use pretrained weights from imagenet - weights of first convolution will be reused. For
+1-channel case it would be a sum of weights of first convolution layer, otherwise channels would be 
+populated with weights like `new_weight[:, i] = pretrained_weight[:, i % 3]` and than scaled with `new_weight * 3 / new_in_channels`.
 ```python
 model = smp.FPN('resnet34', in_channels=1)
 mask = model(torch.ones([1, 1, 64, 64]))

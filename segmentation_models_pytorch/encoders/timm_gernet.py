@@ -1,4 +1,4 @@
-from timm.models import ByobCfg, BlocksCfg, ByobNet
+from timm.models import ByoModelCfg, ByoBlockCfg, ByobNet
 
 from ._base import EncoderMixin
 import torch.nn as nn
@@ -69,13 +69,13 @@ timm_gernet_encoders = {
         "pretrained_settings": pretrained_settings["timm-gernet_s"],
         'params': {
             'out_channels': (3, 13, 48, 48, 384, 1920),
-            'cfg': ByobCfg(
+            'cfg': ByoModelCfg(
                 blocks=(
-                    BlocksCfg(type='basic', d=1, c=48, s=2, gs=0, br=1.),
-                    BlocksCfg(type='basic', d=3, c=48, s=2, gs=0, br=1.),
-                    BlocksCfg(type='bottle', d=7, c=384, s=2, gs=0, br=1 / 4),
-                    BlocksCfg(type='bottle', d=2, c=560, s=2, gs=1, br=3.),
-                    BlocksCfg(type='bottle', d=1, c=256, s=1, gs=1, br=3.),
+                    ByoBlockCfg(type='basic', d=1, c=48, s=2, gs=0, br=1.),
+                    ByoBlockCfg(type='basic', d=3, c=48, s=2, gs=0, br=1.),
+                    ByoBlockCfg(type='bottle', d=7, c=384, s=2, gs=0, br=1 / 4),
+                    ByoBlockCfg(type='bottle', d=2, c=560, s=2, gs=1, br=3.),
+                    ByoBlockCfg(type='bottle', d=1, c=256, s=1, gs=1, br=3.),
                 ),
                 stem_chs=13,
                 num_features=1920,
@@ -87,13 +87,13 @@ timm_gernet_encoders = {
         "pretrained_settings": pretrained_settings["timm-gernet_m"],
         'params': {
             'out_channels': (3, 32, 128, 192, 640, 2560),
-            'cfg': ByobCfg(
+            'cfg': ByoModelCfg(
                 blocks=(
-                    BlocksCfg(type='basic', d=1, c=128, s=2, gs=0, br=1.),
-                    BlocksCfg(type='basic', d=2, c=192, s=2, gs=0, br=1.),
-                    BlocksCfg(type='bottle', d=6, c=640, s=2, gs=0, br=1 / 4),
-                    BlocksCfg(type='bottle', d=4, c=640, s=2, gs=1, br=3.),
-                    BlocksCfg(type='bottle', d=1, c=640, s=1, gs=1, br=3.),
+                    ByoBlockCfg(type='basic', d=1, c=128, s=2, gs=0, br=1.),
+                    ByoBlockCfg(type='basic', d=2, c=192, s=2, gs=0, br=1.),
+                    ByoBlockCfg(type='bottle', d=6, c=640, s=2, gs=0, br=1 / 4),
+                    ByoBlockCfg(type='bottle', d=4, c=640, s=2, gs=1, br=3.),
+                    ByoBlockCfg(type='bottle', d=1, c=640, s=1, gs=1, br=3.),
                 ),
                 stem_chs=32,
                 num_features=2560,
@@ -105,13 +105,13 @@ timm_gernet_encoders = {
         "pretrained_settings": pretrained_settings["timm-gernet_l"],
         'params': {
             'out_channels': (3, 32, 128, 192, 640, 2560),
-            'cfg': ByobCfg(
+            'cfg': ByoModelCfg(
                 blocks=(
-                    BlocksCfg(type='basic', d=1, c=128, s=2, gs=0, br=1.),
-                    BlocksCfg(type='basic', d=2, c=192, s=2, gs=0, br=1.),
-                    BlocksCfg(type='bottle', d=6, c=640, s=2, gs=0, br=1 / 4),
-                    BlocksCfg(type='bottle', d=5, c=640, s=2, gs=1, br=3.),
-                    BlocksCfg(type='bottle', d=4, c=640, s=1, gs=1, br=3.),
+                    ByoBlockCfg(type='basic', d=1, c=128, s=2, gs=0, br=1.),
+                    ByoBlockCfg(type='basic', d=2, c=192, s=2, gs=0, br=1.),
+                    ByoBlockCfg(type='bottle', d=6, c=640, s=2, gs=0, br=1 / 4),
+                    ByoBlockCfg(type='bottle', d=5, c=640, s=2, gs=1, br=3.),
+                    ByoBlockCfg(type='bottle', d=4, c=640, s=1, gs=1, br=3.),
                 ),
                 stem_chs=32,
                 num_features=2560,
