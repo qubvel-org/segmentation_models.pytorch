@@ -16,7 +16,7 @@ class TimmUniversalEncoder(nn.Module):
 
         # not all models support output stride argument, drop it by default
         if output_stride == 32:
-            kwargs.pop(output_stride)
+            kwargs.pop("output_stride")
 
         self.model = timm.create_model(name, **kwargs)
 
