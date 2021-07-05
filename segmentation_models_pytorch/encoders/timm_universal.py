@@ -23,3 +23,7 @@ class TimmUniversalEncoder(nn.Module):
         features = self.model(x)
         features = [x,] + features
         return features
+
+    @property
+    def out_channels(self):
+        return self._out_channels
