@@ -35,11 +35,11 @@ class EncoderMixin:
     def make_dilated(self, output_stride):
 
         if output_stride == 16:
-            stage_list=[5],
-            dilation_list=[2]
+            stage_list=[5,]
+            dilation_list=[2,]
             
         elif output_stride == 8:
-            stage_list=[4, 5],
+            stage_list=[4, 5]
             dilation_list=[2, 4] 
 
         else:

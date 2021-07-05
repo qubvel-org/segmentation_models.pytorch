@@ -7,7 +7,7 @@ class TimmUniversalEncoder(nn.Module):
     def __init__(self, name, pretrained=True, in_channels=3, depth=5, output_stride=32): 
         super().__init__()
         self.model = timm.create_model(
-            name=name,
+            name,
             in_chans=in_channels,
             features_only=True,
             output_stride=output_stride,
