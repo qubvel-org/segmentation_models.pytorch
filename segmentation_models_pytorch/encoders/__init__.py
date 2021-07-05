@@ -19,6 +19,8 @@ from .timm_sknet import timm_sknet_encoders
 from .timm_mobilenetv3 import timm_mobilenetv3_encoders
 from .timm_gernet import timm_gernet_encoders
 
+from .timm_universal import TimmUniversalEncoder
+
 from ._preprocessing import preprocess_input
 
 encoders = {}
@@ -41,7 +43,19 @@ encoders.update(timm_mobilenetv3_encoders)
 encoders.update(timm_gernet_encoders)
 
 
-def get_encoder(name, in_channels=3, depth=5, weights=None):
+def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **kwargs):
+
+    if name.startswith("tu-"):
+        name = name.lstrip("tu-")
+        encoder = TimmUniversalEncoder(
+            name=name,
+            in_channels=in_channels,
+            depth=depth,
+            output_stride=output_stride,
+            pretrained=weights is not None,
+            **kwargs
+        )
+        return encoder
 
     try:
         Encoder = encoders[name]["encoder"]
@@ -62,7 +76,9 @@ def get_encoder(name, in_channels=3, depth=5, weights=None):
         encoder.load_state_dict(model_zoo.load_url(settings["url"]))
 
     encoder.set_in_channels(in_channels, pretrained=weights is not None)
-
+    if output_stride != 32:
+        encoder.make_dilated(output_stride)
+    
     return encoder
 
 

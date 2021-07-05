@@ -58,10 +58,7 @@ class DeepLabV3(SegmentationModel):
             in_channels=in_channels,
             depth=encoder_depth,
             weights=encoder_weights,
-        )
-        self.encoder.make_dilated(
-            stage_list=[4, 5],
-            dilation_list=[2, 4]
+            output_stride=8,
         )
 
         self.decoder = DeepLabV3Decoder(
@@ -136,28 +133,18 @@ class DeepLabV3Plus(SegmentationModel):
     ):
         super().__init__()
 
+        if encoder_output_stride not in [8, 16]:
+            raise ValueError(
+                "Encoder output stride should be 8 or 16, got {}".format(encoder_output_stride)
+            )
+
         self.encoder = get_encoder(
             encoder_name,
             in_channels=in_channels,
             depth=encoder_depth,
             weights=encoder_weights,
+            output_stride=encoder_output_stride,
         )
-
-        if encoder_output_stride == 8:
-            self.encoder.make_dilated(
-                stage_list=[4, 5],
-                dilation_list=[2, 4]
-            )
-
-        elif encoder_output_stride == 16:
-            self.encoder.make_dilated(
-                stage_list=[5],
-                dilation_list=[2]
-            )
-        else:
-            raise ValueError(
-                "Encoder output stride should be 8 or 16, got {}".format(encoder_output_stride)
-            )
 
         self.decoder = DeepLabV3PlusDecoder(
             encoder_channels=self.encoder.out_channels,
