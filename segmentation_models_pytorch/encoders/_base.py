@@ -17,7 +17,7 @@ class EncoderMixin:
         """Return channels dimensions for each tensor of forward output of encoder"""
         return self._out_channels[: self._depth + 1]
 
-    def set_in_channels(self, in_channels):
+    def set_in_channels(self, in_channels, pretrained=True):
         """Change first convolution channels"""
         if in_channels == 3:
             return
@@ -26,7 +26,7 @@ class EncoderMixin:
         if self._out_channels[0] == 3:
             self._out_channels = tuple([in_channels] + list(self._out_channels)[1:])
 
-        utils.patch_first_conv(model=self, in_channels=in_channels)
+        utils.patch_first_conv(model=self, new_in_channels=in_channels, pretrained=pretrained)
 
     def get_stages(self):
         """Method should be overridden in encoder"""

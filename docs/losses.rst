@@ -17,6 +17,10 @@ DiceLoss
 ~~~~~~~~
 .. autoclass:: segmentation_models_pytorch.losses.DiceLoss
 
+TverskyLoss
+~~~~~~~~
+.. autoclass:: segmentation_models_pytorch.losses.TverskyLoss
+
 FocalLoss
 ~~~~~~~~~
 .. autoclass:: segmentation_models_pytorch.losses.FocalLoss

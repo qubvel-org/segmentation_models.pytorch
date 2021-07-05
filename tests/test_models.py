@@ -119,9 +119,12 @@ def test_in_channels(model_class, encoder_name, in_channels):
 
 @pytest.mark.parametrize("encoder_name", ENCODERS)
 def test_dilation(encoder_name):
-    if (encoder_name in ['inceptionresnetv2', 'xception', 'inceptionv4'] or
-            encoder_name.startswith('vgg') or encoder_name.startswith('densenet') or
-            encoder_name.startswith('timm-res')):
+    if (
+        encoder_name in ['inceptionresnetv2', 'xception', 'inceptionv4'] or
+        encoder_name.startswith('vgg') or 
+        encoder_name.startswith('densenet') or
+        encoder_name.startswith('timm-res')
+    ):
         return
 
     encoder = smp.encoders.get_encoder(encoder_name)

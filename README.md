@@ -12,7 +12,7 @@ The main features of this library are:
 
  - High level API (just two lines to create a neural network)
  - 9 models architectures for binary and multi class segmentation (including legendary Unet)
- - 115 available encoders
+ - 113 available encoders
  - All encoders have pre-trained weights for faster and better convergence
  
 ### [📚 Project Documentation 📚](http://smp.readthedocs.io/)
@@ -297,8 +297,12 @@ The following is a list of supported encoders in the SMP. Select the appropriate
 |Encoder                         |Weights                         |Params, M                       |
 |--------------------------------|:------------------------------:|:------------------------------:|
 |mobilenet_v2                    |imagenet                        |2M                              |
-|mobilenet_v3_large              |imagenet                        |3M                              |
-|mobilenet_v3_small              |imagenet                        |1M                              |
+|timm-mobilenetv3_large_075      |imagenet                        |1.78M                       |
+|timm-mobilenetv3_large_100      |imagenet                        |2.97M                       |
+|timm-mobilenetv3_large_minimal_100|imagenet                        |1.41M                       |
+|timm-mobilenetv3_small_075      |imagenet                        |0.57M                        |
+|timm-mobilenetv3_small_100      |imagenet                        |0.93M                       |
+|timm-mobilenetv3_small_minimal_100|imagenet                        |0.43M                       |
 
 </div>
 </details>
@@ -337,22 +341,6 @@ The following is a list of supported encoders in the SMP. Select the appropriate
 </div>
 </details>
 
-<details>
-<summary style="margin-left: 25px;">MobileNetV3</summary>
-<div style="margin-left: 25px;">
-
-|Encoder                         |Weights                         |Params, M                       |
-|--------------------------------|:------------------------------:|:------------------------------:|
-|timm-mobilenetv3_large_075      |imagenet                        |1.78M                       |
-|timm-mobilenetv3_large_100      |imagenet                        |2.97M                       |
-|timm-mobilenetv3_large_minimal_100|imagenet                        |1.41M                       |
-|timm-mobilenetv3_small_075      |imagenet                        |0.57M                        |
-|timm-mobilenetv3_small_100      |imagenet                        |0.93M                       |
-|timm-mobilenetv3_small_minimal_100|imagenet                        |0.43M                       |
-
-</div>
-</details>
-
 
 \* `ssl`, `swsl` - semi-supervised and weakly-supervised learning on ImageNet ([repo](https://github.com/facebookresearch/semi-supervised-ImageNet1K-models)).
 
@@ -367,8 +355,9 @@ The following is a list of supported encoders in the SMP. Select the appropriate
 
 ##### Input channels
 Input channels parameter allows you to create models, which process tensors with arbitrary number of channels.
-If you use pretrained weights from imagenet - weights of first convolution will be reused for
-1- or 2- channels inputs, for input channels > 4 weights of first convolution will be initialized randomly.
+If you use pretrained weights from imagenet - weights of first convolution will be reused. For
+1-channel case it would be a sum of weights of first convolution layer, otherwise channels would be 
+populated with weights like `new_weight[:, i] = pretrained_weight[:, i % 3]` and than scaled with `new_weight * 3 / new_in_channels`.
 ```python
 model = smp.FPN('resnet34', in_channels=1)
 mask = model(torch.ones([1, 1, 64, 64]))

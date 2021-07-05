@@ -68,8 +68,8 @@ class DPNEncoder(DPN, EncoderMixin):
         return features
 
     def load_state_dict(self, state_dict, **kwargs):
-        state_dict.pop("last_linear.bias")
-        state_dict.pop("last_linear.weight")
+        state_dict.pop("last_linear.bias", None)
+        state_dict.pop("last_linear.weight", None)
         super().load_state_dict(state_dict, **kwargs)
 
 

@@ -10,7 +10,6 @@ from .inceptionresnetv2 import inceptionresnetv2_encoders
 from .inceptionv4 import inceptionv4_encoders
 from .efficientnet import efficient_net_encoders
 from .mobilenet import mobilenet_encoders
-from .mobilenet_v3 import mobilenet_v3_encoders
 from .xception import xception_encoders
 from .timm_efficientnet import timm_efficientnet_encoders
 from .timm_resnest import timm_resnest_encoders
@@ -18,12 +17,7 @@ from .timm_res2net import timm_res2net_encoders
 from .timm_regnet import timm_regnet_encoders
 from .timm_sknet import timm_sknet_encoders
 from .timm_mobilenetv3 import timm_mobilenetv3_encoders
-try:
-    from .timm_gernet import timm_gernet_encoders
-except ImportError as e:
-    timm_gernet_encoders = {}
-    print("Current timm version doesn't support GERNet."
-          "If GERNet support is needed please update timm")
+from .timm_gernet import timm_gernet_encoders
 
 from ._preprocessing import preprocess_input
 
@@ -37,7 +31,6 @@ encoders.update(inceptionresnetv2_encoders)
 encoders.update(inceptionv4_encoders)
 encoders.update(efficient_net_encoders)
 encoders.update(mobilenet_encoders)
-encoders.update(mobilenet_v3_encoders)
 encoders.update(xception_encoders)
 encoders.update(timm_efficientnet_encoders)
 encoders.update(timm_resnest_encoders)
@@ -68,7 +61,7 @@ def get_encoder(name, in_channels=3, depth=5, weights=None):
             ))
         encoder.load_state_dict(model_zoo.load_url(settings["url"]))
 
-    encoder.set_in_channels(in_channels)
+    encoder.set_in_channels(in_channels, pretrained=weights is not None)
 
     return encoder
 

@@ -12,14 +12,14 @@ __all__ = ["DiceLoss"]
 class DiceLoss(_Loss):
 
     def __init__(
-            self,
-            mode: str,
-            classes: Optional[List[int]] = None,
-            log_loss: bool = False,
-            from_logits: bool = True,
-            smooth: float = 0.0,
-            ignore_index: Optional[int] = None,
-            eps: float = 1e-7,
+        self,
+        mode: str,
+        classes: Optional[List[int]] = None,
+        log_loss: bool = False,
+        from_logits: bool = True,
+        smooth: float = 0.0,
+        ignore_index: Optional[int] = None,
+        eps: float = 1e-7,
     ):
         """Implementation of Dice loss for image segmentation task.
         It supports binary, multiclass and multilabel cases
