@@ -1,5 +1,5 @@
-Pytorch Image Models Encoders
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Pytorch Image Models (timm) Encoders
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Pytorch Image Models (a.k.a. timm) has a lot of pretrained models and interface which allows using these models as encoders in smp,
 however, not all models are supported
@@ -7,9 +7,13 @@ however, not all models are supported
  - transformer models do not have ``features_only`` functionality implemented
  - some models do not have appropriate strides
 
-Below is a table of suitable encoders (for DeepLab, DeepLabV3, and PAN dilation support is needed also)
+Below is a table of suitable encoders (for DeepLabV3, DeepLabV3+, and PAN dilation support is needed also)
 
 Total number of encoders: 467
+
+.. note::
+
+    To use following encoders you have to add prefix ``tu-``, e.g. ``tu-adv_inception_v3``
 
 +--------------------------------+----------------+
 |          Encoder name          |Support dilation|
