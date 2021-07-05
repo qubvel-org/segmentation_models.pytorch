@@ -32,7 +32,19 @@ class EncoderMixin:
         """Method should be overridden in encoder"""
         raise NotImplementedError
 
-    def make_dilated(self, stage_list, dilation_list):
+    def make_dilated(self, output_stride):
+
+        if output_stride == 16:
+            stage_list=[5,]
+            dilation_list=[2,]
+            
+        elif output_stride == 8:
+            stage_list=[4, 5]
+            dilation_list=[2, 4] 
+
+        else:
+            raise ValueError("Output stride should be 16 or 8, got {}.".format(output_stride))
+        
         stages = self.get_stages()
         for stage_indx, dilation_rate in zip(stage_list, dilation_list):
             utils.replace_strides_with_dilation(

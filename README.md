@@ -25,6 +25,7 @@ Visit [Read The Docs Project Page](https://smp.readthedocs.io/) or read followin
  3. [Models](#models)
     1. [Architectures](#architectures)
     2. [Encoders](#encoders)
+    3. [Timm Encoders](#timm)
  4. [Models API](#api)
     1. [Input channels](#input-channels)
     2. [Auxiliary classification output](#auxiliary-classification-output)
@@ -344,6 +345,17 @@ The following is a list of supported encoders in the SMP. Select the appropriate
 
 \* `ssl`, `swsl` - semi-supervised and weakly-supervised learning on ImageNet ([repo](https://github.com/facebookresearch/semi-supervised-ImageNet1K-models)).
 
+#### Timm Encoders <a name="timm"></a>
+
+[docs](https://smp.readthedocs.io/en/latest/encoders_timm.html)
+
+Pytorch Image Models (a.k.a. timm) has a lot of pretrained models and interface which allows using these models as encoders in smp, however, not all models are supported
+
+ - transformer models do not have ``features_only`` functionality implemented
+ - some models do not have appropriate strides
+
+Total number of supported encoders: 467
+ - [table with available encoders](https://smp.readthedocs.io/en/latest/encoders_timm.html)
 
 ### 🔁 Models API <a name="api"></a>
 
