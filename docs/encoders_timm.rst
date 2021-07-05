@@ -1,5 +1,5 @@
-Pytorch Image Models (timm) Encoders
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+🪐 Timm Encoders
+~~~~~~~~~~~~~~~~
 
 Pytorch Image Models (a.k.a. timm) has a lot of pretrained models and interface which allows using these models as encoders in smp,
 however, not all models are supported

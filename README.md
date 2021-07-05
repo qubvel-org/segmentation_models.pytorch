@@ -25,7 +25,7 @@ Visit [Read The Docs Project Page](https://smp.readthedocs.io/) or read followin
  3. [Models](#models)
     1. [Architectures](#architectures)
     2. [Encoders](#encoders)
-    3. [timm encoders](#timm)
+    3. [Timm Encoders](#timm)
  4. [Models API](#api)
     1. [Input channels](#input-channels)
     2. [Auxiliary classification output](#auxiliary-classification-output)
@@ -345,7 +345,7 @@ The following is a list of supported encoders in the SMP. Select the appropriate
 
 \* `ssl`, `swsl` - semi-supervised and weakly-supervised learning on ImageNet ([repo](https://github.com/facebookresearch/semi-supervised-ImageNet1K-models)).
 
-#### timm encoders <a name="timm"></a>
+#### Timm Encoders <a name="timm"></a>
 
 [docs](https://smp.readthedocs.io/en/latest/encoders_timm.html)
 
