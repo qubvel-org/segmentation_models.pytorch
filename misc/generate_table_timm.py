@@ -17,8 +17,8 @@ def has_dilation_support(name):
 
 def make_table(data):
     names = supported.keys()
-    max_len1 = max([len(x) for x in names])
-    max_len2 = len("support dilation")
+    max_len1 = max([len(x) for x in names]) + 2
+    max_len2 = len("support dilation") + 2
     
     l1 = "+" + "-" * max_len1 + "+" + "-" * max_len2 + "+\n"
     l2 = "+" + "=" * max_len1 + "+" + "=" * max_len2 + "+\n"
@@ -27,8 +27,8 @@ def make_table(data):
     table = l1 + top + l2
     
     for k in sorted(data.keys()):
-        support = "+" if data[k]["has_dilation"] else " "
-        table += "|" + k.ljust(max_len1) + "|" + support.center(max_len2) + "|\n"
+        support = "✅".center(max_len2 - 3) if data[k]["has_dilation"] else " ".center(max_len2 - 2)
+        table += "| " + k.ljust(max_len1 - 2) + " | " + support + " |\n"
         table += l1
     
     return table
