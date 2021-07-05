@@ -29,7 +29,7 @@ def make_table(data):
     for k in sorted(data.keys()):
         support = "+" if data[k]["has_dilation"] else " "
         table += "|" + k.ljust(max_len1) + "|" + support.center(max_len2) + "|\n"
-    table += l1
+        table += l1
     
     return table
     
