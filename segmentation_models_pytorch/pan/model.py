@@ -17,8 +17,8 @@ class PAN(SegmentationModel):
             to extract features of different spatial resolution
         encoder_weights: One of **None** (random initialization), **"imagenet"** (pre-training on ImageNet) and 
             other pretrained weights (see table with available weights for each encoder_name)
-        encoder_dilation: Flag to use dilation in encoder last layer. Doesn't work with ***ception***, **vgg***, 
-            **densenet*`** backbones, default is **True**
+        encoder_output_stride: 16 or 32, if 16 use dilation in encoder last layer. 
+            Doesn't work with ***ception***, **vgg***, **densenet*`** backbones.Default is 16.
         decoder_channels: A number of convolution layer filters in decoder blocks
         in_channels: A number of input channels for the model, default is 3 (RGB images)
         classes: A number of classes for output mask (or you can think as a number of channels of output mask)
@@ -45,7 +45,7 @@ class PAN(SegmentationModel):
             self,
             encoder_name: str = "resnet34",
             encoder_weights: Optional[str] = "imagenet",
-            encoder_dilation: bool = True,
+            encoder_output_stride: int = 16,
             decoder_channels: int = 32,
             in_channels: int = 3,
             classes: int = 1,
@@ -55,18 +55,16 @@ class PAN(SegmentationModel):
     ):
         super().__init__()
 
+        if encoder_output_stride not in [16, 32]:
+            raise ValueError("PAN support output stride 16 or 32, got {}".format(encoder_output_stride))
+
         self.encoder = get_encoder(
             encoder_name,
             in_channels=in_channels,
             depth=5,
             weights=encoder_weights,
+            output_stride=encoder_output_stride,
         )
-
-        if encoder_dilation:
-            self.encoder.make_dilated(
-                stage_list=[5],
-                dilation_list=[2]
-            )
 
         self.decoder = PANDecoder(
             encoder_channels=self.encoder.out_channels,
