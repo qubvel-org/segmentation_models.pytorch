@@ -22,7 +22,7 @@ def make_table(data):
     
     l1 = "+" + "-" * max_len1 + "+" + "-" * max_len2 + "+\n"
     l2 = "+" + "=" * max_len1 + "+" + "=" * max_len2 + "+\n"
-    top = "|" + "Encoder name".center(max_len1) + "|" + "Support dilation".center(max_len2) + "|\n"
+    top = "| " + "Encoder name".ljust(max_len1 - 2) + " | " + "Support dilation".center(max_len2 - 2) + " |\n"
     
     table = l1 + top + l2
     
