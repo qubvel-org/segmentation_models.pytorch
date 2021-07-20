@@ -21,7 +21,7 @@ class TimmUniversalEncoder(nn.Module):
         self.model = timm.create_model(name, **kwargs)
 
         self._in_channels = in_channels
-        self._out_channels = [3, ] + self.model.feature_info.channels()
+        self._out_channels = [in_channels, ] + self.model.feature_info.channels()
         self._depth = depth
 
     def forward(self, x):
