@@ -46,7 +46,7 @@ encoders.update(timm_gernet_encoders)
 def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **kwargs):
 
     if name.startswith("tu-"):
-        name = name.lstrip("tu-")
+        name = name[3:]
         encoder = TimmUniversalEncoder(
             name=name,
             in_channels=in_channels,
