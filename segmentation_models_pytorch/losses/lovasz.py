@@ -148,7 +148,7 @@ def _flatten_probas(probas, labels, ignore=None):
         probas = probas.view(B, 1, H, W)
 
     C = probas.size(1)
-    probas = torch.movedim(probas, 0, -1)  # [B, C, Di, Dj, Dk...] -> [B, C, Di...Dk, C]
+    probas = torch.movedim(probas, 1, -1)  # [B, C, Di, Dj, ...] -> [B, Di, Dj, ..., C]
     probas = probas.contiguous().view(-1, C)  # [P, C]
 
     labels = labels.view(-1)
