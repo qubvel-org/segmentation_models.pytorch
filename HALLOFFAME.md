@@ -88,3 +88,10 @@ Please, follow these rules, when adding a solution to the "Hall of Fame":
 [Pavel Yakubovskiy](https://www.linkedin.com/in/pavel-yakubovskiy/).  
 [[code and description](https://github.com/qubvel/open-cities-challenge)]
 
+### [Machine Learning based feature extraction of Electrical Substations from Satellite Data ](https://competitions.codalab.org/competitions/32132#learn_the_details)
+
+- 3rd place.
+
+[Aarsh chaube](https://github.com/Aarsh2001)
+[[code](https://github.com/Aarsh2001/ML_Challenge_NRSC)]
+[[Pre-Print](https://github.com/Aarsh2001/ML_Challenge_NRSC/blob/main/3rd%20Rank%20Submission.pdf)]
