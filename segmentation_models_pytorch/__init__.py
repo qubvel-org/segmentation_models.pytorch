@@ -1,5 +1,6 @@
 from .unet import Unet
 from .unetplusplus import UnetPlusPlus
+from .unet3plus import Unet3Plus
 from .manet import MAnet
 from .linknet import Linknet
 from .fpn import FPN
