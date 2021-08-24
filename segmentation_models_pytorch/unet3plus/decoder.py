@@ -173,7 +173,7 @@ class UnetDecoder(nn.Module):
             n_blocks=5,
             use_batchnorm=True,
             attention_type=None,
-            center=True,
+            center=False,
     ):
         super().__init__()
 
@@ -196,7 +196,7 @@ class UnetDecoder(nn.Module):
         previous_channels = [i * n_blocks for i in out_channels] #calculating previos channels i.e concatenated output channels of previous block
         previous_channels[0] = int(previous_channels[0]/n_blocks) #first tensor as it comes from CenterBlock, hence no concatenation
 
-        if True:
+        if center:
             self.center = CenterBlock(
                 head_channels, head_channels, use_batchnorm=use_batchnorm
             )
