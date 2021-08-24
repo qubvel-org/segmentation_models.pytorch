@@ -109,16 +109,16 @@ class DecoderBlock(nn.Module):
 
         #creating blocks with respect to the scale
         for i in range(self.num_concat_blocks):
-          if scale>0:
+          if scale > 0:
             block = DownBlock(in_channels[i], out_channels[output_index], pow(2,scale), **kwargs)
-          elif scale==0:
+          elif scale == 0:
             block = ConstBlock(in_channels[i], out_channels[output_index],0, **kwargs)
           else:
             block = UpBlock(previous_channels[output_index-prev_ind], out_channels[output_index], pow(2, abs(scale)), **kwargs)
-            prev_ind+=1
+            prev_ind +=1
 
           blocks.append(block)
-          scale = scale-1
+          scale = scale - 1
         
         self.blocks = nn.ModuleList(blocks)
 
@@ -194,7 +194,7 @@ class UnetDecoder(nn.Module):
 
         out_channels = [head_channels] + list(decoder_channels) 
         previous_channels = [i * n_blocks for i in out_channels] #calculating previos channels i.e concatenated output channels of previous block
-        previous_channels[0] = int(previous_channels[0]/n_blocks) #first tensor as it comes from CenterBlock, hence no concatenation
+        previous_channels[0] = int(previous_channels[0] / n_blocks) #first tensor as it comes from CenterBlock, hence no concatenation
 
         if center:
             self.center = CenterBlock(
@@ -207,11 +207,11 @@ class UnetDecoder(nn.Module):
         kwargs = dict(use_batchnorm=use_batchnorm, attention_type=attention_type)
 
         stages = []
-        self.scale = n_blocks-2
+        self.scale = n_blocks - 2
 
         #Blocks for every stage is generated
         for i in range(n_blocks):
-          stage = DecoderBlock(in_channels, out_channels, previous_channels, self.scale-i, n_blocks, i+1, **kwargs)
+          stage = DecoderBlock(in_channels, out_channels, previous_channels, self.scale-i, n_blocks, i + 1, **kwargs)
           stages.append(stage)
   
         self.stages = nn.ModuleList(stages)
