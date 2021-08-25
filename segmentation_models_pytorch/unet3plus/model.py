@@ -70,7 +70,7 @@ class Unet3Plus(SegmentationModel):
 
         self.decoder = UnetDecoder(
             encoder_channels=self.encoder.out_channels,
-            decoder_channels=(256, 128, 64, 32, 16),
+            decoder_channels=decoder_channels,
             n_blocks=encoder_depth,
             use_batchnorm=decoder_use_batchnorm,
             center=True if encoder_name.startswith("vgg") else False,
