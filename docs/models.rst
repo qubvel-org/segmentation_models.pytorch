@@ -9,7 +9,7 @@ Unet++
 ~~~~~~
 .. autoclass:: segmentation_models_pytorch.UnetPlusPlus
 
-Unet3++
+Unet3+
 ~~~~~~
 .. autoclass:: segmentation_models_pytorch.Unet3Plus
 
