@@ -118,8 +118,3 @@ class Attention(nn.Module):
 
     def forward(self, x):
         return self.attention(x)
-
-
-class Flatten(nn.Module):
-    def forward(self, x):
-        return x.view(x.shape[0], -1)
