@@ -29,7 +29,6 @@ class JaccardLoss(_Loss):
             log_loss: If True, loss computed as `- log(jaccard_coeff)`, otherwise `1 - jaccard_coeff`
             from_logits: If True, assumes input is raw logits
             smooth: Smoothness constant for dice coefficient
-            ignore_index: Label that indicates ignored pixels (does not contribute to loss)
             eps: A small epsilon for numerical stability to avoid zero division error 
                 (denominator will be always greater or equal to eps)
 
