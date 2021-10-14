@@ -34,8 +34,10 @@ class DiceLoss(base.Loss):
 
     def forward(self, y_pr, y_gt):
         y_pr = self.activation(y_pr)
+        axis = [2,3] if len(y_pr.shape) == 4 else []
         return 1 - F.f_score(
             y_pr, y_gt,
+            axis=axis,
             beta=self.beta,
             eps=self.eps,
             threshold=None,
