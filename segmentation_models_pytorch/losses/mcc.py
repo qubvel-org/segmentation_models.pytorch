@@ -50,10 +50,10 @@ class MCCLoss(_Loss):
 
         numerator = torch.mul(tp, tn) - torch.mul(fp, fn)
         denominator = torch.sqrt(
-            torch.add(tp, 1, fp)
-            * torch.add(tp, 1, fn)
-            * torch.add(tn, 1, fp)
-            * torch.add(tn, 1, fn)
+            torch.add(tp, fp)
+            * torch.add(tp, fn)
+            * torch.add(tn, fp)
+            * torch.add(tn, fn)
         )
         mcc = torch.div(numerator.sum(), denominator.sum())
         loss = 1.0 - mcc
