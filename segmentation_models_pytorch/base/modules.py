@@ -73,6 +73,15 @@ class ArgMax(nn.Module):
         return torch.argmax(x, dim=self.dim)
 
 
+class Clip(nn.Module):
+    def __init__(self, min=0, max=1):
+        super().__init__()
+        self.min, self.max = min, max
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return torch.clip(x, self.min, self.max)
+
+
 class Activation(nn.Module):
 
     def __init__(self, name, **params):
@@ -95,6 +104,8 @@ class Activation(nn.Module):
             self.activation = ArgMax(**params)
         elif name == 'argmax2d':
             self.activation = ArgMax(dim=1, **params)
+        elif name == 'clip':
+            self.activation = Clip(**params)
         elif callable(name):
             self.activation = name(**params)
         else:
