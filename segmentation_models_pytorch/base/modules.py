@@ -78,7 +78,7 @@ class Clip(nn.Module):
         super().__init__()
         self.min, self.max = min, max
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x):
         return torch.clip(x, self.min, self.max)
 
 
