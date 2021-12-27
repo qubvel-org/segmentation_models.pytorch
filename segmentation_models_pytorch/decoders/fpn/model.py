@@ -1,4 +1,5 @@
 from typing import Optional, Union
+
 from segmentation_models_pytorch.base import SegmentationModel, SegmentationHead, ClassificationHead
 from segmentation_models_pytorch.encoders import get_encoder
 from .decoder import FPNDecoder
