@@ -1,14 +1,14 @@
-from .unet import Unet
-from .unetplusplus import UnetPlusPlus
-from .manet import MAnet
-from .linknet import Linknet
-from .fpn import FPN
-from .pspnet import PSPNet
-from .deeplabv3 import DeepLabV3, DeepLabV3Plus
-from .pan import PAN
+from .decoders.unet import Unet
+from .decoders.unetplusplus import UnetPlusPlus
+from .decoders.manet import MAnet
+from .decoders.linknet import Linknet
+from .decoders.fpn import FPN
+from .decoders.pspnet import PSPNet
+from .decoders.deeplabv3 import DeepLabV3, DeepLabV3Plus
+from .decoders.pan import PAN
 
 from . import encoders
-from . import utils
+from . import decoders
 from . import losses
 
 from .__version__ import __version__

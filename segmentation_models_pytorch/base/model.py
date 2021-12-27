@@ -23,6 +23,7 @@ class SegmentationModel(torch.nn.Module):
 
         return masks
 
+    @torch.no_grad()
     def predict(self, x):
         """Inference method. Switch model to `eval` mode, call `.forward(x)` with `torch.no_grad()`
 
@@ -36,7 +37,6 @@ class SegmentationModel(torch.nn.Module):
         if self.training:
             self.eval()
 
-        with torch.no_grad():
-            x = self.forward(x)
+        x = self.forward(x)
 
         return x
