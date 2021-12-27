@@ -1,15 +1,15 @@
 from typing import Optional, Union, List
-from .decoder import UnetDecoder
-from ..encoders import get_encoder
-from ..base import SegmentationModel
-from ..base import SegmentationHead, ClassificationHead
+
+from segmentation_models_pytorch.encoders import get_encoder
+from segmentation_models_pytorch.base import SegmentationModel, SegmentationHead, ClassificationHead
+from .decoder import UnetPlusPlusDecoder
 
 
-class Unet(SegmentationModel):
-    """Unet_ is a fully convolution neural network for image semantic segmentation. Consist of *encoder* 
+class UnetPlusPlus(SegmentationModel):
+    """Unet++ is a fully convolution neural network for image semantic segmentation. Consist of *encoder* 
     and *decoder* parts connected with *skip connections*. Encoder extract features of different spatial 
-    resolution (skip connections) which are used by decoder to define accurate segmentation mask. Use *concatenation*
-    for fusing decoder blocks with skip connections.
+    resolution (skip connections) which are used by decoder to define accurate segmentation mask. Decoder of
+    Unet++ is more complex than in usual Unet.
 
     Args:
         encoder_name: Name of the classification model that will be used as an encoder (a.k.a backbone)
@@ -40,10 +40,10 @@ class Unet(SegmentationModel):
                 - activation (str): An activation function to apply "sigmoid"/"softmax" (could be **None** to return logits)
 
     Returns:
-        ``torch.nn.Module``: Unet
+        ``torch.nn.Module``: **Unet++**
 
-    .. _Unet:
-        https://arxiv.org/abs/1505.04597
+    Reference:
+        https://arxiv.org/abs/1807.10165
 
     """
 
@@ -69,7 +69,7 @@ class Unet(SegmentationModel):
             weights=encoder_weights,
         )
 
-        self.decoder = UnetDecoder(
+        self.decoder = UnetPlusPlusDecoder(
             encoder_channels=self.encoder.out_channels,
             decoder_channels=decoder_channels,
             n_blocks=encoder_depth,
@@ -92,5 +92,5 @@ class Unet(SegmentationModel):
         else:
             self.classification_head = None
 
-        self.name = "u-{}".format(encoder_name)
+        self.name = "unetplusplus-{}".format(encoder_name)
         self.initialize()

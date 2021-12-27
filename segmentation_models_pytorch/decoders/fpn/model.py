@@ -1,25 +1,25 @@
 from typing import Optional, Union
-from .decoder import PANDecoder
-from ..encoders import get_encoder
-from ..base import SegmentationModel
-from ..base import SegmentationHead, ClassificationHead
 
+from segmentation_models_pytorch.base import SegmentationModel, SegmentationHead, ClassificationHead
+from segmentation_models_pytorch.encoders import get_encoder
+from .decoder import FPNDecoder
 
-class PAN(SegmentationModel):
-    """ Implementation of PAN_ (Pyramid Attention Network).
-
-    Note:
-        Currently works with shape of input tensor >= [B x C x 128 x 128] for pytorch <= 1.1.0
-        and with shape of input tensor >= [B x C x 256 x 256] for pytorch == 1.3.1
+class FPN(SegmentationModel):
+    """FPN_ is a fully convolution neural network for image semantic segmentation.
 
     Args:
         encoder_name: Name of the classification model that will be used as an encoder (a.k.a backbone)
             to extract features of different spatial resolution
+        encoder_depth: A number of stages used in encoder in range [3, 5]. Each stage generate features 
+            two times smaller in spatial dimensions than previous one (e.g. for depth 0 we will have features
+            with shapes [(N, C, H, W),], for depth 1 - [(N, C, H, W), (N, C, H // 2, W // 2)] and so on).
+            Default is 5
         encoder_weights: One of **None** (random initialization), **"imagenet"** (pre-training on ImageNet) and 
             other pretrained weights (see table with available weights for each encoder_name)
-        encoder_output_stride: 16 or 32, if 16 use dilation in encoder last layer. 
-            Doesn't work with ***ception***, **vgg***, **densenet*`** backbones.Default is 16.
-        decoder_channels: A number of convolution layer filters in decoder blocks
+        decoder_pyramid_channels: A number of convolution filters in Feature Pyramid of FPN_
+        decoder_segmentation_channels: A number of convolution filters in segmentation blocks of FPN_
+        decoder_merge_policy: Determines how to merge pyramid features inside FPN. Available options are **add** and **cat**
+        decoder_dropout: Spatial dropout rate in range (0, 1) for feature pyramid in FPN_
         in_channels: A number of input channels for the model, default is 3 (RGB images)
         classes: A number of classes for output mask (or you can think as a number of channels of output mask)
         activation: An activation function to apply after the final convolution layer.
@@ -34,49 +34,52 @@ class PAN(SegmentationModel):
                 - activation (str): An activation function to apply "sigmoid"/"softmax" (could be **None** to return logits)
 
     Returns:
-        ``torch.nn.Module``: **PAN**
+        ``torch.nn.Module``: **FPN**
 
-    .. _PAN:
-        https://arxiv.org/abs/1805.10180
+    .. _FPN:
+        http://presentations.cocodataset.org/COCO17-Stuff-FAIR.pdf
 
     """
 
     def __init__(
-            self,
-            encoder_name: str = "resnet34",
-            encoder_weights: Optional[str] = "imagenet",
-            encoder_output_stride: int = 16,
-            decoder_channels: int = 32,
-            in_channels: int = 3,
-            classes: int = 1,
-            activation: Optional[Union[str, callable]] = None,
-            upsampling: int = 4,
-            aux_params: Optional[dict] = None
+        self,
+        encoder_name: str = "resnet34",
+        encoder_depth: int = 5,
+        encoder_weights: Optional[str] = "imagenet",
+        decoder_pyramid_channels: int = 256,
+        decoder_segmentation_channels: int = 128,
+        decoder_merge_policy: str = "add",
+        decoder_dropout: float = 0.2,
+        in_channels: int = 3,
+        classes: int = 1,
+        activation: Optional[str] = None,
+        upsampling: int = 4,
+        aux_params: Optional[dict] = None,
     ):
         super().__init__()
-
-        if encoder_output_stride not in [16, 32]:
-            raise ValueError("PAN support output stride 16 or 32, got {}".format(encoder_output_stride))
 
         self.encoder = get_encoder(
             encoder_name,
             in_channels=in_channels,
-            depth=5,
+            depth=encoder_depth,
             weights=encoder_weights,
-            output_stride=encoder_output_stride,
         )
 
-        self.decoder = PANDecoder(
+        self.decoder = FPNDecoder(
             encoder_channels=self.encoder.out_channels,
-            decoder_channels=decoder_channels,
+            encoder_depth=encoder_depth,
+            pyramid_channels=decoder_pyramid_channels,
+            segmentation_channels=decoder_segmentation_channels,
+            dropout=decoder_dropout,
+            merge_policy=decoder_merge_policy,
         )
 
         self.segmentation_head = SegmentationHead(
-            in_channels=decoder_channels,
+            in_channels=self.decoder.out_channels,
             out_channels=classes,
             activation=activation,
-            kernel_size=3,
-            upsampling=upsampling
+            kernel_size=1,
+            upsampling=upsampling,
         )
 
         if aux_params is not None:
@@ -86,5 +89,5 @@ class PAN(SegmentationModel):
         else:
             self.classification_head = None
 
-        self.name = "pan-{}".format(encoder_name)
+        self.name = "fpn-{}".format(encoder_name)
         self.initialize()

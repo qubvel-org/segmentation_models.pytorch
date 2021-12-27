@@ -1,10 +1,9 @@
-import torch.nn as nn
-
+from torch import nn
 from typing import Optional
-from .decoder import DeepLabV3Decoder, DeepLabV3PlusDecoder
-from ..base import SegmentationModel, SegmentationHead, ClassificationHead
-from ..encoders import get_encoder
 
+from segmentation_models_pytorch.base import SegmentationModel, SegmentationHead, ClassificationHead
+from segmentation_models_pytorch.encoders import get_encoder
+from .decoder import DeepLabV3Decoder, DeepLabV3PlusDecoder
 
 class DeepLabV3(SegmentationModel):
     """DeepLabV3_ implementation from "Rethinking Atrous Convolution for Semantic Image Segmentation"
