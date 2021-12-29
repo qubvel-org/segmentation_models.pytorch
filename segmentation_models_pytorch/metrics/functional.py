@@ -43,20 +43,15 @@ def get_stats(
         output (Union[torch.LongTensor, torch.FloatTensor]): Model output with following 
             shapes and types:
             
-             * 'binary' mode - shape (N, 1, ...) and torch.LongTensor or torch.FloatTensor
-             * 'multilabel' mode - shape (N, C, ...) and torch.LongTensor or torch.FloatTensor
-             * 'multiclass' mode - shape (N, ...) and torch.LongTensor
+             * ``'binary'` mode - shape (N, 1, ...) and ``torch.LongTensor`` or ``torch.FloatTensor``
+             * ``'multilabel'` mode - shape (N, C, ...) and ``torch.LongTensor`` or ``torch.FloatTensor``
+             * ``'multiclass'` mode - shape (N, ...) and ``torch.LongTensor``
 
-        target (torch.LongTensor): Targets with following shapes
+        target (torch.LongTensor): Targets with following shapes:
              
-             - 'binary' mode:
-                shape (N, 1, ...)
-
-             - 'multilabel' mode:
-                shape (N, C, ...)
-
-             - 'multiclass' mode:
-                shape (N, ...)
+             * ``'binary'`` mode - shape (N, 1, ...)
+             * ``'multilabel'`` mode - shape (N, C, ...)
+             * ``'multiclass'`` mode - shape (N, ...)
 
         mode (str): One of ``'binary'`` | ``'multilabel'`` | ``'multiclass'``
         ignore_index (Optional[int]): Label to ignore on for metric computation.
@@ -462,37 +457,37 @@ _doc = """
         fp (torch.Tensor): tensor of shape (N, C), false positive cases
         fn (torch.Tensor): tensor of shape (N, C), false negative cases
         tn (torch.Tensor): tensor of shape (N, C), true negative cases
-        reduction (Optional[str], optional): one of . Defaults to None.
+        reduction (Optional[str], optional): Define how to aggregate metric between classes and images:
 
-            - 'micro':
+            - 'micro'
                 Sum true positive, false positive, false negative and true negative pixels over 
                 all images and all classes and then compute score.
 
-            - 'macro':
+            - 'macro'
                 Sum true positive, false positive, false negative and true negative pixels over 
                 all images for each label, then compute score for each label separately and average labels scores.
                 This does not take label imbalance into account.
 
-            - 'weighted':
+            - 'weighted'
                 Sum true positive, false positive, false negative and true negative pixels over
                 all images for each label, then compute score for each label separately and average 
                 weighted labels scores.
 
-            - 'micro-imagewise':
+            - 'micro-imagewise'
                 Sum true positive, false positive, false negative and true negative pixels for **each image**, 
                 then compute score for **each image** and average scores over dataset. All images contribute equally 
                 to final score, however takes into accout class imbalance for each image.
 
-            - 'macro-imagewise':
+            - 'macro-imagewise'
                 Compute score for each image and for each class on that image separately, then compute average score 
                 on each image over labels and average image scores over dataset. Does not take into account label imbalance
                 on each image.
 
-            - 'weighted-imagewise':
+            - 'weighted-imagewise'
                 Compute score for each image and for each class on that image separately, then compute weighted average 
                 score on each image over labels and average image scores over dataset.
 
-            - 'none' or ``None``:
+            - 'none' or ``None``
                 Same as ``'macro-imagewise'``, but without any reduction.
 
         class_weights (Optional[List[float]]): list of class weights for metric 
