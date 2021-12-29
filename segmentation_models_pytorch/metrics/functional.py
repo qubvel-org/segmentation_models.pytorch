@@ -42,27 +42,41 @@ def get_stats(
     Args:
         output (Union[torch.LongTensor, torch.FloatTensor]): Model output with following 
             shapes and types:
-            - for ``binary`` mode shape (N, 1, ...) and torch.LongTensor or torch.FloatTensor
-            - for ``multilabel`` mode (N, C, ...) and torch.LongTensor or torch.FloatTensor
-            - for ``multiclass`` shape (N, ...) and torch.LongTensor
+            
+             - ``'binary'`` mode: 
+                shape (N, 1, ...) and torch.LongTensor or torch.FloatTensor
+            
+             - ``'multilabel'`` mode: 
+                (N, C, ...) and torch.LongTensor or torch.FloatTensor
+            
+             - ``'multiclass'`` mode: 
+                shape (N, ...) and torch.LongTensor
+
         target (torch.LongTensor): Targets with following shapes
-            - for ``binary`` mode shape (N, 1, ...)
-            - for ``multilabel`` mode (N, C, ...)
-            - for ``multiclass`` shape (N, ...)
+             
+             - ``binary`` mode:
+                shape (N, 1, ...)
+
+             - ``multilabel`` mode:
+                shape (N, C, ...)
+
+             - ``multiclass`` mode:
+                shape (N, ...)
+
         mode (str): One of ``'binary'`` | ``'multilabel'`` | ``'multiclass'``
-        ignore_index (Optional[int], optional): Index to ignore on for metric computation.
-            Not supproted for ``'binary'`` and ``'multilabel'`` modes.  Defaults to None.
-        threshold (Optional[float, List[float]], optional): Binarization threshold for 
+        ignore_index (Optional[int]): Label to ignore on for metric computation.
+            **Not** supproted for ``'binary'`` and ``'multilabel'`` modes.  Defaults to None.
+        threshold (Optional[float, List[float]]): Binarization threshold for 
             ``output`` in case of ``'binary'`` or ``'multilabel'`` modes. Defaults to None.
-        num_classes (Optional[int], optional): Number of classes, necessary attribute 
+        num_classes (Optional[int]): Number of classes, necessary attribute 
             only for ``'multiclass'`` mode.
 
     Raises:
         ValueError: in case of misconfiguration.
 
     Returns:
-        Tuple[torch.LongTensor]: true_positive, false_positive, false_negative, true_negative 
-            tensors (N, C) each shape.
+        Tuple[torch.LongTensor]: true_positive, false_positive, false_negative, true_negative tensors (N, C) shape each.
+
     """
 
     if torch.is_floating_point(target):
@@ -493,8 +507,7 @@ _doc = """
             but warnings are also raised.. Defaults to 1.
 
     Returns:
-        torch.Tensor: if ``'reduction'`` is not ``None`` or ``'none'`` returns scalar metric, else
-            returns tensor of shape (N, C)
+        torch.Tensor: if ``'reduction'`` is not ``None`` or ``'none'`` returns scalar metric, else returns tensor of shape (N, C)
 
     References:
         https://en.wikipedia.org/wiki/Confusion_matrix
