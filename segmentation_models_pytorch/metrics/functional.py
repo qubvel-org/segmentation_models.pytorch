@@ -43,15 +43,15 @@ def get_stats(
         output (Union[torch.LongTensor, torch.FloatTensor]): Model output with following 
             shapes and types:
             
-        * **'binary'** mode - shape (N, 1, ...) and ``torch.LongTensor`` or ``torch.FloatTensor``
-        * **'multilabel'** mode - shape (N, C, ...) and ``torch.LongTensor`` or ``torch.FloatTensor``
-        * **'multiclass'** mode - shape (N, ...) and ``torch.LongTensor``
+            * **'binary'** mode - shape (N, 1, ...) and ``torch.LongTensor`` or ``torch.FloatTensor``
+            * **'multilabel'** mode - shape (N, C, ...) and ``torch.LongTensor`` or ``torch.FloatTensor``
+            * **'multiclass'** mode - shape (N, ...) and ``torch.LongTensor``
 
         target (torch.LongTensor): Targets with following shapes:
              
-        * **'binary'** mode - shape (N, 1, ...)
-        * **'multilabel'** mode - shape (N, C, ...)
-        * **'multiclass'** mode - shape (N, ...)
+            * **'binary'** mode - shape (N, 1, ...)
+            * **'multilabel'** mode - shape (N, C, ...)
+            * **'multiclass'** mode - shape (N, ...)
 
         mode (str): One of ``'binary'`` | ``'multilabel'`` | ``'multiclass'``
         ignore_index (Optional[int]): Label to ignore on for metric computation.
