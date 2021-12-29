@@ -37,21 +37,21 @@ def get_stats(
     num_classes: Optional[int] = None,
 ) -> Tuple[torch.LongTensor]:
     """Computes true positive, false positive, false negative, true negative 'pixels' 
-        for each image and each class. 
+    for each image and each class.
 
     Args:
         output (Union[torch.LongTensor, torch.FloatTensor]): Model output with following 
             shapes and types:
             
-             * ``'binary'` mode - shape (N, 1, ...) and ``torch.LongTensor`` or ``torch.FloatTensor``
-             * ``'multilabel'` mode - shape (N, C, ...) and ``torch.LongTensor`` or ``torch.FloatTensor``
-             * ``'multiclass'` mode - shape (N, ...) and ``torch.LongTensor``
+        * **'binary'** mode - shape (N, 1, ...) and ``torch.LongTensor`` or ``torch.FloatTensor``
+        * **'multilabel'** mode - shape (N, C, ...) and ``torch.LongTensor`` or ``torch.FloatTensor``
+        * **'multiclass'** mode - shape (N, ...) and ``torch.LongTensor``
 
         target (torch.LongTensor): Targets with following shapes:
              
-             * ``'binary'`` mode - shape (N, 1, ...)
-             * ``'multilabel'`` mode - shape (N, C, ...)
-             * ``'multiclass'`` mode - shape (N, ...)
+        * **'binary'** mode - shape (N, 1, ...)
+        * **'multilabel'** mode - shape (N, C, ...)
+        * **'multiclass'** mode - shape (N, ...)
 
         mode (str): One of ``'binary'`` | ``'multilabel'`` | ``'multiclass'``
         ignore_index (Optional[int]): Label to ignore on for metric computation.
@@ -457,7 +457,7 @@ _doc = """
         fp (torch.Tensor): tensor of shape (N, C), false positive cases
         fn (torch.Tensor): tensor of shape (N, C), false negative cases
         tn (torch.Tensor): tensor of shape (N, C), true negative cases
-        reduction (Optional[str], optional): Define how to aggregate metric between classes and images:
+        reduction (Optional[str]): Define how to aggregate metric between classes and images:
 
             - 'micro'
                 Sum true positive, false positive, false negative and true negative pixels over 
