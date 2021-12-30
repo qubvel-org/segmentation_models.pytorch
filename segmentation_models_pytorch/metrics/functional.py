@@ -1,5 +1,9 @@
 """Various metrics based on Type I and Type II errors.
 
+References:
+    https://en.wikipedia.org/wiki/Confusion_matrix
+
+
 Example:
 
     .. code-block:: python
@@ -20,9 +24,6 @@ Example:
         f2_score = smp.metrics.fbeta_score(tp, fp, fn, tn, beta=2, reduction="micro")
         accuracy = smp.metrics.accuracy(tp, fp, fn, tn, reduction="macro")
         recall = smp.metrics.recall(tp, fp, fn, tn, reduction="micro-imagewise")
-
-References:
-    https://en.wikipedia.org/wiki/Confusion_matrix
 
 """
 import torch
@@ -155,32 +156,37 @@ def _get_stats_multiclass(
     output: torch.LongTensor,
     target: torch.LongTensor,
     num_classes: int,
-) -> Tuple[torch.LongTensor, torch.LongTensor, torch.LongTensor]:
+) -> Tuple[torch.LongTensor, torch.LongTensor, torch.LongTensor, torch.LongTensor]:
     
-    batch_size = output.shape[0]
+    batch_size, *dims = output.shape
+    num_elements = torch.prod(torch.tensor(dims)).long()
+    
     tp_count = torch.zeros(batch_size, num_classes, dtype=torch.long)
     fp_count = torch.zeros(batch_size, num_classes, dtype=torch.long)
     fn_count = torch.zeros(batch_size, num_classes, dtype=torch.long)
+    tn_count = torch.zeros(batch_size, num_classes, dtype=torch.long)
 
     for i in range(batch_size):
         target_i = target[i]
         output_i = output[i]
         matched = target_i * (output_i == target_i)
-        tp = torch.histc(matched.float(), bins=num_classes - 1, min=0, max=num_classes - 1)
-        fp = torch.histc(output_i.float(), bins=num_classes - 1, min=0, max=num_classes - 1) - tp
-        fn = torch.histc(target_i.float(), bins=num_classes - 1, min=0, max=num_classes - 1) - tp
+        tp = torch.histc(matched.float(), bins=num_classes, min=0, max=num_classes - 1)
+        fp = torch.histc(output_i.float(), bins=num_classes, min=0, max=num_classes - 1) - tp
+        fn = torch.histc(target_i.float(), bins=num_classes, min=0, max=num_classes - 1) - tp
+        tn = num_elements - tp - fp - fn
         tp_count[i] = tp.long()
         fp_count[i] = fp.long()
         fn_count[i] = fn.long()
+        tn_count[i] = tn.long()
 
-    return tp_count, fp_count, fn_count
+    return tp_count, fp_count, fn_count, tn_count
 
 
 @torch.no_grad()
 def _get_stats_multilabel(
     output: torch.LongTensor,
     target: torch.LongTensor,
-) -> Tuple[torch.LongTensor, torch.LongTensor, torch.LongTensor]:
+) -> Tuple[torch.LongTensor, torch.LongTensor, torch.LongTensor, torch.LongTensor]:
     
     batch_size, num_classes, *dims = target.shape
     output = output.view(batch_size, num_classes, -1)
@@ -547,8 +553,8 @@ _doc = """
 
             For ``'binary'`` case ``'micro' = 'macro' = 'weighted'`` and 
             ``'micro-imagewise' = 'macro-imagewise' = 'weighted-imagewise'``.
-            
-            Prefixes ``'micro'``|``'macro'``|``'weighted'`` define how the scores for classes will be aggregated, 
+
+            Prefixes ``'micro'``, ``'macro'`` and ``'weighted'`` define how the scores for classes will be aggregated, 
             while postfix ``'imagewise'`` defines how scores between the images will be aggregated.
 
         class_weights (Optional[List[float]]): list of class weights for metric 
