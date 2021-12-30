@@ -1,5 +1,5 @@
-Metrics
-=======
+📈 Metrics
+==========
 
 Functional metrics
 ~~~~~~~~~~~~~~~~~~

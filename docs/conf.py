@@ -95,6 +95,8 @@ autodoc_mock_imports = [
     'tqdm',
     'numpy',
     'timm',
+    'cv2',
+    'PIL',
     'pretrainedmodels',
     'torchvision',
     'efficientnet-pytorch',
