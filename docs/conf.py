@@ -118,3 +118,8 @@ def f(app, obj, bound_method):
 
 def setup(app):
     app.connect('autodoc-before-process-signature', f)
+
+
+# Custom configuration --------------------------------------------------------
+
+autodoc_member_order = 'bysource'

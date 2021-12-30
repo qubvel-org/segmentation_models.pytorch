@@ -1,3 +1,20 @@
+"""Various metrics based on Type I and Type II errors.
+
+.. code-block:: python
+
+    import segmentation_models_pytorch as smp
+
+    output = ...
+    target = ...
+
+    tp, fp, fn, tn = smp.metrics.get_stats(output, target, threshold=0.5)
+    
+    iou_score = smp.metrics.iou_score(tp, fp, fn, tn, reduction="micro")
+    f2_score = smp.metrics.fbeta_score(tp, fp, fn, tn, beta=2, reduction="micro")
+    accuracy = smp.metrics.accuracy(tp, fp, fn, tn, reduction="macro")
+    recall = smp.metrics.recall(tp, fp, fn, tn, reduction="micro-imagewise")
+
+"""
 import torch
 import warnings
 from typing import Optional, List, Tuple, Union
@@ -41,17 +58,22 @@ def get_stats(
 
     Args:
         output (Union[torch.LongTensor, torch.FloatTensor]): Model output with following 
-            shapes and types:
+        shapes and types (depends on ``mode``):
             
-            * **'binary'** mode - shape (N, 1, ...) and ``torch.LongTensor`` or ``torch.FloatTensor``
-            * **'multilabel'** mode - shape (N, C, ...) and ``torch.LongTensor`` or ``torch.FloatTensor``
-            * **'multiclass'** mode - shape (N, ...) and ``torch.LongTensor``
+            ``'binary'``
+                shape (N, 1, ...) and ``torch.LongTensor`` or ``torch.FloatTensor``
+
+            ``'multilabel'``
+                shape (N, C, ...) and ``torch.LongTensor`` or ``torch.FloatTensor``
+
+            ``'multiclass'``
+                shape (N, ...) and ``torch.LongTensor``
 
         target (torch.LongTensor): Targets with following shapes:
              
-            * **'binary'** mode - shape (N, 1, ...)
-            * **'multilabel'** mode - shape (N, C, ...)
-            * **'multiclass'** mode - shape (N, ...)
+            * 'binary' mode - shape (N, 1, ...)
+            * 'multilabel' mode - shape (N, C, ...)
+            * 'multiclass' mode - shape (N, ...)
 
         mode (str): One of ``'binary'`` | ``'multilabel'`` | ``'multiclass'``
         ignore_index (Optional[int]): Label to ignore on for metric computation.
@@ -177,8 +199,9 @@ def _compute_metric(metric_fn, tp, fp, fn, tn, reduction: Optional[str] = None,
     if class_weights is None and reduction is not None and "weighted" in reduction:
         raise ValueError(f"Class weights should be provided for `{reduction}` reduction")
         
-    class_weights = class_weight if class_weights is not None else 1.
+    class_weights = class_weights if class_weights is not None else 1.
     class_weights = torch.tensor(class_weights).to(tp.device)
+    class_weights = class_weights / class_weights.sum()
     
     if reduction == "micro":
         tp = tp.sum()
