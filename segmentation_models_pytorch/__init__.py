@@ -1,3 +1,9 @@
+from . import datasets
+from . import encoders
+from . import decoders
+from . import losses
+from . import metrics
+
 from .decoders.unet import Unet
 from .decoders.unetplusplus import UnetPlusPlus
 from .decoders.manet import MAnet
@@ -6,12 +12,6 @@ from .decoders.fpn import FPN
 from .decoders.pspnet import PSPNet
 from .decoders.deeplabv3 import DeepLabV3, DeepLabV3Plus
 from .decoders.pan import PAN
-
-from . import datasets
-from . import encoders
-from . import decoders
-from . import losses
-from . import metrics
 
 from .__version__ import __version__
 
