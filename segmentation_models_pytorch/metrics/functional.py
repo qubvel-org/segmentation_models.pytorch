@@ -210,7 +210,7 @@ def _handle_zero_division(x, zero_division):
     if torch.any(nans) and zero_division == "warn":
         warnings.warn("Zero division in metric calculation!")
     value = zero_division if zero_division is not "warn" else 0
-    value = torch.tensor(value, dtype=x.dtype)
+    value = torch.tensor(value, dtype=x.dtype).to(x.device)
     x = torch.where(nans, value, x)
     return x
     
