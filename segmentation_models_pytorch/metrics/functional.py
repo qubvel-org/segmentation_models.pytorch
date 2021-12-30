@@ -1,18 +1,28 @@
 """Various metrics based on Type I and Type II errors.
 
-.. code-block:: python
+Example:
 
-    import segmentation_models_pytorch as smp
+    .. code-block:: python
 
-    output = ...
-    target = ...
+        import segmentation_models_pytorch as smp
 
-    tp, fp, fn, tn = smp.metrics.get_stats(output, target, threshold=0.5)
-    
-    iou_score = smp.metrics.iou_score(tp, fp, fn, tn, reduction="micro")
-    f2_score = smp.metrics.fbeta_score(tp, fp, fn, tn, beta=2, reduction="micro")
-    accuracy = smp.metrics.accuracy(tp, fp, fn, tn, reduction="macro")
-    recall = smp.metrics.recall(tp, fp, fn, tn, reduction="micro-imagewise")
+        # lets assume we have multilabel prediction for 3 classes
+        output = torch.rand([10, 3, 256, 256])
+        target = torch.rand([10, 3, 256, 256]).round().long()
+
+        # first compute statistics for true positives, false positives, false negative and 
+        # true negative "pixels"
+        tp, fp, fn, tn = smp.metrics.get_stats(output, target, mode='multilabel', threshold=0.5)
+        
+        # then compute metrics with required reduction (see metric docs)
+        iou_score = smp.metrics.iou_score(tp, fp, fn, tn, reduction="micro")
+        f1_score = smp.metrics.f1_score(tp, fp, fn, tn, reduction="micro")
+        f2_score = smp.metrics.fbeta_score(tp, fp, fn, tn, beta=2, reduction="micro")
+        accuracy = smp.metrics.accuracy(tp, fp, fn, tn, reduction="macro")
+        recall = smp.metrics.recall(tp, fp, fn, tn, reduction="micro-imagewise")
+
+References:
+    https://en.wikipedia.org/wiki/Confusion_matrix
 
 """
 import torch
@@ -30,6 +40,7 @@ __all__ = [
     "recall",
     "sensitivity",
     "specificity",
+    "balanced_accuracy",
     "positive_predictive_value",
     "negative_predictive_value",
     "false_negative_rate",
@@ -58,23 +69,28 @@ def get_stats(
 
     Args:
         output (Union[torch.LongTensor, torch.FloatTensor]): Model output with following 
-        shapes and types (depends on ``mode``):
+            shapes and types depending on the specified ``mode``:
             
-            ``'binary'``
+            'binary'
                 shape (N, 1, ...) and ``torch.LongTensor`` or ``torch.FloatTensor``
 
-            ``'multilabel'``
+            'multilabel'
                 shape (N, C, ...) and ``torch.LongTensor`` or ``torch.FloatTensor``
 
-            ``'multiclass'``
+            'multiclass'
                 shape (N, ...) and ``torch.LongTensor``
 
-        target (torch.LongTensor): Targets with following shapes:
+        target (torch.LongTensor): Targets with following shapes depending on the specified ``mode``:
              
-            * 'binary' mode - shape (N, 1, ...)
-            * 'multilabel' mode - shape (N, C, ...)
-            * 'multiclass' mode - shape (N, ...)
+            'binary'
+                shape (N, 1, ...)
 
+            'multilabel'
+                shape (N, C, ...)
+
+            'multiclass'
+                shape (N, ...)
+                
         mode (str): One of ``'binary'`` | ``'multilabel'`` | ``'multiclass'``
         ignore_index (Optional[int]): Label to ignore on for metric computation.
             **Not** supproted for ``'binary'`` and ``'multilabel'`` modes.  Defaults to None.
@@ -264,6 +280,9 @@ def _sensitivity(tp, fp, fn, tn):
 def _specificity(tp, fp, fn, tn):
     return tn / (tn + fp)
 
+def _balanced_accuracy(tp, fp, fn, tn):
+    return (_sensitivity(tp, fp, fn, tn) + _specificity(tp, fp, fn, tn)) / 2
+
 def _positive_predictive_value(tp, fp, fn, tn):
     return tp / (tp + fp)
 
@@ -362,6 +381,19 @@ def specificity(tp, fp, fn, tn, reduction: Optional[str] = None,
     """Specificity, selectivity or true negative rate (TNR)"""
     return _compute_metric(
         _specificity,
+        tp, fp, fn, tn,
+        reduction=reduction,
+        class_weights=class_weights,
+        zero_division=zero_division,
+    )
+
+
+def balanced_accuracy(tp, fp, fn, tn, reduction: Optional[str] = None,
+    class_weights: Optional[List[float]] = None, zero_division: Union[str, float] = 1.0,
+) -> torch.Tensor:
+    """Balanced accuracy"""
+    return _compute_metric(
+        _balanced_accuracy,
         tp, fp, fn, tn,
         reduction=reduction,
         class_weights=class_weights,
@@ -513,6 +545,12 @@ _doc = """
             - 'none' or ``None``
                 Same as ``'macro-imagewise'``, but without any reduction.
 
+            For ``'binary'`` case ``'micro' = 'macro' = 'weighted'`` and 
+            ``'micro-imagewise' = 'macro-imagewise' = 'weighted-imagewise'``.
+            
+            Prefixes ``'micro'``|``'macro'``|``'weighted'`` define how the scores for classes will be aggregated, 
+            while postfix ``'imagewise'`` defines how scores between the images will be aggregated.
+
         class_weights (Optional[List[float]]): list of class weights for metric 
             aggregation, in case of `weighted*` reduction is chosen. Defaults to None.
         zero_division (Union[str, float]): Sets the value to return when there is a zero division, 
@@ -532,6 +570,7 @@ iou_score.__doc__ += _doc
 accuracy.__doc__ += _doc
 sensitivity.__doc__ += _doc
 specificity.__doc__ += _doc
+balanced_accuracy.__doc__ += _doc
 positive_predictive_value.__doc__ += _doc
 negative_predictive_value.__doc__ += _doc
 false_negative_rate.__doc__ += _doc

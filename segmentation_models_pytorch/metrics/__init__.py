@@ -8,6 +8,7 @@ from .functional import (
     recall,
     sensitivity,
     specificity,
+    balanced_accuracy,
     positive_predictive_value,
     negative_predictive_value,
     false_negative_rate,
