@@ -1,7 +1,9 @@
 import os
-import cv2
+import torch
 import shutil
 import numpy as np
+
+from PIL import Image
 from tqdm import tqdm
 from urllib.request import urlretrieve
 
@@ -15,8 +17,6 @@ class OxfordPetDataset(torch.utils.data.Dataset):
         self.root = root
         self.mode = mode
         self.transform = transform
-        
-        self._download_dataset() # download only if it does not exist
 
         self.images_directory = os.path.join(self.root, "images")
         self.masks_directory = os.path.join(self.root, "annotations", "trimaps")
@@ -32,10 +32,9 @@ class OxfordPetDataset(torch.utils.data.Dataset):
         image_path = os.path.join(self.images_directory, filename + ".jpg")
         mask_path = os.path.join(self.masks_directory, filename + ".png")
 
-        image = cv2.imread(image_path)
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image = np.array(Image.open(image_path).convert("RGB"))
 
-        trimap = cv2.imread(mask_path, cv2.IMREAD_UNCHANGED)
+        trimap = np.array(Image.open(mask_path))
         mask = self._preprocess_mask(trimap)
 
         sample = dict(image=image, mask=mask, trimap=trimap)
@@ -63,17 +62,18 @@ class OxfordPetDataset(torch.utils.data.Dataset):
             filenames = [x for i, x in enumerate(filenames) if i % 10 == 0]
         return filenames
 
-    def _download_dataset(self):
+    @staticmethod
+    def download(root):
         
         # load images
-        filepath = os.path.join(self.root, "images.tar.gz")
+        filepath = os.path.join(root, "images.tar.gz")
         download_url(
             url="https://www.robots.ox.ac.uk/~vgg/data/pets/data/images.tar.gz", filepath=filepath,
         )
         extract_archive(filepath)
 
         # load annotations
-        filepath = os.path.join(self.root, "annotations.tar.gz")
+        filepath = os.path.join(root, "annotations.tar.gz")
         download_url(
             url="https://www.robots.ox.ac.uk/~vgg/data/pets/data/annotations.tar.gz", filepath=filepath,
         )
@@ -81,16 +81,14 @@ class OxfordPetDataset(torch.utils.data.Dataset):
 
 
 class SimpleOxfordPetDataset(OxfordPetDataset):
-    """Dataset for example without augmentations and transforms"""
-
     def __getitem__(self, *args, **kwargs):
 
         sample = super().__getitem__(*args, **kwargs)
 
         # resize images
-        image = cv2.resize(sample["image"], (256, 256), cv2.INTER_LINEAR)
-        mask = cv2.resize(sample["mask"], (256, 256), cv2.INTER_NEAREST)
-        trimap = cv2.resize(sample["trimap"], (256, 256), cv2.INTER_NEAREST)
+        image = np.array(Image.fromarray(sample["image"]).resize((256, 256), Image.LINEAR))
+        mask = np.array(Image.fromarray(sample["mask"]).resize((256, 256), Image.NEAREST))
+        trimap = np.array(Image.fromarray(sample["trimap"]).resize((256, 256), Image.NEAREST))
 
         # convert to other format HWC -> CHW
         sample["image"] = np.moveaxis(image, -1, 0)
