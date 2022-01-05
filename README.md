@@ -12,8 +12,9 @@ The main features of this library are:
 
  - High level API (just two lines to create a neural network)
  - 9 models architectures for binary and multi class segmentation (including legendary Unet)
- - 113 available encoders
+ - 113 available encoders (and 400+ encoders from [timm](https://github.com/rwightman/pytorch-image-models))
  - All encoders have pre-trained weights for faster and better convergence
+ - Popular metrics and losses for training routines
  
 ### [📚 Project Documentation 📚](http://smp.readthedocs.io/)
 
@@ -68,9 +69,10 @@ preprocess_input = get_preprocessing_fn('resnet18', pretrained='imagenet')
 Congratulations! You are done! Now you can train your model with your favorite framework!
 
 ### 💡 Examples <a name="examples"></a>
+ - Training model for pets binary segmentation with Pytorch-Lightning [notebook](https://github.com/qubvel/segmentation_models.pytorch/blob/master/examples/binary_segmentation_intro.ipynb) and [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/googlecolab/colabtools/blob/master/examples/binary_segmentation_intro.ipynb)
  - Training model for cars segmentation on CamVid dataset [here](https://github.com/qubvel/segmentation_models.pytorch/blob/master/examples/cars%20segmentation%20(camvid).ipynb).
- - Training SMP model with [Catalyst](https://github.com/catalyst-team/catalyst) (high-level framework for PyTorch), [TTAch](https://github.com/qubvel/ttach) (TTA library for PyTorch) and [Albumentations](https://github.com/albu/albumentations) (fast image augmentation library) - [here](https://github.com/catalyst-team/catalyst/blob/master/examples/notebooks/segmentation-tutorial.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/catalyst-team/catalyst/blob/master/examples/notebooks/segmentation-tutorial.ipynb)
- - Training SMP model with [Pytorch-Lightning](https://pytorch-lightning.readthedocs.io) framework - [here](https://github.com/ternaus/cloths_segmentation) (clothes binary segmentation by [@teranus](https://github.com/ternaus)).
+ - Training SMP model with [Catalyst](https://github.com/catalyst-team/catalyst) (high-level framework for PyTorch), [TTAch](https://github.com/qubvel/ttach) (TTA library for PyTorch) and [Albumentations](https://github.com/albu/albumentations) (fast image augmentation library) - [here](https://github.com/catalyst-team/catalyst/blob/v21.02rc0/examples/notebooks/segmentation-tutorial.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/catalyst-team/catalyst/blob/v21.02rc0/examples/notebooks/segmentation-tutorial.ipynb)
+ - Training SMP model with [Pytorch-Lightning](https://pytorch-lightning.readthedocs.io) framework - [here](https://github.com/ternaus/cloths_segmentation) (clothes binary segmentation by [@ternaus](https://github.com/ternaus)).
 
 ### 📦 Models <a name="models"></a>
 

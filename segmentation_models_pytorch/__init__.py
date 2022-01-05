@@ -1,3 +1,9 @@
+from . import datasets
+from . import encoders
+from . import decoders
+from . import losses
+from . import metrics
+
 from .decoders.unet import Unet
 from .decoders.unetplusplus import UnetPlusPlus
 from .decoders.manet import MAnet
@@ -7,27 +13,23 @@ from .decoders.pspnet import PSPNet
 from .decoders.deeplabv3 import DeepLabV3, DeepLabV3Plus
 from .decoders.pan import PAN
 
-from . import encoders
-from . import decoders
-from . import losses
-
 from .__version__ import __version__
 
-from typing import Optional
-import torch
+# some private imports for create_model function
+from typing import Optional as _Optional
+import torch as _torch
 
 
 def create_model(
     arch: str,
     encoder_name: str = "resnet34",
-    encoder_weights: Optional[str] = "imagenet",
+    encoder_weights: _Optional[str] = "imagenet",
     in_channels: int = 3,
     classes: int = 1,
     **kwargs,
-) -> torch.nn.Module:
-    """Models wrapper. Allows to create any model just with parametes
-
-    """
+) -> _torch.nn.Module:
+    """Models entrypoint, allows to create any model architecture just with 
+    parameters, without using its class"""
 
     archs = [Unet, UnetPlusPlus, MAnet, Linknet, FPN, PSPNet, DeepLabV3, DeepLabV3Plus, PAN]
     archs_dict = {a.__name__.lower(): a for a in archs}
