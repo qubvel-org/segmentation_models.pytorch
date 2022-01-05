@@ -4,8 +4,9 @@ repos:
     hooks:
       - id: black
         args: [ --config=pyproject.toml ]
--   repo: https://gitlab.com/pycqa/flake8
+  - repo: https://gitlab.com/pycqa/flake8
     rev: 4.0.1
     hooks:
     - id: flake8
       args: [ --config=.flake8 ]
+      additional_dependencies: [ flake8-docstrings==1.6.0 ]
