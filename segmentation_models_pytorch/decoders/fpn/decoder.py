@@ -8,9 +8,7 @@ class Conv3x3GNReLU(nn.Module):
         super().__init__()
         self.upsample = upsample
         self.block = nn.Sequential(
-            nn.Conv2d(
-                in_channels, out_channels, (3, 3), stride=1, padding=1, bias=False
-            ),
+            nn.Conv2d(in_channels, out_channels, (3, 3), stride=1, padding=1, bias=False),
             nn.GroupNorm(32, out_channels),
             nn.ReLU(inplace=True),
         )
@@ -54,33 +52,27 @@ class MergeBlock(nn.Module):
     def __init__(self, policy):
         super().__init__()
         if policy not in ["add", "cat"]:
-            raise ValueError(
-                "`merge_policy` must be one of: ['add', 'cat'], got {}".format(
-                    policy
-                )
-            )
+            raise ValueError("`merge_policy` must be one of: ['add', 'cat'], got {}".format(policy))
         self.policy = policy
 
     def forward(self, x):
-        if self.policy == 'add':
+        if self.policy == "add":
             return sum(x)
-        elif self.policy == 'cat':
+        elif self.policy == "cat":
             return torch.cat(x, dim=1)
         else:
-            raise ValueError(
-                "`merge_policy` must be one of: ['add', 'cat'], got {}".format(self.policy)
-            )
+            raise ValueError("`merge_policy` must be one of: ['add', 'cat'], got {}".format(self.policy))
 
 
 class FPNDecoder(nn.Module):
     def __init__(
-            self,
-            encoder_channels,
-            encoder_depth=5,
-            pyramid_channels=256,
-            segmentation_channels=128,
-            dropout=0.2,
-            merge_policy="add",
+        self,
+        encoder_channels,
+        encoder_depth=5,
+        pyramid_channels=256,
+        segmentation_channels=128,
+        dropout=0.2,
+        merge_policy="add",
     ):
         super().__init__()
 
@@ -89,17 +81,19 @@ class FPNDecoder(nn.Module):
             raise ValueError("Encoder depth for FPN decoder cannot be less than 3, got {}.".format(encoder_depth))
 
         encoder_channels = encoder_channels[::-1]
-        encoder_channels = encoder_channels[:encoder_depth + 1]
+        encoder_channels = encoder_channels[: encoder_depth + 1]
 
         self.p5 = nn.Conv2d(encoder_channels[0], pyramid_channels, kernel_size=1)
         self.p4 = FPNBlock(pyramid_channels, encoder_channels[1])
         self.p3 = FPNBlock(pyramid_channels, encoder_channels[2])
         self.p2 = FPNBlock(pyramid_channels, encoder_channels[3])
 
-        self.seg_blocks = nn.ModuleList([
-            SegmentationBlock(pyramid_channels, segmentation_channels, n_upsamples=n_upsamples)
-            for n_upsamples in [3, 2, 1, 0]
-        ])
+        self.seg_blocks = nn.ModuleList(
+            [
+                SegmentationBlock(pyramid_channels, segmentation_channels, n_upsamples=n_upsamples)
+                for n_upsamples in [3, 2, 1, 0]
+            ]
+        )
 
         self.merge = MergeBlock(merge_policy)
         self.dropout = nn.Dropout2d(p=dropout, inplace=True)

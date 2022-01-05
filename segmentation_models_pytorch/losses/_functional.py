@@ -34,14 +34,14 @@ def to_tensor(x, dtype=None) -> torch.Tensor:
 
 
 def focal_loss_with_logits(
-        output: torch.Tensor,
-        target: torch.Tensor,
-        gamma: float = 2.0,
-        alpha: Optional[float] = 0.25,
-        reduction: str = "mean",
-        normalized: bool = False,
-        reduced_threshold: Optional[float] = None,
-        eps: float = 1e-6,
+    output: torch.Tensor,
+    target: torch.Tensor,
+    gamma: float = 2.0,
+    alpha: Optional[float] = 0.25,
+    reduction: str = "mean",
+    normalized: bool = False,
+    reduced_threshold: Optional[float] = None,
+    eps: float = 1e-6,
 ) -> torch.Tensor:
     """Compute binary focal loss between target and output logits.
     See :class:`~pytorch_toolbelt.losses.FocalLoss` for details.
@@ -97,13 +97,13 @@ def focal_loss_with_logits(
 
 
 def softmax_focal_loss_with_logits(
-        output: torch.Tensor,
-        target: torch.Tensor,
-        gamma: float = 2.0,
-        reduction="mean",
-        normalized=False,
-        reduced_threshold: Optional[float] = None,
-        eps: float = 1e-6,
+    output: torch.Tensor,
+    target: torch.Tensor,
+    gamma: float = 2.0,
+    reduction="mean",
+    normalized=False,
+    reduced_threshold: Optional[float] = None,
+    eps: float = 1e-6,
 ) -> torch.Tensor:
     """Softmax version of focal loss between target and output logits.
     See :class:`~pytorch_toolbelt.losses.FocalLoss` for details.
@@ -150,7 +150,11 @@ def softmax_focal_loss_with_logits(
 
 
 def soft_jaccard_score(
-        output: torch.Tensor, target: torch.Tensor, smooth: float = 0.0, eps: float = 1e-7, dims=None
+    output: torch.Tensor,
+    target: torch.Tensor,
+    smooth: float = 0.0,
+    eps: float = 1e-7,
+    dims=None,
 ) -> torch.Tensor:
     assert output.size() == target.size()
     if dims is not None:
@@ -166,7 +170,11 @@ def soft_jaccard_score(
 
 
 def soft_dice_score(
-        output: torch.Tensor, target: torch.Tensor, smooth: float = 0.0, eps: float = 1e-7, dims=None
+    output: torch.Tensor,
+    target: torch.Tensor,
+    smooth: float = 0.0,
+    eps: float = 1e-7,
+    dims=None,
 ) -> torch.Tensor:
     assert output.size() == target.size()
     if dims is not None:
@@ -179,16 +187,23 @@ def soft_dice_score(
     return dice_score
 
 
-def soft_tversky_score(output: torch.Tensor, target: torch.Tensor, alpha: float, beta: float,
-                       smooth: float = 0.0, eps: float = 1e-7, dims=None) -> torch.Tensor:
+def soft_tversky_score(
+    output: torch.Tensor,
+    target: torch.Tensor,
+    alpha: float,
+    beta: float,
+    smooth: float = 0.0,
+    eps: float = 1e-7,
+    dims=None,
+) -> torch.Tensor:
     assert output.size() == target.size()
     if dims is not None:
         intersection = torch.sum(output * target, dim=dims)  # TP
-        fp = torch.sum(output * (1. - target), dim=dims)
+        fp = torch.sum(output * (1.0 - target), dim=dims)
         fn = torch.sum((1 - output) * target, dim=dims)
     else:
         intersection = torch.sum(output * target)  # TP
-        fp = torch.sum(output * (1. - target))
+        fp = torch.sum(output * (1.0 - target))
         fn = torch.sum((1 - output) * target)
 
     tversky_score = (intersection + smooth) / (intersection + alpha * fp + beta * fn + smooth).clamp_min(eps)
@@ -196,14 +211,11 @@ def soft_tversky_score(output: torch.Tensor, target: torch.Tensor, alpha: float,
 
 
 def wing_loss(output: torch.Tensor, target: torch.Tensor, width=5, curvature=0.5, reduction="mean"):
-    """
-    https://arxiv.org/pdf/1711.06753.pdf
-    :param output:
-    :param target:
-    :param width:
-    :param curvature:
-    :param reduction:
-    :return:
+    """Wing loss
+
+    References:
+        https://arxiv.org/pdf/1711.06753.pdf
+
     """
     diff_abs = (target - output).abs()
     loss = diff_abs.clone()
@@ -226,16 +238,21 @@ def wing_loss(output: torch.Tensor, target: torch.Tensor, width=5, curvature=0.5
 
 
 def label_smoothed_nll_loss(
-        lprobs: torch.Tensor, target: torch.Tensor, epsilon: float, ignore_index=None, reduction="mean", dim=-1
+    lprobs: torch.Tensor,
+    target: torch.Tensor,
+    epsilon: float,
+    ignore_index=None,
+    reduction="mean",
+    dim=-1,
 ) -> torch.Tensor:
-    """
-    Source: https://github.com/pytorch/fairseq/blob/master/fairseq/criterions/label_smoothed_cross_entropy.py
-    :param lprobs: Log-probabilities of predictions (e.g after log_softmax)
-    :param target:
-    :param epsilon:
-    :param ignore_index:
-    :param reduction:
-    :return:
+    """NLL loss with label smoothing
+
+    References:
+        https://github.com/pytorch/fairseq/blob/master/fairseq/criterions/label_smoothed_cross_entropy.py
+
+    Args:
+        lprobs (torch.Tensor): Log-probabilities of predictions (e.g after log_softmax)
+
     """
     if target.dim() == lprobs.dim() - 1:
         target = target.unsqueeze(dim)

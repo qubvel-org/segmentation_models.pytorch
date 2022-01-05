@@ -3,8 +3,7 @@ import torch.nn as nn
 
 
 class TimmUniversalEncoder(nn.Module):
-
-    def __init__(self, name, pretrained=True, in_channels=3, depth=5, output_stride=32): 
+    def __init__(self, name, pretrained=True, in_channels=3, depth=5, output_stride=32):
         super().__init__()
         kwargs = dict(
             in_chans=in_channels,
@@ -21,12 +20,16 @@ class TimmUniversalEncoder(nn.Module):
         self.model = timm.create_model(name, **kwargs)
 
         self._in_channels = in_channels
-        self._out_channels = [in_channels, ] + self.model.feature_info.channels()
+        self._out_channels = [
+            in_channels,
+        ] + self.model.feature_info.channels()
         self._depth = depth
 
     def forward(self, x):
         features = self.model(x)
-        features = [x,] + features
+        features = [
+            x,
+        ] + features
         return features
 
     @property

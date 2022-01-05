@@ -77,7 +77,7 @@ class DeepLabV3PlusDecoder(nn.Module):
         self.up = nn.UpsamplingBilinear2d(scale_factor=scale_factor)
 
         highres_in_channels = encoder_channels[-4]
-        highres_out_channels = 48   # proposed by authors of paper
+        highres_out_channels = 48  # proposed by authors of paper
         self.block1 = nn.Sequential(
             nn.Conv2d(highres_in_channels, highres_out_channels, kernel_size=1, bias=False),
             nn.BatchNorm2d(highres_out_channels),
@@ -149,7 +149,7 @@ class ASPPPooling(nn.Sequential):
         size = x.shape[-2:]
         for mod in self:
             x = mod(x)
-        return F.interpolate(x, size=size, mode='bilinear', align_corners=False)
+        return F.interpolate(x, size=size, mode="bilinear", align_corners=False)
 
 
 class ASPP(nn.Module):
@@ -190,16 +190,15 @@ class ASPP(nn.Module):
 
 
 class SeparableConv2d(nn.Sequential):
-
     def __init__(
-            self,
-            in_channels,
-            out_channels,
-            kernel_size,
-            stride=1,
-            padding=0,
-            dilation=1,
-            bias=True,
+        self,
+        in_channels,
+        out_channels,
+        kernel_size,
+        stride=1,
+        padding=0,
+        dilation=1,
+        bias=True,
     ):
         dephtwise_conv = nn.Conv2d(
             in_channels,

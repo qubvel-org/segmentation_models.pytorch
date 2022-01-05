@@ -53,7 +53,7 @@ def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **
             depth=depth,
             output_stride=output_stride,
             pretrained=weights is not None,
-            **kwargs
+            **kwargs,
         )
         return encoder
 
@@ -70,15 +70,19 @@ def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **
         try:
             settings = encoders[name]["pretrained_settings"][weights]
         except KeyError:
-            raise KeyError("Wrong pretrained weights `{}` for encoder `{}`. Available options are: {}".format(
-                weights, name, list(encoders[name]["pretrained_settings"].keys()),
-            ))
+            raise KeyError(
+                "Wrong pretrained weights `{}` for encoder `{}`. Available options are: {}".format(
+                    weights,
+                    name,
+                    list(encoders[name]["pretrained_settings"].keys()),
+                )
+            )
         encoder.load_state_dict(model_zoo.load_url(settings["url"]))
 
     encoder.set_in_channels(in_channels, pretrained=weights is not None)
     if output_stride != 32:
         encoder.make_dilated(output_stride)
-    
+
     return encoder
 
 

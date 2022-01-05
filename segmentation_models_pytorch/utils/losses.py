@@ -6,8 +6,7 @@ from ..base.modules import Activation
 
 
 class JaccardLoss(base.Loss):
-
-    def __init__(self, eps=1., activation=None, ignore_channels=None, **kwargs):
+    def __init__(self, eps=1.0, activation=None, ignore_channels=None, **kwargs):
         super().__init__(**kwargs)
         self.eps = eps
         self.activation = Activation(activation)
@@ -16,7 +15,8 @@ class JaccardLoss(base.Loss):
     def forward(self, y_pr, y_gt):
         y_pr = self.activation(y_pr)
         return 1 - F.jaccard(
-            y_pr, y_gt,
+            y_pr,
+            y_gt,
             eps=self.eps,
             threshold=None,
             ignore_channels=self.ignore_channels,
@@ -24,8 +24,7 @@ class JaccardLoss(base.Loss):
 
 
 class DiceLoss(base.Loss):
-
-    def __init__(self, eps=1., beta=1., activation=None, ignore_channels=None, **kwargs):
+    def __init__(self, eps=1.0, beta=1.0, activation=None, ignore_channels=None, **kwargs):
         super().__init__(**kwargs)
         self.eps = eps
         self.beta = beta
@@ -35,7 +34,8 @@ class DiceLoss(base.Loss):
     def forward(self, y_pr, y_gt):
         y_pr = self.activation(y_pr)
         return 1 - F.f_score(
-            y_pr, y_gt,
+            y_pr,
+            y_gt,
             beta=self.beta,
             eps=self.eps,
             threshold=None,
