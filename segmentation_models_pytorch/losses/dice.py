@@ -10,7 +10,6 @@ __all__ = ["DiceLoss"]
 
 
 class DiceLoss(_Loss):
-
     def __init__(
         self,
         mode: str,
@@ -21,7 +20,7 @@ class DiceLoss(_Loss):
         ignore_index: Optional[int] = None,
         eps: float = 1e-7,
     ):
-        """Implementation of Dice loss for image segmentation task.
+        """Dice loss for image segmentation task.
         It supports binary, multiclass and multilabel cases
 
         Args:
@@ -31,7 +30,7 @@ class DiceLoss(_Loss):
             from_logits: If True, assumes input is raw logits
             smooth: Smoothness constant for dice coefficient (a)
             ignore_index: Label that indicates ignored pixels (does not contribute to loss)
-            eps: A small epsilon for numerical stability to avoid zero division error 
+            eps: A small epsilon for numerical stability to avoid zero division error
                 (denominator will be always greater or equal to eps)
 
         Shape

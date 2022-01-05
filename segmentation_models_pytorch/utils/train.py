@@ -5,8 +5,7 @@ from .meter import AverageValueMeter
 
 
 class Epoch:
-
-    def __init__(self, model, loss, metrics, stage_name, device='cpu', verbose=True):
+    def __init__(self, model, loss, metrics, stage_name, device="cpu", verbose=True):
         self.model = model
         self.loss = loss
         self.metrics = metrics
@@ -23,8 +22,8 @@ class Epoch:
             metric.to(self.device)
 
     def _format_logs(self, logs):
-        str_logs = ['{} - {:.4}'.format(k, v) for k, v in logs.items()]
-        s = ', '.join(str_logs)
+        str_logs = ["{} - {:.4}".format(k, v) for k, v in logs.items()]
+        s = ", ".join(str_logs)
         return s
 
     def batch_update(self, x, y):
@@ -41,7 +40,12 @@ class Epoch:
         loss_meter = AverageValueMeter()
         metrics_meters = {metric.__name__: AverageValueMeter() for metric in self.metrics}
 
-        with tqdm(dataloader, desc=self.stage_name, file=sys.stdout, disable=not (self.verbose)) as iterator:
+        with tqdm(
+            dataloader,
+            desc=self.stage_name,
+            file=sys.stdout,
+            disable=not (self.verbose),
+        ) as iterator:
             for x, y in iterator:
                 x, y = x.to(self.device), y.to(self.device)
                 loss, y_pred = self.batch_update(x, y)
@@ -67,13 +71,12 @@ class Epoch:
 
 
 class TrainEpoch(Epoch):
-
-    def __init__(self, model, loss, metrics, optimizer, device='cpu', verbose=True):
+    def __init__(self, model, loss, metrics, optimizer, device="cpu", verbose=True):
         super().__init__(
             model=model,
             loss=loss,
             metrics=metrics,
-            stage_name='train',
+            stage_name="train",
             device=device,
             verbose=verbose,
         )
@@ -92,13 +95,12 @@ class TrainEpoch(Epoch):
 
 
 class ValidEpoch(Epoch):
-
-    def __init__(self, model, loss, metrics, device='cpu', verbose=True):
+    def __init__(self, model, loss, metrics, device="cpu", verbose=True):
         super().__init__(
             model=model,
             loss=loss,
             metrics=metrics,
-            stage_name='valid',
+            stage_name="valid",
             device=device,
             verbose=verbose,
         )

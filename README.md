@@ -58,7 +58,7 @@ model = smp.Unet(
 
 #### 2. Configure data preprocessing
 
-All encoders have pretrained weights. Preparing your data the same way as during weights pre-training may give your better results (higher metric score and faster convergence). But it is relevant only for 1-2-3-channels images and **not necessary** in case you train the whole model, not only decoder.
+All encoders have pretrained weights. Preparing your data the same way as during weights pre-training may give your better results (higher metric score and faster convergence). It is **not necessary** in case you train the whole model, not only decoder.
 
 ```python
 from segmentation_models_pytorch.encoders import get_preprocessing_fn
@@ -419,11 +419,23 @@ $ pip install git+https://github.com/qubvel/segmentation_models.pytorch
 
 ### 🤝 Contributing
 
-##### Run test
+##### Install linting and formatting pre-commit hooks
+```bash
+pip install pre-commit black flake8
+pre-commit install
+```
+
+##### Run tests
+```bash
+pytest -p no:cacheprovider
+```
+
+##### Run tests in docker
 ```bash
 $ docker build -f docker/Dockerfile.dev -t smp:dev . && docker run --rm smp:dev pytest -p no:cacheprovider
 ```
-##### Generate table
+
+##### Generate table with encoders (in case you add a new encoder)
 ```bash
 $ docker build -f docker/Dockerfile.dev -t smp:dev . && docker run --rm smp:dev python misc/generate_table.py
 ```

@@ -9,13 +9,13 @@ except ImportError:
 
 class Conv2dReLU(nn.Sequential):
     def __init__(
-            self,
-            in_channels,
-            out_channels,
-            kernel_size,
-            padding=0,
-            stride=1,
-            use_batchnorm=True,
+        self,
+        in_channels,
+        out_channels,
+        kernel_size,
+        padding=0,
+        stride=1,
+        use_batchnorm=True,
     ):
 
         if use_batchnorm == "inplace" and InPlaceABN is None:
@@ -64,7 +64,6 @@ class SCSEModule(nn.Module):
 
 
 class ArgMax(nn.Module):
-
     def __init__(self, dim=None):
         super().__init__()
         self.dim = dim
@@ -83,46 +82,47 @@ class Clamp(nn.Module):
 
 
 class Activation(nn.Module):
-
     def __init__(self, name, **params):
 
         super().__init__()
 
-        if name is None or name == 'identity':
+        if name is None or name == "identity":
             self.activation = nn.Identity(**params)
-        elif name == 'sigmoid':
+        elif name == "sigmoid":
             self.activation = nn.Sigmoid()
-        elif name == 'softmax2d':
+        elif name == "softmax2d":
             self.activation = nn.Softmax(dim=1, **params)
-        elif name == 'softmax':
+        elif name == "softmax":
             self.activation = nn.Softmax(**params)
-        elif name == 'logsoftmax':
+        elif name == "logsoftmax":
             self.activation = nn.LogSoftmax(**params)
-        elif name == 'tanh':
+        elif name == "tanh":
             self.activation = nn.Tanh()
-        elif name == 'argmax':
+        elif name == "argmax":
             self.activation = ArgMax(**params)
-        elif name == 'argmax2d':
+        elif name == "argmax2d":
             self.activation = ArgMax(dim=1, **params)
-        elif name == 'clamp':
+        elif name == "clamp":
             self.activation = Clamp(**params)
         elif callable(name):
             self.activation = name(**params)
         else:
-            raise ValueError('Activation should be callable/sigmoid/softmax/logsoftmax/tanh/None; got {}'.format(name))
+            raise ValueError(
+                f"Activation should be callable/sigmoid/softmax/logsoftmax/tanh/"
+                f"argmax/argmax2d/clamp/None; got {name}"
+            )
 
     def forward(self, x):
         return self.activation(x)
 
 
 class Attention(nn.Module):
-
     def __init__(self, name, **params):
         super().__init__()
 
         if name is None:
             self.attention = nn.Identity(**params)
-        elif name == 'scse':
+        elif name == "scse":
             self.attention = SCSEModule(**params)
         else:
             raise ValueError("Attention {} is not implemented".format(name))

@@ -264,21 +264,19 @@ def test_multilabel_jaccard_loss():
 def test_soft_ce_loss():
     criterion = SoftCrossEntropyLoss(smooth_factor=0.1, ignore_index=-100)
 
-    # Ideal case
     y_pred = torch.tensor([[+9, -9, -9, -9], [-9, +9, -9, -9], [-9, -9, +9, -9], [-9, -9, -9, +9]]).float()
     y_true = torch.tensor([0, 1, -100, 3]).long()
 
     loss = criterion(y_pred, y_true)
-    print(loss)
+    assert float(loss) == pytest.approx(1.0125, abs=0.0001)
 
 
 @torch.no_grad()
 def test_soft_bce_loss():
     criterion = SoftBCEWithLogitsLoss(smooth_factor=0.1, ignore_index=-100)
 
-    # Ideal case
     y_pred = torch.tensor([-9, 9, 1, 9, -9]).float()
     y_true = torch.tensor([0, 1, -100, 1, 0]).long()
 
     loss = criterion(y_pred, y_true)
-    print(loss)
+    assert float(loss) == pytest.approx(0.7201, abs=0.0001)

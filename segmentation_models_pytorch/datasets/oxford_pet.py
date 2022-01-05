@@ -9,7 +9,6 @@ from urllib.request import urlretrieve
 
 
 class OxfordPetDataset(torch.utils.data.Dataset):
-
     def __init__(self, root, mode="train", transform=None):
 
         assert mode in {"train", "valid", "test"}
@@ -21,7 +20,7 @@ class OxfordPetDataset(torch.utils.data.Dataset):
         self.images_directory = os.path.join(self.root, "images")
         self.masks_directory = os.path.join(self.root, "annotations", "trimaps")
 
-        self.filenames = self._read_split() # read train/valid/test splits
+        self.filenames = self._read_split()  # read train/valid/test splits
 
     def __len__(self):
         return len(self.filenames)
@@ -42,7 +41,7 @@ class OxfordPetDataset(torch.utils.data.Dataset):
             sample = self.transform(**sample)
 
         return sample
-    
+
     @staticmethod
     def _preprocess_mask(mask):
         mask = mask.astype(np.float32)
@@ -64,18 +63,20 @@ class OxfordPetDataset(torch.utils.data.Dataset):
 
     @staticmethod
     def download(root):
-        
+
         # load images
         filepath = os.path.join(root, "images.tar.gz")
         download_url(
-            url="https://www.robots.ox.ac.uk/~vgg/data/pets/data/images.tar.gz", filepath=filepath,
+            url="https://www.robots.ox.ac.uk/~vgg/data/pets/data/images.tar.gz",
+            filepath=filepath,
         )
         extract_archive(filepath)
 
         # load annotations
         filepath = os.path.join(root, "annotations.tar.gz")
         download_url(
-            url="https://www.robots.ox.ac.uk/~vgg/data/pets/data/annotations.tar.gz", filepath=filepath,
+            url="https://www.robots.ox.ac.uk/~vgg/data/pets/data/annotations.tar.gz",
+            filepath=filepath,
         )
         extract_archive(filepath)
 
@@ -111,7 +112,13 @@ def download_url(url, filepath):
     if os.path.exists(filepath):
         return
 
-    with TqdmUpTo(unit="B", unit_scale=True, unit_divisor=1024, miniters=1, desc=os.path.basename(filepath)) as t:
+    with TqdmUpTo(
+        unit="B",
+        unit_scale=True,
+        unit_divisor=1024,
+        miniters=1,
+        desc=os.path.basename(filepath),
+    ) as t:
         urlretrieve(url, filename=filepath, reporthook=t.update_to, data=None)
         t.total = t.n
 

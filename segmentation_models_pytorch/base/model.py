@@ -3,7 +3,6 @@ from . import initialization as init
 
 
 class SegmentationModel(torch.nn.Module):
-
     def initialize(self):
         init.initialize_decoder(self.decoder)
         init.initialize_head(self.segmentation_head)
