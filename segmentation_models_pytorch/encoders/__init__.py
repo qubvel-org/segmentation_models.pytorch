@@ -1,3 +1,4 @@
+import timm
 import functools
 import torch.utils.model_zoo as model_zoo
 
@@ -91,16 +92,24 @@ def get_encoder_names():
 
 
 def get_preprocessing_params(encoder_name, pretrained="imagenet"):
-    settings = encoders[encoder_name]["pretrained_settings"]
 
-    if pretrained not in settings.keys():
-        raise ValueError("Available pretrained options {}".format(settings.keys()))
+    if encoder_name.startswith("tu-"):
+        encoder_name = encoder_name[3:]
+        if encoder_name not in timm.models.registry._model_has_pretrained:
+            raise ValueError(f"{encoder_name} does not have pretrained weights and preprocessing parameters")
+        settings = timm.models.registry._model_default_cfgs[encoder_name]
+    else:
+        all_settings = encoders[encoder_name]["pretrained_settings"]
+        if pretrained not in all_settings.keys():
+            raise ValueError("Available pretrained options {}".format(all_settings.keys()))
+        settings = all_settings[pretrained]
 
     formatted_settings = {}
-    formatted_settings["input_space"] = settings[pretrained].get("input_space")
-    formatted_settings["input_range"] = settings[pretrained].get("input_range")
-    formatted_settings["mean"] = settings[pretrained].get("mean")
-    formatted_settings["std"] = settings[pretrained].get("std")
+    formatted_settings["input_space"] = settings.get("input_space", "RGB")
+    formatted_settings["input_range"] = list(settings.get("input_range", [0, 1]))
+    formatted_settings["mean"] = list(settings.get("mean"))
+    formatted_settings["std"] = list(settings.get("std"))
+
     return formatted_settings
 
 
