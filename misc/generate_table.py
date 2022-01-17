@@ -10,10 +10,12 @@ COLUMNS = [
     "Params, M",
 ]
 
+
 def wrap_row(r):
     return "|{}|".format(r)
 
-header = "|".join([column.ljust(WIDTH, ' ') for column in COLUMNS])
+
+header = "|".join([column.ljust(WIDTH, " ") for column in COLUMNS])
 separator = "|".join(["-" * WIDTH] + [":" + "-" * (WIDTH - 2) + ":"] * (len(COLUMNS) - 1))
 
 print(wrap_row(header))

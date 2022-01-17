@@ -36,3 +36,8 @@ SoftBCEWithLogitsLoss
 SoftCrossEntropyLoss
 ~~~~~~~~~~~~~~~~~~~~
 .. autoclass:: segmentation_models_pytorch.losses.SoftCrossEntropyLoss
+
+MCCLoss
+~~~~~~~~~~~~~~~~~~~~
+.. autoclass:: segmentation_models_pytorch.losses.MCCLoss
+        :members: forward

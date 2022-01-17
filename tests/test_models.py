@@ -1,4 +1,3 @@
-import os
 import sys
 import mock
 import pytest
@@ -6,7 +5,7 @@ import torch
 
 # mock detection module
 sys.modules["torchvision._C"] = mock.Mock()
-import segmentation_models_pytorch as smp
+import segmentation_models_pytorch as smp  # noqa
 
 
 def get_encoders():
@@ -18,7 +17,7 @@ def get_encoders():
     ]
     encoders = smp.encoders.get_encoder_names()
     encoders = [e for e in encoders if e not in exclude_encoders]
-    encoders.append("tu-resnet34") # for timm universal encoder
+    encoders.append("tu-resnet34")  # for timm universal encoder
     return encoders
 
 
@@ -58,9 +57,7 @@ def _test_forward_backward(model, sample, test_shape=False):
 def test_forward(model_class, encoder_name, encoder_depth, **kwargs):
     if model_class is smp.Unet or model_class is smp.UnetPlusPlus or model_class is smp.MAnet:
         kwargs["decoder_channels"] = (16, 16, 16, 16, 16)[-encoder_depth:]
-    model = model_class(
-        encoder_name, encoder_depth=encoder_depth, encoder_weights=None, **kwargs
-    )
+    model = model_class(encoder_name, encoder_depth=encoder_depth, encoder_weights=None, **kwargs)
     sample = get_sample(model_class)
     model.eval()
     if encoder_depth == 5 and model_class != smp.PSPNet:
@@ -72,8 +69,7 @@ def test_forward(model_class, encoder_name, encoder_depth, **kwargs):
 
 
 @pytest.mark.parametrize(
-    "model_class",
-    [smp.PAN, smp.FPN, smp.PSPNet, smp.Linknet, smp.Unet, smp.UnetPlusPlus, smp.MAnet, smp.DeepLabV3]
+    "model_class", [smp.PAN, smp.FPN, smp.PSPNet, smp.Linknet, smp.Unet, smp.UnetPlusPlus, smp.MAnet, smp.DeepLabV3]
 )
 def test_forward_backward(model_class):
     sample = get_sample(model_class)
@@ -81,11 +77,11 @@ def test_forward_backward(model_class):
     _test_forward_backward(model, sample)
 
 
-@pytest.mark.parametrize("model_class", [smp.PAN, smp.FPN, smp.PSPNet, smp.Linknet, smp.Unet, smp.UnetPlusPlus, smp.MAnet])
+@pytest.mark.parametrize(
+    "model_class", [smp.PAN, smp.FPN, smp.PSPNet, smp.Linknet, smp.Unet, smp.UnetPlusPlus, smp.MAnet]
+)
 def test_aux_output(model_class):
-    model = model_class(
-        DEFAULT_ENCODER, encoder_weights=None, aux_params=dict(classes=2)
-    )
+    model = model_class(DEFAULT_ENCODER, encoder_weights=None, aux_params=dict(classes=2))
     sample = get_sample(model_class)
     label_size = (sample.shape[0], 2)
     mask, label = model(sample)
@@ -118,10 +114,10 @@ def test_in_channels(model_class, encoder_name, in_channels):
 @pytest.mark.parametrize("encoder_name", ENCODERS)
 def test_dilation(encoder_name):
     if (
-        encoder_name in ['inceptionresnetv2', 'xception', 'inceptionv4'] or
-        encoder_name.startswith('vgg') or 
-        encoder_name.startswith('densenet') or
-        encoder_name.startswith('timm-res')
+        encoder_name in ["inceptionresnetv2", "xception", "inceptionv4"]
+        or encoder_name.startswith("vgg")
+        or encoder_name.startswith("densenet")
+        or encoder_name.startswith("timm-res")
     ):
         return
 

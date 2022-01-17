@@ -5,11 +5,11 @@ from ._functional import soft_tversky_score
 from .constants import BINARY_MODE, MULTICLASS_MODE, MULTILABEL_MODE
 from .dice import DiceLoss
 
-__all__ = ["TverskyLoss", "TverskyLossFocal"]
+__all__ = ["TverskyLoss"]
 
 
 class TverskyLoss(DiceLoss):
-    """Implementation of Tversky loss for image segmentation task. 
+    """Tversky loss for image segmentation task.
     Where TP and FP is weighted by alpha and beta params.
     With alpha == beta == 0.5, this loss becomes equal DiceLoss.
     It supports binary, multiclass and multilabel cases

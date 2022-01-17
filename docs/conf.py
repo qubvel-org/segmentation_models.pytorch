@@ -46,6 +46,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'sphinx.ext.mathjax', 
+    'autodocsumm',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -95,6 +96,8 @@ autodoc_mock_imports = [
     'tqdm',
     'numpy',
     'timm',
+    'cv2',
+    'PIL',
     'pretrainedmodels',
     'torchvision',
     'efficientnet-pytorch',
@@ -118,3 +121,8 @@ def f(app, obj, bound_method):
 
 def setup(app):
     app.connect('autodoc-before-process-signature', f)
+
+
+# Custom configuration --------------------------------------------------------
+
+autodoc_member_order = 'bysource'

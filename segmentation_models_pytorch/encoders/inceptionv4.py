@@ -1,4 +1,4 @@
-""" Each encoder should have following attributes and methods and be inherited from `_base.EncoderMixin`
+"""Each encoder should have following attributes and methods and be inherited from `_base.EncoderMixin`
 
 Attributes:
 
@@ -50,17 +50,18 @@ class InceptionV4Encoder(InceptionV4, EncoderMixin):
         del self.last_linear
 
     def make_dilated(self, stage_list, dilation_list):
-        raise ValueError("InceptionV4 encoder does not support dilated mode "
-                         "due to pooling operation for downsampling!")
+        raise ValueError(
+            "InceptionV4 encoder does not support dilated mode " "due to pooling operation for downsampling!"
+        )
 
     def get_stages(self):
         return [
             nn.Identity(),
             self.features[: self._stage_idxs[0]],
-            self.features[self._stage_idxs[0]: self._stage_idxs[1]],
-            self.features[self._stage_idxs[1]: self._stage_idxs[2]],
-            self.features[self._stage_idxs[2]: self._stage_idxs[3]],
-            self.features[self._stage_idxs[3]:],
+            self.features[self._stage_idxs[0] : self._stage_idxs[1]],
+            self.features[self._stage_idxs[1] : self._stage_idxs[2]],
+            self.features[self._stage_idxs[2] : self._stage_idxs[3]],
+            self.features[self._stage_idxs[3] :],
         ]
 
     def forward(self, x):

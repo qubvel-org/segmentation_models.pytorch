@@ -8,6 +8,7 @@ from segmentation_models_pytorch.losses import (
     SoftBCEWithLogitsLoss,
     SoftCrossEntropyLoss,
     TverskyLoss,
+    MCCLoss,
 )
 
 
@@ -264,21 +265,66 @@ def test_multilabel_jaccard_loss():
 def test_soft_ce_loss():
     criterion = SoftCrossEntropyLoss(smooth_factor=0.1, ignore_index=-100)
 
-    # Ideal case
     y_pred = torch.tensor([[+9, -9, -9, -9], [-9, +9, -9, -9], [-9, -9, +9, -9], [-9, -9, -9, +9]]).float()
     y_true = torch.tensor([0, 1, -100, 3]).long()
 
     loss = criterion(y_pred, y_true)
-    print(loss)
+    assert float(loss) == pytest.approx(1.0125, abs=0.0001)
 
 
 @torch.no_grad()
 def test_soft_bce_loss():
     criterion = SoftBCEWithLogitsLoss(smooth_factor=0.1, ignore_index=-100)
 
-    # Ideal case
     y_pred = torch.tensor([-9, 9, 1, 9, -9]).float()
     y_true = torch.tensor([0, 1, -100, 1, 0]).long()
 
     loss = criterion(y_pred, y_true)
-    print(loss)
+    assert float(loss) == pytest.approx(0.7201, abs=0.0001)
+
+
+@torch.no_grad()
+def test_binary_mcc_loss():
+    eps = 1e-5
+    criterion = MCCLoss(eps=eps)
+
+    # Ideal case
+    y_pred = torch.tensor([[[1.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 1.0]]])
+    y_true = torch.tensor([[[1.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 1.0]]])
+
+    loss = criterion(y_pred, y_true)
+    assert float(loss) == pytest.approx(0.0, abs=eps)
+
+    # Worst case
+    y_pred = torch.tensor([[[1.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 1.0]]])
+    y_true = 1 - y_pred
+    loss = criterion(y_pred, y_true)
+    assert float(loss) == pytest.approx(2.0, abs=eps)
+
+    # 1 - 1/3 case
+    y_pred = torch.tensor([[[0.0, 1.0, 1.0, 0.0], [0.0, 1.0, 1.0, 0.0]]])
+    y_true = torch.tensor([[[1.0, 1.0, 0.0, 0.0], [1.0, 1.0, 0.0, 0.0]]])
+
+    loss = criterion(y_pred, y_true)
+    assert float(loss) == pytest.approx(1.0, abs=eps)
+
+    # Trivial classifier case #1.
+    y_pred = torch.tensor([[[0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0]]])
+    y_true = torch.tensor([[[1.0, 1.0, 0.0, 0.0], [1.0, 1.0, 0.0, 0.0]]])
+
+    loss = criterion(y_pred, y_true)
+    assert float(loss) == pytest.approx(1.0, abs=eps)
+
+    # Trivial classifier case #2.
+    y_pred = torch.tensor([[[0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0]]])
+    y_true = torch.tensor([[[1.0, 1.0, 1.0, 1.0], [1.0, 1.0, 1.0, 1.0]]])
+
+    loss = criterion(y_pred, y_true)
+    assert float(loss) == pytest.approx(1 + 0.5, abs=eps)
+
+    # Trivial classifier case #3.
+    y_pred = torch.tensor([[[1.0, 1.0, 1.0, 1.0], [1.0, 1.0, 1.0, 1.0]]])
+    y_true = torch.tensor([[[1.0, 1.0, 1.0, 1.0], [1.0, 1.0, 1.0, 1.0]]])
+
+    loss = criterion(y_pred, y_true)
+    assert float(loss) == pytest.approx(0.5, abs=eps)

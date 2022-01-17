@@ -10,13 +10,12 @@ __all__ = ["FocalLoss"]
 
 
 class FocalLoss(_Loss):
-
     def __init__(
         self,
         mode: str,
         alpha: Optional[float] = None,
-        gamma: Optional[float] = 2.,
-        ignore_index: Optional[int] = None, 
+        gamma: Optional[float] = 2.0,
+        ignore_index: Optional[int] = None,
         reduction: Optional[str] = "mean",
         normalized: bool = False,
         reduced_threshold: Optional[float] = None,
@@ -30,8 +29,9 @@ class FocalLoss(_Loss):
             ignore_index: If not None, targets may contain values to be ignored.
                 Target values equal to ignore_index will be ignored from loss computation.
             normalized: Compute normalized focal loss (https://arxiv.org/pdf/1909.07829.pdf).
-            reduced_threshold: Switch to reduced focal loss. Note, when using this mode you should use `reduction="sum"`.
-        
+            reduced_threshold: Switch to reduced focal loss. Note, when using this mode you
+                should use `reduction="sum"`.
+
         Shape
              - **y_pred** - torch.Tensor of shape (N, C, H, W)
              - **y_true** - torch.Tensor of shape (N, H, W) or (N, C, H, W)
