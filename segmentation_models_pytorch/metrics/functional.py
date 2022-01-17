@@ -172,7 +172,8 @@ def _get_stats_multiclass(
     for i in range(batch_size):
         target_i = target[i]
         output_i = output[i]
-        matched = target_i * (output_i == target_i)
+        mask = output_i == target_i
+        matched = torch.where(mask, target_i, -1)
         tp = torch.histc(matched.float(), bins=num_classes, min=0, max=num_classes - 1)
         fp = torch.histc(output_i.float(), bins=num_classes, min=0, max=num_classes - 1) - tp
         fn = torch.histc(target_i.float(), bins=num_classes, min=0, max=num_classes - 1) - tp
@@ -295,7 +296,7 @@ def _iou_score(tp, fp, fn, tn):
 
 
 def _accuracy(tp, fp, fn, tn):
-    return tp / (tp + fp + fn + tn)
+    return (tp + tn) / (tp + fp + fn + tn)
 
 
 def _sensitivity(tp, fp, fn, tn):
