@@ -21,7 +21,7 @@ class XceptionEncoder(Xception, EncoderMixin):
 
         del self.fc
 
-    def make_dilated(self, stage_list, dilation_list):
+    def make_dilated(self, *args, **kwargs):
         raise ValueError(
             "Xception encoder does not support dilated mode " "due to pooling operation for downsampling!"
         )

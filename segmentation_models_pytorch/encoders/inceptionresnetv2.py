@@ -50,7 +50,7 @@ class InceptionResNetV2Encoder(InceptionResNetV2, EncoderMixin):
         del self.avgpool_1a
         del self.last_linear
 
-    def make_dilated(self, stage_list, dilation_list):
+    def make_dilated(self, *args, **kwargs):
         raise ValueError(
             "InceptionResnetV2 encoder does not support dilated mode " "due to pooling operation for downsampling!"
         )
