@@ -99,7 +99,9 @@ def get_stats(
         threshold (Optional[float, List[float]]): Binarization threshold for
             ``output`` in case of ``'binary'`` or ``'multilabel'`` modes. Defaults to None.
         num_classes (Optional[int]): Number of classes, necessary attribute
-            only for ``'multiclass'`` mode.
+            only for ``'multiclass'`` mode. Class values should be in range 0..(num_classes - 1).
+            If ``ignore_index`` is specified it should be outside the classes range, e.g. ``-1`` or
+            ``255``.
 
     Raises:
         ValueError: in case of misconfiguration.
@@ -139,12 +141,16 @@ def get_stats(
     if mode == "multiclass" and num_classes is None:
         raise ValueError("``num_classes`` attribute should be not ``None`` for 'multiclass' mode.")
 
+    if ignore_index is not None and 0 <= ignore_index <= num_classes - 1:
+        raise ValueError(
+            f"``ignore_index`` should be outside the class values range, but got class values in range "
+            f"0..{num_classes - 1} and ``ignore_index={ignore_index}``. Hint: if you have ``ignore_index = 0``"
+            f"consirder subtracting ``1`` from your target and model output to make ``ignore_index = -1``"
+            f"and relevant class values started from ``0``."
+        )
+
     if mode == "multiclass":
-        if ignore_index is not None:
-            ignore = target == ignore_index
-            output = torch.where(ignore, -1, output)
-            target = torch.where(ignore, -1, target)
-        tp, fp, fn, tn = _get_stats_multiclass(output, target, num_classes)
+        tp, fp, fn, tn = _get_stats_multiclass(output, target, num_classes, ignore_index)
     else:
         if threshold is not None:
             output = torch.where(output >= threshold, 1, 0)
@@ -159,10 +165,17 @@ def _get_stats_multiclass(
     output: torch.LongTensor,
     target: torch.LongTensor,
     num_classes: int,
+    ignore_index: Optional[int],
 ) -> Tuple[torch.LongTensor, torch.LongTensor, torch.LongTensor, torch.LongTensor]:
 
     batch_size, *dims = output.shape
     num_elements = torch.prod(torch.tensor(dims)).long()
+
+    if ignore_index is not None:
+        ignore = target == ignore_index
+        output = torch.where(ignore, -1, output)
+        target = torch.where(ignore, -1, target)
+        ignore_per_sample = ignore.view(batch_size, -1).sum(1)
 
     tp_count = torch.zeros(batch_size, num_classes, dtype=torch.long)
     fp_count = torch.zeros(batch_size, num_classes, dtype=torch.long)
@@ -178,6 +191,8 @@ def _get_stats_multiclass(
         fp = torch.histc(output_i.float(), bins=num_classes, min=0, max=num_classes - 1) - tp
         fn = torch.histc(target_i.float(), bins=num_classes, min=0, max=num_classes - 1) - tp
         tn = num_elements - tp - fp - fn
+        if ignore_index is not None:
+            tn = tn - ignore_per_sample[i]
         tp_count[i] = tp.long()
         fp_count[i] = fp.long()
         fn_count[i] = fn.long()
