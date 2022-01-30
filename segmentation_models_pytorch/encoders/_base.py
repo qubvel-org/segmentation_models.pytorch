@@ -12,10 +12,16 @@ class EncoderMixin:
     - patching first convolution for arbitrary input channels
     """
 
+    _output_stride = 32
+
     @property
     def out_channels(self):
         """Return channels dimensions for each tensor of forward output of encoder"""
         return self._out_channels[: self._depth + 1]
+
+    @property
+    def output_stride(self):
+        return min(self._output_stride, 2 ** self._depth)
 
     def set_in_channels(self, in_channels, pretrained=True):
         """Change first convolution channels"""
@@ -48,6 +54,8 @@ class EncoderMixin:
 
         else:
             raise ValueError("Output stride should be 16 or 8, got {}.".format(output_stride))
+
+        self._output_stride = output_stride
 
         stages = self.get_stages()
         for stage_indx, dilation_rate in zip(stage_list, dilation_list):
