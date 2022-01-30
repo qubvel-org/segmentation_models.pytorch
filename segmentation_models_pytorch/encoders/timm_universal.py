@@ -24,6 +24,7 @@ class TimmUniversalEncoder(nn.Module):
             in_channels,
         ] + self.model.feature_info.channels()
         self._depth = depth
+        self._output_stride = output_stride
 
     def forward(self, x):
         features = self.model(x)
@@ -35,3 +36,7 @@ class TimmUniversalEncoder(nn.Module):
     @property
     def out_channels(self):
         return self._out_channels
+
+    @property
+    def output_stride(self):
+        return min(self._output_stride, 2 ** self._depth)
