@@ -150,7 +150,7 @@ class DeepLabV3Plus(SegmentationModel):
     def __init__(
         self,
         encoder_name: str = "resnet34",
-        encoder_depth: int = 5,
+        encoder_depth: Literal[3, 4, 5] = 5,
         encoder_weights: Optional[str] = "imagenet",
         encoder_output_stride: Literal[8, 16] = 16,
         decoder_channels: int = 256,
@@ -177,6 +177,7 @@ class DeepLabV3Plus(SegmentationModel):
 
         self.decoder = DeepLabV3PlusDecoder(
             encoder_channels=self.encoder.out_channels,
+            encoder_depth=encoder_depth,
             out_channels=decoder_channels,
             atrous_rates=decoder_atrous_rates,
             output_stride=encoder_output_stride,
