@@ -153,6 +153,7 @@ class DeepLabV3Plus(SegmentationModel):
 
         self.decoder = DeepLabV3PlusDecoder(
             encoder_channels=self.encoder.out_channels,
+            encoder_depth=encoder_depth,
             out_channels=decoder_channels,
             atrous_rates=decoder_atrous_rates,
             output_stride=encoder_output_stride,
