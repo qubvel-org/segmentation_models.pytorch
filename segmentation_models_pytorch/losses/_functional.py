@@ -172,11 +172,13 @@ def soft_dice_score(
     assert output.size() == target.size()
     if dims is not None:
         intersection = torch.sum(output * target, dim=dims)
-        cardinality = torch.sum(output + target, dim=dims)
+        fp = torch.sum(output * (1.0 - target), dim=dims)
+        fn = torch.sum((1 - output) * target, dim=dims)
     else:
         intersection = torch.sum(output * target)
-        cardinality = torch.sum(output + target)
-    dice_score = (2.0 * intersection + smooth) / (cardinality + smooth).clamp_min(eps)
+        fp = torch.sum(output * (1.0 - target))
+        fn = torch.sum((1 - output) * target)
+    dice_score = (2.0 * intersection + smooth)/(2 * intersection + fn + fp + smooth).clamp_min(eps)
     return dice_score
 
 
