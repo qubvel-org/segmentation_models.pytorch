@@ -43,6 +43,48 @@ class DecoderBlock(nn.Module):
         return x
 
 
+class AttnUnetDecoderBlock(nn.Module):
+    def __init__(
+            self,
+            in_channels,
+            skip_channels,
+            out_channels,
+            use_batchnorm=True,
+            attention_type=None,
+    ):
+        super().__init__()
+        self.up1 = md.UpConv(in_channels=in_channels,
+                             out_channels=in_channels//2)
+        if skip_channels != 0:
+            self.attention1 = md.Attention(name=attention_type,
+                                           in_channels=skip_channels,
+                                           g_channels=in_channels//2,
+                                           inter_channels=in_channels//4)
+        self.conv1 = md.Conv2dReLU(
+            in_channels//2 + skip_channels,
+            out_channels,
+            kernel_size=3,
+            padding=1,
+            use_batchnorm=use_batchnorm,
+        )
+        self.conv2 = md.Conv2dReLU(
+            out_channels,
+            out_channels,
+            kernel_size=3,
+            padding=1,
+            use_batchnorm=use_batchnorm,
+        )
+
+    def forward(self, x, skip=None):
+        x = self.up1(x)
+        if skip is not None:
+            x_1 = self.attention1(x=skip, g=x)
+            x = torch.cat([x, x_1], dim=1)
+        x = self.conv1(x)
+        x = self.conv2(x)
+        return x
+
+
 class CenterBlock(nn.Sequential):
     def __init__(self, in_channels, out_channels, use_batchnorm=True):
         conv1 = md.Conv2dReLU(
@@ -99,10 +141,18 @@ class UnetDecoder(nn.Module):
 
         # combine decoder keyword arguments
         kwargs = dict(use_batchnorm=use_batchnorm, attention_type=attention_type)
-        blocks = [
-            DecoderBlock(in_ch, skip_ch, out_ch, **kwargs)
-            for in_ch, skip_ch, out_ch in zip(in_channels, skip_channels, out_channels)
-        ]
+        if attention_type == 'gated_sse':
+            blocks = [
+                AttnUnetDecoderBlock(in_ch, skip_ch, out_ch, **kwargs)
+                for in_ch, skip_ch, out_ch in zip(in_channels, skip_channels,
+                                                  out_channels)
+            ]
+        else:
+            blocks = [
+                DecoderBlock(in_ch, skip_ch, out_ch, **kwargs)
+                for in_ch, skip_ch, out_ch in zip(in_channels, skip_channels,
+                                                  out_channels)
+            ]
         self.blocks = nn.ModuleList(blocks)
 
     def forward(self, *features):

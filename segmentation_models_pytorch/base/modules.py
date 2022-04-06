@@ -62,6 +62,34 @@ class SCSEModule(nn.Module):
     def forward(self, x):
         return x * self.cSE(x) + x * self.sSE(x)
 
+class GSSEModule(nn.Module):
+    def __init__(self, in_channels, g_channels, inter_channels):
+        super(GSSEModule, self).__init__()
+        self.W_g = nn.Sequential(
+            nn.Conv2d(g_channels, inter_channels,
+                      kernel_size=1, stride=1, padding=0, bias=True),
+            nn.BatchNorm2d(inter_channels)
+            )
+        self.W_x = nn.Sequential(
+            nn.Conv2d(in_channels, inter_channels,
+                      kernel_size=1, stride=1, padding=0, bias=True),
+            nn.BatchNorm2d(inter_channels)
+        )
+
+        self.psi = nn.Sequential(
+            nn.Conv2d(inter_channels, 1, kernel_size=1,
+                      stride=1, padding=0, bias=True),
+            nn.BatchNorm2d(1),
+            nn.Sigmoid()
+        )
+
+        self.relu = nn.ReLU(inplace=True)
+
+    def forward(self, x, g):
+        psi = self.relu(self.W_g(g) + self.W_x(x))
+        attn = self.psi(psi)
+        return x*attn
+
 
 class ArgMax(nn.Module):
     def __init__(self, dim=None):
@@ -116,6 +144,27 @@ class Activation(nn.Module):
         return self.activation(x)
 
 
+class UpConv(nn.Module):
+    def __init__(self, in_channels, out_channels):
+        super(UpConv, self).__init__()
+        self.up = nn.Sequential(
+            nn.Upsample(scale_factor=2),
+            nn.Conv2d(in_channels, out_channels,
+                      kernel_size=3, stride=1, padding=1, bias=True),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True)
+        )
+
+    def forward(self, x):
+        x = self.up(x)
+        return x
+
+
+class Flatten(nn.Module):
+    def forward(self, x):
+        return x.view(x.shape[0], -1)
+
+
 class Attention(nn.Module):
     def __init__(self, name, **params):
         super().__init__()
@@ -124,8 +173,13 @@ class Attention(nn.Module):
             self.attention = nn.Identity(**params)
         elif name == "scse":
             self.attention = SCSEModule(**params)
+        elif name == 'gated_sse':
+            self.attention = GSSEModule(**params)
         else:
             raise ValueError("Attention {} is not implemented".format(name))
 
-    def forward(self, x):
-        return self.attention(x)
+    def forward(self, x, g=None):
+        if g is not None:
+            return self.attention(x, g)
+        else:
+            return self.attention(x)
