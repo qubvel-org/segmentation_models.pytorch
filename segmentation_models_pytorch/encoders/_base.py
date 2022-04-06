@@ -21,7 +21,7 @@ class EncoderMixin:
 
     @property
     def output_stride(self):
-        return min(self._output_stride, 2 ** self._depth)
+        return min(self._output_stride, 2**self._depth)
 
     def set_in_channels(self, in_channels, pretrained=True):
         """Change first convolution channels"""

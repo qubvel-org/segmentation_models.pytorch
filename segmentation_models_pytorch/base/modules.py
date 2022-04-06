@@ -62,25 +62,23 @@ class SCSEModule(nn.Module):
     def forward(self, x):
         return x * self.cSE(x) + x * self.sSE(x)
 
+
 class GSSEModule(nn.Module):
     def __init__(self, in_channels, g_channels, inter_channels):
         super(GSSEModule, self).__init__()
         self.W_g = nn.Sequential(
-            nn.Conv2d(g_channels, inter_channels,
-                      kernel_size=1, stride=1, padding=0, bias=True),
-            nn.BatchNorm2d(inter_channels)
-            )
+            nn.Conv2d(g_channels, inter_channels, kernel_size=1, stride=1, padding=0, bias=True),
+            nn.BatchNorm2d(inter_channels),
+        )
         self.W_x = nn.Sequential(
-            nn.Conv2d(in_channels, inter_channels,
-                      kernel_size=1, stride=1, padding=0, bias=True),
-            nn.BatchNorm2d(inter_channels)
+            nn.Conv2d(in_channels, inter_channels, kernel_size=1, stride=1, padding=0, bias=True),
+            nn.BatchNorm2d(inter_channels),
         )
 
         self.psi = nn.Sequential(
-            nn.Conv2d(inter_channels, 1, kernel_size=1,
-                      stride=1, padding=0, bias=True),
+            nn.Conv2d(inter_channels, 1, kernel_size=1, stride=1, padding=0, bias=True),
             nn.BatchNorm2d(1),
-            nn.Sigmoid()
+            nn.Sigmoid(),
         )
 
         self.relu = nn.ReLU(inplace=True)
@@ -88,7 +86,7 @@ class GSSEModule(nn.Module):
     def forward(self, x, g):
         psi = self.relu(self.W_g(g) + self.W_x(x))
         attn = self.psi(psi)
-        return x*attn
+        return x * attn
 
 
 class ArgMax(nn.Module):
@@ -149,10 +147,9 @@ class UpConv(nn.Module):
         super(UpConv, self).__init__()
         self.up = nn.Sequential(
             nn.Upsample(scale_factor=2),
-            nn.Conv2d(in_channels, out_channels,
-                      kernel_size=3, stride=1, padding=1, bias=True),
+            nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=1, padding=1, bias=True),
             nn.BatchNorm2d(out_channels),
-            nn.ReLU(inplace=True)
+            nn.ReLU(inplace=True),
         )
 
     def forward(self, x):
@@ -173,7 +170,7 @@ class Attention(nn.Module):
             self.attention = nn.Identity(**params)
         elif name == "scse":
             self.attention = SCSEModule(**params)
-        elif name == 'gated_sse':
+        elif name == "gated_sse":
             self.attention = GSSEModule(**params)
         else:
             raise ValueError("Attention {} is not implemented".format(name))

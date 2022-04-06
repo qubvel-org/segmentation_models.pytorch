@@ -45,23 +45,24 @@ class DecoderBlock(nn.Module):
 
 class AttnUnetDecoderBlock(nn.Module):
     def __init__(
-            self,
-            in_channels,
-            skip_channels,
-            out_channels,
-            use_batchnorm=True,
-            attention_type=None,
+        self,
+        in_channels,
+        skip_channels,
+        out_channels,
+        use_batchnorm=True,
+        attention_type=None,
     ):
         super().__init__()
-        self.up1 = md.UpConv(in_channels=in_channels,
-                             out_channels=in_channels//2)
+        self.up1 = md.UpConv(in_channels=in_channels, out_channels=in_channels // 2)
         if skip_channels != 0:
-            self.attention1 = md.Attention(name=attention_type,
-                                           in_channels=skip_channels,
-                                           g_channels=in_channels//2,
-                                           inter_channels=in_channels//4)
+            self.attention1 = md.Attention(
+                name=attention_type,
+                in_channels=skip_channels,
+                g_channels=in_channels // 2,
+                inter_channels=in_channels // 4,
+            )
         self.conv1 = md.Conv2dReLU(
-            in_channels//2 + skip_channels,
+            in_channels // 2 + skip_channels,
             out_channels,
             kernel_size=3,
             padding=1,
@@ -152,11 +153,11 @@ class UnetPlusPlusDecoder(nn.Module):
                     out_ch = self.skip_channels[layer_idx]
                     skip_ch = self.skip_channels[layer_idx] * (layer_idx + 1 - depth_idx)
                     in_ch = self.skip_channels[layer_idx - 1]
-                if attention_type == 'gated_sse':
+                if attention_type == "gated_sse":
                     blocks[f"x_{depth_idx}_{layer_idx}"] = AttnUnetDecoderBlock(in_ch, skip_ch, out_ch, **kwargs)
                 else:
                     blocks[f"x_{depth_idx}_{layer_idx}"] = DecoderBlock(in_ch, skip_ch, out_ch, **kwargs)
-        if attention_type == 'gated_sse':
+        if attention_type == "gated_sse":
             blocks[f"x_{0}_{len(self.in_channels)-1}"] = AttnUnetDecoderBlock(
                 self.in_channels[-1], 0, self.out_channels[-1], **kwargs
             )
