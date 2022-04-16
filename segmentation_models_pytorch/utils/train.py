@@ -1,6 +1,6 @@
 import sys
 import torch
-from tqdm import tqdm as tqdm
+from tqdm import tqdm
 from .meter import AverageValueMeter
 
 
