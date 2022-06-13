@@ -12,7 +12,7 @@ def _take_channels(*xs, ignore_channels=None):
 
 def _threshold(x, threshold=None):
     if threshold is not None:
-        return (x > threshold).type(x.dtype)
+        return torch.tensor((x > threshold).type(x.dtype),requires_grad=True)
     else:
         return x
 
