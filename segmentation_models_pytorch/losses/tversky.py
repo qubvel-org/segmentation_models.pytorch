@@ -10,7 +10,7 @@ __all__ = ["TverskyLoss"]
 
 class TverskyLoss(DiceLoss):
     """Tversky loss for image segmentation task.
-    Where TP and FP is weighted by alpha and beta params.
+    Where FP and FN is weighted by alpha and beta params.
     With alpha == beta == 0.5, this loss becomes equal DiceLoss.
     It supports binary, multiclass and multilabel cases
 
