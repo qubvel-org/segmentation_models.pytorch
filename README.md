@@ -450,10 +450,10 @@ $ docker build -f docker/Dockerfile.dev -t smp:dev . && docker run --rm smp:dev 
 
 ### 📝 Citing
 ```
-@misc{Yakubovskiy:2019,
-  Author = {Pavel Yakubovskiy},
+@misc{Iakubovskii:2019,
+  Author = {Pavel Iakubovskii},
   Title = {Segmentation Models Pytorch},
-  Year = {2020},
+  Year = {2019},
   Publisher = {GitHub},
   Journal = {GitHub repository},
   Howpublished = {\url{https://github.com/qubvel/segmentation_models.pytorch}}
