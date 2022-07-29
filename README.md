@@ -429,7 +429,7 @@ $ pip install git+https://github.com/qubvel/segmentation_models.pytorch
 
 ##### Install linting and formatting pre-commit hooks
 ```bash
-pip install pre-commit black flake8
+pip install pre-commit black==22.3.0 flake8==4.0.1
 pre-commit install
 ```
 

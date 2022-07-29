@@ -39,4 +39,4 @@ class TimmUniversalEncoder(nn.Module):
 
     @property
     def output_stride(self):
-        return min(self._output_stride, 2 ** self._depth)
+        return min(self._output_stride, 2**self._depth)

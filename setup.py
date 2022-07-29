@@ -35,7 +35,16 @@ except:
     REQUIRED = []
 
 # What packages are optional?
-EXTRAS = {"test": ["pytest", "mock", "pre-commit", "flake8==4.0.1", "flake8-docstrings==1.6.0"]}
+EXTRAS = {
+    "test": [
+        "pytest",
+        "mock",
+        "pre-commit",
+        "black==22.3.0",
+        "flake8==4.0.1",
+        "flake8-docstrings==1.6.0",
+    ],
+}
 
 # Import the README and use it as the long-description.
 # Note: this will only work if 'README.md' is present in your MANIFEST.in file!
