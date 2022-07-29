@@ -24,7 +24,7 @@ class TverskyLoss(DiceLoss):
         ignore_index: Label that indicates ignored pixels (does not contribute to loss)
         eps: Small epsilon for numerical stability
         alpha: Weight constant that penalize model for FPs (False Positives)
-        beta: Weight constant that penalize model for FNs (False Positives)
+        beta: Weight constant that penalize model for FNs (False Negatives)
         gamma: Constant that squares the error function. Defaults to ``1.0``
 
     Return:
