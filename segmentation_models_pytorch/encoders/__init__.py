@@ -97,7 +97,10 @@ def get_preprocessing_params(encoder_name, pretrained="imagenet"):
         encoder_name = encoder_name[3:]
         if encoder_name not in timm.models.registry._model_has_pretrained:
             raise ValueError(f"{encoder_name} does not have pretrained weights and preprocessing parameters")
-        settings = timm.models.registry._model_default_cfgs[encoder_name]
+        if hasattr(timm.models.registry, "_model_default_cfgs"):  # timm 0.4.12
+            settings = timm.models.registry._model_default_cfgs[encoder_name]
+        else:  # timm 0.6.7
+            settings = timm.models.registry._model_pretrained_cfgs[encoder_name]
     else:
         all_settings = encoders[encoder_name]["pretrained_settings"]
         if pretrained not in all_settings.keys():
