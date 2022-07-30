@@ -1,5 +1,6 @@
 from ._base import EncoderMixin
 from timm.models.regnet import RegNet
+from easydict import EasyDict as edict
 import torch.nn as nn
 
 
@@ -130,7 +131,7 @@ for model_name, sources in regnet_weights.items():
 
 
 def _mcfg(**kwargs):
-    cfg = dict(se_ratio=0.0, bottle_ratio=1.0, stem_width=32)
+    cfg = edict(se_ratio=0.0, bottle_ratio=1.0, stem_width=32)
     cfg.update(**kwargs)
     return cfg
 
