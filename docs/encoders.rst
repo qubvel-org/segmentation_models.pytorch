@@ -324,3 +324,18 @@ VGG
 +-------------+------------+-------------+
 | vgg19\_bn   | imagenet   | 20M         |
 +-------------+------------+-------------+
+
+
+Mix Visual Transformer
+~~~~~~~~~~~~~~~~~~~~~
+
++-----------+----------+------------+
+| Encoder   | Weights  | Params, M  |
++===========+==========+============+
+| mit\_b0   | imagenet | 3M         |
+| mit\_b1   | imagenet | 13M        |
+| mit\_b2   | imagenet | 24M        |
+| mit\_b3   | imagenet | 44M        |
+| mit\_b4   | imagenet | 60M        |
+| mit\_b5   | imagenet | 81M        |
++-----------+----------+------------+

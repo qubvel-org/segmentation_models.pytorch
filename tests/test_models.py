@@ -99,9 +99,8 @@ def test_upsample(model_class, upsampling):
 
 
 @pytest.mark.parametrize("model_class", [smp.FPN])
-@pytest.mark.parametrize("encoder_name", ENCODERS)
 @pytest.mark.parametrize("in_channels", [1, 2, 4])
-def test_in_channels(model_class, encoder_name, in_channels):
+def test_in_channels(model_class, in_channels):
     sample = torch.ones([1, in_channels, 64, 64])
     model = model_class(DEFAULT_ENCODER, encoder_weights=None, in_channels=in_channels)
     model.eval()
@@ -118,6 +117,7 @@ def test_dilation(encoder_name):
         or encoder_name.startswith("vgg")
         or encoder_name.startswith("densenet")
         or encoder_name.startswith("timm-res")
+        or encoder_name.startswith("mit_b")
     ):
         return
 
