@@ -18,8 +18,7 @@ def get_encoders():
     encoders = smp.encoders.get_encoder_names()
     encoders = [e for e in encoders if e not in exclude_encoders]
     encoders.append("tu-resnet34")  # for timm universal encoder
-    # return encoders
-    return ["mit_b0"]
+    return encoders
 
 
 ENCODERS = get_encoders()
