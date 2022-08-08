@@ -64,6 +64,9 @@ class Linknet(SegmentationModel):
     ):
         super().__init__()
 
+        if encoder_name.startswith("mit_b"):
+            raise ValueError("Encoder `{}` is not supported for Linknet".format(encoder_name))
+
         self.encoder = get_encoder(
             encoder_name,
             in_channels=in_channels,
