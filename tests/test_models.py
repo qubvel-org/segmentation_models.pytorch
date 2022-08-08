@@ -57,6 +57,10 @@ def _test_forward_backward(model, sample, test_shape=False):
 def test_forward(model_class, encoder_name, encoder_depth, **kwargs):
     if model_class is smp.Unet or model_class is smp.UnetPlusPlus or model_class is smp.MAnet:
         kwargs["decoder_channels"] = (16, 16, 16, 16, 16)[-encoder_depth:]
+    if model_class in [smp.UnetPlusPlus, smp.Linknet] and encoder_name.startswith("mit_b"):
+        return  # skip mit_b*
+    if model_class is smp.FPN and encoder_name.startswith("mit_b") and encoder_depth != 5:
+        return  # skip mit_b*
     model = model_class(encoder_name, encoder_depth=encoder_depth, encoder_weights=None, **kwargs)
     sample = get_sample(model_class)
     model.eval()
@@ -99,9 +103,8 @@ def test_upsample(model_class, upsampling):
 
 
 @pytest.mark.parametrize("model_class", [smp.FPN])
-@pytest.mark.parametrize("encoder_name", ENCODERS)
 @pytest.mark.parametrize("in_channels", [1, 2, 4])
-def test_in_channels(model_class, encoder_name, in_channels):
+def test_in_channels(model_class, in_channels):
     sample = torch.ones([1, in_channels, 64, 64])
     model = model_class(DEFAULT_ENCODER, encoder_weights=None, in_channels=in_channels)
     model.eval()
@@ -118,6 +121,7 @@ def test_dilation(encoder_name):
         or encoder_name.startswith("vgg")
         or encoder_name.startswith("densenet")
         or encoder_name.startswith("timm-res")
+        or encoder_name.startswith("mit_b")
     ):
         return
 

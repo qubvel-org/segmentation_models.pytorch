@@ -20,7 +20,7 @@ The main features of this library are:
 
  - High level API (just two lines to create a neural network)
  - 9 models architectures for binary and multi class segmentation (including legendary Unet)
- - 113 available encoders (and 400+ encoders from [timm](https://github.com/rwightman/pytorch-image-models))
+ - 119 available encoders (and 400+ encoders from [timm](https://github.com/rwightman/pytorch-image-models))
  - All encoders have pre-trained weights for faster and better convergence
  - Popular metrics and losses for training routines
  
@@ -348,6 +348,29 @@ The following is a list of supported encoders in the SMP. Select the appropriate
 |vgg16_bn                        |imagenet                        |14M                             |
 |vgg19                           |imagenet                        |20M                             |
 |vgg19_bn                        |imagenet                        |20M                             |
+
+</div>
+</details>
+
+<details>
+<summary style="margin-left: 25px;">Mix Vision Transformer</summary>
+<div style="margin-left: 25px;">
+
+Backbone from SegFormer pretrained on Imagenet! Can be used with other decoders from package, you can combine Mix Visual Transformer with Unet, FPN and others!
+
+Limitations:  
+
+   - encoder is not supported by Linknet, Unet++
+   - encoder is not supported by FPN if encoder depth != 5
+
+|Encoder                         |Weights                         |Params, M                       |
+|--------------------------------|:------------------------------:|:------------------------------:|
+|mit_b0                          |imagenet                        |3M                              |
+|mit_b1                          |imagenet                        |13M                             |
+|mit_b2                          |imagenet                        |24M                             |
+|mit_b3                          |imagenet                        |44M                             |
+|mit_b4                          |imagenet                        |60M                             |
+|mit_b5                          |imagenet                        |81M                             |
 
 </div>
 </details>
