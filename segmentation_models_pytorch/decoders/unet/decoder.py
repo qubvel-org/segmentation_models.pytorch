@@ -71,6 +71,7 @@ class UnetDecoder(nn.Module):
         use_batchnorm=True,
         attention_type=None,
         center=False,
+        auxiliary_cnns=False,
     ):
         super().__init__()
 
@@ -104,6 +105,7 @@ class UnetDecoder(nn.Module):
             for in_ch, skip_ch, out_ch in zip(in_channels, skip_channels, out_channels)
         ]
         self.blocks = nn.ModuleList(blocks)
+        self.auxiliary_cnns = auxiliary_cnns
 
     def forward(self, *features):
 
@@ -113,9 +115,13 @@ class UnetDecoder(nn.Module):
         head = features[0]
         skips = features[1:]
 
+        xs = None        
         x = self.center(head)
         for i, decoder_block in enumerate(self.blocks):
             skip = skips[i] if i < len(skips) else None
             x = decoder_block(x, skip)
+            if xs is None: xs=[x]
+            else:
+                xs.append(x)
 
-        return x
+        return xs if self.cnns else xs[-1]

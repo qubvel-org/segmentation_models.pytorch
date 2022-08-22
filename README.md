@@ -39,6 +39,7 @@ Visit [Read The Docs Project Page](https://smp.readthedocs.io/) or read followin
     1. [Input channels](#input-channels)
     2. [Auxiliary classification output](#auxiliary-classification-output)
     3. [Depth](#depth)
+    4. [Auxiliary CNNs](#auxiliary-cnns)
  5. [Installation](#installation)
  6. [Competitions won with the library](#competitions-won-with-the-library)
  7. [Contributing](#contributing)
@@ -432,6 +433,26 @@ your model lighter if specify smaller `depth`.
 model = smp.Unet('resnet34', encoder_depth=4)
 ```
 
+
+##### Auxiliary CNNs
+The Unet model supports the `auxiliary_cnns` parameter, which is set to `False` by default.
+If `auxiliary_cnns = True`, the segmentation model will return auxiliary CNN outputs as per https://arxiv.org/abs/2011.03683 for directly supervising the intermediate layers of the decoder, for example, as follows:
+```python
+model = Unet(
+   in_channels=3,
+   classes=1,
+   activation='sigmoid',
+   auxiliary_cnns=True
+)
+
+def custom_loss(pred, target):
+   loss = binary_cross_entropy(pred[-1], target) # the main output
+   DW_factor = 4
+   for i in range(len(pred)-2, -1, -1):
+      loss += binary_cross_entropy(pred[i], Resize(pred[i].shape[2:], interpolation=InterpolationMode.NEAREST)(target))/(2**DW_factor) # auxiliary output losses downweighted by 2^DW_factor and calculated versus lower resolution versions of the target
+      DW_factor += 2
+   return loss
+```
 
 ### 🛠 Installation <a name="installation"></a>
 PyPI version:

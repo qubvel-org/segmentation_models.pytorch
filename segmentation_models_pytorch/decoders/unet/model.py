@@ -7,6 +7,7 @@ from segmentation_models_pytorch.base import (
     ClassificationHead,
 )
 from .decoder import UnetDecoder
+from torch.nn import ModuleList
 
 
 class Unet(SegmentationModel):
@@ -44,6 +45,7 @@ class Unet(SegmentationModel):
                 - dropout (float): Dropout factor in [0, 1)
                 - activation (str): An activation function to apply "sigmoid"/"softmax"
                     (could be **None** to return logits)
+        auxiliary_cnns: If **True**, the segmentation model will return auxiliary cnn outputs as per https://arxiv.org/abs/2011.03683 for directly supervising the intermediate layers of the decoder
 
     Returns:
         ``torch.nn.Module``: Unet
@@ -65,6 +67,7 @@ class Unet(SegmentationModel):
         classes: int = 1,
         activation: Optional[Union[str, callable]] = None,
         aux_params: Optional[dict] = None,
+        auxiliary_cnns: bool = False,
     ):
         super().__init__()
 
@@ -82,14 +85,23 @@ class Unet(SegmentationModel):
             use_batchnorm=decoder_use_batchnorm,
             center=True if encoder_name.startswith("vgg") else False,
             attention_type=decoder_attention_type,
+            auxiliary_cnns=auxiliary_cnns,
         )
 
-        self.segmentation_head = SegmentationHead(
-            in_channels=decoder_channels[-1],
-            out_channels=classes,
-            activation=activation,
-            kernel_size=3,
-        )
+        if auxiliary_cnns:
+            self.segmentation_heads = ModuleList(SegmentationHead(
+                in_channels=channels,
+                out_channels=classes,
+                activation=activation,
+                kernel_size=3
+            ) for channels in decoder_channels)
+        else:
+            self.segmentation_head = SegmentationHead(
+                in_channels=decoder_channels[-1],
+                out_channels=classes,
+                activation=activation,
+                kernel_size=3,
+            )
 
         if aux_params is not None:
             self.classification_head = ClassificationHead(in_channels=self.encoder.out_channels[-1], **aux_params)

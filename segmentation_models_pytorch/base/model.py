@@ -5,7 +5,11 @@ from . import initialization as init
 class SegmentationModel(torch.nn.Module):
     def initialize(self):
         init.initialize_decoder(self.decoder)
-        init.initialize_head(self.segmentation_head)
+        if hasattr(self, 'segmentation_heads'):
+            for segmentation_head in self.segmentation_heads:
+                init.initialize_head(segmentation_head)
+        else:
+            init.initialize_head(self.segmentation_head)
         if self.classification_head is not None:
             init.initialize_head(self.classification_head)
 
@@ -29,7 +33,10 @@ class SegmentationModel(torch.nn.Module):
         features = self.encoder(x)
         decoder_output = self.decoder(*features)
 
-        masks = self.segmentation_head(decoder_output)
+        if hasattr(self, 'segmentation_heads'):
+            masks = [self.segmentation_heads[i](decoder_output[i]) for i in range(len(decoder_output))]
+        else:
+            masks = self.segmentation_head(decoder_output)
 
         if self.classification_head is not None:
             labels = self.classification_head(features[-1])
