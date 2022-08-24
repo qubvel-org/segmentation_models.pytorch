@@ -124,4 +124,4 @@ class UnetDecoder(nn.Module):
             else:
                 xs.append(x)
 
-        return xs if self.cnns else xs[-1]
+        return xs if self.auxiliary_cnns else xs[-1]

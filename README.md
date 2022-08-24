@@ -447,10 +447,10 @@ model = Unet(
 
 def custom_loss(pred, target):
    loss = binary_cross_entropy(pred[-1], target) # the main output
-   DW_factor = 4
+   alpha = 2
    for i in range(len(pred)-2, -1, -1):
-      loss += binary_cross_entropy(pred[i], Resize(pred[i].shape[2:], interpolation=InterpolationMode.NEAREST)(target))/(2**DW_factor) # auxiliary output losses downweighted by 2^DW_factor and calculated versus lower resolution versions of the target
-      DW_factor += 2
+      loss += binary_cross_entropy(pred[i], Resize(pred[i].shape[2:], interpolation=InterpolationMode.NEAREST)(target))/(2**alpha) # auxiliary output losses downweighted by 2^alpha and calculated versus lower resolution versions of the target
+      alpha += 2
    return loss
 ```
 
