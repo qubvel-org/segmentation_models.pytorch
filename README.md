@@ -449,7 +449,8 @@ def custom_loss(pred, target):
    loss = binary_cross_entropy(pred[-1], target) # the main output
    alpha = 2
    for i in range(len(pred)-2, -1, -1):
-      loss += binary_cross_entropy(pred[i], Resize(pred[i].shape[2:], interpolation=InterpolationMode.NEAREST)(target))/(2**alpha) # auxiliary output losses downweighted by 2^alpha and calculated versus lower resolution versions of the target
+      loss += binary_cross_entropy(pred[i], Resize(pred[i].shape[2:], interpolation=InterpolationMode.NEAREST)
+                        (target))/(2**alpha) # auxiliary output losses downweighted by 2^alpha and calculated versus lower resolution versions of the target
       alpha += 2
    return loss
 ```
