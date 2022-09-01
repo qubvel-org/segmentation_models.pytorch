@@ -66,7 +66,7 @@ model = smp.Unet(
 
 #### 2. Configure data preprocessing
 
-All encoders have pretrained weights. Preparing your data the same way as during weights pre-training may give your better results (higher metric score and faster convergence). It is **not necessary** in case you train the whole model, not only decoder.
+All encoders have pretrained weights. Preparing your data the same way as during weights pre-training may give you better results (higher metric score and faster convergence). It is **not necessary** in case you train the whole model, not only decoder.
 
 ```python
 from segmentation_models_pytorch.encoders import get_preprocessing_fn
