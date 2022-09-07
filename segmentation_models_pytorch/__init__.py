@@ -6,6 +6,11 @@ from . import metrics
 
 from .decoders.unet import Unet
 from .decoders.unetplusplus import UnetPlusPlus
+
+from .decoders.resunet import ResUnet
+from .decoders.resunetplusplus import ResUnetPlusPlus
+from .decoders.unet3plus import Unet3Plus
+
 from .decoders.manet import MAnet
 from .decoders.linknet import Linknet
 from .decoders.fpn import FPN
@@ -42,6 +47,9 @@ def create_model(
         DeepLabV3,
         DeepLabV3Plus,
         PAN,
+        ResUnet,
+        ResUnetPlusPlus,
+        Unet3Plus
     ]
     archs_dict = {a.__name__.lower(): a for a in archs}
     try:
