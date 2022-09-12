@@ -13,7 +13,8 @@ class Unet3PlusDecoder(nn.Module):
         self.feature_scale = feature_scale
         self.is_deconv = is_deconv
         self.is_batchnorm = is_batchnorm
-        filters = [64, 128, 256, 512, 1024]
+        # (16, 24, 40, 112, 320)
+        filters = [16, 24, 40, 112, 320]
 
 
         ## -------------Decoder--------------
