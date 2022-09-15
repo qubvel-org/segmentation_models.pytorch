@@ -16,7 +16,7 @@ NAME = "segmentation_models_pytorch"
 DESCRIPTION = "Image segmentation models with pre-trained backbones. PyTorch."
 URL = "https://github.com/qubvel/segmentation_models.pytorch"
 EMAIL = "qubvel@gmail.com"
-AUTHOR = "Pavel Yakubovskiy"
+AUTHOR = "Pavel Iakubovskii"
 REQUIRES_PYTHON = ">=3.6.0"
 VERSION = None
 
