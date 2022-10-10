@@ -30,7 +30,7 @@ class EncoderMixin:
 
         self._in_channels = in_channels
         if self._out_channels[0] == 3:
-            self._out_channels = tuple([in_channels] + list(self._out_channels)[1:])
+            self._out_channels = list([in_channels] + list(self._out_channels)[1:])
 
         utils.patch_first_conv(model=self, new_in_channels=in_channels, pretrained=pretrained)
 

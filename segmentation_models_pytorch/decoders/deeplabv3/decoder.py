@@ -30,6 +30,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
+from typing import List
+
 import torch
 from torch import nn
 from torch.nn import functional as F
@@ -95,7 +97,7 @@ class DeepLabV3PlusDecoder(nn.Module):
             nn.ReLU(),
         )
 
-    def forward(self, *features):
+    def forward(self, features: List[torch.Tensor]):
         aspp_features = self.aspp(features[-1])
         aspp_features = self.up(aspp_features)
         high_res_features = self.block1(features[-4])

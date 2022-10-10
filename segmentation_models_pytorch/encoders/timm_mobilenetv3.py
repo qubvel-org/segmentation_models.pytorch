@@ -1,4 +1,5 @@
 import timm
+import torch
 import numpy as np
 import torch.nn as nn
 
@@ -10,7 +11,7 @@ def _make_divisible(x, divisible_by=8):
 
 
 class MobileNetV3Encoder(nn.Module, EncoderMixin):
-    def __init__(self, model_name, width_mult, depth=5, **kwargs):
+    def __init__(self, model_name, width_mult, depth=5):
         super().__init__()
         if "large" not in model_name and "small" not in model_name:
             raise ValueError("MobileNetV3 wrong model name {}".format(model_name))
@@ -28,6 +29,8 @@ class MobileNetV3Encoder(nn.Module, EncoderMixin):
             features_only=True,
         )
 
+        self._stages = self.get_stages()
+
     def _get_channels(self, mode, width_mult):
         if mode == "small":
             channels = [16, 16, 24, 48, 576]
@@ -36,11 +39,11 @@ class MobileNetV3Encoder(nn.Module, EncoderMixin):
         channels = [
             3,
         ] + [_make_divisible(x * width_mult) for x in channels]
-        return tuple(channels)
+        return channels
 
-    def get_stages(self):
+    def get_stages(self) -> torch.nn.ModuleList:
         if self._mode == "small":
-            return [
+            return torch.nn.ModuleList([
                 nn.Identity(),
                 nn.Sequential(
                     self.model.conv_stem,
@@ -51,9 +54,9 @@ class MobileNetV3Encoder(nn.Module, EncoderMixin):
                 self.model.blocks[1],
                 self.model.blocks[2:4],
                 self.model.blocks[4:],
-            ]
+            ])
         elif self._mode == "large":
-            return [
+            return torch.nn.ModuleList([
                 nn.Identity(),
                 nn.Sequential(
                     self.model.conv_stem,
@@ -65,17 +68,17 @@ class MobileNetV3Encoder(nn.Module, EncoderMixin):
                 self.model.blocks[2],
                 self.model.blocks[3:5],
                 self.model.blocks[5:],
-            ]
+            ])
         else:
-            ValueError("MobileNetV3 mode should be small or large, got {}".format(self._mode))
+            raise ValueError("MobileNetV3 mode should be small or large, got {}".format(self._mode))
 
     def forward(self, x):
-        stages = self.get_stages()
-
         features = []
-        for i in range(self._depth + 1):
-            x = stages[i](x)
-            features.append(x)
+        for i, stage in enumerate(self._stages):
+            # Note: the somewhat strange format here with `i` is required for conversion to TorchScript.
+            if i <= self._depth:
+                x = stage(x)
+                features.append(x)
 
         return features
 
