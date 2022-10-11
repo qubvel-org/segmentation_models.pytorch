@@ -1,6 +1,24 @@
+import numpy as np
 import torch
 
 
+def revert_preprocessing_fn(x:np.ndarray, preprocessing_fn):
+    """ 
+    Reverts the preprocessing_fn. Good for viewing the data.
+    """
+    # preprocessing_fn implementation:
+    # https://github.com/qubvel/segmentation_models.pytorch/blob/master/segmentation_models_pytorch/encoders/_preprocessing.py
+    x = x.copy()
+    if preprocessing_fn.keywords["std"]:
+        x *= preprocessing_fn.keywords["std"]
+    if preprocessing_fn.keywords["mean"]:
+        x += preprocessing_fn.keywords["mean"]
+    if preprocessing_fn.keywords["input_range"] and preprocessing_fn.keywords["input_range"][1] == 1:
+        x *= 255
+    if preprocessing_fn.keywords["input_space"] == "BGR":
+        x = x[..., ::-1]
+    return x
+        
 def _take_channels(*xs, ignore_channels=None):
     if ignore_channels is None:
         return xs
