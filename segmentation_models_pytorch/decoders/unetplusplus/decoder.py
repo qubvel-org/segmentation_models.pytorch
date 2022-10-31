@@ -117,7 +117,7 @@ class UnetPlusPlusDecoder(nn.Module):
         self.blocks = nn.ModuleDict(blocks)
         self.depth = len(self.in_channels) - 1
 
-    def forward(self, *features):
+    def forward(self, features):
 
         features = features[1:]  # remove first skip with same spatial resolution
         features = features[::-1]  # reverse channels to start from head of encoder

@@ -41,33 +41,34 @@ class ResNetEncoder(ResNet, EncoderMixin):
         self._out_channels = out_channels
         self._in_channels = 3
 
+        self._stages = self.get_stages()
         del self.fc
         del self.avgpool
 
     def get_stages(self):
-        return [
+        return nn.ModuleList([
             nn.Identity(),
             nn.Sequential(self.conv1, self.bn1, self.relu),
             nn.Sequential(self.maxpool, self.layer1),
             self.layer2,
             self.layer3,
             self.layer4,
-        ]
+        ])
 
     def forward(self, x):
-        stages = self.get_stages()
-
         features = []
-        for i in range(self._depth + 1):
-            x = stages[i](x)
-            features.append(x)
+        for i, stage in enumerate(self._stages):
+            # Note: the somewhat strange format here with `i` is required for conversion to TorchScript.
+            if i <= self._depth:
+                x = stage(x)
+                features.append(x)
 
         return features
 
     def load_state_dict(self, state_dict, **kwargs):
         state_dict.pop("fc.bias", None)
         state_dict.pop("fc.weight", None)
-        super().load_state_dict(state_dict, **kwargs)
+        super().load_state_dict(state_dict, strict=False, **kwargs)
 
 
 new_settings = {
@@ -128,7 +129,7 @@ resnet_encoders = {
         "encoder": ResNetEncoder,
         "pretrained_settings": pretrained_settings["resnet18"],
         "params": {
-            "out_channels": (3, 64, 64, 128, 256, 512),
+            "out_channels": [3, 64, 64, 128, 256, 512],
             "block": BasicBlock,
             "layers": [2, 2, 2, 2],
         },
@@ -137,7 +138,7 @@ resnet_encoders = {
         "encoder": ResNetEncoder,
         "pretrained_settings": pretrained_settings["resnet34"],
         "params": {
-            "out_channels": (3, 64, 64, 128, 256, 512),
+            "out_channels": [3, 64, 64, 128, 256, 512],
             "block": BasicBlock,
             "layers": [3, 4, 6, 3],
         },
@@ -146,7 +147,7 @@ resnet_encoders = {
         "encoder": ResNetEncoder,
         "pretrained_settings": pretrained_settings["resnet50"],
         "params": {
-            "out_channels": (3, 64, 256, 512, 1024, 2048),
+            "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": Bottleneck,
             "layers": [3, 4, 6, 3],
         },
@@ -155,7 +156,7 @@ resnet_encoders = {
         "encoder": ResNetEncoder,
         "pretrained_settings": pretrained_settings["resnet101"],
         "params": {
-            "out_channels": (3, 64, 256, 512, 1024, 2048),
+            "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": Bottleneck,
             "layers": [3, 4, 23, 3],
         },
@@ -164,7 +165,7 @@ resnet_encoders = {
         "encoder": ResNetEncoder,
         "pretrained_settings": pretrained_settings["resnet152"],
         "params": {
-            "out_channels": (3, 64, 256, 512, 1024, 2048),
+            "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": Bottleneck,
             "layers": [3, 8, 36, 3],
         },
@@ -173,7 +174,7 @@ resnet_encoders = {
         "encoder": ResNetEncoder,
         "pretrained_settings": pretrained_settings["resnext50_32x4d"],
         "params": {
-            "out_channels": (3, 64, 256, 512, 1024, 2048),
+            "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": Bottleneck,
             "layers": [3, 4, 6, 3],
             "groups": 32,
@@ -184,7 +185,7 @@ resnet_encoders = {
         "encoder": ResNetEncoder,
         "pretrained_settings": pretrained_settings["resnext101_32x4d"],
         "params": {
-            "out_channels": (3, 64, 256, 512, 1024, 2048),
+            "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": Bottleneck,
             "layers": [3, 4, 23, 3],
             "groups": 32,
@@ -195,7 +196,7 @@ resnet_encoders = {
         "encoder": ResNetEncoder,
         "pretrained_settings": pretrained_settings["resnext101_32x8d"],
         "params": {
-            "out_channels": (3, 64, 256, 512, 1024, 2048),
+            "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": Bottleneck,
             "layers": [3, 4, 23, 3],
             "groups": 32,
@@ -206,7 +207,7 @@ resnet_encoders = {
         "encoder": ResNetEncoder,
         "pretrained_settings": pretrained_settings["resnext101_32x16d"],
         "params": {
-            "out_channels": (3, 64, 256, 512, 1024, 2048),
+            "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": Bottleneck,
             "layers": [3, 4, 23, 3],
             "groups": 32,
@@ -217,7 +218,7 @@ resnet_encoders = {
         "encoder": ResNetEncoder,
         "pretrained_settings": pretrained_settings["resnext101_32x32d"],
         "params": {
-            "out_channels": (3, 64, 256, 512, 1024, 2048),
+            "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": Bottleneck,
             "layers": [3, 4, 23, 3],
             "groups": 32,
@@ -228,7 +229,7 @@ resnet_encoders = {
         "encoder": ResNetEncoder,
         "pretrained_settings": pretrained_settings["resnext101_32x48d"],
         "params": {
-            "out_channels": (3, 64, 256, 512, 1024, 2048),
+            "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": Bottleneck,
             "layers": [3, 4, 23, 3],
             "groups": 32,

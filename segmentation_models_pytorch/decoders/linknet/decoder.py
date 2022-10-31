@@ -65,7 +65,7 @@ class LinknetDecoder(nn.Module):
             [DecoderBlock(channels[i], channels[i + 1], use_batchnorm=use_batchnorm) for i in range(n_blocks)]
         )
 
-    def forward(self, *features):
+    def forward(self, features):
         features = features[1:]  # remove first skip
         features = features[::-1]  # reverse channels to start from head of encoder
 

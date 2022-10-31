@@ -69,7 +69,7 @@ class PSPDecoder(nn.Module):
 
         self.dropout = nn.Dropout2d(p=dropout)
 
-    def forward(self, *features):
+    def forward(self, features):
         x = features[-1]
         x = self.psp(x)
         x = self.conv(x)

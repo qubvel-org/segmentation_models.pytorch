@@ -176,7 +176,7 @@ class PANDecoder(nn.Module):
             upscale_mode=upscale_mode,
         )
 
-    def forward(self, *features):
+    def forward(self, features):
         bottleneck = features[-1]
         x5 = self.fpa(bottleneck)  # 1/32
         x4 = self.gau3(features[-2], x5)  # 1/16
