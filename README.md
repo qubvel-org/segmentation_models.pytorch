@@ -356,12 +356,12 @@ The following is a list of supported encoders in the SMP. Select the appropriate
 <summary style="margin-left: 25px;">Mix Vision Transformer</summary>
 <div style="margin-left: 25px;">
 
-Backbone from SegFormer pretrained on Imagenet! Can be used with other decoders from package, you can combine Mix Visual Transformer with Unet, FPN and others!
+Backbone from SegFormer pretrained on Imagenet! Can be used with other decoders from package, you can combine Mix Vision Transformer with Unet, FPN and others!
 
 Limitations:  
 
-   - encoder is not supported by Linknet, Unet++
-   - encoder is not supported by FPN if encoder depth != 5
+   - encoder is **not** supported by Linknet, Unet++
+   - encoder is supported by FPN only for encoder **depth = 5**
 
 |Encoder                         |Weights                         |Params, M                       |
 |--------------------------------|:------------------------------:|:------------------------------:|
