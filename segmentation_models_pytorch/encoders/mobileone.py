@@ -390,6 +390,11 @@ class MobileOne(nn.Module, EncoderMixin):
             features.append(x)
         return features
 
+    def load_state_dict(self, state_dict, **kwargs):
+        state_dict.pop("linear.weight", None)
+        state_dict.pop( "linear.bias", None)
+        super().load_state_dict(state_dict, **kwargs)
+
 def reparameterize_model(model: torch.nn.Module) -> nn.Module:
     """ Method returns a model where a multi-branched structure
         used in training is re-parameterized into a single branch
