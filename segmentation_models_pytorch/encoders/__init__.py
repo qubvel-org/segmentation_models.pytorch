@@ -1,5 +1,6 @@
 import timm
 import functools
+import torch
 import torch.utils.model_zoo as model_zoo
 
 from .resnet import resnet_encoders
@@ -20,6 +21,7 @@ from .timm_sknet import timm_sknet_encoders
 from .timm_mobilenetv3 import timm_mobilenetv3_encoders
 from .timm_gernet import timm_gernet_encoders
 from .mix_transformer import mix_transformer_encoders
+from .mobileone import mobileone_encoders
 
 from .timm_universal import TimmUniversalEncoder
 
@@ -44,6 +46,8 @@ encoders.update(timm_sknet_encoders)
 encoders.update(timm_mobilenetv3_encoders)
 encoders.update(timm_gernet_encoders)
 encoders.update(mix_transformer_encoders)
+encoders.update(mix_transformer_encoders)
+encoders.update(mobileone_encoders)
 
 
 def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **kwargs):
@@ -80,7 +84,7 @@ def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **
                     list(encoders[name]["pretrained_settings"].keys()),
                 )
             )
-        encoder.load_state_dict(model_zoo.load_url(settings["url"]))
+        encoder.load_state_dict(model_zoo.load_url(settings["url"], map_location=torch.device('cpu')), strict=False)
 
     encoder.set_in_channels(in_channels, pretrained=weights is not None)
     if output_stride != 32:
