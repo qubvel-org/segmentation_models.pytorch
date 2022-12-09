@@ -383,6 +383,10 @@ Apple's "sub-one-ms" Backbone pretrained on Imagenet! Can be used with all decod
 
 Note: In the official github repo the s0 variant has additional num_conv_branches, leading to more params than s1.
 
+Limitations:  
+
+   - encoder currently only supports 3 input channels
+
 |Encoder                         |Weights                         |Params, M                       |
 |--------------------------------|:------------------------------:|:------------------------------:|
 |mobileone_s0                    |imagenet                        |4.6M                              |

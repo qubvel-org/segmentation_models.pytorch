@@ -184,7 +184,7 @@ class MobileOneBlock(nn.Module):
         self.inference_mode = True
 
     def _get_kernel_bias(self) -> Tuple[torch.Tensor, torch.Tensor]:
-        """Method to obtain re-parameterized kernel and bias.
+        """Obtain the re-parameterized kernel and bias.
         Reference: https://github.com/DingXiaoH/RepVGG/blob/main/repvgg.py#L83
 
         :return: Tuple of (kernel, bias) after fusing branches.
@@ -217,7 +217,7 @@ class MobileOneBlock(nn.Module):
         return kernel_final, bias_final
 
     def _fuse_bn_tensor(self, branch) -> Tuple[torch.Tensor, torch.Tensor]:
-        """Method to fuse batchnorm layer with preceeding conv layer.
+        """Fuse batchnorm layer with preceeding conv layer.
         Reference: https://github.com/DingXiaoH/RepVGG/blob/main/repvgg.py#L95
 
         :param branch:
@@ -253,7 +253,7 @@ class MobileOneBlock(nn.Module):
         return kernel * t, beta - running_mean * gamma / std
 
     def _conv_bn(self, kernel_size: int, padding: int) -> nn.Sequential:
-        """Helper method to construct conv-batchnorm layers.
+        """Construct conv-batchnorm layers.
 
         :param kernel_size: Size of the convolution kernel.
         :param padding: Zero-padding size.
@@ -291,6 +291,7 @@ class MobileOne(nn.Module, EncoderMixin):
         inference_mode: bool = False,
         use_se: bool = False,
         depth=5,
+        in_channels=3,
         num_conv_branches: int = 1,
     ) -> None:
         """Construct MobileOne model.
@@ -305,16 +306,18 @@ class MobileOne(nn.Module, EncoderMixin):
         super().__init__()
 
         assert len(width_multipliers) == 4
+        assert in_channels == 3
         self.inference_mode = inference_mode
         self._out_channels = out_channels
         self.in_planes = min(64, int(64 * width_multipliers[0]))
         self.use_se = use_se
         self.num_conv_branches = num_conv_branches
         self._depth = depth
+        self._in_channels = in_channels
 
         # Build stages
         self.stage0 = MobileOneBlock(
-            in_channels=3,
+            in_channels=self._in_channels,
             out_channels=self.in_planes,
             kernel_size=3,
             stride=2,
@@ -404,7 +407,7 @@ class MobileOne(nn.Module, EncoderMixin):
 
 
 def reparameterize_model(model: torch.nn.Module) -> nn.Module:
-    """Method returns a model where a multi-branched structure
+    """Return a model where a multi-branched structure
         used in training is re-parameterized into a single branch
         for inference.
 
