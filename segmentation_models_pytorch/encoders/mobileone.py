@@ -2,13 +2,14 @@
 # For licensing see accompanying LICENSE file.
 # Copyright (C) 2022 Apple Inc. All Rights Reserved.
 #
-from typing import Optional, List, Tuple
-
 import copy
+from typing import List, Optional, Tuple
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from . import _utils as utils
 from ._base import EncoderMixin
 
 __all__ = ["MobileOne", "reparameterize_model"]
@@ -275,6 +276,16 @@ class MobileOneBlock(nn.Module):
         mod_list.add_module("bn", nn.BatchNorm2d(num_features=self.out_channels))
         return mod_list
 
+    def set_in_channels(self, in_channels, pretrained=True):
+        """Change first convolution channels"""
+        if in_channels == 3:
+            return
+
+        self._in_channels = in_channels
+        self._out_channels = tuple([in_channels] + list(self._out_channels)[1:])
+        utils.patch_first_conv(model=self.stage0.rbr_conv, new_in_channels=in_channels, pretrained=pretrained)
+        utils.patch_first_conv(model=self.stage0.rbr_scale, new_in_channels=in_channels, pretrained=pretrained)
+
 
 class MobileOne(nn.Module, EncoderMixin):
     """MobileOne Model
@@ -306,7 +317,6 @@ class MobileOne(nn.Module, EncoderMixin):
         super().__init__()
 
         assert len(width_multipliers) == 4
-        assert in_channels == 3
         self.inference_mode = inference_mode
         self._out_channels = out_channels
         self.in_planes = min(64, int(64 * width_multipliers[0]))
@@ -314,6 +324,7 @@ class MobileOne(nn.Module, EncoderMixin):
         self.num_conv_branches = num_conv_branches
         self._depth = depth
         self._in_channels = in_channels
+        self.set_in_channels(self._in_channels)
 
         # Build stages
         self.stage0 = MobileOneBlock(
