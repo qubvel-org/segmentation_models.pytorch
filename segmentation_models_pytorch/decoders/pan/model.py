@@ -8,6 +8,9 @@ from segmentation_models_pytorch.base import (
 )
 from .decoder import PANDecoder
 
+"""constants"""
+VALID_ENCODER_OUTPUT_STRIDES = (16, 32)
+NO_DILATION_ENCODER_OUTPUT_STRIDES = (32,)
 
 class PAN(SegmentationModel):
     """Implementation of PAN_ (Pyramid Attention Network).
@@ -61,8 +64,19 @@ class PAN(SegmentationModel):
     ):
         super().__init__()
 
-        if encoder_output_stride not in [16, 32]:
+        if encoder_output_stride not in VALID_ENCODER_OUTPUT_STRIDES:
             raise ValueError("PAN support output stride 16 or 32, got {}".format(encoder_output_stride))
+
+        # raise error for incompatible encoder and output stride configuration
+        if (
+            encoder_output_stride not in NO_DILATION_ENCODER_OUTPUT_STRIDES
+            and encoder_name.startswith("mit_")
+        ):
+            raise ValueError(
+                "mit models are transformer models and do not contain "
+                + "convolutional layers, thus they do not support dilation. However,"
+                + f" encoder_output_stride is set to {encoder_output_stride}, which uses dilation."
+                + f" Please set encoder_output_stride to one of {NO_DILATION_ENCODER_OUTPUT_STRIDES} to disable dilation.")
 
         self.encoder = get_encoder(
             encoder_name,
