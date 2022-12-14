@@ -276,16 +276,6 @@ class MobileOneBlock(nn.Module):
         mod_list.add_module("bn", nn.BatchNorm2d(num_features=self.out_channels))
         return mod_list
 
-    def set_in_channels(self, in_channels, pretrained=True):
-        """Change first convolution channels"""
-        if in_channels == 3:
-            return
-
-        self._in_channels = in_channels
-        self._out_channels = tuple([in_channels] + list(self._out_channels)[1:])
-        utils.patch_first_conv(model=self.stage0.rbr_conv, new_in_channels=in_channels, pretrained=pretrained)
-        utils.patch_first_conv(model=self.stage0.rbr_scale, new_in_channels=in_channels, pretrained=pretrained)
-
 
 class MobileOne(nn.Module, EncoderMixin):
     """MobileOne Model
@@ -415,6 +405,16 @@ class MobileOne(nn.Module, EncoderMixin):
         state_dict.pop("linear.weight", None)
         state_dict.pop("linear.bias", None)
         super().load_state_dict(state_dict, **kwargs)
+
+    def set_in_channels(self, in_channels, pretrained=True):
+        """Change first convolution channels"""
+        if in_channels == 3:
+            return
+
+        self._in_channels = in_channels
+        self._out_channels = tuple([in_channels] + list(self._out_channels)[1:])
+        utils.patch_first_conv(model=self.stage0.rbr_conv, new_in_channels=in_channels, pretrained=pretrained)
+        utils.patch_first_conv(model=self.stage0.rbr_scale, new_in_channels=in_channels, pretrained=pretrained)
 
 
 def reparameterize_model(model: torch.nn.Module) -> nn.Module:
