@@ -97,9 +97,9 @@ def get_preprocessing_params(encoder_name, pretrained="imagenet"):
 
     if encoder_name.startswith("tu-"):
         encoder_name = encoder_name[3:]
-        if encoder_name not in timm.models.registry._model_has_pretrained:
+        if not timm.models.is_model_pretrained(encoder_name):
             raise ValueError(f"{encoder_name} does not have pretrained weights and preprocessing parameters")
-        settings = timm.models.registry._model_default_cfgs[encoder_name]
+        settings = timm.models.get_pretrained_cfg(encoder_name)
     else:
         all_settings = encoders[encoder_name]["pretrained_settings"]
         if pretrained not in all_settings.keys():

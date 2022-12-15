@@ -105,7 +105,7 @@ class EfficientNetBaseEncoder(EfficientNet, EncoderMixin):
     def get_stages(self):
         return [
             nn.Identity(),
-            nn.Sequential(self.conv_stem, self.bn1, self.act1),
+            nn.Sequential(self.conv_stem, self.bn1),
             self.blocks[: self._stage_idxs[0]],
             self.blocks[self._stage_idxs[0] : self._stage_idxs[1]],
             self.blocks[self._stage_idxs[1] : self._stage_idxs[2]],
