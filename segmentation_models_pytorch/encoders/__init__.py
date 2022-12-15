@@ -20,6 +20,7 @@ from .timm_sknet import timm_sknet_encoders
 from .timm_mobilenetv3 import timm_mobilenetv3_encoders
 from .timm_gernet import timm_gernet_encoders
 from .mix_transformer import mix_transformer_encoders
+from .mobileone import mobileone_encoders
 
 from .timm_universal import TimmUniversalEncoder
 
@@ -44,6 +45,7 @@ encoders.update(timm_sknet_encoders)
 encoders.update(timm_mobilenetv3_encoders)
 encoders.update(timm_gernet_encoders)
 encoders.update(mix_transformer_encoders)
+encoders.update(mobileone_encoders)
 
 
 def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **kwargs):

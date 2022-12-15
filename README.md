@@ -375,6 +375,25 @@ Limitations:
 </div>
 </details>
 
+<details>
+<summary style="margin-left: 25px;">MobileOne</summary>
+<div style="margin-left: 25px;">
+
+Apple's "sub-one-ms" Backbone pretrained on Imagenet! Can be used with all decoders.
+
+Note: In the official github repo the s0 variant has additional num_conv_branches, leading to more params than s1.
+
+|Encoder                         |Weights                         |Params, M                       |
+|--------------------------------|:------------------------------:|:------------------------------:|
+|mobileone_s0                    |imagenet                        |4.6M                              |
+|mobileone_s1                    |imagenet                        |4.0M                              |
+|mobileone_s2                    |imagenet                        |6.5M                              |
+|mobileone_s3                    |imagenet                        |8.8M                              |
+|mobileone_s4                    |imagenet                        |13.6M                             |
+
+</div>
+</details>
+
 
 \* `ssl`, `swsl` - semi-supervised and weakly-supervised learning on ImageNet ([repo](https://github.com/facebookresearch/semi-supervised-ImageNet1K-models)).
 
