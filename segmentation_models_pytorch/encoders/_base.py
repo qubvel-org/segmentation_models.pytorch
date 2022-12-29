@@ -23,6 +23,11 @@ class EncoderMixin:
     def output_stride(self):
         return min(self._output_stride, 2**self._depth)
 
+    @property
+    def first_conv(self):
+        """Return first convolution layer in encoder"""
+        return utils.find_input_conv_layer(model=self, number_of_channels=self._in_channels)
+
     def set_in_channels(self, in_channels, pretrained=True):
         """Change first convolution channels"""
         if in_channels == 3:
@@ -32,7 +37,7 @@ class EncoderMixin:
         if self._out_channels[0] == 3:
             self._out_channels = tuple([in_channels] + list(self._out_channels)[1:])
 
-        utils.patch_first_conv(model=self, new_in_channels=in_channels, pretrained=pretrained)
+        utils.change_conv_in_channels(self.first_conv, in_channels, pretrained)
 
     def get_stages(self):
         """Override it in your implementation"""
@@ -40,20 +45,19 @@ class EncoderMixin:
 
     def make_dilated(self, output_stride):
 
-        if output_stride == 16:
-            stage_list = [
-                5,
-            ]
-            dilation_list = [
-                2,
-            ]
+        if output_stride == 32:
+            return
+
+        elif output_stride == 16:
+            stage_list = [5]
+            dilation_list = [2]
 
         elif output_stride == 8:
             stage_list = [4, 5]
             dilation_list = [2, 4]
 
         else:
-            raise ValueError("Output stride should be 16 or 8, got {}.".format(output_stride))
+            raise ValueError("Output stride should be 32, 16 or 8, got {}.".format(output_stride))
 
         self._output_stride = output_stride
 
