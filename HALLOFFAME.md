@@ -32,7 +32,7 @@ Please, follow these rules, when adding a solution to the "Hall of Fame":
 [[description](https://www.kaggle.com/c/severstal-steel-defect-detection/discussion/114465#latest-659615)]
 
 - 12th place. 
-[Pavel Yakubovskiy](https://www.linkedin.com/in/pavel-yakubovskiy/), 
+[Pavel Iakubovskii](https://www.linkedin.com/in/pavel-iakubovskii/), 
 [Ilya Dobrynin](https://www.linkedin.com/in/ilya-dobrynin-79a89b106/), 
 [Denis Kolpakov](https://www.linkedin.com/in/denis-kolpakov-ab3137197/)  
 [[description](https://www.kaggle.com/c/severstal-steel-defect-detection/discussion/114309#latest-661404)]
@@ -72,7 +72,7 @@ Please, follow these rules, when adding a solution to the "Hall of Fame":
 [[code](https://github.com/khornlund/understanding-cloud-organization)]
 
 - 55th place.
-[Pavel Yakubovskiy](https://www.linkedin.com/in/pavel-yakubovskiy/)  
+[Pavel Iakubovskii](https://www.linkedin.com/in/pavel-iakubovskii/)  
 [[description](https://www.kaggle.com/c/understanding_cloud_organization/discussion/118019#latest-678626)]
 
 ## Other platforms
@@ -85,7 +85,7 @@ Please, follow these rules, when adding a solution to the "Hall of Fame":
 
 ### [Open Cities AI Challenge: Segmenting Buildings for Disaster Resilience](https://www.drivendata.org/competitions/60/building-segmentation-disaster-resilience/)
  - 1st place.
-[Pavel Yakubovskiy](https://www.linkedin.com/in/pavel-yakubovskiy/).  
+[Pavel Iakubovskii](https://www.linkedin.com/in/pavel-iakubovskii/).  
 [[code and description](https://github.com/qubvel/open-cities-challenge)]
 
 ### [Machine Learning based feature extraction of Electrical Substations from Satellite Data ](https://competitions.codalab.org/competitions/32132#learn_the_details)

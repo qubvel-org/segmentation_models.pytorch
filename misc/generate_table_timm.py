@@ -51,4 +51,6 @@ if __name__ == "__main__":
 
     table = make_table(supported_models)
     print(table)
+    with open("timm_encoders.txt", "w") as f:
+        print(table, file=f)
     print(f"Total encoders: {len(supported_models.keys())}")
