@@ -23,8 +23,8 @@ sys.path.append('..')
 # -- Project information -----------------------------------------------------
 
 project = 'Segmentation Models'
-copyright = '{}, Pavel Yakubovskiy'.format(datetime.datetime.now().year)
-author = 'Pavel Yakubovskiy'
+copyright = '{}, Pavel Iakubovskii'.format(datetime.datetime.now().year)
+author = 'Pavel Iakubovskii'
 
 def get_version():
     sys.path.append('../segmentation_models_pytorch')
