@@ -200,6 +200,24 @@ The following is a list of supported encoders in the SMP. Select the appropriate
 </details>
 
 <details>
+<summary style="margin-left: 25px;">ConvNeXt V2</summary>
+<div style="margin-left: 25px;">
+
+|Encoder                         |Weights                         |Params, M                       |
+|--------------------------------|:------------------------------:|:------------------------------:|
+|convnext2_atto                  |imagenet                        |3.7M                            |
+|convnextv2_femto                |imagenet                        |5.2M                            |
+|convnextv2_pico                 |imagenet                        |9.1M                            |
+|convnextv2_nano                 |imagenet                        |15.6M                           |
+|convnextv2_tiny                 |imagenet                        |28.6M                           |
+|convnextv2_base                 |imagenet                        |89M                             |
+|convnextv2_large                |imagenet                        |198M                            |
+|convnextv2_huge                 |imagenet                        |660M                            |
+
+</div>
+</details>
+
+<details>
 <summary style="margin-left: 25px;">GERNet</summary>
 <div style="margin-left: 25px;">
 

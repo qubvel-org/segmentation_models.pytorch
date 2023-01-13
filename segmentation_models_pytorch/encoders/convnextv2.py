@@ -2,8 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from timm.models.layers import trunc_normal_, DropPath
-from segmentation_models_pytorch.encoders._base import EncoderMixin
-import segmentation_models_pytorch as smp
+from ._base import EncoderMixin
 
 
 class LayerNorm(nn.Module):
@@ -142,6 +141,11 @@ class ConvNeXtV2(nn.Module):
             trunc_normal_(m.weight, std=.02)
             nn.init.constant_(m.bias, 0)
 
+    def get_stages(self):
+        stages = [nn.Identity(), 
+                  *[nn.Sequential(self.downsample_layers[i], self.stages[i]) for i in range(self.depth)]]
+        return stages
+
     def forward_features(self, x):
         outs = [x]
         for i in range(self.depth):
@@ -172,7 +176,17 @@ class ConvNeXtV2Encoder(torch.nn.Module, EncoderMixin):
 convnextv2_encoders = {
     "convnextv2_atto": {
         "encoder": ConvNeXtV2Encoder,
-        "pretrained_settings": {},
+        "pretrained_settings": {
+            'imagenet': {
+                'url': 'https://dl.fbaipublicfiles.com/convnext/convnextv2/im1k/convnextv2_atto_1k_224_ema.pt',
+                'input_space': 'RGB',
+                'input_range': [0, 1],
+                'mean': [0.485, 0.456, 0.406],
+                'std': [0.229, 0.224, 0.225],
+                'num_classes': 1000,
+                'input_size': [3, 224, 224],
+            }
+        },
         "params": {
             "out_channels": [40, 80, 160, 320],
             "depth": 4,
@@ -183,7 +197,17 @@ convnextv2_encoders = {
     },
     "convnextv2_femto": {
         "encoder": ConvNeXtV2Encoder,
-        "pretrained_settings": {},
+        "pretrained_settings": {
+            'imagenet': {
+                'url': 'https://dl.fbaipublicfiles.com/convnext/convnextv2/im1k/convnextv2_femto_1k_224_ema.pt',
+                'input_space': 'RGB',
+                'input_range': [0, 1],
+                'mean': [0.485, 0.456, 0.406],
+                'std': [0.229, 0.224, 0.225],
+                'num_classes': 1000,
+                'input_size': [3, 224, 224],
+            }    
+        },
         "params": {
             "out_channels": [48, 96, 192, 384],
             "depth": 4,
@@ -194,7 +218,17 @@ convnextv2_encoders = {
     },
     "convnextv2_pico": {
         "encoder": ConvNeXtV2Encoder,
-        "pretrained_settings": {},
+        "pretrained_settings": {
+            'imagenet': {
+                'url': 'https://dl.fbaipublicfiles.com/convnext/convnextv2/im1k/convnextv2_pico_1k_224_ema.pt',
+                'input_space': 'RGB',
+                'input_range': [0, 1],
+                'mean': [0.485, 0.456, 0.406],
+                'std': [0.229, 0.224, 0.225],
+                'num_classes': 1000,
+                'input_size': [3, 224, 224],
+            }    
+        },
         "params": {
             "out_channels": [64, 128, 256, 512],
             "depth": 4,
@@ -205,18 +239,38 @@ convnextv2_encoders = {
     },
     "convnextv2_nano": {
         "encoder": ConvNeXtV2Encoder,
-        "pretrained_settings": {},
+        "pretrained_settings": {
+            'imagenet': {
+                'url': 'https://dl.fbaipublicfiles.com/convnext/convnextv2/im22k/convnextv2_nano_22k_224_ema.pt',
+                'input_space': 'RGB',
+                'input_range': [0, 1],
+                'mean': [0.485, 0.456, 0.406],
+                'std': [0.229, 0.224, 0.225],
+                'num_classes': 1000,
+                'input_size': [3, 224, 224],
+            }
+        },
         "params": {
             "out_channels": [80, 160, 320, 640],
             "depth": 4,
             "depths": [2, 2, 8, 2],
             "in_channels": 3,
-            "model_name": "convnextv2_nano"
+            "model_name": "convnextv2_nano",
         },
     },
     "convnextv2_tiny": {
         "encoder": ConvNeXtV2Encoder,
-        "pretrained_settings": {},
+        "pretrained_settings": {
+            'imagenet': {
+                'url': 'https://dl.fbaipublicfiles.com/convnext/convnextv2/im22k/convnextv2_tiny_22k_224_ema.pt',
+                'input_space': 'RGB',
+                'input_range': [0, 1],
+                'mean': [0.485, 0.456, 0.406],
+                'std': [0.229, 0.224, 0.225],
+                'num_classes': 1000,
+                'input_size': [3, 224, 224],
+            }
+        },
         "params": {
             "out_channels": [96, 192, 384, 768],
             "depth": 4,
@@ -227,7 +281,17 @@ convnextv2_encoders = {
     },
     "convnextv2_base": {
         "encoder": ConvNeXtV2Encoder,
-        "pretrained_settings": {},
+        "pretrained_settings": {
+            'imagenet': {
+                'url': 'https://dl.fbaipublicfiles.com/convnext/convnextv2/im22k/convnextv2_base_22k_224_ema.pt',
+                'input_space': 'RGB',
+                'input_range': [0, 1],
+                'mean': [0.485, 0.456, 0.406],
+                'std': [0.229, 0.224, 0.225],
+                'num_classes': 1000,
+                'input_size': [3, 224, 224],
+            }
+        },
         "params": {
             "out_channels": [128, 256, 512, 1024],
             "depth": 4,
@@ -238,7 +302,17 @@ convnextv2_encoders = {
     },
     "convnextv2_large": {
         "encoder": ConvNeXtV2Encoder,
-        "pretrained_settings": {},
+        "pretrained_settings": {
+            'imagenet': {
+                'url': 'https://dl.fbaipublicfiles.com/convnext/convnextv2/im22k/convnextv2_large_22k_224_ema.pt',
+                'input_space': 'RGB',
+                'input_range': [0, 1],
+                'mean': [0.485, 0.456, 0.406],
+                'std': [0.229, 0.224, 0.225],
+                'num_classes': 1000,
+                'input_size': [3, 224, 224],
+            }
+        },
         "params": {
             "out_channels": [192, 384, 768, 1536],
             "depth": 4,
@@ -249,7 +323,17 @@ convnextv2_encoders = {
     },
     "convnextv2_huge": {
         "encoder": ConvNeXtV2Encoder,
-        "pretrained_settings": {},
+        "pretrained_settings": {
+            'imagenet': {
+                'url': 'https://dl.fbaipublicfiles.com/convnext/convnextv2/im22k/convnextv2_huge_22k_384_ema.pt',  
+                'input_space': 'RGB',
+                'input_range': [0, 1],
+                'mean': [0.485, 0.456, 0.406],
+                'std': [0.229, 0.224, 0.225],
+                'num_classes': 1000,
+                'input_size': [3, 384, 384], 
+            }
+        },
         "params": {
             "out_channels": [352, 704, 1408, 2816],
             "depth": 4,
