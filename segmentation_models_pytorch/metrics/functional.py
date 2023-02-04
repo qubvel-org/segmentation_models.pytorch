@@ -65,6 +65,7 @@ def get_stats(
     ignore_index: Optional[int] = None,
     threshold: Optional[Union[float, List[float]]] = None,
     num_classes: Optional[int] = None,
+    output_device: Optional[Union[str, torch.device]] = None,
 ) -> Tuple[torch.LongTensor, torch.LongTensor, torch.LongTensor, torch.LongTensor]:
     """Compute true positive, false positive, false negative, true negative 'pixels'
     for each image and each class.
@@ -102,6 +103,7 @@ def get_stats(
             only for ``'multiclass'`` mode. Class values should be in range 0..(num_classes - 1).
             If ``ignore_index`` is specified it should be outside the classes range, e.g. ``-1`` or
             ``255``.
+        output_device (Optional[Union[str, torch.device]]): Device of the ``output`` tensors.
 
     Raises:
         ValueError: in case of misconfiguration.
@@ -150,12 +152,12 @@ def get_stats(
         )
 
     if mode == "multiclass":
-        tp, fp, fn, tn = _get_stats_multiclass(output, target, num_classes, ignore_index)
+        tp, fp, fn, tn = _get_stats_multiclass(output, target, num_classes, ignore_index, output_device)
     else:
         if threshold is not None:
             output = torch.where(output >= threshold, 1, 0)
             target = torch.where(target >= threshold, 1, 0)
-        tp, fp, fn, tn = _get_stats_multilabel(output, target)
+        tp, fp, fn, tn = _get_stats_multilabel(output, target, output_device)
 
     return tp, fp, fn, tn
 
@@ -166,6 +168,7 @@ def _get_stats_multiclass(
     target: torch.LongTensor,
     num_classes: int,
     ignore_index: Optional[int],
+    device: Optional[Union[str, torch.device]] = None,
 ) -> Tuple[torch.LongTensor, torch.LongTensor, torch.LongTensor, torch.LongTensor]:
 
     batch_size, *dims = output.shape
@@ -177,10 +180,10 @@ def _get_stats_multiclass(
         target = torch.where(ignore, -1, target)
         ignore_per_sample = ignore.view(batch_size, -1).sum(1)
 
-    tp_count = torch.zeros(batch_size, num_classes, dtype=torch.long)
-    fp_count = torch.zeros(batch_size, num_classes, dtype=torch.long)
-    fn_count = torch.zeros(batch_size, num_classes, dtype=torch.long)
-    tn_count = torch.zeros(batch_size, num_classes, dtype=torch.long)
+    tp_count = torch.zeros(batch_size, num_classes, dtype=torch.long, device=device)
+    fp_count = torch.zeros(batch_size, num_classes, dtype=torch.long, device=device)
+    fn_count = torch.zeros(batch_size, num_classes, dtype=torch.long, device=device)
+    tn_count = torch.zeros(batch_size, num_classes, dtype=torch.long, device=device)
 
     for i in range(batch_size):
         target_i = target[i]
@@ -205,6 +208,7 @@ def _get_stats_multiclass(
 def _get_stats_multilabel(
     output: torch.LongTensor,
     target: torch.LongTensor,
+    device: Optional[Union[str, torch.device]] = None,
 ) -> Tuple[torch.LongTensor, torch.LongTensor, torch.LongTensor, torch.LongTensor]:
 
     batch_size, num_classes, *dims = target.shape
@@ -216,7 +220,7 @@ def _get_stats_multilabel(
     fn = target.sum(2) - tp
     tn = torch.prod(torch.tensor(dims)) - (tp + fp + fn)
 
-    return tp, fp, fn, tn
+    return tp.to(device), fp.to(device), fn.to(device), tn.to(device)
 
 
 ###################################################################################################
