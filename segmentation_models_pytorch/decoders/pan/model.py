@@ -1,4 +1,5 @@
 from typing import Optional, Union
+from segmentation_models_pytorch.decoders import ActivationType, AuxParamsType
 
 from segmentation_models_pytorch.encoders import get_encoder
 from segmentation_models_pytorch.base import (
@@ -55,14 +56,14 @@ class PAN(SegmentationModel):
         decoder_channels: int = 32,
         in_channels: int = 3,
         classes: int = 1,
-        activation: Optional[Union[str, callable]] = None,
+        activation: ActivationType = None,
         upsampling: int = 4,
-        aux_params: Optional[dict] = None,
+        aux_params: Optional[AuxParamsType] = None,
     ):
-        super().__init__()
+        if encoder_output_stride not in (16, 32):
+            raise ValueError(f"PAN support output stride 16 or 32, got {encoder_output_stride}")
 
-        if encoder_output_stride not in [16, 32]:
-            raise ValueError("PAN support output stride 16 or 32, got {}".format(encoder_output_stride))
+        super().__init__()
 
         self.encoder = get_encoder(
             encoder_name,
@@ -85,10 +86,9 @@ class PAN(SegmentationModel):
             upsampling=upsampling,
         )
 
-        if aux_params is not None:
-            self.classification_head = ClassificationHead(in_channels=self.encoder.out_channels[-1], **aux_params)
-        else:
-            self.classification_head = None
+        self.classification_head = (
+            None if aux_params is None else ClassificationHead(in_channels=self.encoder.out_channels[-1], **aux_params)
+        )
 
-        self.name = "pan-{}".format(encoder_name)
+        self.name = f"pan-{encoder_name}"
         self.initialize()

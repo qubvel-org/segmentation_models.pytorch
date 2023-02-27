@@ -1,5 +1,6 @@
+from segmentation_models_pytorch.decoders import ActivationType, AuxParamsType
 from torch import nn
-from typing import Optional
+from typing import Optional, Tuple
 
 from segmentation_models_pytorch.base import (
     SegmentationModel,
@@ -53,9 +54,9 @@ class DeepLabV3(SegmentationModel):
         decoder_channels: int = 256,
         in_channels: int = 3,
         classes: int = 1,
-        activation: Optional[str] = None,
+        activation: ActivationType = None,
         upsampling: int = 8,
-        aux_params: Optional[dict] = None,
+        aux_params: Optional[AuxParamsType] = None,
     ):
         super().__init__()
 
@@ -80,10 +81,9 @@ class DeepLabV3(SegmentationModel):
             upsampling=upsampling,
         )
 
-        if aux_params is not None:
-            self.classification_head = ClassificationHead(in_channels=self.encoder.out_channels[-1], **aux_params)
-        else:
-            self.classification_head = None
+        self.classification_head = (
+            None if aux_params is None else ClassificationHead(in_channels=self.encoder.out_channels[-1], **aux_params)
+        )
 
 
 class DeepLabV3Plus(SegmentationModel):
@@ -131,17 +131,17 @@ class DeepLabV3Plus(SegmentationModel):
         encoder_weights: Optional[str] = "imagenet",
         encoder_output_stride: int = 16,
         decoder_channels: int = 256,
-        decoder_atrous_rates: tuple = (12, 24, 36),
+        decoder_atrous_rates: Tuple[int, ...] = (12, 24, 36),
         in_channels: int = 3,
         classes: int = 1,
-        activation: Optional[str] = None,
+        activation: ActivationType = None,
         upsampling: int = 4,
-        aux_params: Optional[dict] = None,
+        aux_params: Optional[AuxParamsType] = None,
     ):
-        super().__init__()
-
         if encoder_output_stride not in [8, 16]:
-            raise ValueError("Encoder output stride should be 8 or 16, got {}".format(encoder_output_stride))
+            raise ValueError(f"Encoder output stride should be 8 or 16, got {encoder_output_stride}")
+
+        super().__init__()
 
         self.encoder = get_encoder(
             encoder_name,
@@ -166,7 +166,6 @@ class DeepLabV3Plus(SegmentationModel):
             upsampling=upsampling,
         )
 
-        if aux_params is not None:
-            self.classification_head = ClassificationHead(in_channels=self.encoder.out_channels[-1], **aux_params)
-        else:
-            self.classification_head = None
+        self.classification_head = (
+            None if aux_params is None else ClassificationHead(in_channels=self.encoder.out_channels[-1], **aux_params)
+        )

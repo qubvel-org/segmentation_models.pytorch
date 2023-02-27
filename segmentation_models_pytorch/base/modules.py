@@ -1,3 +1,5 @@
+from typing import Optional, Tuple, Union
+from segmentation_models_pytorch.decoders import ActivationType
 import torch
 import torch.nn as nn
 
@@ -10,14 +12,13 @@ except ImportError:
 class Conv2dReLU(nn.Sequential):
     def __init__(
         self,
-        in_channels,
-        out_channels,
-        kernel_size,
-        padding=0,
-        stride=1,
-        use_batchnorm=True,
+        in_channels: int,
+        out_channels: int,
+        kernel_size: Union[int, Tuple[int, int]],
+        padding: Union[int, str, Tuple[int, int], None] = 0,
+        stride: Union[int, Tuple[int, int]] = 1,
+        use_batchnorm: bool = True,
     ):
-
         if use_batchnorm == "inplace" and InPlaceABN is None:
             raise RuntimeError(
                 "In order to use `use_batchnorm='inplace'` inplace_abn package must be installed. "
@@ -30,7 +31,7 @@ class Conv2dReLU(nn.Sequential):
             kernel_size,
             stride=stride,
             padding=padding,
-            bias=not (use_batchnorm),
+            bias=not use_batchnorm,
         )
         relu = nn.ReLU(inplace=True)
 
@@ -48,7 +49,7 @@ class Conv2dReLU(nn.Sequential):
 
 
 class SCSEModule(nn.Module):
-    def __init__(self, in_channels, reduction=16):
+    def __init__(self, in_channels: int, reduction: int = 16):
         super().__init__()
         self.cSE = nn.Sequential(
             nn.AdaptiveAvgPool2d(1),
@@ -64,7 +65,7 @@ class SCSEModule(nn.Module):
 
 
 class ArgMax(nn.Module):
-    def __init__(self, dim=None):
+    def __init__(self, dim: Optional[int] = None):
         super().__init__()
         self.dim = dim
 
@@ -73,7 +74,7 @@ class ArgMax(nn.Module):
 
 
 class Clamp(nn.Module):
-    def __init__(self, min=0, max=1):
+    def __init__(self, min: float = 0, max: float = 1):
         super().__init__()
         self.min, self.max = min, max
 
@@ -82,10 +83,7 @@ class Clamp(nn.Module):
 
 
 class Activation(nn.Module):
-    def __init__(self, name, **params):
-
-        super().__init__()
-
+    def __init__(self, name: ActivationType, **params):
         if name is None or name == "identity":
             self.activation = nn.Identity(**params)
         elif name == "sigmoid":
@@ -112,20 +110,22 @@ class Activation(nn.Module):
                 f"argmax/argmax2d/clamp/None; got {name}"
             )
 
+        super().__init__()
+
     def forward(self, x):
         return self.activation(x)
 
 
 class Attention(nn.Module):
-    def __init__(self, name, **params):
-        super().__init__()
-
+    def __init__(self, name: Optional[str], **params):
         if name is None:
             self.attention = nn.Identity(**params)
         elif name == "scse":
             self.attention = SCSEModule(**params)
         else:
-            raise ValueError("Attention {} is not implemented".format(name))
+            raise ValueError(f"Attention {name} is not implemented")
+
+        super().__init__()
 
     def forward(self, x):
         return self.attention(x)

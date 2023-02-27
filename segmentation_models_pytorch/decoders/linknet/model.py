@@ -5,6 +5,7 @@ from segmentation_models_pytorch.base import (
     SegmentationModel,
     ClassificationHead,
 )
+from segmentation_models_pytorch.decoders import ActivationType, AuxParamsType
 from segmentation_models_pytorch.encoders import get_encoder
 from .decoder import LinknetDecoder
 
@@ -56,16 +57,16 @@ class Linknet(SegmentationModel):
         encoder_name: str = "resnet34",
         encoder_depth: int = 5,
         encoder_weights: Optional[str] = "imagenet",
-        decoder_use_batchnorm: bool = True,
+        decoder_use_batchnorm: Union[bool, str] = True,
         in_channels: int = 3,
         classes: int = 1,
-        activation: Optional[Union[str, callable]] = None,
-        aux_params: Optional[dict] = None,
+        activation: ActivationType = None,
+        aux_params: Optional[AuxParamsType] = None,
     ):
-        super().__init__()
-
         if encoder_name.startswith("mit_b"):
-            raise ValueError("Encoder `{}` is not supported for Linknet".format(encoder_name))
+            raise ValueError(f"Encoder `{encoder_name}` is not supported for Linknet")
+
+        super().__init__()
 
         self.encoder = get_encoder(
             encoder_name,
@@ -85,10 +86,9 @@ class Linknet(SegmentationModel):
             in_channels=32, out_channels=classes, activation=activation, kernel_size=1
         )
 
-        if aux_params is not None:
-            self.classification_head = ClassificationHead(in_channels=self.encoder.out_channels[-1], **aux_params)
-        else:
-            self.classification_head = None
+        self.classification_head = (
+            None if aux_params is None else ClassificationHead(in_channels=self.encoder.out_channels[-1], **aux_params)
+        )
 
-        self.name = "link-{}".format(encoder_name)
+        self.name = f"link-{encoder_name}"
         self.initialize()

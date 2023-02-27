@@ -1,4 +1,5 @@
 from typing import Optional, Union
+from segmentation_models_pytorch.decoders import ActivationType, AuxParamsType
 
 from segmentation_models_pytorch.encoders import get_encoder
 from segmentation_models_pytorch.base import (
@@ -58,13 +59,13 @@ class PSPNet(SegmentationModel):
         encoder_weights: Optional[str] = "imagenet",
         encoder_depth: int = 3,
         psp_out_channels: int = 512,
-        psp_use_batchnorm: bool = True,
+        psp_use_batchnorm: Union[bool, str] = True,
         psp_dropout: float = 0.2,
         in_channels: int = 3,
         classes: int = 1,
-        activation: Optional[Union[str, callable]] = None,
+        activation: ActivationType = None,
         upsampling: int = 8,
-        aux_params: Optional[dict] = None,
+        aux_params: Optional[AuxParamsType] = None,
     ):
         super().__init__()
 
@@ -90,10 +91,9 @@ class PSPNet(SegmentationModel):
             upsampling=upsampling,
         )
 
-        if aux_params:
-            self.classification_head = ClassificationHead(in_channels=self.encoder.out_channels[-1], **aux_params)
-        else:
-            self.classification_head = None
+        self.classification_head = (
+            None if aux_params is None else ClassificationHead(in_channels=self.encoder.out_channels[-1], **aux_params)
+        )
 
-        self.name = "psp-{}".format(encoder_name)
+        self.name = f"psp-{encoder_name}"
         self.initialize()
