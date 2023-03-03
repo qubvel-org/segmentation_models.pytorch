@@ -84,6 +84,8 @@ class Clamp(nn.Module):
 
 class Activation(nn.Module):
     def __init__(self, name: ActivationType, **params):
+        super().__init__()
+
         if name is None or name == "identity":
             self.activation = nn.Identity(**params)
         elif name == "sigmoid":
@@ -110,22 +112,20 @@ class Activation(nn.Module):
                 f"argmax/argmax2d/clamp/None; got {name}"
             )
 
-        super().__init__()
-
     def forward(self, x):
         return self.activation(x)
 
 
 class Attention(nn.Module):
     def __init__(self, name: Optional[str], **params):
+        super().__init__()
+
         if name is None:
             self.attention = nn.Identity(**params)
         elif name == "scse":
             self.attention = SCSEModule(**params)
         else:
             raise ValueError(f"Attention {name} is not implemented")
-
-        super().__init__()
 
     def forward(self, x):
         return self.attention(x)
