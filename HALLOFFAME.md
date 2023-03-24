@@ -95,3 +95,9 @@ Please, follow these rules, when adding a solution to the "Hall of Fame":
 [Aarsh chaube](https://github.com/Aarsh2001)
 [[code](https://github.com/Aarsh2001/ML_Challenge_NRSC)]
 [[Pre-Print](https://github.com/Aarsh2001/ML_Challenge_NRSC/blob/main/3rd%20Rank%20Submission.pdf)]
+
+### [NeurIPS2022 Cell Segmentation Challenge](https://neurips22-cellseg.grand-challenge.org/)
+
+- 1st place. [Gihun Lee](https://github.com/Lee-Gihun), [Sangmook Kim](https://github.com/ElvinKim), [Joonkee Kim](https://github.com/joonkeekim)
+- [[code](https://github.com/Lee-Gihun/MEDIAR)]
+[[Paper](https://arxiv.org/abs/2212.03465)]
