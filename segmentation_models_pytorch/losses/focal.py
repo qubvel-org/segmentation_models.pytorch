@@ -41,7 +41,7 @@ class FocalLoss(_Loss):
 
         """
         assert mode in {BINARY_MODE, MULTILABEL_MODE, MULTICLASS_MODE}
-        super().__init__()
+        super().__init__(reduction=reduction)
 
         self.mode = mode
         self.ignore_index = ignore_index

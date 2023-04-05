@@ -4,6 +4,7 @@ import segmentation_models_pytorch as smp
 import segmentation_models_pytorch.losses._functional as F
 from segmentation_models_pytorch.losses import (
     DiceLoss,
+    FocalLoss,
     JaccardLoss,
     SoftBCEWithLogitsLoss,
     SoftCrossEntropyLoss,
@@ -21,6 +22,17 @@ def test_focal_loss_with_logits():
     loss_bad = F.focal_loss_with_logits(input_bad, target)
     assert loss_good < loss_bad
 
+def test_focal_loss_reduction():
+    input = torch.tensor([10, -10, 10]).float()
+    target = torch.tensor([1, 0, 1])
+
+    loss_fn = FocalLoss(mode="binary", reduction="none")
+    assert loss_fn(input, target).shape == (3,)
+    assert loss_fn.reduction == "none"
+
+    loss_fn = FocalLoss(mode="binary", reduction="mean")
+    assert loss_fn(input, target).shape == ()
+    assert loss_fn.reduction == "mean"
 
 def test_softmax_focal_loss_with_logits():
     input_good = torch.tensor([[0, 10, 0], [10, 0, 0], [0, 0, 10]]).float()
