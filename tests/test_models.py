@@ -26,7 +26,7 @@ DEFAULT_ENCODER = "resnet18"
 
 
 def get_sample(model_class):
-    if model_class in [smp.Unet, smp.Linknet, smp.FPN, smp.PSPNet, smp.UnetPlusPlus, smp.MAnet]:
+    if model_class in [smp.Unet, smp.Linknet, smp.FPN, smp.PSPNet, smp.UnetPlusPlus, smp.MAnet, smp.SAM]:
         sample = torch.ones([1, 3, 64, 64])
     elif model_class == smp.PAN:
         sample = torch.ones([2, 3, 256, 256])
@@ -134,6 +134,18 @@ def test_dilation(encoder_name):
 
     shapes = [out.shape[-1] for out in output]
     assert shapes == [64, 32, 16, 8, 4, 4]  # last downsampling replaced with dilation
+
+
+@pytest.mark.parametrize("encoder_name", ["vit_b", "vit_l"])
+@pytest.mark.parametrize("image_size", [64, 128])
+def test_sam(encoder_name, image_size):
+    model_class = smp.SAM
+    model = model_class(encoder_name, encoder_weights=None, image_size=image_size)
+    sample = get_sample(model_class)
+    model.eval()
+
+    _test_forward(model, sample, test_shape=True)
+    _test_forward_backward(model, sample, test_shape=True)
 
 
 if __name__ == "__main__":

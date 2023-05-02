@@ -12,6 +12,7 @@ from .decoders.fpn import FPN
 from .decoders.pspnet import PSPNet
 from .decoders.deeplabv3 import DeepLabV3, DeepLabV3Plus
 from .decoders.pan import PAN
+from .decoders.sam import SAM
 
 from .__version__ import __version__
 
