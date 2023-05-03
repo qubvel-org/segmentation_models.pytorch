@@ -1,6 +1,7 @@
 from typing import Optional, Union, List, Tuple
 
 import torch
+from segment_anything.modeling import MaskDecoder, TwoWayTransformer, PromptEncoder
 from torch.nn import functional as F
 
 from segmentation_models_pytorch.base import (
@@ -61,7 +62,7 @@ class SAM(SegmentationModel):
         encoder_depth: int = None,
         encoder_weights: Optional[str] = "sam-vit_h",
         decoder_use_batchnorm: bool = True,
-        decoder_channels: List[int] = (256, 128, 64, 32, 16),
+        decoder_channels: List[int] = 256,
         decoder_attention_type: Optional[str] = None,
         in_channels: int = 3,
         image_size: int = 1024,
@@ -71,14 +72,9 @@ class SAM(SegmentationModel):
         aux_params: Optional[dict] = None,
     ):
         super().__init__()
-        from segment_anything import sam_model_registry
 
-        sam = sam_model_registry[encoder_name[4:]](
-            checkpoint=encoder_weights, image_size=image_size, vit_patch_size=vit_patch_size
-        )
-
-        self.pixel_mean = sam.pixel_mean
-        self.pixel_std = sam.pixel_std
+        self.pixel_mean = torch.Tensor([123.675, 116.28, 103.53]).view(-1, 1, 1)
+        self.pixel_std = torch.Tensor([58.395, 57.12, 57.375]).view(-1, 1, 1)
 
         self.encoder = get_encoder(
             encoder_name,
@@ -87,13 +83,32 @@ class SAM(SegmentationModel):
             weights=encoder_weights,
             img_size=image_size,
             patch_size=vit_patch_size,
+            out_chans=decoder_channels,
         )
-        self.prompt_encoder = sam.prompt_encoder
 
-        self.decoder = sam.mask_decoder
+        image_embedding_size = image_size // vit_patch_size
+        self.prompt_encoder = PromptEncoder(
+            embed_dim=decoder_channels,
+            image_embedding_size=(image_embedding_size, image_embedding_size),
+            input_image_size=(image_size, image_size),
+            mask_in_chans=16,
+        )
+
+        self.decoder = MaskDecoder(
+            num_multimask_outputs=3,
+            transformer=TwoWayTransformer(
+                depth=2,
+                embedding_dim=decoder_channels,
+                mlp_dim=2048,
+                num_heads=8,
+            ),
+            transformer_dim=decoder_channels,
+            iou_head_depth=3,
+            iou_head_hidden_dim=256,
+        )
 
         self.segmentation_head = SegmentationHead(
-            in_channels=decoder_channels[-1],
+            in_channels=decoder_channels,
             out_channels=classes,
             activation=activation,
             kernel_size=3,
@@ -155,7 +170,7 @@ class SAM(SegmentationModel):
         x = torch.stack([self.preprocess(img) for img in x])
         features = self.encoder(x)
         sparse_embeddings, dense_embeddings = self.prompt_encoder(points=None, boxes=None, masks=None)
-        low_res_masks, iou_preidctions = self.decoder(
+        low_res_masks, iou_predictions = self.decoder(
             image_embeddings=features,
             image_pe=self.prompt_encoder.get_dense_pe(),
             sparse_prompt_embeddings=sparse_embeddings,

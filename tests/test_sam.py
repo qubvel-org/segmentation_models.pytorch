@@ -22,8 +22,8 @@ def test_sam_encoder(encoder_name, img_size, patch_size):
     assert out.size() == torch.Size([1, 256, expected_patches, expected_patches])
 
 
-@pytest.mark.parametrize("encoder_name", ["sam-vit_b"])
-@pytest.mark.parametrize("image_size", [64])
+@pytest.mark.parametrize("encoder_name", ["sam-vit_b", "sam-vit_l"])
+@pytest.mark.parametrize("image_size", [64, 128])
 def test_sam(encoder_name, image_size):
     model_class = smp.SAM
     model = model_class(encoder_name, encoder_weights=None, image_size=image_size)
