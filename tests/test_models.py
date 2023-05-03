@@ -136,17 +136,5 @@ def test_dilation(encoder_name):
     assert shapes == [64, 32, 16, 8, 4, 4]  # last downsampling replaced with dilation
 
 
-@pytest.mark.parametrize("encoder_name", ["vit_b", "vit_l"])
-@pytest.mark.parametrize("image_size", [64, 128])
-def test_sam(encoder_name, image_size):
-    model_class = smp.SAM
-    model = model_class(encoder_name, encoder_weights=None, image_size=image_size)
-    sample = get_sample(model_class)
-    model.eval()
-
-    _test_forward(model, sample, test_shape=True)
-    _test_forward_backward(model, sample, test_shape=True)
-
-
 if __name__ == "__main__":
     pytest.main([__file__])

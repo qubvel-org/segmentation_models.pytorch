@@ -4,6 +4,7 @@ import torch.utils.model_zoo as model_zoo
 
 from .resnet import resnet_encoders
 from .dpn import dpn_encoders
+from .sam import sam_vit_encoders, SamVitEncoder
 from .vgg import vgg_encoders
 from .senet import senet_encoders
 from .densenet import densenet_encoders
@@ -46,6 +47,7 @@ encoders.update(timm_mobilenetv3_encoders)
 encoders.update(timm_gernet_encoders)
 encoders.update(mix_transformer_encoders)
 encoders.update(mobileone_encoders)
+encoders.update(sam_vit_encoders)
 
 
 def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **kwargs):
@@ -68,7 +70,13 @@ def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **
         raise KeyError("Wrong encoder name `{}`, supported encoders: {}".format(name, list(encoders.keys())))
 
     params = encoders[name]["params"]
-    params.update(depth=depth)
+    if name.startswith("sam-"):
+        params.update(**kwargs)
+        params.update(dict(name=name[4:]))
+        if depth is not None:
+            params.update(depth=depth)
+    else:
+        params.update(depth=depth)
     encoder = Encoder(**params)
 
     if weights is not None:

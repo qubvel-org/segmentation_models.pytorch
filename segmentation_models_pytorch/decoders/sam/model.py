@@ -8,6 +8,7 @@ from segmentation_models_pytorch.base import (
     SegmentationHead,
     ClassificationHead,
 )
+from segmentation_models_pytorch.encoders import get_encoder
 
 
 class SAM(SegmentationModel):
@@ -56,9 +57,9 @@ class SAM(SegmentationModel):
 
     def __init__(
         self,
-        encoder_name: str = "vit_h",
-        encoder_depth: int = 5,
-        encoder_weights: Optional[str] = "imagenet",
+        encoder_name: str = "sam-vit_h",
+        encoder_depth: int = None,
+        encoder_weights: Optional[str] = "sam-vit_h",
         decoder_use_batchnorm: bool = True,
         decoder_channels: List[int] = (256, 128, 64, 32, 16),
         decoder_attention_type: Optional[str] = None,
@@ -72,15 +73,21 @@ class SAM(SegmentationModel):
         super().__init__()
         from segment_anything import sam_model_registry
 
-        sam = sam_model_registry[encoder_name](
+        sam = sam_model_registry[encoder_name[4:]](
             checkpoint=encoder_weights, image_size=image_size, vit_patch_size=vit_patch_size
         )
 
         self.pixel_mean = sam.pixel_mean
         self.pixel_std = sam.pixel_std
 
-        self.encoder = sam.image_encoder
-        self.encoder.output_stride = 32  # TODO fix this
+        self.encoder = get_encoder(
+            encoder_name,
+            in_channels=in_channels,
+            depth=encoder_depth,
+            weights=encoder_weights,
+            img_size=image_size,
+            patch_size=vit_patch_size,
+        )
         self.prompt_encoder = sam.prompt_encoder
 
         self.decoder = sam.mask_decoder
@@ -97,7 +104,7 @@ class SAM(SegmentationModel):
         else:
             self.classification_head = None
 
-        self.name = "sam-{}".format(encoder_name)
+        self.name = encoder_name
         self.initialize()
 
     def preprocess(self, x):
