@@ -37,4 +37,7 @@ DeepLabV3+
 ~~~~~~~~~~
 .. autoclass:: segmentation_models_pytorch.DeepLabV3Plus
 
+SAM
+~~~~~~~~~~
+.. autoclass:: segmentation_models_pytorch.SAM
 
