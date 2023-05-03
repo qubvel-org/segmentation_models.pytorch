@@ -14,6 +14,9 @@ def get_encoders():
         "resnext101_32x16d",
         "resnext101_32x32d",
         "resnext101_32x48d",
+        "sam-vit_h",
+        "sam-vit_l",
+        "sam-vit_b",
     ]
     encoders = smp.encoders.get_encoder_names()
     encoders = [e for e in encoders if e not in exclude_encoders]
