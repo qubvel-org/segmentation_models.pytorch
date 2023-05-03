@@ -7,33 +7,25 @@ from torch.nn import functional as F
 from segmentation_models_pytorch.base import (
     SegmentationModel,
     SegmentationHead,
-    ClassificationHead,
 )
 from segmentation_models_pytorch.encoders import get_encoder
 
 
 class SAM(SegmentationModel):
-    """Unet_ is a fully convolution neural network for image semantic segmentation. Consist of *encoder*
-    and *decoder* parts connected with *skip connections*. Encoder extract features of different spatial
-    resolution (skip connections) which are used by decoder to define accurate segmentation mask. Use *concatenation*
-    for fusing decoder blocks with skip connections.
+    """SAM_ (Segment Anything Model) is a visual transformer based encoder-decoder segmentation
+    model that can be used to produce high quality segmentation masks from images and prompts.
+    Consists of *image encoder*, *prompt encoder* and *mask decoder*. *Segmentation head* is
+    added after the *mask decoder* to define the final number of classes for the output mask.
 
     Args:
         encoder_name: Name of the classification model that will be used as an encoder (a.k.a backbone)
             to extract features of different spatial resolution
-        encoder_depth: A number of stages used in encoder in range [3, 5]. Each stage generate features
+        encoder_depth: A number of stages used in encoder in range [6, 24]. Each stage generate features
             two times smaller in spatial dimensions than previous one (e.g. for depth 0 we will have features
             with shapes [(N, C, H, W),], for depth 1 - [(N, C, H, W), (N, C, H // 2, W // 2)] and so on).
             Default is 5
-        encoder_weights: One of **None** (random initialization), **"imagenet"** (pre-training on ImageNet) and
-            other pretrained weights (see table with available weights for each encoder_name)
-        decoder_channels: List of integers which specify **in_channels** parameter for convolutions used in decoder.
-            Length of the list should be the same as **encoder_depth**
-        decoder_use_batchnorm: If **True**, BatchNorm2d layer between Conv2D and Activation layers
-            is used. If **"inplace"** InplaceABN will be used, allows to decrease memory consumption.
-            Available options are **True, False, "inplace"**
-        decoder_attention_type: Attention module used in decoder of the model. Available options are
-            **None** and **scse** (https://arxiv.org/abs/1808.08127).
+        encoder_weights: One of **None** (random initialization), **"sa-1b"** (pre-training on SA-1B dataset).
+        decoder_channels: How many output channels image encoder will have. Default is 256.
         in_channels: A number of input channels for the model, default is 3 (RGB images)
         classes: A number of classes for output mask (or you can think as a number of channels of output mask)
         activation: An activation function to apply after the final convolution layer.
@@ -49,10 +41,10 @@ class SAM(SegmentationModel):
                     (could be **None** to return logits)
 
     Returns:
-        ``torch.nn.Module``: Unet
+        ``torch.nn.Module``: SAM
 
-    .. _Unet:
-        https://arxiv.org/abs/1505.04597
+    .. _SAM:
+        https://github.com/facebookresearch/segment-anything
 
     """
 
@@ -61,9 +53,8 @@ class SAM(SegmentationModel):
         encoder_name: str = "sam-vit_h",
         encoder_depth: int = None,
         encoder_weights: Optional[str] = "sam-vit_h",
-        decoder_use_batchnorm: bool = True,
         decoder_channels: List[int] = 256,
-        decoder_attention_type: Optional[str] = None,
+        decoder_multimask_output: bool = True,
         in_channels: int = 3,
         image_size: int = 1024,
         vit_patch_size: int = 16,
@@ -106,18 +97,18 @@ class SAM(SegmentationModel):
             iou_head_depth=3,
             iou_head_hidden_dim=256,
         )
+        self._decoder_multiclass_output = decoder_multimask_output
 
         self.segmentation_head = SegmentationHead(
-            in_channels=decoder_channels,
+            in_channels=3 if decoder_multimask_output else 1,
             out_channels=classes,
             activation=activation,
             kernel_size=3,
         )
 
         if aux_params is not None:
-            self.classification_head = ClassificationHead(in_channels=self.encoder.out_channels[-1], **aux_params)
-        else:
-            self.classification_head = None
+            raise NotImplementedError("Auxiliary output is not supported yet")
+        self.classification_head = None
 
         self.name = encoder_name
         self.initialize()
@@ -175,7 +166,8 @@ class SAM(SegmentationModel):
             image_pe=self.prompt_encoder.get_dense_pe(),
             sparse_prompt_embeddings=sparse_embeddings,
             dense_prompt_embeddings=dense_embeddings,
-            multimask_output=False,
+            multimask_output=self._decoder_multiclass_output,
         )
         masks = self.postprocess_masks(low_res_masks, input_size=img_size, original_size=img_size)
-        return masks
+        output = self.segmentation_head(masks)
+        return output
