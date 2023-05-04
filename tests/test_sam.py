@@ -29,6 +29,7 @@ def test_sam(decoder_multiclass_output, n_classes):
     model = smp.SAM(
         "sam-vit_b",
         encoder_weights=None,
+        weights=None,
         image_size=64,
         decoder_multimask_output=decoder_multiclass_output,
         classes=n_classes,

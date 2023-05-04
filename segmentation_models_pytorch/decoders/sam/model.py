@@ -73,8 +73,8 @@ class SAM(SegmentationModel):
     ):
         super().__init__()
 
-        self.pixel_mean = torch.Tensor([123.675, 116.28, 103.53]).view(-1, 1, 1)
-        self.pixel_std = torch.Tensor([58.395, 57.12, 57.375]).view(-1, 1, 1)
+        self.register_buffer("pixel_mean", torch.Tensor([123.675, 116.28, 103.53]).view(-1, 1, 1), False)
+        self.register_buffer("pixel_std", torch.Tensor([58.395, 57.12, 57.375]).view(-1, 1, 1), False)
 
         self.encoder = get_encoder(
             encoder_name,
