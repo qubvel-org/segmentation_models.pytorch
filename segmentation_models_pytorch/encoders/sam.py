@@ -14,7 +14,7 @@ sam_vit_encoders = {
     "sam-vit_h": {
         "encoder": SamVitEncoder,
         "pretrained_settings": {
-            "sam-1b": {"url": "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth"},
+            "sa-1b": {"url": "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth"},
         },
         "params": dict(
             embed_dim=1280,
@@ -26,7 +26,7 @@ sam_vit_encoders = {
     "sam-vit_l": {
         "encoder": SamVitEncoder,
         "pretrained_settings": {
-            "sam-1b": {"url": "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_l_0b3195.pth"},
+            "sa-1b": {"url": "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_l_0b3195.pth"},
         },
         "params": dict(
             embed_dim=1024,
@@ -38,7 +38,7 @@ sam_vit_encoders = {
     "sam-vit_b": {
         "encoder": SamVitEncoder,
         "pretrained_settings": {
-            "sam-1b": {"url": "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth"},
+            "sa-1b": {"url": "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth"},
         },
         "params": dict(
             embed_dim=768,

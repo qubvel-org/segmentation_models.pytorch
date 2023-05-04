@@ -38,3 +38,8 @@ def test_sam(decoder_multiclass_output, n_classes):
 
     _test_forward(model, sample, test_shape=True)
     _test_forward_backward(model, sample, test_shape=True)
+
+
+@pytest.mark.skip(reason="Run this test manually as it needs to download weights")
+def test_sam_weights():
+    smp.create_model("sam", encoder_name="sam-vit_b", encoder_weights=None, weights="sa-1b")

@@ -50,6 +50,33 @@ encoders.update(mobileone_encoders)
 encoders.update(sam_vit_encoders)
 
 
+def get_pretrained_settings(encoders: dict, encoder_name: str, weights: str) -> dict:
+    """Get pretrained settings for encoder from encoders collection.
+
+    Args:
+        encoders: collection of encoders
+        encoder_name: name of encoder in collection
+        weights: one of ``None`` (random initialization), ``imagenet`` or other pretrained settings
+
+    Returns:
+        pretrained settings for encoder
+
+    Raises:
+        KeyError: in case of wrong encoder name or pretrained settings name
+    """
+    try:
+        settings = encoders[encoder_name]["pretrained_settings"][weights]
+    except KeyError:
+        raise KeyError(
+            "Wrong pretrained weights `{}` for encoder `{}`. Available options are: {}".format(
+                weights,
+                encoder_name,
+                list(encoders[encoder_name]["pretrained_settings"].keys()),
+            )
+        )
+    return settings
+
+
 def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **kwargs):
 
     if name.startswith("tu-"):
@@ -80,16 +107,7 @@ def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **
     encoder = Encoder(**params)
 
     if weights is not None:
-        try:
-            settings = encoders[name]["pretrained_settings"][weights]
-        except KeyError:
-            raise KeyError(
-                "Wrong pretrained weights `{}` for encoder `{}`. Available options are: {}".format(
-                    weights,
-                    name,
-                    list(encoders[name]["pretrained_settings"].keys()),
-                )
-            )
+        settings = get_pretrained_settings(encoders, name, weights)
         encoder.load_state_dict(model_zoo.load_url(settings["url"]))
 
     encoder.set_in_channels(in_channels, pretrained=weights is not None)

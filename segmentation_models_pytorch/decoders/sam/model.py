@@ -1,14 +1,22 @@
+import logging
 from typing import Optional, Union, List, Tuple
 
 import torch
 from segment_anything.modeling import MaskDecoder, TwoWayTransformer, PromptEncoder
 from torch.nn import functional as F
+from torch.utils import model_zoo
 
 from segmentation_models_pytorch.base import (
     SegmentationModel,
     SegmentationHead,
 )
-from segmentation_models_pytorch.encoders import get_encoder
+from segmentation_models_pytorch.encoders import get_encoder, sam_vit_encoders, get_pretrained_settings
+
+logger = logging.getLogger("sam")
+logger.setLevel(logging.WARNING)
+stream = logging.StreamHandler()
+logger.addHandler(stream)
+logger.propagate = False
 
 
 class SAM(SegmentationModel):
@@ -52,13 +60,14 @@ class SAM(SegmentationModel):
         self,
         encoder_name: str = "sam-vit_h",
         encoder_depth: int = None,
-        encoder_weights: Optional[str] = "sam-vit_h",
+        encoder_weights: Optional[str] = None,
         decoder_channels: List[int] = 256,
         decoder_multimask_output: bool = True,
         in_channels: int = 3,
         image_size: int = 1024,
         vit_patch_size: int = 16,
         classes: int = 1,
+        weights: Optional[str] = "sa-1b",
         activation: Optional[Union[str, callable]] = None,
         aux_params: Optional[dict] = None,
     ):
@@ -99,6 +108,9 @@ class SAM(SegmentationModel):
         )
         self._decoder_multiclass_output = decoder_multimask_output
 
+        if weights is not None:
+            self._load_pretrained_weights(encoder_name, weights)
+
         self.segmentation_head = SegmentationHead(
             in_channels=3 if decoder_multimask_output else 1,
             out_channels=classes,
@@ -112,6 +124,19 @@ class SAM(SegmentationModel):
 
         self.name = encoder_name
         self.initialize()
+
+    def _load_pretrained_weights(self, encoder_name: str, weights: str):
+        settings = get_pretrained_settings(sam_vit_encoders, encoder_name, weights)
+        state_dict = model_zoo.load_url(settings["url"])
+        state_dict = {k.replace("image_encoder", "encoder"): v for k, v in state_dict.items()}
+        state_dict = {k.replace("mask_decoder", "decoder"): v for k, v in state_dict.items()}
+        missing, unused = self.load_state_dict(state_dict, strict=False)
+        if len(missing) > 0 or len(unused) > 0:
+            n_loaded = len(state_dict) - len(missing) - len(unused)
+            logger.warning(
+                f"Only {n_loaded} out of pretrained {len(state_dict)} SAM modules are loaded. "
+                f"Missing modules: {missing}. Unused modules: {unused}."
+            )
 
     def preprocess(self, x):
         """Normalize pixel values and pad to a square input."""

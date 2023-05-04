@@ -43,6 +43,7 @@ def create_model(
         DeepLabV3,
         DeepLabV3Plus,
         PAN,
+        SAM,
     ]
     archs_dict = {a.__name__.lower(): a for a in archs}
     try:
