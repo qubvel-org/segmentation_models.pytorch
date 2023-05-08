@@ -194,5 +194,7 @@ class SAM(SegmentationModel):
             multimask_output=self._decoder_multiclass_output,
         )
         masks = self.postprocess_masks(low_res_masks, input_size=img_size, original_size=img_size)
+        # use scaling below in order to make it work with torch DDP
+        masks = masks * iou_predictions.view(-1, masks.size(1), 1, 1)
         output = self.segmentation_head(masks)
         return output
