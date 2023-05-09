@@ -93,6 +93,9 @@ class SAM(SegmentationModel):
             input_image_size=(image_size, image_size),
             mask_in_chans=16,
         )
+        self.prompt_encoder.point_embeddings = None
+        self.prompt_encoder.mask_downscaling = None
+        self.not_a_point_embed = None
 
         self.decoder = MaskDecoder(
             num_multimask_outputs=3,
@@ -198,8 +201,3 @@ class SAM(SegmentationModel):
         masks = masks * iou_predictions.view(-1, masks.size(1), 1, 1)
         output = self.segmentation_head(masks)
         return output
-
-    def train(self, mode: bool = True):
-        super(SAM, self).train(mode)
-        self.prompt_encoder.point_embeddings.requires_grad = False
-        self.prompt_encoder.mask_downscaling.requires_grad = False
