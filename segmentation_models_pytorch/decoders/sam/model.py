@@ -198,3 +198,8 @@ class SAM(SegmentationModel):
         masks = masks * iou_predictions.view(-1, masks.size(1), 1, 1)
         output = self.segmentation_head(masks)
         return output
+
+    def train(self, mode: bool = True):
+        super(SAM, self).train(mode)
+        self.prompt_encoder.point_embeddings.requires_grad = False
+        self.prompt_encoder.mask_downscaling.requires_grad = False
