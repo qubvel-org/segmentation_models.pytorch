@@ -8,6 +8,11 @@ class SamVitEncoder(EncoderMixin, ImageEncoderViT):
         super().__init__(**kwargs)
         self._name = name
         self._depth = kwargs["depth"]
+        self._out_chans = kwargs.get("out_chans", 256)
+
+    @property
+    def out_channels(self):
+        return [-1, self._out_chans]
 
 
 sam_vit_encoders = {
