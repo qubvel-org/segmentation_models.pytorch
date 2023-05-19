@@ -59,3 +59,10 @@ def test_sam_as_encoder_only(model_class, decoder_channels, patch_size):
 @pytest.mark.skip(reason="Run this test manually as it needs to download weights")
 def test_sam_weights():
     smp.create_model("sam", encoder_name="sam-vit_b", encoder_weights=None, weights="sa-1b")
+
+
+# @pytest.mark.skip(reason="Run this test manually as it needs to download weights")
+def test_sam_encoder_weights():
+    smp.create_model(
+        "unet", encoder_name="sam-vit_b", encoder_weights="sa-1b", encoder_depth=12, decoder_channels=[64, 32, 16, 8]
+    )

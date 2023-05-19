@@ -1,4 +1,6 @@
 import math
+import warnings
+from typing import Mapping, Any
 
 import torch
 from segment_anything.modeling import ImageEncoderViT
@@ -38,6 +40,22 @@ class SamVitEncoder(EncoderMixin, ImageEncoderViT):
     def forward(self, x: torch.Tensor) -> list[torch.Tensor]:
         # Return a list of tensors to match other encoders
         return [x, super().forward(x)]
+
+    def load_state_dict(self, state_dict: Mapping[str, Any], strict: bool = True) -> None:
+        # Exclude mask_decoder and prompt encoder weights
+        # and remove 'image_encoder.' prefix
+        state_dict = {
+            k.replace("image_encoder.", ""): v
+            for k, v in state_dict.items()
+            if not k.startswith("mask_decoder") and not k.startswith("prompt_encoder")
+        }
+        missing, unused = super().load_state_dict(state_dict, strict=False)
+        if len(missing) + len(unused) > 0:
+            n_loaded = len(state_dict) - len(missing) - len(unused)
+            warnings.warn(
+                f"Only {n_loaded} out of pretrained {len(state_dict)} SAM image encoder modules are loaded. "
+                f"Missing modules: {missing}. Unused modules: {unused}."
+            )
 
 
 sam_vit_encoders = {
