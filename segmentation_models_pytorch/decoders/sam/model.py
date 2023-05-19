@@ -185,8 +185,7 @@ class SAM(SegmentationModel):
     def forward(self, x):
         img_size = x.shape[-2:]
         x = torch.stack([self.preprocess(img) for img in x])
-        features = self.encoder(x)
-        # sparse_embeddings, dense_embeddings = self.prompt_encoder(points=None, boxes=None, masks=None)
+        *_, features = self.encoder(x)
         sparse_embeddings, dense_embeddings = self._get_dummy_promp_encoder_output(x.size(0))
         low_res_masks, iou_predictions = self.decoder(
             image_embeddings=features,

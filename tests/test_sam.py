@@ -20,7 +20,7 @@ def test_sam_encoder(encoder_name, img_size, patch_size, depth):
         out = encoder(sample)
 
     expected_patches = img_size // patch_size
-    assert out.size() == torch.Size([1, 256, expected_patches, expected_patches])
+    assert out[-1].size() == torch.Size([1, 256, expected_patches, expected_patches])
 
 
 @pytest.mark.parametrize("decoder_multiclass_output", [True, False])
@@ -39,6 +39,21 @@ def test_sam(decoder_multiclass_output, n_classes):
 
     _test_forward(model, sample, test_shape=True)
     _test_forward_backward(model, sample, test_shape=True)
+
+
+@pytest.mark.parametrize("model_class", [smp.Unet])
+@pytest.mark.parametrize("decoder_channels,patch_size", [([64, 32, 16, 8], 16), ([64, 32, 16], 8)])
+def test_sam_as_encoder_only(model_class, decoder_channels, patch_size):
+    img_size = 64
+    model = model_class(
+        "sam-vit_b",
+        encoder_weights=None,
+        encoder_depth=3,
+        encoder_kwargs=dict(img_size=img_size, out_chans=decoder_channels[0], patch_size=patch_size),
+        decoder_channels=decoder_channels,
+    )
+    smp = torch.ones(1, 3, img_size, img_size)
+    _test_forward_backward(model, smp, test_shape=True)
 
 
 @pytest.mark.skip(reason="Run this test manually as it needs to download weights")

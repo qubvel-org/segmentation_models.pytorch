@@ -58,6 +58,8 @@ class PAN(SegmentationModel):
         activation: Optional[Union[str, callable]] = None,
         upsampling: int = 4,
         aux_params: Optional[dict] = None,
+        encoder_kwargs: Optional[dict] = None,
+        encoder_depth: int = 5,
     ):
         super().__init__()
 
@@ -67,9 +69,10 @@ class PAN(SegmentationModel):
         self.encoder = get_encoder(
             encoder_name,
             in_channels=in_channels,
-            depth=5,
+            depth=encoder_depth,
             weights=encoder_weights,
             output_stride=encoder_output_stride,
+            **({} if encoder_kwargs is None else encoder_kwargs),
         )
 
         self.decoder = PANDecoder(
