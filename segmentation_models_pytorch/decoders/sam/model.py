@@ -1,4 +1,5 @@
 import logging
+import warnings
 from typing import Optional, Union, List, Tuple
 
 import torch
@@ -13,12 +14,6 @@ from segmentation_models_pytorch.base import (
     SegmentationHead,
 )
 from segmentation_models_pytorch.encoders import get_encoder, sam_vit_encoders, get_pretrained_settings
-
-logger = logging.getLogger("sam")
-logger.setLevel(logging.WARNING)
-stream = logging.StreamHandler()
-logger.addHandler(stream)
-logger.propagate = False
 
 
 class SAM(SegmentationModel):
@@ -134,7 +129,7 @@ class SAM(SegmentationModel):
         missing, unused = self.load_state_dict(state_dict, strict=False)
         if len(missing) > 0 or len(unused) > 0:
             n_loaded = len(state_dict) - len(missing) - len(unused)
-            logger.warning(
+            warnings.warn(
                 f"Only {n_loaded} out of pretrained {len(state_dict)} SAM modules are loaded. "
                 f"Missing modules: {missing}. Unused modules: {unused}."
             )
@@ -185,8 +180,7 @@ class SAM(SegmentationModel):
     def forward(self, x):
         img_size = x.shape[-2:]
         x = torch.stack([self.preprocess(img) for img in x])
-        features = self.encoder(x)
-        # sparse_embeddings, dense_embeddings = self.prompt_encoder(points=None, boxes=None, masks=None)
+        *_, features = self.encoder(x)
         sparse_embeddings, dense_embeddings = self._get_dummy_promp_encoder_output(x.size(0))
         low_res_masks, iou_predictions = self.decoder(
             image_embeddings=features,
