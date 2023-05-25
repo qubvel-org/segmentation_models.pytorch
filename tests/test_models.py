@@ -29,7 +29,7 @@ DEFAULT_ENCODER = "resnet18"
 
 
 def get_sample(model_class):
-    if model_class in [smp.Unet, smp.Linknet, smp.FPN, smp.PSPNet, smp.UnetPlusPlus, smp.MAnet, smp.SAM]:
+    if model_class in [smp.Unet, smp.Linknet, smp.FPN, smp.PSPNet, smp.UnetPlusPlus, smp.MAnet]:
         sample = torch.ones([1, 3, 64, 64])
     elif model_class == smp.PAN:
         sample = torch.ones([2, 3, 256, 256])

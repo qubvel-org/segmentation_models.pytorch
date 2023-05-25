@@ -23,6 +23,7 @@ def test_sam_encoder(encoder_name, img_size, patch_size, depth):
     assert out[-1].size() == torch.Size([1, 256, expected_patches, expected_patches])
 
 
+@pytest.mark.skip(reason="Decoder has been removed, keeping this for future integration")
 @pytest.mark.parametrize("decoder_multiclass_output", [True, False])
 @pytest.mark.parametrize("n_classes", [1, 3])
 def test_sam(decoder_multiclass_output, n_classes):
@@ -61,7 +62,7 @@ def test_sam_weights():
     smp.create_model("sam", encoder_name="sam-vit_b", encoder_weights=None, weights="sa-1b")
 
 
-# @pytest.mark.skip(reason="Run this test manually as it needs to download weights")
+@pytest.mark.skip(reason="Run this test manually as it needs to download weights")
 def test_sam_encoder_weights():
     smp.create_model(
         "unet", encoder_name="sam-vit_b", encoder_weights="sa-1b", encoder_depth=12, decoder_channels=[64, 32, 16, 8]
