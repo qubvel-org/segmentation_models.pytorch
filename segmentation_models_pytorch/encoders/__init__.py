@@ -101,7 +101,7 @@ def get_preprocessing_params(encoder_name, pretrained="imagenet"):
         encoder_name = encoder_name[3:]
         if not timm.models.is_model_pretrained(encoder_name):
             raise ValueError(f"{encoder_name} does not have pretrained weights and preprocessing parameters")
-        settings = timm.models.get_pretrained_cfg(encoder_name)
+        settings = timm.models.get_pretrained_cfg(encoder_name).__dict__
     else:
         all_settings = encoders[encoder_name]["pretrained_settings"]
         if pretrained not in all_settings.keys():
@@ -111,8 +111,8 @@ def get_preprocessing_params(encoder_name, pretrained="imagenet"):
     formatted_settings = {}
     formatted_settings["input_space"] = settings.get("input_space", "RGB")
     formatted_settings["input_range"] = list(settings.get("input_range", [0, 1]))
-    formatted_settings["mean"] = list(settings.get("mean"))
-    formatted_settings["std"] = list(settings.get("std"))
+    formatted_settings["mean"] = list(settings["mean"])
+    formatted_settings["std"] = list(settings["std"])
 
     return formatted_settings
 

@@ -8,7 +8,7 @@ import torch
 import torch.nn as nn
 from functools import partial
 
-from timm.models.layers import DropPath, to_2tuple, trunc_normal_
+from timm.layers import DropPath, to_2tuple, trunc_normal_
 
 
 class Mlp(nn.Module):
