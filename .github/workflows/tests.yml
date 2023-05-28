@@ -11,8 +11,9 @@ on:
     branches: [ master ]
 
 jobs:
-  test:
-    runs-on: ubuntu-18.04
+  
+  lint:
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -23,28 +24,27 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install torch==1.9.0+cpu torchvision==0.10.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
-        pip install .[test]
-    - name: Run Tests
-      run: python -m pytest -s tests
+        make install_dev
     - name: Run Flake8
-      run: flake8 --config=.flake8
+      run: make flake8
+    - name: Run Black
+      run: make black
 
-  check_code_formatting:
-    name: Check code formatting with Black
+  test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.8]
+    needs: [lint]
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Set up Python
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
-    - name: Update pip
-      run: python -m pip install --upgrade pip
-    - name: Install Black
-      run: pip install black==22.3.0
-    - name: Run Black
-      run: black --config=pyproject.toml --check .
+        python-version: 3.7
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install torch==1.9.0+cpu torchvision==0.10.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+        make install_dev
+    - name: Run Flake8
+      run: make flake8
+    - name: Run Tests
+      run: make test
