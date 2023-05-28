@@ -13,6 +13,9 @@ test: .venv
 table:
 	.venv/bin/python misc/generate_table.py
 
+table_timm:
+	.venv/bin/python misc/generate_table_timm.py
+
 black: .venv
 	.venv/bin/black ./segmentation_models_pytorch --config=pyproject.toml --check
 
