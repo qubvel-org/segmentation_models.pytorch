@@ -97,13 +97,8 @@ def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **
         raise KeyError("Wrong encoder name `{}`, supported encoders: {}".format(name, list(encoders.keys())))
 
     params = encoders[name]["params"]
-    if name.startswith("sam-"):
-        params.update(**kwargs)
-        params.update(dict(name=name[4:]))
-        if depth is not None:
-            params.update(depth=depth)
-    else:
-        params.update(depth=depth)
+    params.update(depth=depth)
+    params.update(kwargs)
     encoder = Encoder(**params)
 
     if weights is not None:

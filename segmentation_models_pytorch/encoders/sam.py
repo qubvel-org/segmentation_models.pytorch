@@ -9,33 +9,41 @@ from segmentation_models_pytorch.encoders._base import EncoderMixin
 
 
 class SamVitEncoder(EncoderMixin, ImageEncoderViT):
-    def __init__(self, name: str, **kwargs):
-        patch_size = kwargs.get("patch_size", 16)
-        n_skips = kwargs.pop("num_hidden_skips", int(self._get_scale_factor(patch_size)))
+    def __init__(self, **kwargs):
+        self._vit_depth = kwargs.pop("vit_depth")
+        self._encoder_depth = kwargs.get("depth", 5)
+        kwargs.update({"depth": self._vit_depth})
         super().__init__(**kwargs)
-        self._name = name
-        self._depth = kwargs["depth"]
         self._out_chans = kwargs.get("out_chans", 256)
-        self._num_skips = n_skips
-        self._validate_output(patch_size)
+        self._patch_size = kwargs.get("patch_size", 16)
+        self._validate()
 
-    @staticmethod
-    def _get_scale_factor(patch_size: int) -> float:
+    @property
+    def output_stride(self):
+        return 32
+
+    def _get_scale_factor(self) -> float:
         """Input image will be downscale by this factor"""
-        return math.log(patch_size, 2)
+        return int(math.log(self._patch_size, 2))
 
-    def _validate_output(self, patch_size: int):
-        scale_factor = self._get_scale_factor(patch_size)
-        if scale_factor != self._num_skips:
+    def _validate(self):
+        # check vit depth
+        if self._vit_depth not in [12, 24, 32]:
+            raise ValueError(f"vit_depth must be one of [12, 24, 32], got {self._vit_depth}")
+        # check output
+        scale_factor = self._get_scale_factor()
+        if scale_factor != self._encoder_depth:
             raise ValueError(
-                f"With {patch_size=} and {self._num_skips} skip connection layers, "
-                "spatial dimensions of model output will not match input spatial dimensions"
+                f"With patch_size={self._patch_size} and depth={self._encoder_depth}, "
+                "spatial dimensions of model output will not match input spatial dimensions. "
+                "It is recommended to set encoder depth=4 with default vit patch_size=16."
             )
 
     @property
     def out_channels(self):
         # Fill up with leading zeros to be used in Unet
-        return [0] * self._num_skips + [self._out_chans]
+        scale_factor = self._get_scale_factor()
+        return [0] * scale_factor + [self._out_chans]
 
     def forward(self, x: torch.Tensor) -> list[torch.Tensor]:
         # Return a list of tensors to match other encoders
@@ -66,7 +74,7 @@ sam_vit_encoders = {
         },
         "params": dict(
             embed_dim=1280,
-            depth=32,
+            vit_depth=32,
             num_heads=16,
             global_attn_indexes=[7, 15, 23, 31],
         ),
@@ -78,7 +86,7 @@ sam_vit_encoders = {
         },
         "params": dict(
             embed_dim=1024,
-            depth=24,
+            vit_depth=24,
             num_heads=16,
             global_attn_indexes=[5, 11, 17, 23],
         ),
@@ -90,7 +98,7 @@ sam_vit_encoders = {
         },
         "params": dict(
             embed_dim=768,
-            depth=12,
+            vit_depth=12,
             num_heads=12,
             global_attn_indexes=[2, 5, 8, 11],
         ),

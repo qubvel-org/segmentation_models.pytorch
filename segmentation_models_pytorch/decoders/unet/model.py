@@ -65,30 +65,20 @@ class Unet(SegmentationModel):
         classes: int = 1,
         activation: Optional[Union[str, callable]] = None,
         aux_params: Optional[dict] = None,
-        encoder_kwargs: Optional[dict] = None,
     ):
         super().__init__()
-
-        # if sam encoder, make sure to make num_hidden_skips is set
-        if encoder_name.startswith("sam-"):
-            encoder_kwargs = encoder_kwargs if encoder_kwargs is not None else {}
-            encoder_kwargs.update({"num_hidden_skips": len(decoder_channels)})
-            n_decoder_blocks = len(decoder_channels)
-        else:
-            n_decoder_blocks = encoder_depth
 
         self.encoder = get_encoder(
             encoder_name,
             in_channels=in_channels,
             depth=encoder_depth,
             weights=encoder_weights,
-            **encoder_kwargs if encoder_kwargs is not None else {},
         )
 
         self.decoder = UnetDecoder(
             encoder_channels=self.encoder.out_channels,
             decoder_channels=decoder_channels,
-            n_blocks=n_decoder_blocks,
+            n_blocks=encoder_depth,
             use_batchnorm=decoder_use_batchnorm,
             center=True if encoder_name.startswith("vgg") else False,
             attention_type=decoder_attention_type,
