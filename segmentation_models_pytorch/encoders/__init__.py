@@ -22,7 +22,7 @@ from .timm_gernet import timm_gernet_encoders
 from .mix_transformer import mix_transformer_encoders
 from .mobileone import mobileone_encoders
 
-from .timm_universal import TimmUniversalEncoder
+from .timm_universal import TimmUniversalEncoder, TimmUniversalViTEncoder
 
 from ._preprocessing import preprocess_input
 
@@ -49,17 +49,25 @@ encoders.update(mobileone_encoders)
 
 
 def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **kwargs):
-
     if name.startswith("tu-"):
         name = name[3:]
-        encoder = TimmUniversalEncoder(
-            name=name,
-            in_channels=in_channels,
-            depth=depth,
-            output_stride=output_stride,
-            pretrained=weights is not None,
-            **kwargs,
-        )
+        if name.startswith("vit"):
+            depth = 4
+            encoder = TimmUniversalViTEncoder(
+                name=name,
+                in_channels=in_channels,
+                pretrained=weights is not None,
+                **kwargs,
+            )
+        else:
+            encoder = TimmUniversalEncoder(
+                name=name,
+                in_channels=in_channels,
+                depth=depth,
+                output_stride=output_stride,
+                pretrained=weights is not None,
+                **kwargs,
+            )
         return encoder
 
     try:
@@ -96,7 +104,6 @@ def get_encoder_names():
 
 
 def get_preprocessing_params(encoder_name, pretrained="imagenet"):
-
     if encoder_name.startswith("tu-"):
         encoder_name = encoder_name[3:]
         if not timm.models.is_model_pretrained(encoder_name):
