@@ -56,7 +56,7 @@ class TimmUniversalViTEncoder(nn.Module):
         self._depth = 4
         self._in_channels = in_channels
         self._out_channels = [in_channels] + [self.model.num_features] * len(self.indexes)
-        self.upsample = nn.ModuleList([nn.UpsamplingBilinear2d(scale_factor=s) for s in [16, 8, 4, 2]])
+        self.upsample = nn.ModuleList([nn.UpsamplingBilinear2d(scale_factor=s) for s in self.scale_factors])
 
     def forward(self, x):
         features = self.model.get_intermediate_layers(
@@ -77,3 +77,12 @@ class TimmUniversalViTEncoder(nn.Module):
     @property
     def image_size(self):
         return self.model.patch_embed.img_size[0]
+
+    @property
+    def num_tokens(self):
+        return self.image_size // self.output_stride
+
+    @property
+    def scale_factors(self):
+        sizes = [self.image_size // i for i in [2 ** (i + 1) for i in range(4)]]
+        return [s // self.num_tokens for s in sizes]
