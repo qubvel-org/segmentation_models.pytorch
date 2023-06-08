@@ -100,6 +100,8 @@ class EfficientNetBaseEncoder(EfficientNet, EncoderMixin):
         self._depth = depth
         self._in_channels = 3
 
+        del self.conv_head
+        del self.bn2
         del self.classifier
 
     def get_stages(self):
