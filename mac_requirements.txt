@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 certifi==2022.12.7
 charset-normalizer==2.1.1
 efficientnet-pytorch==0.7.1
@@ -28,10 +27,8 @@ torchvision==0.16.0.dev20230609
 tqdm==4.65.0
 typing_extensions==4.4.0
 urllib3==1.26.13
-=======
 pretrainedmodels==0.7.4
 efficientnet-pytorch==0.7.1
 timm==0.9.2
 tqdm
 pillow
->>>>>>> origin/ly-dev
