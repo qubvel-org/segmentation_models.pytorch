@@ -4,6 +4,8 @@ from typing import Mapping, Any
 
 import torch
 from segment_anything.modeling import ImageEncoderViT
+from torch import nn
+from segment_anything.modeling.common import LayerNorm2d
 
 from segmentation_models_pytorch.encoders._base import EncoderMixin
 
@@ -16,15 +18,55 @@ class SamVitEncoder(EncoderMixin, ImageEncoderViT):
         super().__init__(**kwargs)
         self._out_chans = kwargs.get("out_chans", 256)
         self._patch_size = kwargs.get("patch_size", 16)
+        self._embed_dim = kwargs.get("embed_dim", 768)
         self._validate()
+        self.intermediate_necks = nn.ModuleList(
+            [self.init_neck(self._embed_dim, out_chan) for out_chan in self.out_channels[:-1]]
+        )
+
+    @staticmethod
+    def init_neck(embed_dim: int, out_chans: int) -> nn.Module:
+        # Use similar neck as in ImageEncoderViT
+        return nn.Sequential(
+            nn.Conv2d(
+                embed_dim,
+                out_chans,
+                kernel_size=1,
+                bias=False,
+            ),
+            LayerNorm2d(out_chans),
+            nn.Conv2d(
+                out_chans,
+                out_chans,
+                kernel_size=3,
+                padding=1,
+                bias=False,
+            ),
+            LayerNorm2d(out_chans),
+        )
+
+    @staticmethod
+    def neck_forward(neck: nn.Module, x: torch.Tensor, scale_factor: float = 1) -> torch.Tensor:
+        x = x.permute(0, 3, 1, 2)
+        if scale_factor != 1.0:
+            x = nn.functional.interpolate(x, scale_factor=scale_factor, mode="bilinear")
+        return neck(x)
+
+    def requires_grad_(self, requires_grad: bool = True):
+        # Keep the intermediate necks trainable
+        for param in self.parameters():
+            param.requires_grad_(requires_grad)
+        for param in self.intermediate_necks.parameters():
+            param.requires_grad_(True)
+        return self
 
     @property
     def output_stride(self):
         return 32
 
-    def _get_scale_factor(self) -> float:
-        """Input image will be downscale by this factor"""
-        return int(math.log(self._patch_size, 2))
+    @property
+    def out_channels(self):
+        return [self._out_chans // (2**i) for i in range(self._encoder_depth + 1)][::-1]
 
     def _validate(self):
         # check vit depth
@@ -39,15 +81,30 @@ class SamVitEncoder(EncoderMixin, ImageEncoderViT):
                 "It is recommended to set encoder depth=4 with default vit patch_size=16."
             )
 
-    @property
-    def out_channels(self):
-        # Fill up with leading zeros to be used in Unet
-        scale_factor = self._get_scale_factor()
-        return [0] * scale_factor + [self._out_chans]
+    def _get_scale_factor(self) -> float:
+        """Input image will be downscale by this factor"""
+        return int(math.log(self._patch_size, 2))
 
     def forward(self, x: torch.Tensor) -> list[torch.Tensor]:
-        # Return a list of tensors to match other encoders
-        return [x, super().forward(x)]
+        x = self.patch_embed(x)
+        if self.pos_embed is not None:
+            x = x + self.pos_embed
+
+        features = []
+        skip_steps = self._vit_depth // self._encoder_depth
+        scale_factor = self._get_scale_factor()
+        for i, blk in enumerate(self.blocks):
+            x = blk(x)
+            if i % skip_steps == 0:
+                # Double spatial dimension and halve number of channels
+                neck = self.intermediate_necks[i // skip_steps]
+                features.append(self.neck_forward(neck, x, scale_factor=2**scale_factor))
+                scale_factor -= 1
+
+        x = self.neck(x.permute(0, 3, 1, 2))
+        features.append(x)
+
+        return features
 
     def load_state_dict(self, state_dict: Mapping[str, Any], strict: bool = True) -> None:
         # Exclude mask_decoder and prompt encoder weights
@@ -58,6 +115,7 @@ class SamVitEncoder(EncoderMixin, ImageEncoderViT):
             if not k.startswith("mask_decoder") and not k.startswith("prompt_encoder")
         }
         missing, unused = super().load_state_dict(state_dict, strict=False)
+        missing = list(filter(lambda x: not x.startswith("intermediate_necks"), missing))
         if len(missing) + len(unused) > 0:
             n_loaded = len(state_dict) - len(missing) - len(unused)
             warnings.warn(
