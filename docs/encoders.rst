@@ -215,7 +215,7 @@ EfficientNet
 +------------------------+--------------------------------------+-------------+
 | Encoder                | Weights                              | Params, M   |
 +========================+======================================+=============+
-| efficientnet-b0        | imagenet                             | 4M          |
+| efficientnet-b0        | imagenet                             | 3M          |
 +------------------------+--------------------------------------+-------------+
 | efficientnet-b1        | imagenet                             | 6M          |
 +------------------------+--------------------------------------+-------------+
@@ -223,15 +223,15 @@ EfficientNet
 +------------------------+--------------------------------------+-------------+
 | efficientnet-b3        | imagenet                             | 10M         |
 +------------------------+--------------------------------------+-------------+
-| efficientnet-b4        | imagenet                             | 17M         |
+| efficientnet-b4        | imagenet                             | 16M         |
 +------------------------+--------------------------------------+-------------+
-| efficientnet-b5        | imagenet                             | 28M         |
+| efficientnet-b5        | imagenet                             | 27M         |
 +------------------------+--------------------------------------+-------------+
-| efficientnet-b6        | imagenet                             | 40M         |
+| efficientnet-b6        | imagenet                             | 39M         |
 +------------------------+--------------------------------------+-------------+
-| efficientnet-b7        | imagenet                             | 63M         |
+| efficientnet-b7        | imagenet                             | 62M         |
 +------------------------+--------------------------------------+-------------+
-| timm-efficientnet-b0   | imagenet / advprop / noisy-student   | 4M          |
+| timm-efficientnet-b0   | imagenet / advprop / noisy-student   | 3M          |
 +------------------------+--------------------------------------+-------------+
 | timm-efficientnet-b1   | imagenet / advprop / noisy-student   | 6M          |
 +------------------------+--------------------------------------+-------------+
@@ -239,27 +239,27 @@ EfficientNet
 +------------------------+--------------------------------------+-------------+
 | timm-efficientnet-b3   | imagenet / advprop / noisy-student   | 10M         |
 +------------------------+--------------------------------------+-------------+
-| timm-efficientnet-b4   | imagenet / advprop / noisy-student   | 17M         |
+| timm-efficientnet-b4   | imagenet / advprop / noisy-student   | 16M         |
 +------------------------+--------------------------------------+-------------+
-| timm-efficientnet-b5   | imagenet / advprop / noisy-student   | 28M         |
+| timm-efficientnet-b5   | imagenet / advprop / noisy-student   | 27M         |
 +------------------------+--------------------------------------+-------------+
-| timm-efficientnet-b6   | imagenet / advprop / noisy-student   | 40M         |
+| timm-efficientnet-b6   | imagenet / advprop / noisy-student   | 39M         |
 +------------------------+--------------------------------------+-------------+
-| timm-efficientnet-b7   | imagenet / advprop / noisy-student   | 63M         |
+| timm-efficientnet-b7   | imagenet / advprop / noisy-student   | 62M         |
 +------------------------+--------------------------------------+-------------+
-| timm-efficientnet-b8   | imagenet / advprop                   | 84M         |
+| timm-efficientnet-b8   | imagenet / advprop                   | 82M         |
 +------------------------+--------------------------------------+-------------+
-| timm-efficientnet-l2   | noisy-student / noisy-student-475    | 474M        |
+| timm-efficientnet-l2   | noisy-student / noisy-student-475    | 467M        |
 +------------------------+--------------------------------------+-------------+
-| timm-efficientnet-lite0| imagenet                             | 4M          |
+| timm-efficientnet-lite0| imagenet                             | 2M          |
 +------------------------+--------------------------------------+-------------+
-| timm-efficientnet-lite1| imagenet                             | 4M          |
+| timm-efficientnet-lite1| imagenet                             | 3M          |
 +------------------------+--------------------------------------+-------------+
-| timm-efficientnet-lite2| imagenet                             | 6M          |
+| timm-efficientnet-lite2| imagenet                             | 4M          |
 +------------------------+--------------------------------------+-------------+
-| timm-efficientnet-lite3| imagenet                             | 8M          |
+| timm-efficientnet-lite3| imagenet                             | 6M          |
 +------------------------+--------------------------------------+-------------+
-| timm-efficientnet-lite4| imagenet                             | 13M         |
+| timm-efficientnet-lite4| imagenet                             | 11M         |
 +------------------------+--------------------------------------+-------------+
 
 MobileNet
