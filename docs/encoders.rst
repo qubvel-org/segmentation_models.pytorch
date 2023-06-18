@@ -215,21 +215,21 @@ EfficientNet
 +------------------------+--------------------------------------+-------------+
 | Encoder                | Weights                              | Params, M   |
 +========================+======================================+=============+
-| efficientnet-b0        | imagenet                             | 3M          |
+| efficientnet-b0        | imagenet / advprop                   | 3M          |
 +------------------------+--------------------------------------+-------------+
-| efficientnet-b1        | imagenet                             | 6M          |
+| efficientnet-b1        | imagenet / advprop                   | 6M          |
 +------------------------+--------------------------------------+-------------+
-| efficientnet-b2        | imagenet                             | 7M          |
+| efficientnet-b2        | imagenet / advprop                   | 7M          |
 +------------------------+--------------------------------------+-------------+
-| efficientnet-b3        | imagenet                             | 10M         |
+| efficientnet-b3        | imagenet / advprop                   | 10M         |
 +------------------------+--------------------------------------+-------------+
-| efficientnet-b4        | imagenet                             | 16M         |
+| efficientnet-b4        | imagenet / advprop                   | 16M         |
 +------------------------+--------------------------------------+-------------+
-| efficientnet-b5        | imagenet                             | 27M         |
+| efficientnet-b5        | imagenet / advprop                   | 27M         |
 +------------------------+--------------------------------------+-------------+
-| efficientnet-b6        | imagenet                             | 39M         |
+| efficientnet-b6        | imagenet / advprop                   | 39M         |
 +------------------------+--------------------------------------+-------------+
-| efficientnet-b7        | imagenet                             | 62M         |
+| efficientnet-b7        | imagenet / advprop                   | 62M         |
 +------------------------+--------------------------------------+-------------+
 | timm-efficientnet-b0   | imagenet / advprop / noisy-student   | 3M          |
 +------------------------+--------------------------------------+-------------+
