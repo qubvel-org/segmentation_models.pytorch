@@ -125,6 +125,14 @@ class EfficientNetBaseEncoder(EfficientNet, EncoderMixin):
         return features
 
     def load_state_dict(self, state_dict, **kwargs):
+        state_dict.pop("conv_head.bias", None)
+        state_dict.pop("conv_head.weight", None)
+        state_dict.pop("bn2.bias", None)
+        state_dict.pop("bn2.weight", None)
+        state_dict.pop("bn2.running_mean", None)
+        state_dict.pop("bn2.running_var", None)
+        state_dict.pop("bn2.num_batches_tracked", None)
+        state_dict.pop("classifier.bias", None)
         state_dict.pop("classifier.bias", None)
         state_dict.pop("classifier.weight", None)
         super().load_state_dict(state_dict, **kwargs)
