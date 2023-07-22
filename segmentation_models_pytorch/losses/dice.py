@@ -10,6 +10,9 @@ __all__ = ["DiceLoss"]
 
 
 class DiceLoss(_Loss):
+    def __name__():
+        return "Dice Loss"
+        
     def __init__(
         self,
         mode: str,
