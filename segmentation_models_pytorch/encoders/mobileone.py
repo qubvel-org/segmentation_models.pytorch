@@ -39,6 +39,9 @@ class SEBlock(nn.Module):
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """Apply forward pass."""
         b, c, h, w = inputs.size()
+        if torch.is_tensor(h):
+             h = h.item()
+             w = w.item()
         x = F.avg_pool2d(inputs, kernel_size=[h, w])
         x = self.reduce(x)
         x = F.relu(x)
