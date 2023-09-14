@@ -16,6 +16,7 @@ class DiceLoss(_Loss):
         classes: Optional[List[int]] = None,
         log_loss: bool = False,
         from_logits: bool = True,
+        soft_labels: bool = False,
         smooth: float = 0.0,
         ignore_index: Optional[int] = None,
         eps: float = 1e-7,
@@ -28,6 +29,7 @@ class DiceLoss(_Loss):
             classes:  List of classes that contribute in loss computation. By default, all channels are included.
             log_loss: If True, loss computed as `- log(dice_coeff)`, otherwise `1 - dice_coeff`
             from_logits: If True, assumes input is raw logits
+            soft_labels: If True, assigns minimum loss for prediction=target with label aggregation, default False to save compute.
             smooth: Smoothness constant for dice coefficient (a)
             ignore_index: Label that indicates ignored pixels (does not contribute to loss)
             eps: A small epsilon for numerical stability to avoid zero division error
@@ -49,6 +51,7 @@ class DiceLoss(_Loss):
 
         self.classes = classes
         self.from_logits = from_logits
+        self.soft_labels = soft_labels
         self.smooth = smooth
         self.eps = eps
         self.log_loss = log_loss
@@ -103,7 +106,7 @@ class DiceLoss(_Loss):
                 y_pred = y_pred * mask
                 y_true = y_true * mask
 
-        scores = self.compute_score(y_pred, y_true.type_as(y_pred), smooth=self.smooth, eps=self.eps, dims=dims)
+        scores = self.compute_score(y_pred, y_true.type_as(y_pred), smooth=self.smooth, eps=self.eps, dims=dims, soft_labels=self.soft_labels)
 
         if self.log_loss:
             loss = -torch.log(scores.clamp_min(self.eps))
@@ -126,5 +129,5 @@ class DiceLoss(_Loss):
     def aggregate_loss(self, loss):
         return loss.mean()
 
-    def compute_score(self, output, target, smooth=0.0, eps=1e-7, dims=None) -> torch.Tensor:
-        return soft_dice_score(output, target, smooth, eps, dims)
+    def compute_score(self, output, target, smooth=0.0, eps=1e-7, dims=None, soft_labels=False) -> torch.Tensor:
+        return soft_dice_score(output, target, smooth, eps, dims, soft_labels)

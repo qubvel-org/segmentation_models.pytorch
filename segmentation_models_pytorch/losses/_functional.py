@@ -175,13 +175,20 @@ def soft_dice_score(
     smooth: float = 0.0,
     eps: float = 1e-7,
     dims=None,
+    soft_labels: bool = False,
 ) -> torch.Tensor:
     assert output.size() == target.size()
     if dims is not None:
-        intersection = torch.sum(output * target, dim=dims)
+        if soft_labels:
+            intersection = torch.sum((1-torch.abs(target - output)) * torch.minimum(target, output), dim=dims)
+        else:
+            intersection = torch.sum(output * target, dim=dims)
         cardinality = torch.sum(output + target, dim=dims)
     else:
-        intersection = torch.sum(output * target)
+        if soft_labels:
+            intersection = torch.sum((1-torch.abs(target - output)) * torch.minimum(target, output))
+        else:
+            intersection = torch.sum(output * target)
         cardinality = torch.sum(output + target)
     dice_score = (2.0 * intersection + smooth) / (cardinality + smooth).clamp_min(eps)
     return dice_score
