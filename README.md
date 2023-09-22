@@ -302,6 +302,19 @@ The following is a list of supported encoders in the SMP. Select the appropriate
 </details>
 
 <details>
+<summary style="margin-left: 25px;">EfficientNetV2</summary>
+<div style="margin-left: 25px;">
+
+|Encoder                         |Weights                         |Params, M                       |
+|--------------------------------|:------------------------------:|:------------------------------:|
+|efficientnet_v2_s               |IMAGENET1K_V1                   |21M                             |
+|efficientnet_v2_m               |IMAGENET1K_V1                   |54M                             |
+|efficientnet_v2_l               |IMAGENET1K_V1                   |118M                            |
+
+</div>
+</details>
+
+<details>
 <summary style="margin-left: 25px;">MobileNet</summary>
 <div style="margin-left: 25px;">
 
