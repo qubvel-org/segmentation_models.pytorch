@@ -82,10 +82,15 @@ def _get_pretrained_settings(encoder):
         "efficientnet_v2_m": EfficientNet_V2_M_Weights,
         "efficientnet_v2_l": EfficientNet_V2_L_Weights,
     }
+    transform_values_map = {
+        "efficientnet_v2_s": {"mean": [0.485, 0.456, 0.406], "std": [0.229, 0.224, 0.225]},
+        "efficientnet_v2_m": {"mean": [0.485, 0.456, 0.406], "std": [0.229, 0.224, 0.225]},
+        "efficientnet_v2_l": {"mean": [0.5, 0.5, 0.5], "std": [0.5, 0.5, 0.5]},
+    }
     pretrained_settings = {
         "IMAGENET1K_V1": {
-            "mean": [0.5, 0.5, 0.5],
-            "std": [0.5, 0.5, 0.5],
+            "mean": transform_values_map[encoder.lower()]["mean"],
+            "std": transform_values_map[encoder.lower()]["std"],
             "url": weights_map[encoder.lower()].IMAGENET1K_V1.url,
             "input_space": "RGB",
             "input_range": [0, 1],
