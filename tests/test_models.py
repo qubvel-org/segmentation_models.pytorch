@@ -2,6 +2,7 @@ import sys
 import mock
 import pytest
 import torch
+import torch.nn
 
 # mock detection module
 sys.modules["torchvision._C"] = mock.Mock()
@@ -134,6 +135,23 @@ def test_dilation(encoder_name):
 
     shapes = [out.shape[-1] for out in output]
     assert shapes == [64, 32, 16, 8, 4, 4]  # last downsampling replaced with dilation
+
+
+@pytest.mark.parametrize(
+    "in_chans,out_chans,groups,new_in_chans",
+    [
+        (3, 6, 1, 6),
+        (3, 6, 1, 1),
+        (6, 8, 2, 16),
+        (6, 12, 2, 2),
+    ],
+)
+def test_patch_first_conv(in_chans, out_chans, groups, new_in_chans):
+    kernel = 3
+    model = torch.nn.Sequential(torch.nn.Conv2d(in_chans, out_chans, kernel, groups=groups))
+    smp.encoders._utils.patch_first_conv(model, new_in_chans)
+    assert model[0].in_channels == new_in_chans
+    assert model[0].weight.shape[1] == new_in_chans // groups
 
 
 if __name__ == "__main__":
