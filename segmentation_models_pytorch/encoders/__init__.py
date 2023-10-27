@@ -1,4 +1,4 @@
-import timm
+import timm, torch, os
 import functools
 import torch.utils.model_zoo as model_zoo
 
@@ -72,17 +72,25 @@ def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **
     encoder = Encoder(**params)
 
     if weights is not None:
-        try:
-            settings = encoders[name]["pretrained_settings"][weights]
-        except KeyError:
-            raise KeyError(
-                "Wrong pretrained weights `{}` for encoder `{}`. Available options are: {}".format(
-                    weights,
-                    name,
-                    list(encoders[name]["pretrained_settings"].keys()),
+        if os.path.isfile(weights):
+            print('Loading custom pretrained weights...')
+            state_dict = torch.load(weights, map_location='cpu')
+            encoder.load_state_dict(state_dict, strict=True)
+            print("All keys were matched successfully!")
+        else:
+            try:
+                settings = encoders[name]["pretrained_settings"][weights]
+                # state_dict = load_state_dict_from_url(settings["url"], progress=True, map_location='cpu')
+                # encoder.load_state_dict(state_dict)
+                encoder.load_state_dict(model_zoo.load_url(settings["url"]))
+            except KeyError:
+                raise KeyError(
+                    "Wrong pretrained weights `{}` for encoder `{}`. Available options are: {}".format(
+                        weights,
+                        name,
+                        list(encoders[name]["pretrained_settings"].keys()),
+                    )
                 )
-            )
-        encoder.load_state_dict(model_zoo.load_url(settings["url"]))
 
     encoder.set_in_channels(in_channels, pretrained=weights is not None)
     if output_stride != 32:
