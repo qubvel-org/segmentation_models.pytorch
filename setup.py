@@ -40,9 +40,6 @@ EXTRAS = {
         "pytest",
         "mock",
         "pre-commit",
-        "black ==22.3.0",
-        "flake8 ==4.0.1",
-        "flake8-docstrings ==1.6.0",
     ],
 }
 
