@@ -36,5 +36,3 @@ DeepLabV3
 DeepLabV3+
 ~~~~~~~~~~
 .. autoclass:: segmentation_models_pytorch.DeepLabV3Plus
-
-

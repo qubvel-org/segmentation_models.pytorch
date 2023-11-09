@@ -21,20 +21,20 @@ Each encoder should have following attributes and methods and be inherited from 
 .. code-block:: python
 
     class MyEncoder(torch.nn.Module, EncoderMixin):
-        
+
         def __init__(self, **kwargs):
             super().__init__()
-            
+
             # A number of channels for each encoder feature tensor, list of integers
             self._out_channels: List[int] = [3, 16, 64, 128, 256, 512]
 
             # A number of stages in decoder (in other words number of downsampling operations), integer
             # use in in forward pass to reduce number of returning features
-            self._depth: int = 5 
+            self._depth: int = 5
 
             # Default number of input channels in first Conv2d layer for encoder (usually 3)
-            self._in_channels: int = 3 
-            
+            self._in_channels: int = 3
+
             # Define encoder modules below
             ...
 
@@ -90,12 +90,12 @@ For better understanding see more examples of encoder in smp.encoders module.
 3. Aux classification output
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-All models support ``aux_params`` parameter, which is default set to ``None``. 
+All models support ``aux_params`` parameter, which is default set to ``None``.
 If ``aux_params = None`` than classification auxiliary output is not created, else
 model produce not only ``mask``, but also ``label`` output with shape ``(N, C)``.
 
 Classification head consist of following layers:
-    
+
 1. GlobalPooling
 2. Dropout (optional)
 3. Linear
@@ -104,7 +104,7 @@ Classification head consist of following layers:
 Example:
 
 .. code-block:: python
-    
+
     aux_params=dict(
         pooling='avg',             # one of 'avg', 'max'
         dropout=0.5,               # dropout ratio, default is None

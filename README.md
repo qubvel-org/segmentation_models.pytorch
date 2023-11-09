@@ -1,18 +1,18 @@
 <div align="center">
- 
-![logo](https://i.ibb.co/dc1XdhT/Segmentation-Models-V2-Side-1-1.png)  
-**Python library with Neural Networks for Image  
-Segmentation based on [PyTorch](https://pytorch.org/).**  
 
-[![Generic badge](https://img.shields.io/badge/License-MIT-<COLOR>.svg?style=for-the-badge)](https://github.com/qubvel/segmentation_models.pytorch/blob/master/LICENSE) 
-[![GitHub Workflow Status (branch)](https://img.shields.io/github/actions/workflow/status/qubvel/segmentation_models.pytorch/tests.yml?branch=master&style=for-the-badge)](https://github.com/qubvel/segmentation_models.pytorch/actions/workflows/tests.yml) 
-[![Read the Docs](https://img.shields.io/readthedocs/smp?style=for-the-badge&logo=readthedocs&logoColor=white)](https://smp.readthedocs.io/en/latest/) 
+![logo](https://i.ibb.co/dc1XdhT/Segmentation-Models-V2-Side-1-1.png)
+**Python library with Neural Networks for Image
+Segmentation based on [PyTorch](https://pytorch.org/).**
+
+[![Generic badge](https://img.shields.io/badge/License-MIT-<COLOR>.svg?style=for-the-badge)](https://github.com/qubvel/segmentation_models.pytorch/blob/master/LICENSE)
+[![GitHub Workflow Status (branch)](https://img.shields.io/github/actions/workflow/status/qubvel/segmentation_models.pytorch/tests.yml?branch=master&style=for-the-badge)](https://github.com/qubvel/segmentation_models.pytorch/actions/workflows/tests.yml)
+[![Read the Docs](https://img.shields.io/readthedocs/smp?style=for-the-badge&logo=readthedocs&logoColor=white)](https://smp.readthedocs.io/en/latest/)
 <br>
-[![PyPI](https://img.shields.io/pypi/v/segmentation-models-pytorch?color=blue&style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/segmentation-models-pytorch/) 
-[![PyPI - Downloads](https://img.shields.io/pypi/dm/segmentation-models-pytorch?style=for-the-badge&color=blue)](https://pepy.tech/project/segmentation-models-pytorch) 
+[![PyPI](https://img.shields.io/pypi/v/segmentation-models-pytorch?color=blue&style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/segmentation-models-pytorch/)
+[![PyPI - Downloads](https://img.shields.io/pypi/dm/segmentation-models-pytorch?style=for-the-badge&color=blue)](https://pepy.tech/project/segmentation-models-pytorch)
 <br>
-[![PyTorch - Version](https://img.shields.io/badge/PYTORCH-1.4+-red?style=for-the-badge&logo=pytorch)](https://pepy.tech/project/segmentation-models-pytorch) 
-[![Python - Version](https://img.shields.io/badge/PYTHON-3.7+-red?style=for-the-badge&logo=python&logoColor=white)](https://pepy.tech/project/segmentation-models-pytorch) 
+[![PyTorch - Version](https://img.shields.io/badge/PYTORCH-1.4+-red?style=for-the-badge&logo=pytorch)](https://pepy.tech/project/segmentation-models-pytorch)
+[![Python - Version](https://img.shields.io/badge/PYTHON-3.7+-red?style=for-the-badge&logo=python&logoColor=white)](https://pepy.tech/project/segmentation-models-pytorch)
 
 </div>
 
@@ -23,7 +23,7 @@ The main features of this library are:
  - 124 available encoders (and 500+ encoders from [timm](https://github.com/rwightman/pytorch-image-models))
  - All encoders have pre-trained weights for faster and better convergence
  - Popular metrics and losses for training routines
- 
+
 ### [📚 Project Documentation 📚](http://smp.readthedocs.io/)
 
 Visit [Read The Docs Project Page](https://smp.readthedocs.io/) or read following README to know more about Segmentation Models Pytorch (SMP for short) library
@@ -358,7 +358,7 @@ The following is a list of supported encoders in the SMP. Select the appropriate
 
 Backbone from SegFormer pretrained on Imagenet! Can be used with other decoders from package, you can combine Mix Vision Transformer with Unet, FPN and others!
 
-Limitations:  
+Limitations:
 
    - encoder is **not** supported by Linknet, Unet++
    - encoder is supported by FPN only for encoder **depth = 5**
@@ -420,18 +420,18 @@ Total number of supported encoders: 549
 ##### Input channels
 Input channels parameter allows you to create models, which process tensors with arbitrary number of channels.
 If you use pretrained weights from imagenet - weights of first convolution will be reused. For
-1-channel case it would be a sum of weights of first convolution layer, otherwise channels would be 
+1-channel case it would be a sum of weights of first convolution layer, otherwise channels would be
 populated with weights like `new_weight[:, i] = pretrained_weight[:, i % 3]` and than scaled with `new_weight * 3 / new_in_channels`.
 ```python
 model = smp.FPN('resnet34', in_channels=1)
 mask = model(torch.ones([1, 1, 64, 64]))
 ```
 
-##### Auxiliary classification output  
-All models support `aux_params` parameters, which is default set to `None`. 
+##### Auxiliary classification output
+All models support `aux_params` parameters, which is default set to `None`.
 If `aux_params = None` then classification auxiliary output is not created, else
 model produce not only `mask`, but also `label` output with shape `NC`.
-Classification head consists of GlobalPooling->Dropout(optional)->Linear->Activation(optional) layers, which can be 
+Classification head consists of GlobalPooling->Dropout(optional)->Linear->Activation(optional) layers, which can be
 configured by `aux_params` as follows:
 ```python
 aux_params=dict(
@@ -469,19 +469,19 @@ $ pip install git+https://github.com/qubvel/segmentation_models.pytorch
 
 ### 🤝 Contributing
 
-#### Install SMP  
+#### Install SMP
 
 ```bash
 make install_dev  # create .venv, install SMP in dev mode
 ```
 
-#### Run tests and code checks  
+#### Run tests and code checks
 
 ```bash
 make all          # run flake8, black, tests
 ```
 
-#### Update table with encoders  
+#### Update table with encoders
 
 ```bash
 make table        # generate table with encoders and print to stdout

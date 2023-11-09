@@ -6,7 +6,7 @@
 Segmentation model is just a PyTorch nn.Module, which can be created as easy as:
 
 .. code-block:: python
-    
+
     import segmentation_models_pytorch as smp
 
     model = smp.Unet(
