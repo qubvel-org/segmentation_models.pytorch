@@ -16,7 +16,7 @@ table:
 table_timm:
 	.venv/bin/python misc/generate_table_timm.py
 
-precommit: .venv
+precommit: install_dev
 	.venv/bin/pre-commit run --all-files
 
 all: precommit test
