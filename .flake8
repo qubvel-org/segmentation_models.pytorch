@@ -1,5 +1,31 @@
 [flake8]
-max-line-length = 119
-exclude =.git,__pycache__,docs/conf.py,build,dist,setup.py,tests,.venv
-ignore = I101,I201,F401,F403,S001,D100,D101,D102,D103,D104,D105,D106,D107,D200,D205,D400,W504,D202,E203,W503,B006,D412
-inline-quotes = "
+max-line-length = 88
+extend-ignore =
+    # See https://github.com/PyCQA/pycodestyle/issues/373
+    E203,
+exclude =
+    # Extra files
+    data/,
+    images/,
+    logo/,
+    logs/,
+    output/,
+
+    # Docs
+    docs/src/,
+
+    # Spack
+    .spack-env/,
+
+    # Python
+    build/,
+    dist/,
+    .cache/,
+    .mypy_cache/,
+    .pytest_cache/,
+    __pycache__/,
+    *.egg-info/,
+
+    # Git
+    .git/,
+    .github/,

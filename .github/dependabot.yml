@@ -1,11 +1,16 @@
 version: 2
 updates:
-  - package-ecosystem: "pip"
+  - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
+      interval: "weekly"
+  - package-ecosystem: "pip"
+    directory: "/requirements"
+    schedule:
       interval: "daily"
-    # Allow up to 2 open pull requests at a time
-    open-pull-requests-limit: 2
-    allow:
+    ignore:
+      # setuptools releases new versions almost daily
+      - dependency-name: "setuptools"
+        update-types: ["version-update:semver-patch"]
       - dependency-name: "timm"
-        dependency-type: "all"
+      - dependency-name: "torch"

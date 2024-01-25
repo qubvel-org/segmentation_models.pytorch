@@ -1,0 +1,26 @@
+changelog:
+  exclude:
+    authors:
+      - dependabot[bot]
+  categories:
+    - title: Backwards-incompatible changes
+      labels:
+        - backwards-incompatible
+    - title: Dependencies
+      labels:
+        - dependencies
+    - title: Encoders
+      labels:
+        - encoders
+    - title: Decoders
+      labels:
+        - decoders
+    - title: Losses
+      labels:
+        - losses
+    - title: Documentation
+      labels:
+        - documentation
+    - title: Testing
+      labels:
+        - testing

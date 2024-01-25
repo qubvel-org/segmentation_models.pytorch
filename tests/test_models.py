@@ -1,11 +1,12 @@
 import sys
-import mock
+from unittest import mock
+
 import pytest
 import torch
 
 # mock detection module
 sys.modules["torchvision._C"] = mock.Mock()
-import segmentation_models_pytorch as smp  # noqa
+import torchseg  # noqa
 
 
 def get_encoders():
@@ -15,7 +16,7 @@ def get_encoders():
         "resnext101_32x32d",
         "resnext101_32x48d",
     ]
-    encoders = smp.encoders.get_encoder_names()
+    encoders = torchseg.encoders.get_encoder_names()
     encoders = [e for e in encoders if e not in exclude_encoders]
     encoders.append("tu-resnet34")  # for timm universal encoder
     return encoders
@@ -26,14 +27,21 @@ DEFAULT_ENCODER = "resnet18"
 
 
 def get_sample(model_class):
-    if model_class in [smp.Unet, smp.Linknet, smp.FPN, smp.PSPNet, smp.UnetPlusPlus, smp.MAnet]:
+    if model_class in [
+        torchseg.Unet,
+        torchseg.Linknet,
+        torchseg.FPN,
+        torchseg.PSPNet,
+        torchseg.UnetPlusPlus,
+        torchseg.MAnet,
+    ]:
         sample = torch.ones([1, 3, 64, 64])
-    elif model_class == smp.PAN:
+    elif model_class == torchseg.PAN:
         sample = torch.ones([2, 3, 256, 256])
-    elif model_class == smp.DeepLabV3:
+    elif model_class == torchseg.DeepLabV3:
         sample = torch.ones([2, 3, 128, 128])
     else:
-        raise ValueError("Not supported model class {}".format(model_class))
+        raise ValueError(f"Not supported model class {model_class}")
     return sample
 
 
@@ -53,18 +61,40 @@ def _test_forward_backward(model, sample, test_shape=False):
 
 @pytest.mark.parametrize("encoder_name", ENCODERS)
 @pytest.mark.parametrize("encoder_depth", [3, 5])
-@pytest.mark.parametrize("model_class", [smp.FPN, smp.PSPNet, smp.Linknet, smp.Unet, smp.UnetPlusPlus])
+@pytest.mark.parametrize(
+    "model_class",
+    [
+        torchseg.FPN,
+        torchseg.PSPNet,
+        torchseg.Linknet,
+        torchseg.Unet,
+        torchseg.UnetPlusPlus,
+    ],
+)
 def test_forward(model_class, encoder_name, encoder_depth, **kwargs):
-    if model_class is smp.Unet or model_class is smp.UnetPlusPlus or model_class is smp.MAnet:
+    if (
+        model_class is torchseg.Unet
+        or model_class is torchseg.UnetPlusPlus
+        or model_class is torchseg.MAnet
+    ):
         kwargs["decoder_channels"] = (16, 16, 16, 16, 16)[-encoder_depth:]
-    if model_class in [smp.UnetPlusPlus, smp.Linknet] and encoder_name.startswith("mit_b"):
+    if model_class in [
+        torchseg.UnetPlusPlus,
+        torchseg.Linknet,
+    ] and encoder_name.startswith("mit_b"):
         return  # skip mit_b*
-    if model_class is smp.FPN and encoder_name.startswith("mit_b") and encoder_depth != 5:
+    if (
+        model_class is torchseg.FPN
+        and encoder_name.startswith("mit_b")
+        and encoder_depth != 5
+    ):
         return  # skip mit_b*
-    model = model_class(encoder_name, encoder_depth=encoder_depth, encoder_weights=None, **kwargs)
+    model = model_class(
+        encoder_name, encoder_depth=encoder_depth, encoder_weights=None, **kwargs
+    )
     sample = get_sample(model_class)
     model.eval()
-    if encoder_depth == 5 and model_class != smp.PSPNet:
+    if encoder_depth == 5 and model_class != torchseg.PSPNet:
         test_shape = True
     else:
         test_shape = False
@@ -73,7 +103,17 @@ def test_forward(model_class, encoder_name, encoder_depth, **kwargs):
 
 
 @pytest.mark.parametrize(
-    "model_class", [smp.PAN, smp.FPN, smp.PSPNet, smp.Linknet, smp.Unet, smp.UnetPlusPlus, smp.MAnet, smp.DeepLabV3]
+    "model_class",
+    [
+        torchseg.PAN,
+        torchseg.FPN,
+        torchseg.PSPNet,
+        torchseg.Linknet,
+        torchseg.Unet,
+        torchseg.UnetPlusPlus,
+        torchseg.MAnet,
+        torchseg.DeepLabV3,
+    ],
 )
 def test_forward_backward(model_class):
     sample = get_sample(model_class)
@@ -82,10 +122,21 @@ def test_forward_backward(model_class):
 
 
 @pytest.mark.parametrize(
-    "model_class", [smp.PAN, smp.FPN, smp.PSPNet, smp.Linknet, smp.Unet, smp.UnetPlusPlus, smp.MAnet]
+    "model_class",
+    [
+        torchseg.PAN,
+        torchseg.FPN,
+        torchseg.PSPNet,
+        torchseg.Linknet,
+        torchseg.Unet,
+        torchseg.UnetPlusPlus,
+        torchseg.MAnet,
+    ],
 )
 def test_aux_output(model_class):
-    model = model_class(DEFAULT_ENCODER, encoder_weights=None, aux_params=dict(classes=2))
+    model = model_class(
+        DEFAULT_ENCODER, encoder_weights=None, aux_params=dict(classes=2)
+    )
     sample = get_sample(model_class)
     label_size = (sample.shape[0], 2)
     mask, label = model(sample)
@@ -93,16 +144,16 @@ def test_aux_output(model_class):
 
 
 @pytest.mark.parametrize("upsampling", [2, 4, 8])
-@pytest.mark.parametrize("model_class", [smp.FPN, smp.PSPNet])
+@pytest.mark.parametrize("model_class", [torchseg.FPN, torchseg.PSPNet])
 def test_upsample(model_class, upsampling):
-    default_upsampling = 4 if model_class is smp.FPN else 8
+    default_upsampling = 4 if model_class is torchseg.FPN else 8
     model = model_class(DEFAULT_ENCODER, encoder_weights=None, upsampling=upsampling)
     sample = get_sample(model_class)
     mask = model(sample)
     assert mask.size()[-1] / 64 == upsampling / default_upsampling
 
 
-@pytest.mark.parametrize("model_class", [smp.FPN])
+@pytest.mark.parametrize("model_class", [torchseg.FPN])
 @pytest.mark.parametrize("in_channels", [1, 2, 4])
 def test_in_channels(model_class, in_channels):
     sample = torch.ones([1, in_channels, 64, 64])
@@ -125,7 +176,7 @@ def test_dilation(encoder_name):
     ):
         return
 
-    encoder = smp.encoders.get_encoder(encoder_name, output_stride=16)
+    encoder = torchseg.encoders.get_encoder(encoder_name, output_stride=16)
 
     encoder.eval()
     with torch.no_grad():

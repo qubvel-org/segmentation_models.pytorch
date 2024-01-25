@@ -1,3 +1,0 @@
-faculty-sphinx-theme==0.2.2
-six==1.15.0
-autodocsumm

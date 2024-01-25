@@ -1,14 +1,15 @@
 import pytest
 import torch
-import segmentation_models_pytorch as smp
-import segmentation_models_pytorch.losses._functional as F
-from segmentation_models_pytorch.losses import (
+
+import torchseg
+import torchseg.losses._functional as F
+from torchseg.losses import (
     DiceLoss,
     JaccardLoss,
+    MCCLoss,
     SoftBCEWithLogitsLoss,
     SoftCrossEntropyLoss,
     TverskyLoss,
-    MCCLoss,
 )
 
 
@@ -96,21 +97,21 @@ def test_soft_tversky_score(y_true, y_pred, expected, eps, alpha, beta):
 @torch.no_grad()
 def test_dice_loss_binary():
     eps = 1e-5
-    criterion = DiceLoss(mode=smp.losses.BINARY_MODE, from_logits=False)
+    criterion = DiceLoss(mode=torchseg.losses.BINARY_MODE, from_logits=False)
 
     # Ideal case
     y_pred = torch.tensor([1.0, 1.0, 1.0]).view(1, 1, 1, -1)
-    y_true = torch.tensor(([1, 1, 1])).view(1, 1, 1, -1)
+    y_true = torch.tensor([1, 1, 1]).view(1, 1, 1, -1)
     loss = criterion(y_pred, y_true)
     assert float(loss) == pytest.approx(0.0, abs=eps)
 
     y_pred = torch.tensor([1.0, 0.0, 1.0]).view(1, 1, 1, -1)
-    y_true = torch.tensor(([1, 0, 1])).view(1, 1, 1, -1)
+    y_true = torch.tensor([1, 0, 1]).view(1, 1, 1, -1)
     loss = criterion(y_pred, y_true)
     assert float(loss) == pytest.approx(0.0, abs=eps)
 
     y_pred = torch.tensor([0.0, 0.0, 0.0]).view(1, 1, 1, -1)
-    y_true = torch.tensor(([0, 0, 0])).view(1, 1, 1, -1)
+    y_true = torch.tensor([0, 0, 0]).view(1, 1, 1, -1)
     loss = criterion(y_pred, y_true)
     assert float(loss) == pytest.approx(0.0, abs=eps)
 
@@ -135,21 +136,23 @@ def test_dice_loss_binary():
 def test_tversky_loss_binary():
     eps = 1e-5
     # with alpha=0.5; beta=0.5 it is equal to DiceLoss
-    criterion = TverskyLoss(mode=smp.losses.BINARY_MODE, from_logits=False, alpha=0.5, beta=0.5)
+    criterion = TverskyLoss(
+        mode=torchseg.losses.BINARY_MODE, from_logits=False, alpha=0.5, beta=0.5
+    )
 
     # Ideal case
     y_pred = torch.tensor([1.0, 1.0, 1.0]).view(1, 1, 1, -1)
-    y_true = torch.tensor(([1, 1, 1])).view(1, 1, 1, -1)
+    y_true = torch.tensor([1, 1, 1]).view(1, 1, 1, -1)
     loss = criterion(y_pred, y_true)
     assert float(loss) == pytest.approx(0.0, abs=eps)
 
     y_pred = torch.tensor([1.0, 0.0, 1.0]).view(1, 1, 1, -1)
-    y_true = torch.tensor(([1, 0, 1])).view(1, 1, 1, -1)
+    y_true = torch.tensor([1, 0, 1]).view(1, 1, 1, -1)
     loss = criterion(y_pred, y_true)
     assert float(loss) == pytest.approx(0.0, abs=eps)
 
     y_pred = torch.tensor([0.0, 0.0, 0.0]).view(1, 1, 1, -1)
-    y_true = torch.tensor(([0, 0, 0])).view(1, 1, 1, -1)
+    y_true = torch.tensor([0, 0, 0]).view(1, 1, 1, -1)
     loss = criterion(y_pred, y_true)
     assert float(loss) == pytest.approx(0.0, abs=eps)
 
@@ -173,21 +176,21 @@ def test_tversky_loss_binary():
 @torch.no_grad()
 def test_binary_jaccard_loss():
     eps = 1e-5
-    criterion = JaccardLoss(mode=smp.losses.BINARY_MODE, from_logits=False)
+    criterion = JaccardLoss(mode=torchseg.losses.BINARY_MODE, from_logits=False)
 
     # Ideal case
     y_pred = torch.tensor([1.0]).view(1, 1, 1, 1)
-    y_true = torch.tensor(([1])).view(1, 1, 1, 1)
+    y_true = torch.tensor([1]).view(1, 1, 1, 1)
     loss = criterion(y_pred, y_true)
     assert float(loss) == pytest.approx(0.0, abs=eps)
 
     y_pred = torch.tensor([1.0, 0.0, 1.0]).view(1, 1, 1, -1)
-    y_true = torch.tensor(([1, 0, 1])).view(1, 1, 1, -1)
+    y_true = torch.tensor([1, 0, 1]).view(1, 1, 1, -1)
     loss = criterion(y_pred, y_true)
     assert float(loss) == pytest.approx(0.0, abs=eps)
 
     y_pred = torch.tensor([0.0, 0.0, 0.0]).view(1, 1, 1, -1)
-    y_true = torch.tensor(([0, 0, 0])).view(1, 1, 1, -1)
+    y_true = torch.tensor([0, 0, 0]).view(1, 1, 1, -1)
     loss = criterion(y_pred, y_true)
     assert float(loss) == pytest.approx(0.0, abs=eps)
 
@@ -211,7 +214,7 @@ def test_binary_jaccard_loss():
 @torch.no_grad()
 def test_multiclass_jaccard_loss():
     eps = 1e-5
-    criterion = JaccardLoss(mode=smp.losses.MULTICLASS_MODE, from_logits=False)
+    criterion = JaccardLoss(mode=torchseg.losses.MULTICLASS_MODE, from_logits=False)
 
     # Ideal case
     y_pred = torch.tensor([[[1.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 1.0]]])
@@ -238,7 +241,7 @@ def test_multiclass_jaccard_loss():
 @torch.no_grad()
 def test_multilabel_jaccard_loss():
     eps = 1e-5
-    criterion = JaccardLoss(mode=smp.losses.MULTILABEL_MODE, from_logits=False)
+    criterion = JaccardLoss(mode=torchseg.losses.MULTILABEL_MODE, from_logits=False)
 
     # Ideal case
     y_pred = torch.tensor([[[1.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 1.0]]])
@@ -265,7 +268,9 @@ def test_multilabel_jaccard_loss():
 def test_soft_ce_loss():
     criterion = SoftCrossEntropyLoss(smooth_factor=0.1, ignore_index=-100)
 
-    y_pred = torch.tensor([[+9, -9, -9, -9], [-9, +9, -9, -9], [-9, -9, +9, -9], [-9, -9, -9, +9]]).float()
+    y_pred = torch.tensor(
+        [[+9, -9, -9, -9], [-9, +9, -9, -9], [-9, -9, +9, -9], [-9, -9, -9, +9]]
+    ).float()
     y_true = torch.tensor([0, 1, -100, 3]).long()
 
     loss = criterion(y_pred, y_true)

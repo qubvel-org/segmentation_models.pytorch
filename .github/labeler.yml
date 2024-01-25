@@ -1,0 +1,31 @@
+# TorchSeg modules
+base:
+- changed-files:
+  - any-glob-to-any-file: "torchseg/base/**"
+encoders:
+- changed-files:
+  - any-glob-to-any-file: "torchseg/encoders/**"
+decoders:
+- changed-files:
+  - any-glob-to-any-file: "torchseg/decoders/**"
+losses:
+- changed-files:
+  - any-glob-to-any-file: "torchseg/losses/**"
+
+# Other
+dependencies:
+- changed-files:
+  - any-glob-to-any-file:
+    - "pyproject.toml"
+    - "requirements/**"
+documentation:
+- changed-files:
+  - any-glob-to-any-file:
+    - "docs/**"
+    - "*.md"
+    - ".github/*.md"
+testing:
+- changed-files:
+  - any-glob-to-any-file:
+    - "tests/**"
+    - ".github/workflows/**"
