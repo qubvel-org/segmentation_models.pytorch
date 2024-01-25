@@ -1,19 +1,96 @@
+[build-system]
+requires = [
+    # setuptools 61+ required for pyproject.toml support
+    "setuptools>=61",
+]
+build-backend = "setuptools.build_meta"
+
+# https://packaging.python.org/en/latest/specifications/declaring-project-metadata/
+[project]
+name = "torchseg"
+description = "TorchSeg: Semantic Segmentation models for PyTorch"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Isaac Corley", email = "isaac.corley@utsa.edu"},
+]
+maintainers = [
+    {name = "Isaac Corley", email = "isaac.corley@utsa.edu"},
+]
+keywords = ["pytorch", "deep learning", "machine learning", "computer vision", "semantic segmentation"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "timm>=0.4.12",
+    "torch>=1.13",
+    "torchvision>=0.14",
+    "einops>=0.3",
+    "pretrainedmodels==0.7.4",
+    "efficientnet-pytorch==0.7.1",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+style = [
+    "black[jupyter]>=21.8",
+    "flake8>=3.8",
+    "isort[colors]>=5.8",
+    "pyupgrade>=2.8",
+]
+tests = [
+    "pytest>=7.3",
+    "pytest-cov>=4",
+]
+all = [
+    "torchseg[style,tests]",
+]
+
 [tool.black]
-line-length = 119
-target-version = ['py37', 'py38']
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | docs
-  | _build
-  | buck-out
-  | build
-  | dist
-)/
-'''
+target-version = ["py39", "py310"]
+color = true
+skip_magic_trailing_comma = true
+
+[tool.coverage.report]
+# Ignore warnings for overloads
+# https://github.com/nedbat/coveragepy/issues/970#issuecomment-612602180
+exclude_lines = [
+    "pragma: no cover",
+    "@overload",
+]
+
+[tool.isort]
+profile = "black"
+known_first_party = ["docs", "tests", "torchseg", "train"]
+skip_gitignore = true
+color_output = true
+
+[tool.pytest.ini_options]
+norecursedirs = [
+    ".ipynb_checkpoints",
+    "data",
+    "__pycache__",
+]
+testpaths = [
+    "tests",
+]
+tmp_path_retention_policy = "failed"
+
+# https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
+[tool.setuptools.dynamic]
+version = {attr = "torchseg.__version__"}
+
+[tool.setuptools.package-data]
+torchseg = ["py.typed"]
+
+[tool.setuptools.packages.find]
+include = ["torchseg*"]

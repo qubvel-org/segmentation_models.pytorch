@@ -1,0 +1,4 @@
+# tests
+pytest==7.4.4
+pytest-cov==4.1.0
+mock==5.1.0
