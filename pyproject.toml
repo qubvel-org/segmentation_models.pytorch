@@ -31,7 +31,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 dependencies = [
-    "timm>=0.4.12",
+    "timm>=0.9.12",
     "torch>=1.13",
     "torchvision>=0.14",
     "einops>=0.3",
@@ -50,6 +50,7 @@ style = [
 tests = [
     "pytest>=7.3",
     "pytest-cov>=4",
+    "six>=1.16.0"
 ]
 all = [
     "torchseg[style,tests]",

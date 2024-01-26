@@ -31,9 +31,7 @@ jobs:
     - name: List pip dependencies
       run: pip list
     - name: Run integration checks
-      run: |
-        python -m torchseg --help
-        torchseg --help
+      run: pytest
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.head.label || github.head_ref || github.ref }}
   cancel-in-progress: true

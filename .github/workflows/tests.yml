@@ -44,7 +44,6 @@ jobs:
     - name: Run pytest checks
       run: |
         pytest --cov=torchseg --cov-report=xml --durations=10
-        python3 -m torchseg --help
     - name: Report coverage
       uses: codecov/codecov-action@v3.1.4
       with:
