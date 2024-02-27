@@ -1,4 +1,6 @@
-from typing import Optional, Union
+from typing import Callable, Optional
+
+import torch.nn as nn
 
 from ...base import ClassificationHead, SegmentationHead, SegmentationModel
 from ...encoders import get_encoder
@@ -56,14 +58,17 @@ class MAnet(SegmentationModel):
     def __init__(
         self,
         encoder_name: str = "resnet34",
+        encoder_indices: Optional[tuple[int]] = None,
         encoder_depth: int = 5,
+        encoder_output_stride: int = 32,
         encoder_weights: Optional[str] = "imagenet",
         decoder_use_batchnorm: bool = True,
         decoder_channels: list[int] = (256, 128, 64, 32, 16),
         decoder_pab_channels: int = 64,
         in_channels: int = 3,
         classes: int = 1,
-        activation: Optional[Union[str, callable]] = None,
+        activation: Callable = nn.Identity(),
+        encoder_params: dict = {},
         aux_params: Optional[dict] = None,
     ):
         super().__init__()
@@ -71,8 +76,11 @@ class MAnet(SegmentationModel):
         self.encoder = get_encoder(
             encoder_name,
             in_channels=in_channels,
+            indices=encoder_indices,
             depth=encoder_depth,
+            output_stride=encoder_output_stride,
             weights=encoder_weights,
+            **encoder_params,
         )
 
         self.decoder = MAnetDecoder(

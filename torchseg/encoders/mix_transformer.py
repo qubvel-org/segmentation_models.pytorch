@@ -514,34 +514,23 @@ class DWConv(nn.Module):
 # End of NVIDIA code
 # ---------------------------------------------------------------
 
-from ._base import EncoderMixin  # noqa E402
 
+class MixVisionTransformerEncoder(MixVisionTransformer):
+    output_stride = 32
 
-class MixVisionTransformerEncoder(MixVisionTransformer, EncoderMixin):
     def __init__(self, out_channels, depth=5, **kwargs):
         super().__init__(**kwargs)
-        self._out_channels = out_channels
-        self._depth = depth
-        self._in_channels = 3
-
-    def make_dilated(self, *args, **kwargs):
-        raise ValueError("MixVisionTransformer encoder does not support dilated mode")
-
-    def set_in_channels(self, in_channels, *args, **kwargs):
-        if in_channels != 3:
-            raise ValueError(
-                """
-                MixVisionTransformer encoder does not support
-                in_channels setting other than 3
-                """
-            )
+        self.depth = depth
+        self.in_channels = 3
+        self.out_channels = out_channels[: self.depth + 1]
+        self.output_stride = min(self.output_stride, 2**self.depth)
 
     def forward(self, x):
         # create dummy output for the first block
         B, C, H, W = x.shape
         dummy = torch.empty([B, 0, H // 2, W // 2], dtype=x.dtype, device=x.device)
 
-        return [x, dummy] + self.forward_features(x)[: self._depth - 1]
+        return [x, dummy] + self.forward_features(x)[: self.depth - 1]
 
     def load_state_dict(self, state_dict):
         state_dict.pop("head.weight", None)

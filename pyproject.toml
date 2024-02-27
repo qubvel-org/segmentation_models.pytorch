@@ -31,12 +31,9 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 dependencies = [
+    "einops>=0.7.0",
     "timm>=0.9.12",
     "torch>=1.13",
-    "torchvision>=0.14",
-    "einops>=0.3",
-    "pretrainedmodels==0.7.4",
-    "efficientnet-pytorch==0.7.1",
 ]
 dynamic = ["version"]
 
@@ -50,7 +47,6 @@ style = [
 tests = [
     "pytest>=7.3",
     "pytest-cov>=4",
-    "six>=1.16.0"
 ]
 all = [
     "torchseg[style,tests]",
@@ -71,7 +67,7 @@ exclude_lines = [
 
 [tool.isort]
 profile = "black"
-known_first_party = ["docs", "tests", "torchseg", "train"]
+known_first_party = ["tests", "torchseg", "train"]
 skip_gitignore = true
 color_output = true
 

@@ -1,4 +1,6 @@
-from typing import Optional, Union
+from typing import Callable, Optional
+
+import torch.nn as nn
 
 from ...base import ClassificationHead, SegmentationHead, SegmentationModel
 from ...encoders import get_encoder
@@ -44,12 +46,15 @@ class PAN(SegmentationModel):
         self,
         encoder_name: str = "resnet34",
         encoder_weights: Optional[str] = "imagenet",
+        encoder_indices: Optional[tuple[int]] = None,
+        encoder_depth: int = 5,
         encoder_output_stride: int = 16,
         decoder_channels: int = 32,
         in_channels: int = 3,
         classes: int = 1,
-        activation: Optional[Union[str, callable]] = None,
+        activation: Callable = nn.Identity(),
         upsampling: int = 4,
+        encoder_params: dict = {},
         aux_params: Optional[dict] = None,
     ):
         super().__init__()
@@ -61,9 +66,11 @@ class PAN(SegmentationModel):
         self.encoder = get_encoder(
             encoder_name,
             in_channels=in_channels,
-            depth=5,
+            indices=encoder_indices,
+            depth=encoder_depth,
             weights=encoder_weights,
             output_stride=encoder_output_stride,
+            **encoder_params,
         )
 
         self.decoder = PANDecoder(

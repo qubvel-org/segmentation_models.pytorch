@@ -1,4 +1,6 @@
-from typing import Optional, Union
+from typing import Callable, Optional
+
+import torch.nn as nn
 
 from ...base import ClassificationHead, SegmentationHead, SegmentationModel
 from ...encoders import get_encoder
@@ -46,6 +48,9 @@ class Unet(SegmentationModel):
                 - dropout (float): Dropout factor in [0, 1)
                 - activation (str): An activation function to apply "sigmoid"/"softmax"
                     (could be **None** to return logits)
+        head_upsampling: Factor to upsample input to segmentation head. Defaults to 1.
+            This allows for use of U-Net decoder with models that need additional
+            upsampling to be at the original input image resolution.
 
 
     .. _Unet:
@@ -56,23 +61,30 @@ class Unet(SegmentationModel):
     def __init__(
         self,
         encoder_name: str = "resnet34",
+        encoder_indices: Optional[tuple[int]] = None,
         encoder_depth: int = 5,
+        encoder_output_stride: Optional[int] = None,
         encoder_weights: Optional[str] = "imagenet",
         decoder_use_batchnorm: bool = True,
         decoder_channels: list[int] = (256, 128, 64, 32, 16),
         decoder_attention_type: Optional[str] = None,
         in_channels: int = 3,
         classes: int = 1,
-        activation: Optional[Union[str, callable]] = None,
+        activation: Callable = nn.Identity(),
+        encoder_params: dict = {},
         aux_params: Optional[dict] = None,
+        head_upsampling: int = 1,
     ):
         super().__init__()
 
         self.encoder = get_encoder(
             encoder_name,
             in_channels=in_channels,
+            indices=encoder_indices,
             depth=encoder_depth,
+            output_stride=encoder_output_stride,
             weights=encoder_weights,
+            **encoder_params,
         )
 
         self.decoder = UnetDecoder(
@@ -89,6 +101,7 @@ class Unet(SegmentationModel):
             out_channels=classes,
             activation=activation,
             kernel_size=3,
+            upsampling=head_upsampling,
         )
 
         if aux_params is not None:

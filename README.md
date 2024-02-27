@@ -1,38 +1,129 @@
 ## TorchSeg
 
-TorchSeg is an actively maintained and up-to-date fork of the Segmentation Models PyTorch (torchseg).
+TorchSeg is an actively maintained and up-to-date fork of the [Segmentation Models PyTorch (smp) library](https://github.com/qubvel/segmentation_models.pytorch).
+
+#### Updates
+
+The goal of this fork is to 1) provide maintenance support for the original library and 2) add features relevant to modern semantic segmentation. Since the fork, this library has added some features which can be summarized below:
+
+- Improved [PyTorch Image Models (timm)](https://github.com/huggingface/pytorch-image-models) for models with feature extraction functionality (852/1017=84% of timm models). This includes the typical CNN models such as `ResNet`, `EfficientNet`, etc., but now extends to include modern architectures like `ConvNext`, `Swin`, `PoolFormer`, `MaxViT` and more!
+- Support for pretrained Vision Transformer (ViT) encoders. Currently timm ViTs do not support feature extraction out of the box. However we have added support for extracting intermediate transformer encoder layer feature maps to obtain this functionality. We support 100+ ViT based models including `ViT`, `DeiT`, `FlexiViT`!
+
+
+Additionally we have performed the following for improved software standards:
+
+- More thorough testing and CI
+- Formatting using `black`, `isort`, `flake8`, `mypy`
+- Reduction of dependence on unmaintained libraries (now depends only on `torch`, `timm`, and `einops`)
+- Reduce lines of code to maintain (removed custom utils, metrics, encoders) in favor of newer libraries such as `torchmetrics` and `timm`
+
 
 #### Features
 The main features of this library are:
 
  - High level API (just two lines to create a neural network)
- - 9 models architectures for binary and multi class segmentation (including legendary Unet)
- - 124 available encoders (and 500+ encoders from [timm](https://github.com/rwightman/pytorch-image-models))
+ - 9 segmentation architectures for binary and multi class segmentation (including U-Net, DeepLabV3)
+ - Support for 852/1017 (~84%) of available encoders from [timm](https://github.com/rwightman/pytorch-image-models)
  - All encoders have pre-trained weights for faster and better convergence
- - Popular losses for training routines
+ - Popular segmentation loss functions
 
 #### Example Usage
 
-Segmentation model is just a PyTorch nn.Module, which can be created as easy as:
+TorchSeg models at their base are just torch nn.Modules. They can be created as follows:
 
 ```python
 import torchseg
 
 model = torchseg.Unet(
-    encoder_name="resnet34",        # choose encoder, e.g. mobilenet_v2 or efficientnet-b7
-    encoder_weights="imagenet",     # use `imagenet` pre-trained weights for encoder initialization
-    in_channels=1,                  # model input channels (1 for gray-scale images, 3 for RGB, etc.)
-    classes=3,                      # model output channels (number of classes in your dataset)
+    encoder_name="resnet50",
+    encoder_weights=True,
+    in_channels=3
+    classes=3,
 )
 ```
 
-   - see [table](#architectures) with available model architectures
-   - see [table](#encoders) with available encoders and their corresponding weights
+TorchSeg has an `encoder_params` feature which passes additional parameters to `timm.create_model()` when defining an encoder backbone. One can specify different activitions, normalization layers, and more like below.
 
+You can also define a `functools.partial` callable as an activation/normalization layer. See the timm docs for more information on available [activations](https://github.com/huggingface/pytorch-image-models/blob/main/timm/layers/create_act.py) and [normalization](https://github.com/huggingface/pytorch-image-models/blob/main/timm/layers/create_norm.py) layers. You can even used pretrained weights while changing the activations/normalizations!
+
+```python
+model = torchseg.Unet(
+    encoder_name="resnet50",
+    encoder_weights=True,
+    in_channels=3
+    classes=3,
+    encoder_params={
+      "act_layer": "prelu",
+      "norm_layer": "layernorm"
+    }
+)
+```
+
+Some models like `Swin` and `ConvNext` perform a downsampling of scale=4 in the first block (stem) and then downsample by 2 afterwards with only `depth=4` blocks. This results in an output size of half after the decoder. To get the same output size as the input you can pass `head_upsampling=2` which will upsample once more prior to the segmentation head.
+
+```python
+model = torchseg.Unet(
+    "convnextv2_tiny",
+    in_channels=3,
+    classes=2,
+    encoder_weights=True,
+    encoder_depth=4,
+    decoder_channels=(256, 128, 64, 32),
+    head_upsampling=2
+)
+
+model = torchseg.Unet(
+    "swin_tiny_patch4_window7_224",
+    in_channels=3,
+    classes=2,
+    encoder_weights=True,
+    encoder_depth=4,
+    decoder_channels=(256, 128, 64, 32),
+    head_upsampling=2,
+    encoder_params={"img_size": 256}  # need to define img size since swin is a ViT hybrid
+)
+
+model = torchseg.Unet(
+    "maxvit_small_tf_224",
+    in_channels=3,
+    classes=2,
+    encoder_weights=True,
+    encoder_depth=5,
+    decoder_channels=(256, 128, 64, 32, 16),
+    encoder_params={"img_size": 256}
+)
+```
+
+TorchSeg supports pretrained ViT encoders from timm by extracting intermediate transformer block features specified by the `encoder_indices` and `encoder_depth` arguments.
+
+You will also need to define `scale_factors` for upsampling the feature layers to the resolutions expected by the decoders. For U-Net `depth=5` this would be `scales=(8, 4, 2, 1, 0.5)`. For `depth=4` this would be `scales=(4, 2, 1, 0.5)`, for `depth=3` this would be `scales=(2, 1, 0.5)` and so on.
+
+Another benefit of using timm is that by passing in a new `img_size`, timm automatically interpolates the ViT positional embeddings to work with your new image size which creates a different number of patch tokens.
+
+```python
+import torch
+import torchseg
+
+
+model = torchseg.Unet(
+    "vit_small_patch16_224",
+    in_channels=8,
+    classes=2,
+    encoder_depth=5,
+    encoder_indices=(2, 4, 6, 8, 10),  # which intermediate blocks to extract features from
+    encoder_weights=True,
+    decoder_channels=(256, 128, 64, 32, 16),
+    encoder_params={  # additional params passed to timm.create_model and the vit encoder
+        "scale_factors": (8, 4, 2, 1, 0.5), # resize scale_factors for patch size 16 and 5 layers
+        "img_size": 256,  # timm automatically interpolates the positional embeddings to your new image size
+    },
+)
+
+```
 
 ### Models
 
-#### Architectures
+#### Architectures (Decoders)
 
    - Unet [[paper](https://arxiv.org/abs/1505.04597)]
    - Unet++ [[paper](https://arxiv.org/pdf/1807.10165.pdf)]
@@ -46,339 +137,66 @@ model = torchseg.Unet(
 
 #### Encoders
 
-The following is a list of supported encoders in TorchSeg. Select the appropriate family of encoders and click to expand the table and select a specific encoder and its pre-trained weights (`encoder_name` and `encoder_weights` parameters).
+TorchSeg relies entirely on the [timm](https://github.com/huggingface/pytorch-image-models) library for pretrained encoder support. This means that TorchSeg supports any timm model which has `features_only` feature extraction functionality. Additionally we support any ViT models with a `get_intermediate_layers` method. This results in a total of 852/1017 (~84%) encoders from timm including `ResNet`, `Swin`, `ConvNext`, `ViT`, and more!
 
-<details>
-<summary style="margin-left: 25px;">ResNet</summary>
-<div style="margin-left: 25px;">
+To list the following supported encoders:
 
-| Encoder   |        Weights        | Params, M |
-| --------- | :-------------------: | :-------: |
-| resnet18  | imagenet / ssl / swsl |    11M    |
-| resnet34  |       imagenet        |    21M    |
-| resnet50  | imagenet / ssl / swsl |    23M    |
-| resnet101 |       imagenet        |    42M    |
-| resnet152 |       imagenet        |    58M    |
+```python
+import torchseg
 
-</div>
-</details>
+torchseg.list_encoders()
+```
 
-<details>
-<summary style="margin-left: 25px;">ResNeXt</summary>
-<div style="margin-left: 25px;">
+We have additionally pulled the the feature extractor metadata of each model with `features_only` support from timm at `output_stride=32`. This metadata provides information such as the number of intermediate layers, channels for each layer, layer name, and downsampling reduction.
 
-| Encoder           |              Weights              | Params, M |
-| ----------------- | :-------------------------------: | :-------: |
-| resnext50_32x4d   |       imagenet / ssl / swsl       |    22M    |
-| resnext101_32x4d  |            ssl / swsl             |    42M    |
-| resnext101_32x8d  | imagenet / instagram / ssl / swsl |    86M    |
-| resnext101_32x16d |      instagram / ssl / swsl       |   191M    |
-| resnext101_32x32d |             instagram             |   466M    |
-| resnext101_32x48d |             instagram             |   826M    |
+```python
+import torchseg
 
-</div>
-</details>
+metadata = torchseg.encoders.TIMM_ENCODERS["convnext_base"]
+print(metadata)
 
-<details>
-<summary style="margin-left: 25px;">ResNeSt</summary>
-<div style="margin-left: 25px;">
+"""
+{
+   'channels': [128, 256, 512, 1024],
+   'indices': (0, 1, 2, 3),
+   'module': ['stages.0', 'stages.1', 'stages.2', 'stages.3'],
+   'reduction': [4, 8, 16, 32],
+}
+"""
 
-| Encoder                 | Weights  | Params, M |
-| ----------------------- | :------: | :-------: |
-| timm-resnest14d         | imagenet |    8M     |
-| timm-resnest26d         | imagenet |    15M    |
-| timm-resnest50d         | imagenet |    25M    |
-| timm-resnest101e        | imagenet |    46M    |
-| timm-resnest200e        | imagenet |    68M    |
-| timm-resnest269e        | imagenet |   108M    |
-| timm-resnest50d_4s2x40d | imagenet |    28M    |
-| timm-resnest50d_1s4x24d | imagenet |    23M    |
+metadata = torchseg.encoders.TIMM_ENCODERS["resnet50"]
+print(metadata)
 
-</div>
-</details>
+"""
+{
+   'channels': [64, 256, 512, 1024, 2048],
+   'indices': (0, 1, 2, 3, 4),
+   'module': ['act1', 'layer1', 'layer2', 'layer3', 'layer4'],
+   'reduction': [2, 4, 8, 16, 32]
+}
+"""
+```
 
-<details>
-<summary style="margin-left: 25px;">Res2Ne(X)t</summary>
-<div style="margin-left: 25px;">
+#### Models API
 
-| Encoder                | Weights  | Params, M |
-| ---------------------- | :------: | :-------: |
-| timm-res2net50_26w_4s  | imagenet |    23M    |
-| timm-res2net101_26w_4s | imagenet |    43M    |
-| timm-res2net50_26w_6s  | imagenet |    35M    |
-| timm-res2net50_26w_8s  | imagenet |    46M    |
-| timm-res2net50_48w_2s  | imagenet |    23M    |
-| timm-res2net50_14w_8s  | imagenet |    23M    |
-| timm-res2next50        | imagenet |    22M    |
-
-</div>
-</details>
-
-<details>
-<summary style="margin-left: 25px;">RegNet(x/y)</summary>
-<div style="margin-left: 25px;">
-
-| Encoder          | Weights  | Params, M |
-| ---------------- | :------: | :-------: |
-| timm-regnetx_002 | imagenet |    2M     |
-| timm-regnetx_004 | imagenet |    4M     |
-| timm-regnetx_006 | imagenet |    5M     |
-| timm-regnetx_008 | imagenet |    6M     |
-| timm-regnetx_016 | imagenet |    8M     |
-| timm-regnetx_032 | imagenet |    14M    |
-| timm-regnetx_040 | imagenet |    20M    |
-| timm-regnetx_064 | imagenet |    24M    |
-| timm-regnetx_080 | imagenet |    37M    |
-| timm-regnetx_120 | imagenet |    43M    |
-| timm-regnetx_160 | imagenet |    52M    |
-| timm-regnetx_320 | imagenet |   105M    |
-| timm-regnety_002 | imagenet |    2M     |
-| timm-regnety_004 | imagenet |    3M     |
-| timm-regnety_006 | imagenet |    5M     |
-| timm-regnety_008 | imagenet |    5M     |
-| timm-regnety_016 | imagenet |    10M    |
-| timm-regnety_032 | imagenet |    17M    |
-| timm-regnety_040 | imagenet |    19M    |
-| timm-regnety_064 | imagenet |    29M    |
-| timm-regnety_080 | imagenet |    37M    |
-| timm-regnety_120 | imagenet |    49M    |
-| timm-regnety_160 | imagenet |    80M    |
-| timm-regnety_320 | imagenet |   141M    |
-
-</div>
-</details>
-
-<details>
-<summary style="margin-left: 25px;">GERNet</summary>
-<div style="margin-left: 25px;">
-
-| Encoder       | Weights  | Params, M |
-| ------------- | :------: | :-------: |
-| timm-gernet_s | imagenet |    6M     |
-| timm-gernet_m | imagenet |    18M    |
-| timm-gernet_l | imagenet |    28M    |
-
-</div>
-</details>
-
-<details>
-<summary style="margin-left: 25px;">SE-Net</summary>
-<div style="margin-left: 25px;">
-
-| Encoder             | Weights  | Params, M |
-| ------------------- | :------: | :-------: |
-| senet154            | imagenet |   113M    |
-| se_resnet50         | imagenet |    26M    |
-| se_resnet101        | imagenet |    47M    |
-| se_resnet152        | imagenet |    64M    |
-| se_resnext50_32x4d  | imagenet |    25M    |
-| se_resnext101_32x4d | imagenet |    46M    |
-
-</div>
-</details>
-
-<details>
-<summary style="margin-left: 25px;">SK-ResNe(X)t</summary>
-<div style="margin-left: 25px;">
-
-| Encoder                | Weights  | Params, M |
-| ---------------------- | :------: | :-------: |
-| timm-skresnet18        | imagenet |    11M    |
-| timm-skresnet34        | imagenet |    21M    |
-| timm-skresnext50_32x4d | imagenet |    25M    |
-
-</div>
-</details>
-
-<details>
-<summary style="margin-left: 25px;">DenseNet</summary>
-<div style="margin-left: 25px;">
-
-| Encoder     | Weights  | Params, M |
-| ----------- | :------: | :-------: |
-| densenet121 | imagenet |    6M     |
-| densenet169 | imagenet |    12M    |
-| densenet201 | imagenet |    18M    |
-| densenet161 | imagenet |    26M    |
-
-</div>
-</details>
-
-<details>
-<summary style="margin-left: 25px;">Inception</summary>
-<div style="margin-left: 25px;">
-
-| Encoder           |             Weights             | Params, M |
-| ----------------- | :-----------------------------: | :-------: |
-| inceptionresnetv2 | imagenet /  imagenet+background |    54M    |
-| inceptionv4       | imagenet /  imagenet+background |    41M    |
-| xception          |            imagenet             |    22M    |
-
-</div>
-</details>
-
-<details>
-<summary style="margin-left: 25px;">EfficientNet</summary>
-<div style="margin-left: 25px;">
-
-| Encoder                 |              Weights               | Params, M |
-| ----------------------- | :--------------------------------: | :-------: |
-| efficientnet-b0         |              imagenet              |    4M     |
-| efficientnet-b1         |              imagenet              |    6M     |
-| efficientnet-b2         |              imagenet              |    7M     |
-| efficientnet-b3         |              imagenet              |    10M    |
-| efficientnet-b4         |              imagenet              |    17M    |
-| efficientnet-b5         |              imagenet              |    28M    |
-| efficientnet-b6         |              imagenet              |    40M    |
-| efficientnet-b7         |              imagenet              |    63M    |
-| timm-efficientnet-b0    | imagenet / advprop / noisy-student |    4M     |
-| timm-efficientnet-b1    | imagenet / advprop / noisy-student |    6M     |
-| timm-efficientnet-b2    | imagenet / advprop / noisy-student |    7M     |
-| timm-efficientnet-b3    | imagenet / advprop / noisy-student |    10M    |
-| timm-efficientnet-b4    | imagenet / advprop / noisy-student |    17M    |
-| timm-efficientnet-b5    | imagenet / advprop / noisy-student |    28M    |
-| timm-efficientnet-b6    | imagenet / advprop / noisy-student |    40M    |
-| timm-efficientnet-b7    | imagenet / advprop / noisy-student |    63M    |
-| timm-efficientnet-b8    |         imagenet / advprop         |    84M    |
-| timm-efficientnet-l2    |           noisy-student            |   474M    |
-| timm-efficientnet-lite0 |              imagenet              |    4M     |
-| timm-efficientnet-lite1 |              imagenet              |    5M     |
-| timm-efficientnet-lite2 |              imagenet              |    6M     |
-| timm-efficientnet-lite3 |              imagenet              |    8M     |
-| timm-efficientnet-lite4 |              imagenet              |    13M    |
-
-</div>
-</details>
-
-<details>
-<summary style="margin-left: 25px;">MobileNet</summary>
-<div style="margin-left: 25px;">
-
-| Encoder                            | Weights  | Params, M |
-| ---------------------------------- | :------: | :-------: |
-| mobilenet_v2                       | imagenet |    2M     |
-| timm-mobilenetv3_large_075         | imagenet |   1.78M   |
-| timm-mobilenetv3_large_100         | imagenet |   2.97M   |
-| timm-mobilenetv3_large_minimal_100 | imagenet |   1.41M   |
-| timm-mobilenetv3_small_075         | imagenet |   0.57M   |
-| timm-mobilenetv3_small_100         | imagenet |   0.93M   |
-| timm-mobilenetv3_small_minimal_100 | imagenet |   0.43M   |
-
-</div>
-</details>
-
-<details>
-<summary style="margin-left: 25px;">DPN</summary>
-<div style="margin-left: 25px;">
-
-| Encoder |   Weights   | Params, M |
-| ------- | :---------: | :-------: |
-| dpn68   |  imagenet   |    11M    |
-| dpn68b  | imagenet+5k |    11M    |
-| dpn92   | imagenet+5k |    34M    |
-| dpn98   |  imagenet   |    58M    |
-| dpn107  | imagenet+5k |    84M    |
-| dpn131  |  imagenet   |    76M    |
-
-</div>
-</details>
-
-<details>
-<summary style="margin-left: 25px;">VGG</summary>
-<div style="margin-left: 25px;">
-
-| Encoder  | Weights  | Params, M |
-| -------- | :------: | :-------: |
-| vgg11    | imagenet |    9M     |
-| vgg11_bn | imagenet |    9M     |
-| vgg13    | imagenet |    9M     |
-| vgg13_bn | imagenet |    9M     |
-| vgg16    | imagenet |    14M    |
-| vgg16_bn | imagenet |    14M    |
-| vgg19    | imagenet |    20M    |
-| vgg19_bn | imagenet |    20M    |
-
-</div>
-</details>
-
-<details>
-<summary style="margin-left: 25px;">Mix Vision Transformer</summary>
-<div style="margin-left: 25px;">
-
-Backbone from SegFormer pretrained on Imagenet! Can be used with other decoders from package, you can combine Mix Vision Transformer with Unet, FPN and others!
-
-Limitations:  
-
-   - encoder is **not** supported by Linknet, Unet++
-   - encoder is supported by FPN only for encoder **depth = 5**
-
-| Encoder | Weights  | Params, M |
-| ------- | :------: | :-------: |
-| mit_b0  | imagenet |    3M     |
-| mit_b1  | imagenet |    13M    |
-| mit_b2  | imagenet |    24M    |
-| mit_b3  | imagenet |    44M    |
-| mit_b4  | imagenet |    60M    |
-| mit_b5  | imagenet |    81M    |
-
-</div>
-</details>
-
-<details>
-<summary style="margin-left: 25px;">MobileOne</summary>
-<div style="margin-left: 25px;">
-
-Apple's "sub-one-ms" Backbone pretrained on Imagenet! Can be used with all decoders.
-
-Note: In the official github repo the s0 variant has additional num_conv_branches, leading to more params than s1.
-
-| Encoder      | Weights  | Params, M |
-| ------------ | :------: | :-------: |
-| mobileone_s0 | imagenet |   4.6M    |
-| mobileone_s1 | imagenet |   4.0M    |
-| mobileone_s2 | imagenet |   6.5M    |
-| mobileone_s3 | imagenet |   8.8M    |
-| mobileone_s4 | imagenet |   13.6M   |
-
-</div>
-</details>
-
-
-\* `ssl`, `swsl` - semi-supervised and weakly-supervised learning on ImageNet ([repo](https://github.com/facebookresearch/semi-supervised-ImageNet1K-models)).
-
-#### Timm Encoders
-
-Pytorch Image Models (a.k.a. timm) has a lot of pretrained models and interface which allows using these models as encoders in torchseg, however, not all models are supported
-
-   - not all transformer models have ``features_only`` functionality implemented that is required for encoder
-   - some models have inappropriate strides
-
-Total number of supported encoders: 549
-
-### Models API
-
-   - `model.encoder` - pretrained backbone to extract features of different spatial resolution
-   - `model.decoder` - depends on models architecture (`Unet`/`Linknet`/`PSPNet`/`FPN`)
-   - `model.segmentation_head` - last block to produce required number of mask channels (include also optional upsampling and activation)
+   - `model.encoder` - pretrained backbone to extract intermediate features
+   - `model.decoder` - network for processing the intermediate features to the original image resolution (`Unet`, `DeepLabv3+`, `FPN`)
+   - `model.segmentation_head` - final block producing the mask output (includes optional upsampling and activation)
    - `model.classification_head` - optional block which create classification head on top of encoder
    - `model.forward(x)` - sequentially pass `x` through model\`s encoder, decoder and segmentation head (and classification head if specified)
 
 ##### Input channels
-Input channels parameter allows you to create models, which process tensors with arbitrary number of channels.
-If you use pretrained weights from imagenet - weights of first convolution will be reused. For
-1-channel case it would be a sum of weights of first convolution layer, otherwise channels would be 
-populated with weights like `new_weight[:, i] = pretrained_weight[:, i % 3]` and than scaled with `new_weight * 3 / new_in_channels`.
 
-```python
-model = torchseg.FPN('resnet34', in_channels=1)
-mask = model(torch.ones([1, 1, 64, 64]))
-```
+Timm encoders supports the use of pretrained weights with arbitrary input channels by repeating weights for channels if > 3. For example, if `in_channels=6`, RGB ImageNet pretrained weights in the initial layer would be repeated `RGBRGB` to avoid random initialization. For `in_channels=7` this would result in `RGBRGBR`. Below is a diagram to visualize this method.
 
-##### Auxiliary classification output
+<p align="center">
+    <img src="./assets/pretrained_weights.webp" width="400"/><br/>
+</p>
 
-All models support `aux_params` parameters, which is default set to `None`.
-If `aux_params = None` then classification auxiliary output is not created, else
-model produce not only `mask`, but also `label` output with shape `NC`.
+##### Auxiliary Classifier
+
+All models support an optional auxiliary classifier head through the use of `aux_params`. If `aux_params != None` then the
+model will produce the a `label` output in addition to the `mask` output with shape `(N, C)`.
 Classification head consists of GlobalPooling->Dropout(optional)->Linear->Activation(optional) layers, which can be
 configured by `aux_params` as follows:
 
@@ -386,18 +204,20 @@ configured by `aux_params` as follows:
 aux_params=dict(
     pooling='avg',             # one of 'avg', 'max'
     dropout=0.5,               # dropout ratio, default is None
-    activation='sigmoid',      # activation function, default is None
+    activation=nn.Sigmoid(),   # activation function, default is Identity
     classes=4,                 # define number of output labels
 )
-model = torchseg.Unet('resnet34', classes=4, aux_params=aux_params)
+model = torchseg.Unet('resnet18', classes=4, aux_params=aux_params)
 mask, label = model(x)
 ```
 
 ##### Depth
 
-Depth parameter specify a number of downsampling operations in encoder, so you can make
-your model lighter if specify smaller `depth`.
+Depth represents the number of downsampling operations in the encoder, so you can make
+your model lighter by specifying less `depth`. Defaults to `depth=5`.
+
+Note that some models like `ConvNext` and `Swin` only have 4 intermediate feature blocks. Therefore, to use these encoders set `encoder_depth=4`. This can be found in the metadata above.
 
 ```python
-model = torchseg.Unet('resnet34', encoder_depth=4)
+model = torchseg.Unet('resnet50', encoder_depth=4)
 ```

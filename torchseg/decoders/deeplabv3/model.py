@@ -1,4 +1,6 @@
-from typing import Optional
+from typing import Callable, Optional
+
+import torch.nn as nn
 
 from ...base import ClassificationHead, SegmentationHead, SegmentationModel
 from ...encoders import get_encoder
@@ -47,13 +49,16 @@ class DeepLabV3(SegmentationModel):
     def __init__(
         self,
         encoder_name: str = "resnet34",
+        encoder_indices: Optional[tuple[int]] = None,
         encoder_depth: int = 5,
+        encoder_output_stride: int = 8,
         encoder_weights: Optional[str] = "imagenet",
         decoder_channels: int = 256,
         in_channels: int = 3,
         classes: int = 1,
-        activation: Optional[str] = None,
+        activation: Callable = nn.Identity(),
         upsampling: int = 8,
+        encoder_params: Optional[dict] = {},
         aux_params: Optional[dict] = None,
     ):
         super().__init__()
@@ -61,9 +66,11 @@ class DeepLabV3(SegmentationModel):
         self.encoder = get_encoder(
             encoder_name,
             in_channels=in_channels,
+            indices=encoder_indices,
             depth=encoder_depth,
             weights=encoder_weights,
-            output_stride=8,
+            output_stride=encoder_output_stride,
+            **encoder_params,
         )
 
         self.decoder = DeepLabV3Decoder(
@@ -133,6 +140,7 @@ class DeepLabV3Plus(SegmentationModel):
     def __init__(
         self,
         encoder_name: str = "resnet34",
+        encoder_indices: Optional[tuple[int]] = None,
         encoder_depth: int = 5,
         encoder_weights: Optional[str] = "imagenet",
         encoder_output_stride: int = 16,
@@ -140,8 +148,9 @@ class DeepLabV3Plus(SegmentationModel):
         decoder_atrous_rates: tuple = (12, 24, 36),
         in_channels: int = 3,
         classes: int = 1,
-        activation: Optional[str] = None,
+        activation: Callable = nn.Identity(),
         upsampling: int = 4,
+        encoder_params: Optional[dict] = {},
         aux_params: Optional[dict] = None,
     ):
         super().__init__()
@@ -155,9 +164,11 @@ class DeepLabV3Plus(SegmentationModel):
         self.encoder = get_encoder(
             encoder_name,
             in_channels=in_channels,
+            indices=encoder_indices,
             depth=encoder_depth,
             weights=encoder_weights,
             output_stride=encoder_output_stride,
+            **encoder_params,
         )
 
         self.decoder = DeepLabV3PlusDecoder(

@@ -15,13 +15,16 @@ from .decoders import (
     Unet,
     UnetPlusPlus,
 )
+from .encoders import list_encoders
 
-__all__ = ("encoders", "decoders", "losses")
+__all__ = ("encoders", "decoders", "losses", "list_encoders")
 
 
 def create_model(
     arch: str,
     encoder_name: str = "resnet34",
+    encoder_indices: Optional[tuple[int]] = None,
+    encoder_depth: Optional[int] = 5,
     encoder_weights: Optional[str] = "imagenet",
     in_channels: int = 3,
     classes: int = 1,
@@ -52,6 +55,8 @@ def create_model(
 
     return model_class(
         encoder_name=encoder_name,
+        encoder_indices=encoder_indices,
+        encoder_depth=encoder_depth,
         encoder_weights=encoder_weights,
         in_channels=in_channels,
         classes=classes,
