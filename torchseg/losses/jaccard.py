@@ -16,6 +16,7 @@ class JaccardLoss(nn.Module):
         log_loss: bool = False,
         from_logits: bool = True,
         smooth: float = 0.0,
+        ignore_index: Optional[int] = None,
         eps: float = 1e-7,
     ):
         """Jaccard loss for image segmentation task.
@@ -29,6 +30,8 @@ class JaccardLoss(nn.Module):
                 otherwise `1 - jaccard_coeff`
             from_logits: If True, assumes input is raw logits
             smooth: Smoothness constant for dice coefficient
+            ignore_index: Label that indicates ignored pixels
+                (does not contribute to loss)
             eps: A small epsilon for numerical stability to avoid zero division error
                 (denominator will be always greater or equal to eps)
 
@@ -53,6 +56,7 @@ class JaccardLoss(nn.Module):
         self.from_logits = from_logits
         self.smooth = smooth
         self.eps = eps
+        self.ignore_index = ignore_index
         self.log_loss = log_loss
 
     def forward(self, y_pred: torch.Tensor, y_true: torch.Tensor) -> torch.Tensor:
@@ -76,16 +80,35 @@ class JaccardLoss(nn.Module):
             y_true = y_true.view(bs, 1, -1)
             y_pred = y_pred.view(bs, 1, -1)
 
+            if self.ignore_index is not None:
+                mask = y_true != self.ignore_index
+                y_pred = y_pred * mask
+                y_true = y_true * mask
+
         if self.mode == MULTICLASS_MODE:
             y_true = y_true.view(bs, -1)
             y_pred = y_pred.view(bs, num_classes, -1)
 
-            y_true = F.one_hot(y_true, num_classes)  # N,H*W -> N,H*W, C
-            y_true = y_true.permute(0, 2, 1)  # H, C, H*W
+            if self.ignore_index is not None:
+                mask = y_true != self.ignore_index
+                y_pred = y_pred * mask.unsqueeze(1)
+
+                y_true = F.one_hot(
+                    (y_true * mask).to(torch.long), num_classes
+                )  # N,H*W -> N,H*W, C
+                y_true = y_true.permute(0, 2, 1) * mask.unsqueeze(1)  # N, C, H*W
+            else:
+                y_true = F.one_hot(y_true, num_classes)  # N,H*W -> N,H*W, C
+                y_true = y_true.permute(0, 2, 1)  # H, C, H*W
 
         if self.mode == MULTILABEL_MODE:
             y_true = y_true.view(bs, num_classes, -1)
             y_pred = y_pred.view(bs, num_classes, -1)
+
+            if self.ignore_index is not None:
+                mask = y_true != self.ignore_index
+                y_pred = y_pred * mask
+                y_true = y_true * mask
 
         scores = soft_jaccard_score(
             y_pred,

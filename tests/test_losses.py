@@ -5,6 +5,7 @@ import torchseg
 import torchseg.losses._functional as F
 from torchseg.losses import (
     DiceLoss,
+    FocalLoss,
     JaccardLoss,
     MCCLoss,
     SoftBCEWithLogitsLoss,
@@ -333,3 +334,15 @@ def test_binary_mcc_loss():
 
     loss = criterion(y_pred, y_true)
     assert float(loss) == pytest.approx(0.5, abs=eps)
+
+
+@torch.no_grad()
+@pytest.mark.parametrize("loss_fn", [DiceLoss, JaccardLoss, FocalLoss])
+@pytest.mark.parametrize("classes", [None, [1]])
+@pytest.mark.parametrize("ignore_index", [None, 0, -255])
+def test_classes_arg(loss_fn, classes, ignore_index):
+    criterion = loss_fn(mode="multiclass", classes=classes, ignore_index=ignore_index)
+    y_pred = torch.zeros(1, 2, 128, 128, dtype=torch.float)
+    y_pred[:, 0, ...] = 1.0
+    y_true = torch.ones(1, 128, 128, dtype=torch.long)
+    criterion(y_pred, y_true)
