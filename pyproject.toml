@@ -52,6 +52,9 @@ all = [
     "torchseg[style,tests]",
 ]
 
+[project.urls]
+Homepage = "https://github.com/isaaccorley/torchseg"
+
 [tool.black]
 target-version = ["py39", "py310"]
 color = true
