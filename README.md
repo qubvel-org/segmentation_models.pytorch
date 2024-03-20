@@ -37,7 +37,7 @@ import torchseg
 model = torchseg.Unet(
     encoder_name="resnet50",
     encoder_weights=True,
-    in_channels=3
+    in_channels=3,
     classes=3,
 )
 ```
@@ -50,7 +50,7 @@ You can also define a `functools.partial` callable as an activation/normalizatio
 model = torchseg.Unet(
     encoder_name="resnet50",
     encoder_weights=True,
-    in_channels=3
+    in_channels=3,
     classes=3,
     encoder_params={
       "act_layer": "prelu",
