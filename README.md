@@ -2,6 +2,12 @@
 
 TorchSeg is an actively maintained and up-to-date fork of the [Segmentation Models PyTorch (smp) library](https://github.com/qubvel/segmentation_models.pytorch).
 
+#### Install
+
+```bash
+pip install torchseg
+```
+
 #### Updates
 
 The goal of this fork is to 1) provide maintenance support for the original library and 2) add features relevant to modern semantic segmentation. Since the fork, this library has added some features which can be summarized below:
