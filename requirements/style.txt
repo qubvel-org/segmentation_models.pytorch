@@ -1,5 +1,5 @@
 # style
-black[jupyter]==23.12.1
+black[jupyter]==24.3.0
 flake8==7.0.0
 isort[colors]==5.13.2
-pyupgrade==3.15.0
+pyupgrade==3.15.2

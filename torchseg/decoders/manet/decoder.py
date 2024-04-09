@@ -161,9 +161,11 @@ class MAnetDecoder(nn.Module):
         # combine decoder keyword arguments
         kwargs = dict(use_batchnorm=use_batchnorm)  # no attention type here
         blocks = [
-            MFAB(in_ch, skip_ch, out_ch, reduction=reduction, **kwargs)
-            if skip_ch > 0
-            else DecoderBlock(in_ch, skip_ch, out_ch, **kwargs)
+            (
+                MFAB(in_ch, skip_ch, out_ch, reduction=reduction, **kwargs)
+                if skip_ch > 0
+                else DecoderBlock(in_ch, skip_ch, out_ch, **kwargs)
+            )
             for in_ch, skip_ch, out_ch in zip(in_channels, skip_channels, out_channels)
         ]
         # for the last we dont have skip connection -> use simple decoder block
