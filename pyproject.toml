@@ -40,10 +40,7 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 style = [
-    "black[jupyter]>=21.8",
-    "flake8>=3.8",
-    "isort[colors]>=5.8",
-    "pyupgrade>=2.8",
+    "ruff>=0.3.0"
 ]
 tests = [
     "pytest>=7.3",
@@ -56,11 +53,6 @@ all = [
 [project.urls]
 Homepage = "https://github.com/isaaccorley/torchseg"
 
-[tool.black]
-target-version = ["py39", "py310"]
-color = true
-skip_magic_trailing_comma = true
-
 [tool.coverage.report]
 # Ignore warnings for overloads
 # https://github.com/nedbat/coveragepy/issues/970#issuecomment-612602180
@@ -68,12 +60,6 @@ exclude_lines = [
     "pragma: no cover",
     "@overload",
 ]
-
-[tool.isort]
-profile = "black"
-known_first_party = ["tests", "torchseg", "train"]
-skip_gitignore = true
-color_output = true
 
 [tool.pytest.ini_options]
 norecursedirs = [
@@ -95,3 +81,45 @@ torchseg = ["py.typed"]
 
 [tool.setuptools.packages.find]
 include = ["torchseg*"]
+
+[tool.ruff]
+exclude = [
+    # Extra files
+    "data/",
+    "images/",
+    "logo/",
+    "logs/",
+    "output/",
+
+    # Docs
+    "docs/src/",
+
+    # Spack
+    ".spack-env/",
+
+    # Python
+    "build/",
+    "dist/",
+    ".cache/",
+    ".mypy_cache/",
+    ".pytest_cache/",
+    "__pycache__/",
+    "*.egg-info/",
+
+    # Git
+    ".git/",
+    ".github/",
+]
+
+line-length = 88
+indent-width = 4
+target-version = "py311"
+
+[tool.ruff.format]
+skip-magic-trailing-comma = true
+
+[tool.ruff.lint]
+ignore = ["E203"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["tests", "torchseg"]

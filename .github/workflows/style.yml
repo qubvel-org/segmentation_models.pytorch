@@ -9,8 +9,8 @@ on:
     - main
     - release**
 jobs:
-  black:
-    name: black
+  ruff:
+    name: ruff
     runs-on: ubuntu-latest
     steps:
     - name: Clone repo
@@ -19,96 +19,14 @@ jobs:
       uses: actions/setup-python@v5.0.0
       with:
         python-version: '3.11'
-    - name: Cache dependencies
-      uses: actions/cache@v4.0.0
-      id: cache
-      with:
-        path: ${{ env.pythonLocation }}
-        key: ${{ env.pythonLocation }}-${{ hashFiles('requirements/style.txt') }}
     - name: Install pip dependencies
-      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         pip install -r requirements/style.txt
         pip cache purge
     - name: List pip dependencies
       run: pip list
-    - name: Run black checks
-      run: black . --check --diff
-  flake8:
-    name: flake8
-    runs-on: ubuntu-latest
-    steps:
-    - name: Clone repo
-      uses: actions/checkout@v4.1.1
-    - name: Set up python
-      uses: actions/setup-python@v5.0.0
-      with:
-        python-version: '3.11'
-    - name: Cache dependencies
-      uses: actions/cache@v4.0.0
-      id: cache
-      with:
-        path: ${{ env.pythonLocation }}
-        key: ${{ env.pythonLocation }}-${{ hashFiles('requirements/style.txt') }}
-    - name: Install pip dependencies
-      if: steps.cache.outputs.cache-hit != 'true'
-      run: |
-        pip install -r requirements/style.txt
-        pip cache purge
-    - name: List pip dependencies
-      run: pip list
-    - name: Run flake8 checks
-      run: flake8
-  isort:
-    name: isort
-    runs-on: ubuntu-latest
-    steps:
-    - name: Clone repo
-      uses: actions/checkout@v4.1.1
-    - name: Set up python
-      uses: actions/setup-python@v5.0.0
-      with:
-        python-version: '3.11'
-    - name: Cache dependencies
-      uses: actions/cache@v4.0.0
-      id: cache
-      with:
-        path: ${{ env.pythonLocation }}
-        key: ${{ env.pythonLocation }}-${{ hashFiles('requirements/style.txt') }}
-    - name: Install pip dependencies
-      if: steps.cache.outputs.cache-hit != 'true'
-      run: |
-        pip install -r requirements/style.txt
-        pip cache purge
-    - name: List pip dependencies
-      run: pip list
-    - name: Run isort checks
-      run: isort . --check --diff
-  pyupgrade:
-    name: pyupgrade
-    runs-on: ubuntu-latest
-    steps:
-    - name: Clone repo
-      uses: actions/checkout@v4.1.1
-    - name: Set up python
-      uses: actions/setup-python@v5.0.0
-      with:
-        python-version: '3.11'
-    - name: Cache dependencies
-      uses: actions/cache@v4.0.0
-      id: cache
-      with:
-        path: ${{ env.pythonLocation }}
-        key: ${{ env.pythonLocation }}-${{ hashFiles('requirements/style.txt') }}
-    - name: Install pip dependencies
-      if: steps.cache.outputs.cache-hit != 'true'
-      run: |
-        pip install -r requirements/style.txt
-        pip cache purge
-    - name: List pip dependencies
-      run: pip list
-    - name: Run pyupgrade checks
-      run: pyupgrade --py39-plus
+    - name: Run ruff checks
+      run: ruff format --check -v
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.head.label || github.head_ref || github.ref }}
   cancel-in-progress: true
