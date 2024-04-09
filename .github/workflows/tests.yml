@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ['3.9', '3.10', '3.11']
+        python-version: ['3.9', '3.10', '3.11', '3.12']
     steps:
     - name: Clone repo
       uses: actions/checkout@v4.1.1
@@ -31,7 +31,7 @@ jobs:
       with:
         path: ${{ env.pythonLocation }}
         key: ${{ env.pythonLocation }}-${{ hashFiles('requirements/required.txt') }}-${{ hashFiles('requirements/tests.txt') }}
-      if: ${{ ! (runner.os == 'macOS' && matrix.python-version == '3.11') }}
+      if: ${{ ! (runner.os == 'macOS' && (matrix.python-version == '3.11' || matrix.python-version == '3.12')) }}
     - name: Setup headless display for pyvista
       uses: pyvista/setup-headless-display-action@v2
     - name: Install pip dependencies
@@ -45,7 +45,7 @@ jobs:
       run: |
         pytest --cov=torchseg --cov-report=xml --durations=10
     - name: Report coverage
-      uses: codecov/codecov-action@v3.1.4
+      uses: codecov/codecov-action@v3.1.6
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
 concurrency:
