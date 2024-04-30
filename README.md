@@ -394,6 +394,19 @@ Note: In the official github repo the s0 variant has additional num_conv_branche
 </div>
 </details>
 
+<details>
+<summary style="margin-left: 25px;">SAM</summary>
+<div style="margin-left: 25px;">
+
+| Encoder   | Weights  | Params, M |
+|-----------|:--------:|:---------:|
+| sam-vit_b |  sa-1b   |    91M    |
+| sam-vit_l |  sa-1b   |   308M    |
+| sam-vit_h |  sa-1b   |   636M    |
+
+</div>
+</details>
+
 
 \* `ssl`, `swsl` - semi-supervised and weakly-supervised learning on ImageNet ([repo](https://github.com/facebookresearch/semi-supervised-ImageNet1K-models)).
 
