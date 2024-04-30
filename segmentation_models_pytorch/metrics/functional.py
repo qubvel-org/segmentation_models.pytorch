@@ -344,11 +344,11 @@ def _negative_predictive_value(tp, fp, fn, tn):
 
 
 def _false_negative_rate(tp, fp, fn, tn):
-    return fn / (fn + tp)
+    return 1 - _sensitivity(tp, fp, fn, tn)
 
 
 def _false_positive_rate(tp, fp, fn, tn):
-    return fp / (fp + tn)
+    return 1 - _specificity(tp, fp, fn, tn)
 
 
 def _false_discovery_rate(tp, fp, fn, tn):
