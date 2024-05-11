@@ -8,4 +8,5 @@ from .modules import (
 from .heads import (
     SegmentationHead,
     ClassificationHead,
+    ReconstructionHead     #Edited for reconstruction head
 )
