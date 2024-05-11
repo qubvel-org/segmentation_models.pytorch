@@ -5,6 +5,7 @@ from segmentation_models_pytorch.base import (
     SegmentationModel,
     SegmentationHead,
     ClassificationHead,
+    ReconstructionHead,                                    #Edited for reconstruction head
 )
 from .decoder import UnetDecoder
 
@@ -65,6 +66,8 @@ class Unet(SegmentationModel):
         classes: int = 1,
         activation: Optional[Union[str, callable]] = None,
         aux_params: Optional[dict] = None,
+        # whether to add a reconstruction head
+        add_reconstruction_head: bool = False,                  #Edited for reconstruction head
     ):
         super().__init__()
 
@@ -84,12 +87,22 @@ class Unet(SegmentationModel):
             attention_type=decoder_attention_type,
         )
 
+        
         self.segmentation_head = SegmentationHead(
             in_channels=decoder_channels[-1],
             out_channels=classes,
             activation=activation,
             kernel_size=3,
         )
+
+        if add_reconstruction_head is True:                     #Edited for reconstruction head
+            self.reconstruction_head = ReconstructionHead(   
+                in_channels=decoder_channels[-1],
+                out_channels=in_channels, # output channels same as input channels
+                kernel_size=1,
+            )
+        else:
+            self.reconstruction_head = None
 
         if aux_params is not None:
             self.classification_head = ClassificationHead(in_channels=self.encoder.out_channels[-1], **aux_params)
