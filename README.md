@@ -475,10 +475,10 @@ $ pip install git+https://github.com/qubvel/segmentation_models.pytorch
 make install_dev  # create .venv, install SMP in dev mode
 ```
 
-#### Run tests and code checks  
+#### Run tests and code checks
 
 ```bash
-make all          # run flake8, black, tests
+make all          # run precommit, tests
 ```
 
 #### Update table with encoders  
