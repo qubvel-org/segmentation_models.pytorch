@@ -478,7 +478,7 @@ make install_dev  # create .venv, install SMP in dev mode
 #### Run tests and code checks
 
 ```bash
-make all          # run precommit, tests
+make fixup         # Ruff for formatting and lint checks
 ```
 
 #### Update table with encoders  

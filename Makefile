@@ -4,8 +4,7 @@
 	python3 -m venv .venv
 
 install_dev: .venv
-	.venv/bin/pip install -e .[test]
-	.venv/bin/pre-commit install
+	.venv/bin/pip install -e ".[test]"
 
 test: .venv
 	.venv/bin/pytest -p no:cacheprovider tests/
@@ -16,7 +15,9 @@ table:
 table_timm:
 	.venv/bin/python misc/generate_table_timm.py
 
-precommit: install_dev
-	.venv/bin/pre-commit run --all-files
+fixup:
+	.venv/bin/ruff check --fix
+	.venv/bin/ruff format
 
-all: precommit test
+all: fixup test
+
