@@ -2,13 +2,12 @@ from typing import Optional
 
 import torch
 import torch.nn.functional as F
-from torch import nn, Tensor
+from torch import nn
 
 __all__ = ["SoftBCEWithLogitsLoss"]
 
 
 class SoftBCEWithLogitsLoss(nn.Module):
-
     __constants__ = [
         "weight",
         "pos_weight",
@@ -57,7 +56,9 @@ class SoftBCEWithLogitsLoss(nn.Module):
         """
 
         if self.smooth_factor is not None:
-            soft_targets = (1 - y_true) * self.smooth_factor + y_true * (1 - self.smooth_factor)
+            soft_targets = (1 - y_true) * self.smooth_factor + y_true * (
+                1 - self.smooth_factor
+            )
         else:
             soft_targets = y_true
 

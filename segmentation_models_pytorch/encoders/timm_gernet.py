@@ -41,13 +41,13 @@ class GERNetEncoder(ByobNet, EncoderMixin):
 
 regnet_weights = {
     "timm-gernet_s": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-ger-weights/gernet_s-756b4751.pth",  # noqa
+        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-ger-weights/gernet_s-756b4751.pth"  # noqa
     },
     "timm-gernet_m": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-ger-weights/gernet_m-0873c53a.pth",  # noqa
+        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-ger-weights/gernet_m-0873c53a.pth"  # noqa
     },
     "timm-gernet_l": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-ger-weights/gernet_l-f31e2e8d.pth",  # noqa
+        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-ger-weights/gernet_l-f31e2e8d.pth"  # noqa
     },
 }
 

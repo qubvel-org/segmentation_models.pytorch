@@ -65,7 +65,9 @@ class Linknet(SegmentationModel):
         super().__init__()
 
         if encoder_name.startswith("mit_b"):
-            raise ValueError("Encoder `{}` is not supported for Linknet".format(encoder_name))
+            raise ValueError(
+                "Encoder `{}` is not supported for Linknet".format(encoder_name)
+            )
 
         self.encoder = get_encoder(
             encoder_name,
@@ -86,7 +88,9 @@ class Linknet(SegmentationModel):
         )
 
         if aux_params is not None:
-            self.classification_head = ClassificationHead(in_channels=self.encoder.out_channels[-1], **aux_params)
+            self.classification_head = ClassificationHead(
+                in_channels=self.encoder.out_channels[-1], **aux_params
+            )
         else:
             self.classification_head = None
 

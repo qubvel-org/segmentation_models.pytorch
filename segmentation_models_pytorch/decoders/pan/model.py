@@ -62,7 +62,11 @@ class PAN(SegmentationModel):
         super().__init__()
 
         if encoder_output_stride not in [16, 32]:
-            raise ValueError("PAN support output stride 16 or 32, got {}".format(encoder_output_stride))
+            raise ValueError(
+                "PAN support output stride 16 or 32, got {}".format(
+                    encoder_output_stride
+                )
+            )
 
         self.encoder = get_encoder(
             encoder_name,
@@ -86,7 +90,9 @@ class PAN(SegmentationModel):
         )
 
         if aux_params is not None:
-            self.classification_head = ClassificationHead(in_channels=self.encoder.out_channels[-1], **aux_params)
+            self.classification_head = ClassificationHead(
+                in_channels=self.encoder.out_channels[-1], **aux_params
+            )
         else:
             self.classification_head = None
 

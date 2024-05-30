@@ -30,10 +30,18 @@ class SEBlock(nn.Module):
         """
         super(SEBlock, self).__init__()
         self.reduce = nn.Conv2d(
-            in_channels=in_channels, out_channels=int(in_channels * rd_ratio), kernel_size=1, stride=1, bias=True
+            in_channels=in_channels,
+            out_channels=int(in_channels * rd_ratio),
+            kernel_size=1,
+            stride=1,
+            bias=True,
         )
         self.expand = nn.Conv2d(
-            in_channels=int(in_channels * rd_ratio), out_channels=in_channels, kernel_size=1, stride=1, bias=True
+            in_channels=int(in_channels * rd_ratio),
+            out_channels=in_channels,
+            kernel_size=1,
+            stride=1,
+            bias=True,
         )
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
@@ -114,7 +122,9 @@ class MobileOneBlock(nn.Module):
         else:
             # Re-parameterizable skip connection
             self.rbr_skip = (
-                nn.BatchNorm2d(num_features=in_channels) if out_channels == in_channels and stride == 1 else None
+                nn.BatchNorm2d(num_features=in_channels)
+                if out_channels == in_channels and stride == 1
+                else None
             )
 
             # Re-parameterizable conv branches
@@ -241,7 +251,9 @@ class MobileOneBlock(nn.Module):
                     device=branch.weight.device,
                 )
                 for i in range(self.in_channels):
-                    kernel_value[i, i % input_dim, self.kernel_size // 2, self.kernel_size // 2] = 1
+                    kernel_value[
+                        i, i % input_dim, self.kernel_size // 2, self.kernel_size // 2
+                    ] = 1
                 self.id_tensor = kernel_value
             kernel = self.id_tensor
             running_mean = branch.running_mean
@@ -326,8 +338,12 @@ class MobileOne(nn.Module, EncoderMixin):
             inference_mode=self.inference_mode,
         )
         self.cur_layer_idx = 1
-        self.stage1 = self._make_stage(int(64 * width_multipliers[0]), num_blocks_per_stage[0], num_se_blocks=0)
-        self.stage2 = self._make_stage(int(128 * width_multipliers[1]), num_blocks_per_stage[1], num_se_blocks=0)
+        self.stage1 = self._make_stage(
+            int(64 * width_multipliers[0]), num_blocks_per_stage[0], num_se_blocks=0
+        )
+        self.stage2 = self._make_stage(
+            int(128 * width_multipliers[1]), num_blocks_per_stage[1], num_se_blocks=0
+        )
         self.stage3 = self._make_stage(
             int(256 * width_multipliers[2]),
             num_blocks_per_stage[2],
@@ -340,9 +356,18 @@ class MobileOne(nn.Module, EncoderMixin):
         )
 
     def get_stages(self):
-        return [nn.Identity(), self.stage0, self.stage1, self.stage2, self.stage3, self.stage4]
+        return [
+            nn.Identity(),
+            self.stage0,
+            self.stage1,
+            self.stage2,
+            self.stage3,
+            self.stage4,
+        ]
 
-    def _make_stage(self, planes: int, num_blocks: int, num_se_blocks: int) -> nn.Sequential:
+    def _make_stage(
+        self, planes: int, num_blocks: int, num_se_blocks: int
+    ) -> nn.Sequential:
         """Build a stage of MobileOne model.
 
         :param planes: Number of output channels.
@@ -356,7 +381,9 @@ class MobileOne(nn.Module, EncoderMixin):
         for ix, stride in enumerate(strides):
             use_se = False
             if num_se_blocks > num_blocks:
-                raise ValueError("Number of SE blocks cannot " "exceed number of layers.")
+                raise ValueError(
+                    "Number of SE blocks cannot " "exceed number of layers."
+                )
             if ix >= (num_blocks - num_se_blocks):
                 use_se = True
 
@@ -413,8 +440,16 @@ class MobileOne(nn.Module, EncoderMixin):
 
         self._in_channels = in_channels
         self._out_channels = tuple([in_channels] + list(self._out_channels)[1:])
-        utils.patch_first_conv(model=self.stage0.rbr_conv, new_in_channels=in_channels, pretrained=pretrained)
-        utils.patch_first_conv(model=self.stage0.rbr_scale, new_in_channels=in_channels, pretrained=pretrained)
+        utils.patch_first_conv(
+            model=self.stage0.rbr_conv,
+            new_in_channels=in_channels,
+            pretrained=pretrained,
+        )
+        utils.patch_first_conv(
+            model=self.stage0.rbr_scale,
+            new_in_channels=in_channels,
+            pretrained=pretrained,
+        )
 
 
 def reparameterize_model(model: torch.nn.Module) -> nn.Module:
@@ -443,7 +478,7 @@ mobileone_encoders = {
                 "url": "https://docs-assets.developer.apple.com/ml-research/datasets/mobileone/mobileone_s0_unfused.pth.tar",  # noqa
                 "input_space": "RGB",
                 "input_range": [0, 1],
-            },
+            }
         },
         "params": {
             "out_channels": (3, 48, 48, 128, 256, 1024),
@@ -461,7 +496,7 @@ mobileone_encoders = {
                 "url": "https://docs-assets.developer.apple.com/ml-research/datasets/mobileone/mobileone_s1_unfused.pth.tar",  # noqa
                 "input_space": "RGB",
                 "input_range": [0, 1],
-            },
+            }
         },
         "params": {
             "out_channels": (3, 64, 96, 192, 512, 1280),
@@ -478,7 +513,7 @@ mobileone_encoders = {
                 "url": "https://docs-assets.developer.apple.com/ml-research/datasets/mobileone/mobileone_s2_unfused.pth.tar",  # noqa
                 "input_space": "RGB",
                 "input_range": [0, 1],
-            },
+            }
         },
         "params": {
             "out_channels": (3, 64, 96, 256, 640, 2048),
@@ -495,7 +530,7 @@ mobileone_encoders = {
                 "url": "https://docs-assets.developer.apple.com/ml-research/datasets/mobileone/mobileone_s3_unfused.pth.tar",  # noqa
                 "input_space": "RGB",
                 "input_range": [0, 1],
-            },
+            }
         },
         "params": {
             "out_channels": (3, 64, 128, 320, 768, 2048),
@@ -512,7 +547,7 @@ mobileone_encoders = {
                 "url": "https://docs-assets.developer.apple.com/ml-research/datasets/mobileone/mobileone_s4_unfused.pth.tar",  # noqa
                 "input_space": "RGB",
                 "input_range": [0, 1],
-            },
+            }
         },
         "params": {
             "out_channels": (3, 64, 192, 448, 896, 2048),

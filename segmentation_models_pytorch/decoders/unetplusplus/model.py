@@ -69,7 +69,9 @@ class UnetPlusPlus(SegmentationModel):
         super().__init__()
 
         if encoder_name.startswith("mit_b"):
-            raise ValueError("UnetPlusPlus is not support encoder_name={}".format(encoder_name))
+            raise ValueError(
+                "UnetPlusPlus is not support encoder_name={}".format(encoder_name)
+            )
 
         self.encoder = get_encoder(
             encoder_name,
@@ -95,7 +97,9 @@ class UnetPlusPlus(SegmentationModel):
         )
 
         if aux_params is not None:
-            self.classification_head = ClassificationHead(in_channels=self.encoder.out_channels[-1], **aux_params)
+            self.classification_head = ClassificationHead(
+                in_channels=self.encoder.out_channels[-1], **aux_params
+            )
         else:
             self.classification_head = None
 

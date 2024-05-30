@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Optional
 
 from segmentation_models_pytorch.base import (
     SegmentationModel,
@@ -68,7 +68,9 @@ class FPN(SegmentationModel):
 
         # validate input params
         if encoder_name.startswith("mit_b") and encoder_depth != 5:
-            raise ValueError("Encoder {} support only encoder_depth=5".format(encoder_name))
+            raise ValueError(
+                "Encoder {} support only encoder_depth=5".format(encoder_name)
+            )
 
         self.encoder = get_encoder(
             encoder_name,
@@ -95,7 +97,9 @@ class FPN(SegmentationModel):
         )
 
         if aux_params is not None:
-            self.classification_head = ClassificationHead(in_channels=self.encoder.out_channels[-1], **aux_params)
+            self.classification_head = ClassificationHead(
+                in_channels=self.encoder.out_channels[-1], **aux_params
+            )
         else:
             self.classification_head = None
 

@@ -12,7 +12,14 @@ from timm.layers import DropPath, to_2tuple, trunc_normal_
 
 
 class Mlp(nn.Module):
-    def __init__(self, in_features, hidden_features=None, out_features=None, act_layer=nn.GELU, drop=0.0):
+    def __init__(
+        self,
+        in_features,
+        hidden_features=None,
+        out_features=None,
+        act_layer=nn.GELU,
+        drop=0.0,
+    ):
         super().__init__()
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
@@ -50,9 +57,20 @@ class Mlp(nn.Module):
 
 
 class Attention(nn.Module):
-    def __init__(self, dim, num_heads=8, qkv_bias=False, qk_scale=None, attn_drop=0.0, proj_drop=0.0, sr_ratio=1):
+    def __init__(
+        self,
+        dim,
+        num_heads=8,
+        qkv_bias=False,
+        qk_scale=None,
+        attn_drop=0.0,
+        proj_drop=0.0,
+        sr_ratio=1,
+    ):
         super().__init__()
-        assert dim % num_heads == 0, f"dim {dim} should be divided by num_heads {num_heads}."
+        assert (
+            dim % num_heads == 0
+        ), f"dim {dim} should be divided by num_heads {num_heads}."
 
         self.dim = dim
         self.num_heads = num_heads
@@ -89,15 +107,27 @@ class Attention(nn.Module):
 
     def forward(self, x, H, W):
         B, N, C = x.shape
-        q = self.q(x).reshape(B, N, self.num_heads, C // self.num_heads).permute(0, 2, 1, 3)
+        q = (
+            self.q(x)
+            .reshape(B, N, self.num_heads, C // self.num_heads)
+            .permute(0, 2, 1, 3)
+        )
 
         if self.sr_ratio > 1:
             x_ = x.permute(0, 2, 1).reshape(B, C, H, W)
             x_ = self.sr(x_).reshape(B, C, -1).permute(0, 2, 1)
             x_ = self.norm(x_)
-            kv = self.kv(x_).reshape(B, -1, 2, self.num_heads, C // self.num_heads).permute(2, 0, 3, 1, 4)
+            kv = (
+                self.kv(x_)
+                .reshape(B, -1, 2, self.num_heads, C // self.num_heads)
+                .permute(2, 0, 3, 1, 4)
+            )
         else:
-            kv = self.kv(x).reshape(B, -1, 2, self.num_heads, C // self.num_heads).permute(2, 0, 3, 1, 4)
+            kv = (
+                self.kv(x)
+                .reshape(B, -1, 2, self.num_heads, C // self.num_heads)
+                .permute(2, 0, 3, 1, 4)
+            )
         k, v = kv[0], kv[1]
 
         attn = (q @ k.transpose(-2, -1)) * self.scale
@@ -141,7 +171,12 @@ class Block(nn.Module):
         self.drop_path = DropPath(drop_path) if drop_path > 0.0 else nn.Identity()
         self.norm2 = norm_layer(dim)
         mlp_hidden_dim = int(dim * mlp_ratio)
-        self.mlp = Mlp(in_features=dim, hidden_features=mlp_hidden_dim, act_layer=act_layer, drop=drop)
+        self.mlp = Mlp(
+            in_features=dim,
+            hidden_features=mlp_hidden_dim,
+            act_layer=act_layer,
+            drop=drop,
+        )
 
         self.apply(self._init_weights)
 
@@ -239,20 +274,38 @@ class MixVisionTransformer(nn.Module):
 
         # patch_embed
         self.patch_embed1 = OverlapPatchEmbed(
-            img_size=img_size, patch_size=7, stride=4, in_chans=in_chans, embed_dim=embed_dims[0]
+            img_size=img_size,
+            patch_size=7,
+            stride=4,
+            in_chans=in_chans,
+            embed_dim=embed_dims[0],
         )
         self.patch_embed2 = OverlapPatchEmbed(
-            img_size=img_size // 4, patch_size=3, stride=2, in_chans=embed_dims[0], embed_dim=embed_dims[1]
+            img_size=img_size // 4,
+            patch_size=3,
+            stride=2,
+            in_chans=embed_dims[0],
+            embed_dim=embed_dims[1],
         )
         self.patch_embed3 = OverlapPatchEmbed(
-            img_size=img_size // 8, patch_size=3, stride=2, in_chans=embed_dims[1], embed_dim=embed_dims[2]
+            img_size=img_size // 8,
+            patch_size=3,
+            stride=2,
+            in_chans=embed_dims[1],
+            embed_dim=embed_dims[2],
         )
         self.patch_embed4 = OverlapPatchEmbed(
-            img_size=img_size // 16, patch_size=3, stride=2, in_chans=embed_dims[2], embed_dim=embed_dims[3]
+            img_size=img_size // 16,
+            patch_size=3,
+            stride=2,
+            in_chans=embed_dims[2],
+            embed_dim=embed_dims[3],
         )
 
         # transformer encoder
-        dpr = [x.item() for x in torch.linspace(0, drop_path_rate, sum(depths))]  # stochastic depth decay rule
+        dpr = [
+            x.item() for x in torch.linspace(0, drop_path_rate, sum(depths))
+        ]  # stochastic depth decay rule
         cur = 0
         self.block1 = nn.ModuleList(
             [
@@ -379,14 +432,22 @@ class MixVisionTransformer(nn.Module):
 
     @torch.jit.ignore
     def no_weight_decay(self):
-        return {"pos_embed1", "pos_embed2", "pos_embed3", "pos_embed4", "cls_token"}  # has pos_embed may be better
+        return {
+            "pos_embed1",
+            "pos_embed2",
+            "pos_embed3",
+            "pos_embed4",
+            "cls_token",
+        }  # has pos_embed may be better
 
     def get_classifier(self):
         return self.head
 
     def reset_classifier(self, num_classes, global_pool=""):
         self.num_classes = num_classes
-        self.head = nn.Linear(self.embed_dim, num_classes) if num_classes > 0 else nn.Identity()
+        self.head = (
+            nn.Linear(self.embed_dim, num_classes) if num_classes > 0 else nn.Identity()
+        )
 
     def forward_features(self, x):
         B = x.shape[0]
@@ -466,10 +527,11 @@ class MixVisionTransformerEncoder(MixVisionTransformer, EncoderMixin):
 
     def set_in_channels(self, in_channels, *args, **kwargs):
         if in_channels != 3:
-            raise ValueError("MixVisionTransformer encoder does not support in_channels setting other than 3")
+            raise ValueError(
+                "MixVisionTransformer encoder does not support in_channels setting other than 3"
+            )
 
     def forward(self, x):
-
         # create dummy output for the first block
         B, C, H, W = x.shape
         dummy = torch.empty([B, 0, H // 2, W // 2], dtype=x.dtype, device=x.device)
@@ -484,7 +546,9 @@ class MixVisionTransformerEncoder(MixVisionTransformer, EncoderMixin):
 
 def get_pretrained_cfg(name):
     return {
-        "url": "https://github.com/qubvel/segmentation_models.pytorch/releases/download/v0.0.2/{}.pth".format(name),
+        "url": "https://github.com/qubvel/segmentation_models.pytorch/releases/download/v0.0.2/{}.pth".format(
+            name
+        ),
         "input_space": "RGB",
         "input_size": [3, 224, 224],
         "input_range": [0, 1],
@@ -496,9 +560,7 @@ def get_pretrained_cfg(name):
 mix_transformer_encoders = {
     "mit_b0": {
         "encoder": MixVisionTransformerEncoder,
-        "pretrained_settings": {
-            "imagenet": get_pretrained_cfg("mit_b0"),
-        },
+        "pretrained_settings": {"imagenet": get_pretrained_cfg("mit_b0")},
         "params": dict(
             out_channels=(3, 0, 32, 64, 160, 256),
             patch_size=4,
@@ -515,9 +577,7 @@ mix_transformer_encoders = {
     },
     "mit_b1": {
         "encoder": MixVisionTransformerEncoder,
-        "pretrained_settings": {
-            "imagenet": get_pretrained_cfg("mit_b1"),
-        },
+        "pretrained_settings": {"imagenet": get_pretrained_cfg("mit_b1")},
         "params": dict(
             out_channels=(3, 0, 64, 128, 320, 512),
             patch_size=4,
@@ -534,9 +594,7 @@ mix_transformer_encoders = {
     },
     "mit_b2": {
         "encoder": MixVisionTransformerEncoder,
-        "pretrained_settings": {
-            "imagenet": get_pretrained_cfg("mit_b2"),
-        },
+        "pretrained_settings": {"imagenet": get_pretrained_cfg("mit_b2")},
         "params": dict(
             out_channels=(3, 0, 64, 128, 320, 512),
             patch_size=4,
@@ -553,9 +611,7 @@ mix_transformer_encoders = {
     },
     "mit_b3": {
         "encoder": MixVisionTransformerEncoder,
-        "pretrained_settings": {
-            "imagenet": get_pretrained_cfg("mit_b3"),
-        },
+        "pretrained_settings": {"imagenet": get_pretrained_cfg("mit_b3")},
         "params": dict(
             out_channels=(3, 0, 64, 128, 320, 512),
             patch_size=4,
@@ -572,9 +628,7 @@ mix_transformer_encoders = {
     },
     "mit_b4": {
         "encoder": MixVisionTransformerEncoder,
-        "pretrained_settings": {
-            "imagenet": get_pretrained_cfg("mit_b4"),
-        },
+        "pretrained_settings": {"imagenet": get_pretrained_cfg("mit_b4")},
         "params": dict(
             out_channels=(3, 0, 64, 128, 320, 512),
             patch_size=4,
@@ -591,9 +645,7 @@ mix_transformer_encoders = {
     },
     "mit_b5": {
         "encoder": MixVisionTransformerEncoder,
-        "pretrained_settings": {
-            "imagenet": get_pretrained_cfg("mit_b5"),
-        },
+        "pretrained_settings": {"imagenet": get_pretrained_cfg("mit_b5")},
         "params": dict(
             out_channels=(3, 0, 64, 128, 320, 512),
             patch_size=4,

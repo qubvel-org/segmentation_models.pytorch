@@ -73,10 +73,8 @@ mobilenet_encoders = {
                 "url": "https://download.pytorch.org/models/mobilenet_v2-b0353104.pth",
                 "input_space": "RGB",
                 "input_range": [0, 1],
-            },
+            }
         },
-        "params": {
-            "out_channels": (3, 16, 24, 32, 96, 1280),
-        },
-    },
+        "params": {"out_channels": (3, 16, 24, 32, 96, 1280)},
+    }
 }

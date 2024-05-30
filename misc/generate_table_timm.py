@@ -24,12 +24,22 @@ def make_table(data):
 
     l1 = "+" + "-" * max_len1 + "+" + "-" * max_len2 + "+\n"
     l2 = "+" + "=" * max_len1 + "+" + "=" * max_len2 + "+\n"
-    top = "| " + "Encoder name".ljust(max_len1 - 2) + " | " + "Support dilation".center(max_len2 - 2) + " |\n"
+    top = (
+        "| "
+        + "Encoder name".ljust(max_len1 - 2)
+        + " | "
+        + "Support dilation".center(max_len2 - 2)
+        + " |\n"
+    )
 
     table = l1 + top + l2
 
     for k in sorted(data.keys()):
-        support = "✅".center(max_len2 - 3) if data[k]["has_dilation"] else " ".center(max_len2 - 2)
+        support = (
+            "✅".center(max_len2 - 3)
+            if data[k]["has_dilation"]
+            else " ".center(max_len2 - 2)
+        )
         table += "| " + k.ljust(max_len1 - 2) + " | " + support + " |\n"
         table += l1
 
@@ -37,7 +47,6 @@ def make_table(data):
 
 
 if __name__ == "__main__":
-
     supported_models = {}
 
     with tqdm(timm.list_models()) as names:

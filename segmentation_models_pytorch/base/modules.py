@@ -17,7 +17,6 @@ class Conv2dReLU(nn.Sequential):
         stride=1,
         use_batchnorm=True,
     ):
-
         if use_batchnorm == "inplace" and InPlaceABN is None:
             raise RuntimeError(
                 "In order to use `use_batchnorm='inplace'` inplace_abn package must be installed. "
@@ -83,7 +82,6 @@ class Clamp(nn.Module):
 
 class Activation(nn.Module):
     def __init__(self, name, **params):
-
         super().__init__()
 
         if name is None or name == "identity":

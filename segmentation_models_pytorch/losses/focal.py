@@ -55,7 +55,6 @@ class FocalLoss(_Loss):
         )
 
     def forward(self, y_pred: torch.Tensor, y_true: torch.Tensor) -> torch.Tensor:
-
         if self.mode in {BINARY_MODE, MULTILABEL_MODE}:
             y_true = y_true.view(-1)
             y_pred = y_pred.view(-1)
@@ -69,7 +68,6 @@ class FocalLoss(_Loss):
             loss = self.focal_loss_fn(y_pred, y_true)
 
         elif self.mode == MULTICLASS_MODE:
-
             num_classes = y_pred.size(1)
             loss = 0
 

@@ -22,6 +22,7 @@ Methods:
         number of feature tensors = 6 (one with same resolution as input and 5 downsampled),
         depth = 3 -> number of feature tensors = 4 (one with same resolution as input and 3 downsampled).
 """
+
 from copy import deepcopy
 
 import torch.nn as nn
@@ -100,10 +101,10 @@ new_settings = {
         "swsl": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_weakly_supervised_resnext101_32x16-f3559a9c.pth",  # noqa
     },
     "resnext101_32x32d": {
-        "instagram": "https://download.pytorch.org/models/ig_resnext101_32x32-e4b90b00.pth",
+        "instagram": "https://download.pytorch.org/models/ig_resnext101_32x32-e4b90b00.pth"
     },
     "resnext101_32x48d": {
-        "instagram": "https://download.pytorch.org/models/ig_resnext101_32x48-3e41cc8a.pth",
+        "instagram": "https://download.pytorch.org/models/ig_resnext101_32x48-3e41cc8a.pth"
     },
 }
 

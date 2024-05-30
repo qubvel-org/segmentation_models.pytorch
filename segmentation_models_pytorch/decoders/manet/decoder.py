@@ -39,7 +39,9 @@ class PAB(nn.Module):
 
 
 class MFAB(nn.Module):
-    def __init__(self, in_channels, skip_channels, out_channels, use_batchnorm=True, reduction=16):
+    def __init__(
+        self, in_channels, skip_channels, out_channels, use_batchnorm=True, reduction=16
+    ):
         # MFAB is just a modified version of SE-blocks, one for skip, one for input
         super(MFAB, self).__init__()
         self.hl_conv = nn.Sequential(
@@ -51,10 +53,7 @@ class MFAB(nn.Module):
                 use_batchnorm=use_batchnorm,
             ),
             md.Conv2dReLU(
-                in_channels,
-                skip_channels,
-                kernel_size=1,
-                use_batchnorm=use_batchnorm,
+                in_channels, skip_channels, kernel_size=1, use_batchnorm=use_batchnorm
             ),
         )
         reduced_channels = max(1, skip_channels // reduction)
@@ -73,7 +72,8 @@ class MFAB(nn.Module):
             nn.Sigmoid(),
         )
         self.conv1 = md.Conv2dReLU(
-            skip_channels + skip_channels,  # we transform C-prime form high level to C from skip connection
+            skip_channels
+            + skip_channels,  # we transform C-prime form high level to C from skip connection
             out_channels,
             kernel_size=3,
             padding=1,
@@ -173,7 +173,6 @@ class MAnetDecoder(nn.Module):
         self.blocks = nn.ModuleList(blocks)
 
     def forward(self, *features):
-
         features = features[1:]  # remove first skip with same spatial resolution
         features = features[::-1]  # reverse channels to start from head of encoder
 

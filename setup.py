@@ -31,17 +31,11 @@ here = os.path.abspath(os.path.dirname(__file__))
 try:
     with open(os.path.join(here, "requirements.txt"), encoding="utf-8") as f:
         REQUIRED = f.read().split("\n")
-except:
+except Exception:
     REQUIRED = []
 
 # What packages are optional?
-EXTRAS = {
-    "test": [
-        "pytest",
-        "mock",
-        "pre-commit",
-    ],
-}
+EXTRAS = {"test": ["pytest", "mock", "pre-commit"]}
 
 # Import the README and use it as the long-description.
 # Note: this will only work if 'README.md' is present in your MANIFEST.in file!
@@ -128,7 +122,5 @@ setup(
         "Programming Language :: Python :: Implementation :: PyPy",
     ],
     # $ setup.py publish support.
-    cmdclass={
-        "upload": UploadCommand,
-    },
+    cmdclass={"upload": UploadCommand},
 )

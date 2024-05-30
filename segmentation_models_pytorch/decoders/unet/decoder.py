@@ -22,7 +22,9 @@ class DecoderBlock(nn.Module):
             padding=1,
             use_batchnorm=use_batchnorm,
         )
-        self.attention1 = md.Attention(attention_type, in_channels=in_channels + skip_channels)
+        self.attention1 = md.Attention(
+            attention_type, in_channels=in_channels + skip_channels
+        )
         self.conv2 = md.Conv2dReLU(
             out_channels,
             out_channels,
@@ -93,7 +95,9 @@ class UnetDecoder(nn.Module):
         out_channels = decoder_channels
 
         if center:
-            self.center = CenterBlock(head_channels, head_channels, use_batchnorm=use_batchnorm)
+            self.center = CenterBlock(
+                head_channels, head_channels, use_batchnorm=use_batchnorm
+            )
         else:
             self.center = nn.Identity()
 
@@ -106,7 +110,6 @@ class UnetDecoder(nn.Module):
         self.blocks = nn.ModuleList(blocks)
 
     def forward(self, *features):
-
         features = features[1:]  # remove first skip with same spatial resolution
         features = features[::-1]  # reverse channels to start from head of encoder
 

@@ -52,7 +52,8 @@ class InceptionResNetV2Encoder(InceptionResNetV2, EncoderMixin):
 
     def make_dilated(self, *args, **kwargs):
         raise ValueError(
-            "InceptionResnetV2 encoder does not support dilated mode " "due to pooling operation for downsampling!"
+            "InceptionResnetV2 encoder does not support dilated mode "
+            "due to pooling operation for downsampling!"
         )
 
     def get_stages(self):
@@ -66,7 +67,6 @@ class InceptionResNetV2Encoder(InceptionResNetV2, EncoderMixin):
         ]
 
     def forward(self, x):
-
         stages = self.get_stages()
 
         features = []

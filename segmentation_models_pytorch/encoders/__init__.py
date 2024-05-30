@@ -49,7 +49,6 @@ encoders.update(mobileone_encoders)
 
 
 def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **kwargs):
-
     if name.startswith("tu-"):
         name = name[3:]
         encoder = TimmUniversalEncoder(
@@ -65,7 +64,11 @@ def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **
     try:
         Encoder = encoders[name]["encoder"]
     except KeyError:
-        raise KeyError("Wrong encoder name `{}`, supported encoders: {}".format(name, list(encoders.keys())))
+        raise KeyError(
+            "Wrong encoder name `{}`, supported encoders: {}".format(
+                name, list(encoders.keys())
+            )
+        )
 
     params = encoders[name]["params"]
     params.update(depth=depth)
@@ -77,9 +80,7 @@ def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **
         except KeyError:
             raise KeyError(
                 "Wrong pretrained weights `{}` for encoder `{}`. Available options are: {}".format(
-                    weights,
-                    name,
-                    list(encoders[name]["pretrained_settings"].keys()),
+                    weights, name, list(encoders[name]["pretrained_settings"].keys())
                 )
             )
         encoder.load_state_dict(model_zoo.load_url(settings["url"]))
@@ -96,16 +97,19 @@ def get_encoder_names():
 
 
 def get_preprocessing_params(encoder_name, pretrained="imagenet"):
-
     if encoder_name.startswith("tu-"):
         encoder_name = encoder_name[3:]
         if not timm.models.is_model_pretrained(encoder_name):
-            raise ValueError(f"{encoder_name} does not have pretrained weights and preprocessing parameters")
+            raise ValueError(
+                f"{encoder_name} does not have pretrained weights and preprocessing parameters"
+            )
         settings = timm.models.get_pretrained_cfg(encoder_name).__dict__
     else:
         all_settings = encoders[encoder_name]["pretrained_settings"]
         if pretrained not in all_settings.keys():
-            raise ValueError("Available pretrained options {}".format(all_settings.keys()))
+            raise ValueError(
+                "Available pretrained options {}".format(all_settings.keys())
+            )
         settings = all_settings[pretrained]
 
     formatted_settings = {}

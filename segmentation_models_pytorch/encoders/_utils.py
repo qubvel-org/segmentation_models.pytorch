@@ -19,7 +19,11 @@ def patch_first_conv(model, new_in_channels, default_in_channels=3, pretrained=T
 
     if not pretrained:
         module.weight = nn.parameter.Parameter(
-            torch.Tensor(module.out_channels, new_in_channels // module.groups, *module.kernel_size)
+            torch.Tensor(
+                module.out_channels,
+                new_in_channels // module.groups,
+                *module.kernel_size,
+            )
         )
         module.reset_parameters()
 
@@ -28,7 +32,9 @@ def patch_first_conv(model, new_in_channels, default_in_channels=3, pretrained=T
         module.weight = nn.parameter.Parameter(new_weight)
 
     else:
-        new_weight = torch.Tensor(module.out_channels, new_in_channels // module.groups, *module.kernel_size)
+        new_weight = torch.Tensor(
+            module.out_channels, new_in_channels // module.groups, *module.kernel_size
+        )
 
         for i in range(new_in_channels):
             new_weight[:, i] = weight[:, i % default_in_channels]
