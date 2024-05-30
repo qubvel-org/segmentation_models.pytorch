@@ -63,6 +63,7 @@ def create_model(
 
 
 __all__ = [
+    "datasets",
     "encoders",
     "decoders",
     "losses",
