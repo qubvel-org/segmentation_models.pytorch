@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from typing import Optional, Union
 from functools import wraps
-from huggingface_hub import PyTorchModelHubMixin, ModelCard, ModelCardData
+from huggingface_hub import PyTorchModelHubMixin, ModelCard, ModelCardData, hf_hub_download
 
 
 MODEL_CARD = """
@@ -44,7 +44,8 @@ This model has been pushed to the Hub using the [PytorchModelHubMixin](https://h
 
 
 def _format_parameters(parameters: dict):
-    params = [f'"{k}": {v}' if not isinstance(v, str) else f'"{k}": "{v}"' for k, v in parameters.items()]
+    params = {k: v for k, v in parameters.items() if not k.startswith("_")}
+    params = [f'"{k}": {v}' if not isinstance(v, str) else f'"{k}": "{v}"' for k, v in params.items()]
     params = ",\n".join([f"    {param}" for param in params])
     params = "{\n" + f"{params}" + "\n}"
     return params
@@ -97,10 +98,22 @@ class SMPHubMixin(PyTorchModelHubMixin):
 
     @wraps(PyTorchModelHubMixin.save_pretrained)
     def save_pretrained(self, save_directory: Union[str, Path], *args, **kwargs) -> Optional[str]:
+
+        # set additional attributes to be used in generate_model_card
         self._save_directory = save_directory
         self._set_attrs_from_kwargs(["metrics", "dataset"], kwargs)
-        result = super().save_pretrained(save_directory, *args, **kwargs)
-        self._del_attrs(["save_directory", "metrics", "dataset"])
+
+        # set additional attribute to be used in from_pretrained
+        self._hub_mixin_config["_model_class"] = self.__class__.__name__
+
+        try:
+            # call the original save_pretrained
+            result = super().save_pretrained(save_directory, *args, **kwargs)
+        finally:
+            # delete the additional attributes
+            self._del_attrs(["save_directory", "metrics", "dataset"])
+            self._hub_mixin_config.pop("_model_class")
+
         return result
 
     @wraps(PyTorchModelHubMixin.push_to_hub)
@@ -110,3 +123,22 @@ class SMPHubMixin(PyTorchModelHubMixin):
         result = super().push_to_hub(repo_id, *args, **kwargs)
         self._del_attrs(["repo_id", "metrics", "dataset"])
         return result
+
+    @property
+    def config(self):
+        return self._hub_mixin_config
+
+
+@wraps(PyTorchModelHubMixin.from_pretrained)
+def from_pretrained(pretrained_model_name_or_path: str, *args, **kwargs):
+    config_path = hf_hub_download(
+        pretrained_model_name_or_path, filename="config.json", revision=kwargs.get("revision", None)
+    )
+    with open(config_path, "r") as f:
+        config = json.load(f)
+    model_class_name = config.pop("_model_class")
+
+    import segmentation_models_pytorch as smp
+
+    model_class = getattr(smp, model_class_name)
+    return model_class.from_pretrained(pretrained_model_name_or_path, *args, **kwargs)
