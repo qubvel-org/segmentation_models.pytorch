@@ -4,6 +4,8 @@ __pycache__/
 *$py.class
 .idea/
 .venv*
+examples/images*
+examples/annotations*
 
 # C extensions
 *.so
