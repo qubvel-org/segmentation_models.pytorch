@@ -206,11 +206,15 @@ def soft_tversky_score(
         fp = torch.sum(output * (1.0 - target))
         fn = torch.sum((1 - output) * target)
 
-    tversky_score = (intersection + smooth) / (intersection + alpha * fp + beta * fn + smooth).clamp_min(eps)
+    tversky_score = (intersection + smooth) / (
+        intersection + alpha * fp + beta * fn + smooth
+    ).clamp_min(eps)
     return tversky_score
 
 
-def wing_loss(output: torch.Tensor, target: torch.Tensor, width=5, curvature=0.5, reduction="mean"):
+def wing_loss(
+    output: torch.Tensor, target: torch.Tensor, width=5, curvature=0.5, reduction="mean"
+):
     """Wing loss
 
     References:

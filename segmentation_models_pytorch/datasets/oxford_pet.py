@@ -10,7 +10,6 @@ from urllib.request import urlretrieve
 
 class OxfordPetDataset(torch.utils.data.Dataset):
     def __init__(self, root, mode="train", transform=None):
-
         assert mode in {"train", "valid", "test"}
 
         self.root = root
@@ -26,7 +25,6 @@ class OxfordPetDataset(torch.utils.data.Dataset):
         return len(self.filenames)
 
     def __getitem__(self, idx):
-
         filename = self.filenames[idx]
         image_path = os.path.join(self.images_directory, filename + ".jpg")
         mask_path = os.path.join(self.masks_directory, filename + ".png")
@@ -63,7 +61,6 @@ class OxfordPetDataset(torch.utils.data.Dataset):
 
     @staticmethod
     def download(root):
-
         # load images
         filepath = os.path.join(root, "images.tar.gz")
         download_url(
@@ -83,13 +80,18 @@ class OxfordPetDataset(torch.utils.data.Dataset):
 
 class SimpleOxfordPetDataset(OxfordPetDataset):
     def __getitem__(self, *args, **kwargs):
-
         sample = super().__getitem__(*args, **kwargs)
 
         # resize images
-        image = np.array(Image.fromarray(sample["image"]).resize((256, 256), Image.BILINEAR))
-        mask = np.array(Image.fromarray(sample["mask"]).resize((256, 256), Image.NEAREST))
-        trimap = np.array(Image.fromarray(sample["trimap"]).resize((256, 256), Image.NEAREST))
+        image = np.array(
+            Image.fromarray(sample["image"]).resize((256, 256), Image.BILINEAR)
+        )
+        mask = np.array(
+            Image.fromarray(sample["mask"]).resize((256, 256), Image.NEAREST)
+        )
+        trimap = np.array(
+            Image.fromarray(sample["trimap"]).resize((256, 256), Image.NEAREST)
+        )
 
         # convert to other format HWC -> CHW
         sample["image"] = np.moveaxis(image, -1, 0)

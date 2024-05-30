@@ -14,14 +14,7 @@ class RegNetEncoder(RegNet, EncoderMixin):
         del self.head
 
     def get_stages(self):
-        return [
-            nn.Identity(),
-            self.stem,
-            self.s1,
-            self.s2,
-            self.s3,
-            self.s4,
-        ]
+        return [nn.Identity(), self.stem, self.s1, self.s2, self.s3, self.s4]
 
     def forward(self, x):
         stages = self.get_stages()
@@ -41,76 +34,76 @@ class RegNetEncoder(RegNet, EncoderMixin):
 
 regnet_weights = {
     "timm-regnetx_002": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnetx_002-e7e85e5c.pth",  # noqa
+        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnetx_002-e7e85e5c.pth"  # noqa
     },
     "timm-regnetx_004": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnetx_004-7d0e9424.pth",  # noqa
+        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnetx_004-7d0e9424.pth"  # noqa
     },
     "timm-regnetx_006": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnetx_006-85ec1baa.pth",  # noqa
+        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnetx_006-85ec1baa.pth"  # noqa
     },
     "timm-regnetx_008": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnetx_008-d8b470eb.pth",  # noqa
+        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnetx_008-d8b470eb.pth"  # noqa
     },
     "timm-regnetx_016": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnetx_016-65ca972a.pth",  # noqa
+        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnetx_016-65ca972a.pth"  # noqa
     },
     "timm-regnetx_032": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnetx_032-ed0c7f7e.pth",  # noqa
+        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnetx_032-ed0c7f7e.pth"  # noqa
     },
     "timm-regnetx_040": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnetx_040-73c2a654.pth",  # noqa
+        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnetx_040-73c2a654.pth"  # noqa
     },
     "timm-regnetx_064": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnetx_064-29278baa.pth",  # noqa
+        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnetx_064-29278baa.pth"  # noqa
     },
     "timm-regnetx_080": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnetx_080-7c7fcab1.pth",  # noqa
+        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnetx_080-7c7fcab1.pth"  # noqa
     },
     "timm-regnetx_120": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnetx_120-65d5521e.pth",  # noqa
+        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnetx_120-65d5521e.pth"  # noqa
     },
     "timm-regnetx_160": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnetx_160-c98c4112.pth",  # noqa
+        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnetx_160-c98c4112.pth"  # noqa
     },
     "timm-regnetx_320": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnetx_320-8ea38b93.pth",  # noqa
+        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnetx_320-8ea38b93.pth"  # noqa
     },
     "timm-regnety_002": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnety_002-e68ca334.pth",  # noqa
+        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnety_002-e68ca334.pth"  # noqa
     },
     "timm-regnety_004": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnety_004-0db870e6.pth",  # noqa
+        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnety_004-0db870e6.pth"  # noqa
     },
     "timm-regnety_006": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnety_006-c67e57ec.pth",  # noqa
+        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnety_006-c67e57ec.pth"  # noqa
     },
     "timm-regnety_008": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnety_008-dc900dbe.pth",  # noqa
+        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnety_008-dc900dbe.pth"  # noqa
     },
     "timm-regnety_016": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnety_016-54367f74.pth",  # noqa
+        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnety_016-54367f74.pth"  # noqa
     },
     "timm-regnety_032": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-weights/regnety_032_ra-7f2439f9.pth",  # noqa
+        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-weights/regnety_032_ra-7f2439f9.pth"  # noqa
     },
     "timm-regnety_040": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnety_040-f0d569f9.pth",  # noqa
+        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnety_040-f0d569f9.pth"  # noqa
     },
     "timm-regnety_064": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnety_064-0a48325c.pth",  # noqa
+        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnety_064-0a48325c.pth"  # noqa
     },
     "timm-regnety_080": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnety_080-e7f3eb93.pth",  # noqa
+        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnety_080-e7f3eb93.pth"  # noqa
     },
     "timm-regnety_120": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnety_120-721ba79a.pth",  # noqa
+        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnety_120-721ba79a.pth"  # noqa
     },
     "timm-regnety_160": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnety_160-d64013cd.pth",  # noqa
+        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnety_160-d64013cd.pth"  # noqa
     },
     "timm-regnety_320": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnety_320-ba464b29.pth",  # noqa
+        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-regnet/regnety_320-ba464b29.pth"  # noqa
     },
 }
 
@@ -239,7 +232,9 @@ timm_regnet_encoders = {
         "pretrained_settings": pretrained_settings["timm-regnety_002"],
         "params": {
             "out_channels": (3, 32, 24, 56, 152, 368),
-            "cfg": _mcfg(w0=24, wa=36.44, wm=2.49, group_size=8, depth=13, se_ratio=0.25),
+            "cfg": _mcfg(
+                w0=24, wa=36.44, wm=2.49, group_size=8, depth=13, se_ratio=0.25
+            ),
         },
     },
     "timm-regnety_004": {
@@ -247,7 +242,9 @@ timm_regnet_encoders = {
         "pretrained_settings": pretrained_settings["timm-regnety_004"],
         "params": {
             "out_channels": (3, 32, 48, 104, 208, 440),
-            "cfg": _mcfg(w0=48, wa=27.89, wm=2.09, group_size=8, depth=16, se_ratio=0.25),
+            "cfg": _mcfg(
+                w0=48, wa=27.89, wm=2.09, group_size=8, depth=16, se_ratio=0.25
+            ),
         },
     },
     "timm-regnety_006": {
@@ -255,7 +252,9 @@ timm_regnet_encoders = {
         "pretrained_settings": pretrained_settings["timm-regnety_006"],
         "params": {
             "out_channels": (3, 32, 48, 112, 256, 608),
-            "cfg": _mcfg(w0=48, wa=32.54, wm=2.32, group_size=16, depth=15, se_ratio=0.25),
+            "cfg": _mcfg(
+                w0=48, wa=32.54, wm=2.32, group_size=16, depth=15, se_ratio=0.25
+            ),
         },
     },
     "timm-regnety_008": {
@@ -263,7 +262,9 @@ timm_regnet_encoders = {
         "pretrained_settings": pretrained_settings["timm-regnety_008"],
         "params": {
             "out_channels": (3, 32, 64, 128, 320, 768),
-            "cfg": _mcfg(w0=56, wa=38.84, wm=2.4, group_size=16, depth=14, se_ratio=0.25),
+            "cfg": _mcfg(
+                w0=56, wa=38.84, wm=2.4, group_size=16, depth=14, se_ratio=0.25
+            ),
         },
     },
     "timm-regnety_016": {
@@ -271,7 +272,9 @@ timm_regnet_encoders = {
         "pretrained_settings": pretrained_settings["timm-regnety_016"],
         "params": {
             "out_channels": (3, 32, 48, 120, 336, 888),
-            "cfg": _mcfg(w0=48, wa=20.71, wm=2.65, group_size=24, depth=27, se_ratio=0.25),
+            "cfg": _mcfg(
+                w0=48, wa=20.71, wm=2.65, group_size=24, depth=27, se_ratio=0.25
+            ),
         },
     },
     "timm-regnety_032": {
@@ -279,7 +282,9 @@ timm_regnet_encoders = {
         "pretrained_settings": pretrained_settings["timm-regnety_032"],
         "params": {
             "out_channels": (3, 32, 72, 216, 576, 1512),
-            "cfg": _mcfg(w0=80, wa=42.63, wm=2.66, group_size=24, depth=21, se_ratio=0.25),
+            "cfg": _mcfg(
+                w0=80, wa=42.63, wm=2.66, group_size=24, depth=21, se_ratio=0.25
+            ),
         },
     },
     "timm-regnety_040": {
@@ -287,7 +292,9 @@ timm_regnet_encoders = {
         "pretrained_settings": pretrained_settings["timm-regnety_040"],
         "params": {
             "out_channels": (3, 32, 128, 192, 512, 1088),
-            "cfg": _mcfg(w0=96, wa=31.41, wm=2.24, group_size=64, depth=22, se_ratio=0.25),
+            "cfg": _mcfg(
+                w0=96, wa=31.41, wm=2.24, group_size=64, depth=22, se_ratio=0.25
+            ),
         },
     },
     "timm-regnety_064": {
@@ -295,7 +302,9 @@ timm_regnet_encoders = {
         "pretrained_settings": pretrained_settings["timm-regnety_064"],
         "params": {
             "out_channels": (3, 32, 144, 288, 576, 1296),
-            "cfg": _mcfg(w0=112, wa=33.22, wm=2.27, group_size=72, depth=25, se_ratio=0.25),
+            "cfg": _mcfg(
+                w0=112, wa=33.22, wm=2.27, group_size=72, depth=25, se_ratio=0.25
+            ),
         },
     },
     "timm-regnety_080": {
@@ -303,7 +312,9 @@ timm_regnet_encoders = {
         "pretrained_settings": pretrained_settings["timm-regnety_080"],
         "params": {
             "out_channels": (3, 32, 168, 448, 896, 2016),
-            "cfg": _mcfg(w0=192, wa=76.82, wm=2.19, group_size=56, depth=17, se_ratio=0.25),
+            "cfg": _mcfg(
+                w0=192, wa=76.82, wm=2.19, group_size=56, depth=17, se_ratio=0.25
+            ),
         },
     },
     "timm-regnety_120": {
@@ -311,7 +322,9 @@ timm_regnet_encoders = {
         "pretrained_settings": pretrained_settings["timm-regnety_120"],
         "params": {
             "out_channels": (3, 32, 224, 448, 896, 2240),
-            "cfg": _mcfg(w0=168, wa=73.36, wm=2.37, group_size=112, depth=19, se_ratio=0.25),
+            "cfg": _mcfg(
+                w0=168, wa=73.36, wm=2.37, group_size=112, depth=19, se_ratio=0.25
+            ),
         },
     },
     "timm-regnety_160": {
@@ -319,7 +332,9 @@ timm_regnet_encoders = {
         "pretrained_settings": pretrained_settings["timm-regnety_160"],
         "params": {
             "out_channels": (3, 32, 224, 448, 1232, 3024),
-            "cfg": _mcfg(w0=200, wa=106.23, wm=2.48, group_size=112, depth=18, se_ratio=0.25),
+            "cfg": _mcfg(
+                w0=200, wa=106.23, wm=2.48, group_size=112, depth=18, se_ratio=0.25
+            ),
         },
     },
     "timm-regnety_320": {
@@ -327,7 +342,9 @@ timm_regnet_encoders = {
         "pretrained_settings": pretrained_settings["timm-regnety_320"],
         "params": {
             "out_channels": (3, 32, 232, 696, 1392, 3712),
-            "cfg": _mcfg(w0=232, wa=115.89, wm=2.53, group_size=232, depth=20, se_ratio=0.25),
+            "cfg": _mcfg(
+                w0=232, wa=115.89, wm=2.53, group_size=232, depth=20, se_ratio=0.25
+            ),
         },
     },
 }

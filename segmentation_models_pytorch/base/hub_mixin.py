@@ -2,7 +2,12 @@ import json
 from pathlib import Path
 from typing import Optional, Union
 from functools import wraps
-from huggingface_hub import PyTorchModelHubMixin, ModelCard, ModelCardData, hf_hub_download
+from huggingface_hub import (
+    PyTorchModelHubMixin,
+    ModelCard,
+    ModelCardData,
+    hf_hub_download,
+)
 
 
 MODEL_CARD = """
@@ -45,7 +50,10 @@ This model has been pushed to the Hub using the [PytorchModelHubMixin](https://h
 
 def _format_parameters(parameters: dict):
     params = {k: v for k, v in parameters.items() if not k.startswith("_")}
-    params = [f'"{k}": {v}' if not isinstance(v, str) else f'"{k}": "{v}"' for k, v in params.items()]
+    params = [
+        f'"{k}": {v}' if not isinstance(v, str) else f'"{k}": "{v}"'
+        for k, v in params.items()
+    ]
     params = ",\n".join([f"    {param}" for param in params])
     params = "{\n" + f"{params}" + "\n}"
     return params
@@ -53,7 +61,6 @@ def _format_parameters(parameters: dict):
 
 class SMPHubMixin(PyTorchModelHubMixin):
     def generate_model_card(self, *args, **kwargs) -> ModelCard:
-
         model_parameters_json = _format_parameters(self._hub_mixin_config)
         directory = self._save_directory if hasattr(self, "_save_directory") else None
         repo_id = self._repo_id if hasattr(self, "_repo_id") else None
@@ -97,8 +104,9 @@ class SMPHubMixin(PyTorchModelHubMixin):
                 delattr(self, f"_{attr}")
 
     @wraps(PyTorchModelHubMixin.save_pretrained)
-    def save_pretrained(self, save_directory: Union[str, Path], *args, **kwargs) -> Optional[str]:
-
+    def save_pretrained(
+        self, save_directory: Union[str, Path], *args, **kwargs
+    ) -> Optional[str]:
         # set additional attributes to be used in generate_model_card
         self._save_directory = save_directory
         self._set_attrs_from_kwargs(["metrics", "dataset"], kwargs)
@@ -132,7 +140,9 @@ class SMPHubMixin(PyTorchModelHubMixin):
 @wraps(PyTorchModelHubMixin.from_pretrained)
 def from_pretrained(pretrained_model_name_or_path: str, *args, **kwargs):
     config_path = hf_hub_download(
-        pretrained_model_name_or_path, filename="config.json", revision=kwargs.get("revision", None)
+        pretrained_model_name_or_path,
+        filename="config.json",
+        revision=kwargs.get("revision", None),
     )
     with open(config_path, "r") as f:
         config = json.load(f)

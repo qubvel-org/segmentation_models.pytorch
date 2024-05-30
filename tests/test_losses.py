@@ -135,7 +135,9 @@ def test_dice_loss_binary():
 def test_tversky_loss_binary():
     eps = 1e-5
     # with alpha=0.5; beta=0.5 it is equal to DiceLoss
-    criterion = TverskyLoss(mode=smp.losses.BINARY_MODE, from_logits=False, alpha=0.5, beta=0.5)
+    criterion = TverskyLoss(
+        mode=smp.losses.BINARY_MODE, from_logits=False, alpha=0.5, beta=0.5
+    )
 
     # Ideal case
     y_pred = torch.tensor([1.0, 1.0, 1.0]).view(1, 1, 1, -1)
@@ -265,7 +267,9 @@ def test_multilabel_jaccard_loss():
 def test_soft_ce_loss():
     criterion = SoftCrossEntropyLoss(smooth_factor=0.1, ignore_index=-100)
 
-    y_pred = torch.tensor([[+9, -9, -9, -9], [-9, +9, -9, -9], [-9, -9, +9, -9], [-9, -9, -9, +9]]).float()
+    y_pred = torch.tensor(
+        [[+9, -9, -9, -9], [-9, +9, -9, -9], [-9, -9, +9, -9], [-9, -9, -9, +9]]
+    ).float()
     y_true = torch.tensor([0, 1, -100, 3]).long()
 
     loss = criterion(y_pred, y_true)

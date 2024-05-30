@@ -46,15 +46,18 @@ class DPNEncoder(DPN, EncoderMixin):
     def get_stages(self):
         return [
             nn.Identity(),
-            nn.Sequential(self.features[0].conv, self.features[0].bn, self.features[0].act),
-            nn.Sequential(self.features[0].pool, self.features[1 : self._stage_idxs[0]]),
+            nn.Sequential(
+                self.features[0].conv, self.features[0].bn, self.features[0].act
+            ),
+            nn.Sequential(
+                self.features[0].pool, self.features[1 : self._stage_idxs[0]]
+            ),
             self.features[self._stage_idxs[0] : self._stage_idxs[1]],
             self.features[self._stage_idxs[1] : self._stage_idxs[2]],
             self.features[self._stage_idxs[2] : self._stage_idxs[3]],
         ]
 
     def forward(self, x):
-
         stages = self.get_stages()
 
         features = []

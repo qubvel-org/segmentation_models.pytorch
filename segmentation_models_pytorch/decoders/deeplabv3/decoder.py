@@ -61,14 +61,18 @@ class DeepLabV3PlusDecoder(nn.Module):
     ):
         super().__init__()
         if output_stride not in {8, 16}:
-            raise ValueError("Output stride should be 8 or 16, got {}.".format(output_stride))
+            raise ValueError(
+                "Output stride should be 8 or 16, got {}.".format(output_stride)
+            )
 
         self.out_channels = out_channels
         self.output_stride = output_stride
 
         self.aspp = nn.Sequential(
             ASPP(encoder_channels[-1], out_channels, atrous_rates, separable=True),
-            SeparableConv2d(out_channels, out_channels, kernel_size=3, padding=1, bias=False),
+            SeparableConv2d(
+                out_channels, out_channels, kernel_size=3, padding=1, bias=False
+            ),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(),
         )
@@ -79,7 +83,9 @@ class DeepLabV3PlusDecoder(nn.Module):
         highres_in_channels = encoder_channels[-4]
         highres_out_channels = 48  # proposed by authors of paper
         self.block1 = nn.Sequential(
-            nn.Conv2d(highres_in_channels, highres_out_channels, kernel_size=1, bias=False),
+            nn.Conv2d(
+                highres_in_channels, highres_out_channels, kernel_size=1, bias=False
+            ),
             nn.BatchNorm2d(highres_out_channels),
             nn.ReLU(),
         )
@@ -210,10 +216,5 @@ class SeparableConv2d(nn.Sequential):
             groups=in_channels,
             bias=False,
         )
-        pointwise_conv = nn.Conv2d(
-            in_channels,
-            out_channels,
-            kernel_size=1,
-            bias=bias,
-        )
+        pointwise_conv = nn.Conv2d(in_channels, out_channels, kernel_size=1, bias=bias)
         super().__init__(dephtwise_conv, pointwise_conv)

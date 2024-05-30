@@ -7,7 +7,9 @@ class TransposeX2(nn.Sequential):
     def __init__(self, in_channels, out_channels, use_batchnorm=True):
         super().__init__()
         layers = [
-            nn.ConvTranspose2d(in_channels, out_channels, kernel_size=4, stride=2, padding=1),
+            nn.ConvTranspose2d(
+                in_channels, out_channels, kernel_size=4, stride=2, padding=1
+            ),
             nn.ReLU(inplace=True),
         ]
 
@@ -28,7 +30,9 @@ class DecoderBlock(nn.Module):
                 kernel_size=1,
                 use_batchnorm=use_batchnorm,
             ),
-            TransposeX2(in_channels // 4, in_channels // 4, use_batchnorm=use_batchnorm),
+            TransposeX2(
+                in_channels // 4, in_channels // 4, use_batchnorm=use_batchnorm
+            ),
             modules.Conv2dReLU(
                 in_channels // 4,
                 out_channels,
@@ -46,11 +50,7 @@ class DecoderBlock(nn.Module):
 
 class LinknetDecoder(nn.Module):
     def __init__(
-        self,
-        encoder_channels,
-        prefinal_channels=32,
-        n_blocks=5,
-        use_batchnorm=True,
+        self, encoder_channels, prefinal_channels=32, n_blocks=5, use_batchnorm=True
     ):
         super().__init__()
 
@@ -62,7 +62,10 @@ class LinknetDecoder(nn.Module):
         channels = list(encoder_channels) + [prefinal_channels]
 
         self.blocks = nn.ModuleList(
-            [DecoderBlock(channels[i], channels[i + 1], use_batchnorm=use_batchnorm) for i in range(n_blocks)]
+            [
+                DecoderBlock(channels[i], channels[i + 1], use_batchnorm=use_batchnorm)
+                for i in range(n_blocks)
+            ]
         )
 
     def forward(self, *features):

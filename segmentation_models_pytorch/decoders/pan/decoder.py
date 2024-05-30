@@ -87,20 +87,32 @@ class FPABlock(nn.Module):
         )
         self.down2 = nn.Sequential(
             nn.MaxPool2d(kernel_size=2, stride=2),
-            ConvBnRelu(in_channels=1, out_channels=1, kernel_size=5, stride=1, padding=2),
+            ConvBnRelu(
+                in_channels=1, out_channels=1, kernel_size=5, stride=1, padding=2
+            ),
         )
         self.down3 = nn.Sequential(
             nn.MaxPool2d(kernel_size=2, stride=2),
-            ConvBnRelu(in_channels=1, out_channels=1, kernel_size=3, stride=1, padding=1),
-            ConvBnRelu(in_channels=1, out_channels=1, kernel_size=3, stride=1, padding=1),
+            ConvBnRelu(
+                in_channels=1, out_channels=1, kernel_size=3, stride=1, padding=1
+            ),
+            ConvBnRelu(
+                in_channels=1, out_channels=1, kernel_size=3, stride=1, padding=1
+            ),
         )
-        self.conv2 = ConvBnRelu(in_channels=1, out_channels=1, kernel_size=5, stride=1, padding=2)
-        self.conv1 = ConvBnRelu(in_channels=1, out_channels=1, kernel_size=7, stride=1, padding=3)
+        self.conv2 = ConvBnRelu(
+            in_channels=1, out_channels=1, kernel_size=5, stride=1, padding=2
+        )
+        self.conv1 = ConvBnRelu(
+            in_channels=1, out_channels=1, kernel_size=7, stride=1, padding=3
+        )
 
     def forward(self, x):
         h, w = x.size(2), x.size(3)
         b1 = self.branch1(x)
-        upscale_parameters = dict(mode=self.upscale_mode, align_corners=self.align_corners)
+        upscale_parameters = dict(
+            mode=self.upscale_mode, align_corners=self.align_corners
+        )
         b1 = F.interpolate(b1, size=(h, w), **upscale_parameters)
 
         mid = self.mid(x)
@@ -123,7 +135,9 @@ class FPABlock(nn.Module):
 
 
 class GAUBlock(nn.Module):
-    def __init__(self, in_channels: int, out_channels: int, upscale_mode: str = "bilinear"):
+    def __init__(
+        self, in_channels: int, out_channels: int, upscale_mode: str = "bilinear"
+    ):
         super(GAUBlock, self).__init__()
 
         self.upscale_mode = upscale_mode
@@ -139,7 +153,9 @@ class GAUBlock(nn.Module):
             ),
             nn.Sigmoid(),
         )
-        self.conv2 = ConvBnRelu(in_channels=in_channels, out_channels=out_channels, kernel_size=3, padding=1)
+        self.conv2 = ConvBnRelu(
+            in_channels=in_channels, out_channels=out_channels, kernel_size=3, padding=1
+        )
 
     def forward(self, x, y):
         """
@@ -148,7 +164,9 @@ class GAUBlock(nn.Module):
             y: high level feature
         """
         h, w = x.size(2), x.size(3)
-        y_up = F.interpolate(y, size=(h, w), mode=self.upscale_mode, align_corners=self.align_corners)
+        y_up = F.interpolate(
+            y, size=(h, w), mode=self.upscale_mode, align_corners=self.align_corners
+        )
         x = self.conv2(x)
         y = self.conv1(y)
         z = torch.mul(x, y)
@@ -156,10 +174,14 @@ class GAUBlock(nn.Module):
 
 
 class PANDecoder(nn.Module):
-    def __init__(self, encoder_channels, decoder_channels, upscale_mode: str = "bilinear"):
+    def __init__(
+        self, encoder_channels, decoder_channels, upscale_mode: str = "bilinear"
+    ):
         super().__init__()
 
-        self.fpa = FPABlock(in_channels=encoder_channels[-1], out_channels=decoder_channels)
+        self.fpa = FPABlock(
+            in_channels=encoder_channels[-1], out_channels=decoder_channels
+        )
         self.gau3 = GAUBlock(
             in_channels=encoder_channels[-2],
             out_channels=decoder_channels,

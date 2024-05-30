@@ -49,7 +49,10 @@ class VGGEncoder(VGG, EncoderMixin):
         del self.classifier
 
     def make_dilated(self, *args, **kwargs):
-        raise ValueError("'VGG' models do not support dilated mode due to Max Pooling" " operations for downsampling!")
+        raise ValueError(
+            "'VGG' models do not support dilated mode due to Max Pooling"
+            " operations for downsampling!"
+        )
 
     def get_stages(self):
         stages = []

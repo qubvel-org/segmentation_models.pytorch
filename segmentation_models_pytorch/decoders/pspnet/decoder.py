@@ -12,7 +12,9 @@ class PSPBlock(nn.Module):
             use_bathcnorm = False  # PyTorch does not support BatchNorm for 1x1 shape
         self.pool = nn.Sequential(
             nn.AdaptiveAvgPool2d(output_size=(pool_size, pool_size)),
-            modules.Conv2dReLU(in_channels, out_channels, (1, 1), use_batchnorm=use_bathcnorm),
+            modules.Conv2dReLU(
+                in_channels, out_channels, (1, 1), use_batchnorm=use_bathcnorm
+            ),
         )
 
     def forward(self, x):
@@ -46,11 +48,7 @@ class PSPModule(nn.Module):
 
 class PSPDecoder(nn.Module):
     def __init__(
-        self,
-        encoder_channels,
-        use_batchnorm=True,
-        out_channels=512,
-        dropout=0.2,
+        self, encoder_channels, use_batchnorm=True, out_channels=512, dropout=0.2
     ):
         super().__init__()
 

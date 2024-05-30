@@ -5,8 +5,15 @@ def _take_channels(*xs, ignore_channels=None):
     if ignore_channels is None:
         return xs
     else:
-        channels = [channel for channel in range(xs[0].shape[1]) if channel not in ignore_channels]
-        xs = [torch.index_select(x, dim=1, index=torch.tensor(channels).to(x.device)) for x in xs]
+        channels = [
+            channel
+            for channel in range(xs[0].shape[1])
+            if channel not in ignore_channels
+        ]
+        xs = [
+            torch.index_select(x, dim=1, index=torch.tensor(channels).to(x.device))
+            for x in xs
+        ]
         return xs
 
 

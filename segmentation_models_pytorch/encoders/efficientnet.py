@@ -22,6 +22,7 @@ Methods:
         number of feature tensors = 6 (one with same resolution as input and 5 downsampled),
         depth = 3 -> number of feature tensors = 4 (one with same resolution as input and 3 downsampled).
 """
+
 import torch.nn as nn
 from efficientnet_pytorch import EfficientNet
 from efficientnet_pytorch.utils import url_map, url_map_advprop, get_model_params
@@ -31,7 +32,6 @@ from ._base import EncoderMixin
 
 class EfficientNetEncoder(EfficientNet, EncoderMixin):
     def __init__(self, stage_idxs, out_channels, model_name, depth=5):
-
         blocks_args, global_params = get_model_params(model_name, override_params=None)
         super().__init__(blocks_args, global_params)
 
@@ -60,7 +60,6 @@ class EfficientNetEncoder(EfficientNet, EncoderMixin):
 
         features = []
         for i in range(self._depth + 1):
-
             # Identity and Sequential stages
             if i < 2:
                 x = stages[i](x)

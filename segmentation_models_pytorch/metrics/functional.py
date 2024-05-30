@@ -26,6 +26,7 @@ Example:
         recall = smp.metrics.recall(tp, fp, fn, tn, reduction="micro-imagewise")
 
 """
+
 import torch
 import warnings
 from typing import Optional, List, Tuple, Union
@@ -113,7 +114,9 @@ def get_stats(
     """
 
     if torch.is_floating_point(target):
-        raise ValueError(f"Target should be one of the integer types, got {target.dtype}.")
+        raise ValueError(
+            f"Target should be one of the integer types, got {target.dtype}."
+        )
 
     if torch.is_floating_point(output) and threshold is None:
         raise ValueError(
@@ -121,13 +124,19 @@ def get_stats(
         )
 
     if torch.is_floating_point(output) and mode == "multiclass":
-        raise ValueError(f"For ``multiclass`` mode ``output`` should be one of the integer types, got {output.dtype}.")
+        raise ValueError(
+            f"For ``multiclass`` mode ``output`` should be one of the integer types, got {output.dtype}."
+        )
 
     if mode not in {"binary", "multiclass", "multilabel"}:
-        raise ValueError(f"``mode`` should be in ['binary', 'multiclass', 'multilabel'], got mode={mode}.")
+        raise ValueError(
+            f"``mode`` should be in ['binary', 'multiclass', 'multilabel'], got mode={mode}."
+        )
 
     if mode == "multiclass" and threshold is not None:
-        raise ValueError("``threshold`` parameter does not supported for this 'multiclass' mode")
+        raise ValueError(
+            "``threshold`` parameter does not supported for this 'multiclass' mode"
+        )
 
     if output.shape != target.shape:
         raise ValueError(
@@ -136,10 +145,14 @@ def get_stats(
         )
 
     if mode != "multiclass" and ignore_index is not None:
-        raise ValueError(f"``ignore_index`` parameter is not supproted for '{mode}' mode")
+        raise ValueError(
+            f"``ignore_index`` parameter is not supproted for '{mode}' mode"
+        )
 
     if mode == "multiclass" and num_classes is None:
-        raise ValueError("``num_classes`` attribute should be not ``None`` for 'multiclass' mode.")
+        raise ValueError(
+            "``num_classes`` attribute should be not ``None`` for 'multiclass' mode."
+        )
 
     if ignore_index is not None and 0 <= ignore_index <= num_classes - 1:
         raise ValueError(
@@ -150,7 +163,9 @@ def get_stats(
         )
 
     if mode == "multiclass":
-        tp, fp, fn, tn = _get_stats_multiclass(output, target, num_classes, ignore_index)
+        tp, fp, fn, tn = _get_stats_multiclass(
+            output, target, num_classes, ignore_index
+        )
     else:
         if threshold is not None:
             output = torch.where(output >= threshold, 1, 0)
@@ -167,7 +182,6 @@ def _get_stats_multiclass(
     num_classes: int,
     ignore_index: Optional[int],
 ) -> Tuple[torch.LongTensor, torch.LongTensor, torch.LongTensor, torch.LongTensor]:
-
     batch_size, *dims = output.shape
     num_elements = torch.prod(torch.tensor(dims)).long()
 
@@ -188,8 +202,14 @@ def _get_stats_multiclass(
         mask = output_i == target_i
         matched = torch.where(mask, target_i, -1)
         tp = torch.histc(matched.float(), bins=num_classes, min=0, max=num_classes - 1)
-        fp = torch.histc(output_i.float(), bins=num_classes, min=0, max=num_classes - 1) - tp
-        fn = torch.histc(target_i.float(), bins=num_classes, min=0, max=num_classes - 1) - tp
+        fp = (
+            torch.histc(output_i.float(), bins=num_classes, min=0, max=num_classes - 1)
+            - tp
+        )
+        fn = (
+            torch.histc(target_i.float(), bins=num_classes, min=0, max=num_classes - 1)
+            - tp
+        )
         tn = num_elements - tp - fp - fn
         if ignore_index is not None:
             tn = tn - ignore_per_sample[i]
@@ -203,10 +223,8 @@ def _get_stats_multiclass(
 
 @torch.no_grad()
 def _get_stats_multilabel(
-    output: torch.LongTensor,
-    target: torch.LongTensor,
+    output: torch.LongTensor, target: torch.LongTensor
 ) -> Tuple[torch.LongTensor, torch.LongTensor, torch.LongTensor, torch.LongTensor]:
-
     batch_size, num_classes, *dims = target.shape
     output = output.view(batch_size, num_classes, -1)
     target = target.view(batch_size, num_classes, -1)
@@ -245,9 +263,10 @@ def _compute_metric(
     zero_division="warn",
     **metric_kwargs,
 ) -> float:
-
     if class_weights is None and reduction is not None and "weighted" in reduction:
-        raise ValueError(f"Class weights should be provided for `{reduction}` reduction")
+        raise ValueError(
+            f"Class weights should be provided for `{reduction}` reduction"
+        )
 
     class_weights = class_weights if class_weights is not None else 1.0
     class_weights = torch.tensor(class_weights).to(tp.device)

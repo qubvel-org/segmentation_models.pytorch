@@ -24,7 +24,9 @@ class JaccardLoss(base.Loss):
 
 
 class DiceLoss(base.Loss):
-    def __init__(self, eps=1.0, beta=1.0, activation=None, ignore_channels=None, **kwargs):
+    def __init__(
+        self, eps=1.0, beta=1.0, activation=None, ignore_channels=None, **kwargs
+    ):
         super().__init__(**kwargs)
         self.eps = eps
         self.beta = beta

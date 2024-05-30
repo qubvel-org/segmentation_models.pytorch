@@ -20,17 +20,13 @@ class TimmUniversalEncoder(nn.Module):
         self.model = timm.create_model(name, **kwargs)
 
         self._in_channels = in_channels
-        self._out_channels = [
-            in_channels,
-        ] + self.model.feature_info.channels()
+        self._out_channels = [in_channels] + self.model.feature_info.channels()
         self._depth = depth
         self._output_stride = output_stride
 
     def forward(self, x):
         features = self.model(x)
-        features = [
-            x,
-        ] + features
+        features = [x] + features
         return features
 
     @property

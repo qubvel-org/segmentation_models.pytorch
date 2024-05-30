@@ -33,20 +33,14 @@ class MobileNetV3Encoder(nn.Module, EncoderMixin):
             channels = [16, 16, 24, 48, 576]
         else:
             channels = [16, 24, 40, 112, 960]
-        channels = [
-            3,
-        ] + [_make_divisible(x * width_mult) for x in channels]
+        channels = [3] + [_make_divisible(x * width_mult) for x in channels]
         return tuple(channels)
 
     def get_stages(self):
         if self._mode == "small":
             return [
                 nn.Identity(),
-                nn.Sequential(
-                    self.model.conv_stem,
-                    self.model.bn1,
-                    self.model.act1,
-                ),
+                nn.Sequential(self.model.conv_stem, self.model.bn1, self.model.act1),
                 self.model.blocks[0],
                 self.model.blocks[1],
                 self.model.blocks[2:4],
@@ -67,7 +61,9 @@ class MobileNetV3Encoder(nn.Module, EncoderMixin):
                 self.model.blocks[5:],
             ]
         else:
-            ValueError("MobileNetV3 mode should be small or large, got {}".format(self._mode))
+            ValueError(
+                "MobileNetV3 mode should be small or large, got {}".format(self._mode)
+            )
 
     def forward(self, x):
         stages = self.get_stages()

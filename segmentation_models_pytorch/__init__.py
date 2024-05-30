@@ -50,8 +50,7 @@ def create_model(
     except KeyError:
         raise KeyError(
             "Wrong architecture type `{}`. Available options are: {}".format(
-                arch,
-                list(archs_dict.keys()),
+                arch, list(archs_dict.keys())
             )
         )
     return model_class(
@@ -61,3 +60,24 @@ def create_model(
         classes=classes,
         **kwargs,
     )
+
+
+__all__ = [
+    "datasets",
+    "encoders",
+    "decoders",
+    "losses",
+    "metrics",
+    "Unet",
+    "UnetPlusPlus",
+    "MAnet",
+    "Linknet",
+    "FPN",
+    "PSPNet",
+    "DeepLabV3",
+    "DeepLabV3Plus",
+    "PAN",
+    "from_pretrained",
+    "create_model",
+    "__version__",
+]

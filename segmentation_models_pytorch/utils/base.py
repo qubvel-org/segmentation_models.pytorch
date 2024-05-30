@@ -54,7 +54,6 @@ class SumOfLosses(Loss):
 
 class MultipliedLoss(Loss):
     def __init__(self, loss, multiplier):
-
         # resolve name
         if len(loss.__name__.split("+")) > 1:
             name = "{} * ({})".format(multiplier, loss.__name__)

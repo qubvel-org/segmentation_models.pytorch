@@ -33,12 +33,13 @@ class Epoch:
         pass
 
     def run(self, dataloader):
-
         self.on_epoch_start()
 
         logs = {}
         loss_meter = AverageValueMeter()
-        metrics_meters = {metric.__name__: AverageValueMeter() for metric in self.metrics}
+        metrics_meters = {
+            metric.__name__: AverageValueMeter() for metric in self.metrics
+        }
 
         with tqdm(
             dataloader,
