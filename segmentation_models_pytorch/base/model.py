@@ -1,8 +1,13 @@
 import torch
+
 from . import initialization as init
+from .hub_mixin import SMPHubMixin
 
 
-class SegmentationModel(torch.nn.Module):
+class SegmentationModel(
+    torch.nn.Module,
+    SMPHubMixin,
+):
     def initialize(self):
         init.initialize_decoder(self.decoder)
         init.initialize_head(self.segmentation_head)
