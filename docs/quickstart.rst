@@ -34,4 +34,18 @@ All encoders have pretrained weights. Preparing your data the same way as during
 **3. Congratulations!** 🎉
 
 
-You are done! Now you can train your model with your favorite framework!
+You are done! Now you can train your model with your favorite framework, or as simple as:
+
+.. code-block:: python
+
+    for images, gt_masks in dataloader:
+
+        predicted_mask = model(image)
+        loss = loss_fn(prediction, mask)
+
+        loss.backward()
+        optimizer.step()
+
+Check the following examples:
+- Finetuning notebook on Oxford Pet dataset with `PyTorch Lightning <https://github.com/qubvel/segmentation_models.pytorch/blob/master/examples/binary_segmentation_intro.ipynb>`_
+- Finetuning script for cloth segmentation with `PyTorch Lightning <https://github.com/ternaus/cloths_segmentation>`_
