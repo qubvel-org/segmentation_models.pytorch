@@ -2,18 +2,8 @@
 ==============================
 
 
-Table of contents:
-------------------
-- [Unet](#unet)
-- [Unet++](#unetplusplus)
-- [MAnet](#manet)
-- [Linknet](#linknet)
-- [FPN](#fpn)
-- [PSPNet](#pspnet)
-- [PAN](#pan)
-- [DeepLabV3](#deeplabv3)
-- [DeepLabV3+](#deeplabv3plus)
-
+.. contents::
+   :local:
 
 .. _unet:
 
