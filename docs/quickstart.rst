@@ -16,8 +16,9 @@ Segmentation model is just a PyTorch nn.Module, which can be created as easy as:
         classes=3,                      # model output channels (number of classes in your dataset)
     )
 
-- see table with available model architectures
-- see table with available encoders and its corresponding weights
+- Check the page with available :doc:`model architectures <models>`.
+- Check the table with :doc:`available ported encoders and its corresponding weights <encoders>`.
+- `Pytorch Image Models (timm) <https://github.com/huggingface/pytorch-image-models>`_ encoders are also supported, check it :doc:`here<encoders_timm>`.
 
 **2. Configure data preprocessing**
 
