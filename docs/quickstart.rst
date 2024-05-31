@@ -1,4 +1,4 @@
-⏳ Quick Start
+🚀 Quick Start
 ==============
 
 **1. Create segmentation model**
@@ -16,8 +16,9 @@ Segmentation model is just a PyTorch nn.Module, which can be created as easy as:
         classes=3,                      # model output channels (number of classes in your dataset)
     )
 
-- see table with available model architectures
-- see table with avaliable encoders and its corresponding weights
+- Check the page with available :doc:`model architectures <models>`.
+- Check the table with :doc:`available ported encoders and its corresponding weights <encoders>`.
+- `Pytorch Image Models (timm) <https://github.com/huggingface/pytorch-image-models>`_ encoders are also supported, check it :doc:`here<encoders_timm>`.
 
 **2. Configure data preprocessing**
 
@@ -33,4 +34,23 @@ All encoders have pretrained weights. Preparing your data the same way as during
 **3. Congratulations!** 🎉
 
 
-You are done! Now you can train your model with your favorite framework!
+You are done! Now you can train your model with your favorite framework, or as simple as:
+
+.. code-block:: python
+
+    for images, gt_masks in dataloader:
+
+        predicted_mask = model(image)
+        loss = loss_fn(predicted_mask, gt_masks)
+
+        loss.backward()
+        optimizer.step()
+
+Check the following examples:
+
+.. |colab-badge| image:: https://colab.research.google.com/assets/colab-badge.svg
+   :target: https://colab.research.google.com/github/qubvel/segmentation_models.pytorch/blob/master/examples/binary_segmentation_intro.ipynb
+   :alt: Open In Colab
+
+- Finetuning notebook on Oxford Pet dataset with `PyTorch Lightning <https://github.com/qubvel/segmentation_models.pytorch/blob/master/examples/binary_segmentation_intro.ipynb>`_ |colab-badge|
+- Finetuning script for cloth segmentation with `PyTorch Lightning <https://github.com/ternaus/cloths_segmentation>`_

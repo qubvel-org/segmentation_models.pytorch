@@ -1,4 +1,4 @@
-🏔 Available Encoders
+🔍 Available Encoders
 =====================
 
 ResNet

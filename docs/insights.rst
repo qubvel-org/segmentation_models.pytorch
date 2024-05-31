@@ -1,4 +1,4 @@
-🔧 Insights
+💡 Insights
 ===========
 
 1. Models architecture
