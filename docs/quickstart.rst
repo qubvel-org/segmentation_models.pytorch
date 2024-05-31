@@ -1,4 +1,4 @@
-⏳ Quick Start
+🚀 Quick Start
 ==============
 
 **1. Create segmentation model**
@@ -17,7 +17,7 @@ Segmentation model is just a PyTorch nn.Module, which can be created as easy as:
     )
 
 - see table with available model architectures
-- see table with avaliable encoders and its corresponding weights
+- see table with available encoders and its corresponding weights
 
 **2. Configure data preprocessing**
 

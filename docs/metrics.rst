@@ -1,4 +1,4 @@
-📈 Metrics
+📏 Metrics
 ==========
 
 Functional metrics
