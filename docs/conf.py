@@ -105,6 +105,7 @@ autodoc_mock_imports = [
     "efficientnet-pytorch",
     "segmentation_models_pytorch.encoders",
     "segmentation_models_pytorch.utils",
+    "huggingface_hub",
     # 'segmentation_models_pytorch.base',
 ]
 
