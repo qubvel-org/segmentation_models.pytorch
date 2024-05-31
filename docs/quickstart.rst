@@ -41,11 +41,13 @@ You are done! Now you can train your model with your favorite framework, or as s
     for images, gt_masks in dataloader:
 
         predicted_mask = model(image)
-        loss = loss_fn(prediction, mask)
+        loss = loss_fn(predicted_mask, gt_masks)
 
         loss.backward()
         optimizer.step()
 
 Check the following examples:
-- Finetuning notebook on Oxford Pet dataset with `PyTorch Lightning <https://github.com/qubvel/segmentation_models.pytorch/blob/master/examples/binary_segmentation_intro.ipynb>`_
+
+- Finetuning notebook on Oxford Pet dataset with `PyTorch Lightning <https://github.com/qubvel/segmentation_models.pytorch/blob/master/examples/binary_segmentation_intro.ipynb>`_ .. image:: https://colab.research.google.com/assets/colab-badge.svg
+   :target: https://colab.research.google.com/github/qubvel/segmentation_models.pytorch/blob/master/examples/binary_segmentation_intro.ipynb
 - Finetuning script for cloth segmentation with `PyTorch Lightning <https://github.com/ternaus/cloths_segmentation>`_
