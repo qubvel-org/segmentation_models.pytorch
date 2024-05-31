@@ -73,7 +73,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # import karma_sphinx_theme
 # html_theme = "karma_sphinx_theme"
 
-html_theme = "faculty_sphinx_theme"
+html_theme = "sphinx_book_theme"
 
 # import catalyst_sphinx_theme
 # html_theme = "catalyst_sphinx_theme"

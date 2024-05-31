@@ -1,5 +1,5 @@
 sphinx<7
-faculty-sphinx-theme==0.2.2
+sphinx-book-theme==1.1.2
 six==1.15.0
 autodocsumm
 huggingface_hub
