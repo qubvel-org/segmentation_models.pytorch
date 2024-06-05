@@ -20,6 +20,19 @@ Segmentation model is just a PyTorch nn.Module, which can be created as easy as:
 - Check the table with :doc:`available ported encoders and its corresponding weights <encoders>`.
 - `Pytorch Image Models (timm) <https://github.com/huggingface/pytorch-image-models>`_ encoders are also supported, check it :doc:`here<encoders_timm>`.
 
+Alternatively, you can use `smp.create_model` function to create a model by name:
+
+.. code-block:: python
+
+    model = smp.create_model(
+        arch="fpn",                     # name of the architecture, e.g. 'Unet'/ 'FPN' / etc. Case INsensitive!
+        encoder_name="mit_b0",
+        encoder_weights="imagenet",
+        in_channels=1,
+        classes=3,
+    )
+
+
 **2. Configure data preprocessing**
 
 All encoders have pretrained weights. Preparing your data the same way as during weights pre-training may give your better results (higher metric score and faster convergence). But it is relevant only for 1-2-3-channels images and **not necessary** in case you train the whole model, not only decoder.
