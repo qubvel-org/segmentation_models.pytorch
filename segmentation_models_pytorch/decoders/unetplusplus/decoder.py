@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from loguru import logger
 
 from segmentation_models_pytorch.base import modules as md
 
@@ -76,11 +77,16 @@ class UnetPlusPlusDecoder(nn.Module):
     ):
         super().__init__()
 
-        if n_blocks != len(decoder_channels):
+        if n_blocks < len(decoder_channels):
+            logger.warning(
+                f"Specified `encoder_depth={n_blocks}`, but provided `decoder_channels={decoder_channels}` for "
+                f"{len(decoder_channels)} blocks. Using the last {n_blocks} decoder channels: {decoder_channels[-n_blocks:]}."
+            )
+            decoder_channels = decoder_channels[-n_blocks:]
+        elif n_blocks > len(decoder_channels):
             raise ValueError(
-                "Model depth is {}, but you provide `decoder_channels` for {} blocks.".format(
-                    n_blocks, len(decoder_channels)
-                )
+                f"Specified `encoder_depth={n_blocks}`, but provided only {len(decoder_channels)} "
+                f"`decoder_channels={decoder_channels}`. Please provide a list of channels for all {n_blocks} blocks."
             )
 
         # remove first skip with same spatial resolution
