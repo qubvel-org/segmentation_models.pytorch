@@ -24,6 +24,15 @@ class Unet(SegmentationModel):
             Default is 5
         encoder_weights: One of **None** (random initialization), **"imagenet"** (pre-training on ImageNet) and
             other pretrained weights (see table with available weights for each encoder_name)
+        encoder_indices: The indices of the encoder features that will be used in the decoder.
+            If **"first"**, only the first `encoder_depth` features will be used. 
+            If **"last"**, only the last `encoder_depth` features will be used.
+            If a list of integers, the indices of the encoder features that will be used in the decoder.
+            Default is **"first"**
+        encoder_channels: A list of integers that specify the number of output channels for each encoder layer.
+            If **None**, the number of encoder output channels stays the same as for specifier `encoder_name`.
+            If a list of integers, the number of encoder output channels is equal to the provided list, 
+            features are adjusted by 1x1 convolutions without non-linearity.
         decoder_channels: List of integers which specify **in_channels** parameter for convolutions used in decoder.
             Length of the list should be the same as **encoder_depth**
         decoder_use_batchnorm: If **True**, BatchNorm2d layer between Conv2D and Activation layers
@@ -58,6 +67,8 @@ class Unet(SegmentationModel):
         encoder_name: str = "resnet34",
         encoder_depth: int = 5,
         encoder_weights: Optional[str] = "imagenet",
+        encoder_indices: Union[str, List[int]] = "first",
+        encoder_channels: Optional[List[int]] = None,
         decoder_use_batchnorm: bool = True,
         decoder_channels: List[int] = (256, 128, 64, 32, 16),
         decoder_attention_type: Optional[str] = None,
@@ -73,12 +84,14 @@ class Unet(SegmentationModel):
             in_channels=in_channels,
             depth=encoder_depth,
             weights=encoder_weights,
+            out_indices=encoder_indices,
+            out_channels=encoder_channels,
         )
 
         self.decoder = UnetDecoder(
             encoder_channels=self.encoder.out_channels,
             decoder_channels=decoder_channels,
-            n_blocks=encoder_depth,
+            n_blocks=self.encoder.depth,
             use_batchnorm=decoder_use_batchnorm,
             center=True if encoder_name.startswith("vgg") else False,
             attention_type=decoder_attention_type,
