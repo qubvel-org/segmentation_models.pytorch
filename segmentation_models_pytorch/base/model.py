@@ -1,10 +1,16 @@
 import torch
+from typing import TypeVar
 
 from . import initialization as init
 from .hub_mixin import SMPHubMixin
 
+T = TypeVar("T", bound="SegmentationModel")
+
 
 class SegmentationModel(torch.nn.Module, SMPHubMixin):
+    def __new__(cls, *args, **kwargs) -> T:
+        return super().__new__(cls, *args, **kwargs)
+
     def initialize(self):
         init.initialize_decoder(self.decoder)
         init.initialize_head(self.segmentation_head)
