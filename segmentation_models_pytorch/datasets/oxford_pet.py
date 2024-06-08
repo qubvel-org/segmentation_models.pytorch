@@ -60,22 +60,24 @@ class OxfordPetDataset(torch.utils.data.Dataset):
         return filenames
 
     @staticmethod
-    def download(root):
+    def download(root, force_reload=False):
         # load images
         filepath = os.path.join(root, "images.tar.gz")
-        download_url(
-            url="https://www.robots.ox.ac.uk/~vgg/data/pets/data/images.tar.gz",
-            filepath=filepath,
-        )
-        extract_archive(filepath)
+        if not os.path.exists(filepath) or force_reload:
+            download_url(
+                url="https://www.robots.ox.ac.uk/~vgg/data/pets/data/images.tar.gz",
+                filepath=filepath,
+            )
+            extract_archive(filepath)
 
         # load annotations
         filepath = os.path.join(root, "annotations.tar.gz")
-        download_url(
-            url="https://www.robots.ox.ac.uk/~vgg/data/pets/data/annotations.tar.gz",
-            filepath=filepath,
-        )
-        extract_archive(filepath)
+        if not os.path.exists(filepath) or force_reload:
+            download_url(
+                url="https://www.robots.ox.ac.uk/~vgg/data/pets/data/annotations.tar.gz",
+                filepath=filepath,
+            )
+            extract_archive(filepath)
 
 
 class SimpleOxfordPetDataset(OxfordPetDataset):
