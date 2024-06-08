@@ -336,8 +336,9 @@ class TimmUniversalEncoder(nn.Module):
         return [x] + features
 
     # This one is used for visualization only, the code is a bit messy
-    def visualize(self) -> str:
-        """Method to visualize features of extractor and adapter."""
+    @property
+    def features_info_str(self) -> str:
+        """Return a string with information about intermediate and output tensor shapes"""
         # for visualization
         model_selected_features_info = [
             x
