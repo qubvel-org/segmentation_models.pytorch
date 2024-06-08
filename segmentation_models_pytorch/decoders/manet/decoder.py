@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from loguru import logger
 
 from segmentation_models_pytorch.base import modules as md
 
@@ -142,10 +141,6 @@ class MAnetDecoder(nn.Module):
         super().__init__()
 
         if n_blocks < len(decoder_channels):
-            logger.warning(
-                f"Specified `encoder_depth={n_blocks}`, but provided `decoder_channels={decoder_channels}` for "
-                f"{len(decoder_channels)} blocks. Using the last {n_blocks} decoder channels: {decoder_channels[-n_blocks:]}."
-            )
             decoder_channels = decoder_channels[-n_blocks:]
         elif n_blocks > len(decoder_channels):
             raise ValueError(
