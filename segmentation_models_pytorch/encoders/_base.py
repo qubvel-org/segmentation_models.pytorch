@@ -21,11 +21,13 @@ class EncoderMixin:
     @property
     def depth(self):
         return self._depth
-    
+
     @property
     def features_info_str(self):
         """Return a string with information about intermediate and output tensor shapes"""
-        raise NotImplementedError("Method is only implemented for `timm` encoders ('tu-' prefix)")
+        raise NotImplementedError(
+            "Method is only implemented for `timm` encoders ('tu-' prefix)"
+        )
 
     def set_in_channels(self, in_channels, pretrained=True):
         """Change first convolution channels"""
