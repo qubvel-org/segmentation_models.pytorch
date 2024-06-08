@@ -1,6 +1,7 @@
 import timm
 import functools
 import torch.utils.model_zoo as model_zoo
+from loguru import logger
 
 from .resnet import resnet_encoders
 from .dpn import dpn_encoders
@@ -51,6 +52,10 @@ encoders.update(mobileone_encoders)
 def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **kwargs):
     if name.startswith("tu-"):
         name = name[3:]
+
+        if "encoder_indices" in kwargs and kwargs["encoder_indices"] is None:
+            kwargs["encoder_indices"] = "first"
+
         encoder = TimmUniversalEncoder(
             name=name,
             in_channels=in_channels,
@@ -60,6 +65,18 @@ def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **
             **kwargs,
         )
         return encoder
+
+    encoder_indices = kwargs.pop("encoder_indices", None)
+    if encoder_indices is not None:
+        logger.warning(
+            "Argument `encoder_indices` is supported only for `tu-` encoders (Timm) and will be ignored."
+        )
+
+    encoder_channels = kwargs.pop("encoder_channels", None)
+    if encoder_channels is not None:
+        logger.warning(
+            "Argument `encoder_channels` is supported only for `tu-` encoders (Timm) and will be ignored."
+        )
 
     try:
         Encoder = encoders[name]["encoder"]

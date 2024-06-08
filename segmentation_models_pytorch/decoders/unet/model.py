@@ -1,4 +1,4 @@
-from typing import Optional, Union, List
+from typing import Optional, Union, List, Sequence, Callable
 
 from segmentation_models_pytorch.encoders import get_encoder
 from segmentation_models_pytorch.base import (
@@ -25,13 +25,13 @@ class Unet(SegmentationModel):
         encoder_weights: One of **None** (random initialization), **"imagenet"** (pre-training on ImageNet) and
             other pretrained weights (see table with available weights for each encoder_name)
         encoder_indices: The indices of the encoder features that will be used in the decoder.
-            If **"first"**, only the first `encoder_depth` features will be used. 
+            If **"first"**, only the first `encoder_depth` features will be used.
             If **"last"**, only the last `encoder_depth` features will be used.
             If a list of integers, the indices of the encoder features that will be used in the decoder.
-            Default is **"first"**
+            If **None**, defaults to **"first"**.
         encoder_channels: A list of integers that specify the number of output channels for each encoder layer.
             If **None**, the number of encoder output channels stays the same as for specifier `encoder_name`.
-            If a list of integers, the number of encoder output channels is equal to the provided list, 
+            If a list of integers, the number of encoder output channels is equal to the provided list,
             features are adjusted by 1x1 convolutions without non-linearity.
         decoder_channels: List of integers which specify **in_channels** parameter for convolutions used in decoder.
             Length of the list should be the same as **encoder_depth**
@@ -67,14 +67,14 @@ class Unet(SegmentationModel):
         encoder_name: str = "resnet34",
         encoder_depth: int = 5,
         encoder_weights: Optional[str] = "imagenet",
-        encoder_indices: Union[str, List[int]] = "first",
+        encoder_indices: Optional[Union[str, List[int]]] = None,
         encoder_channels: Optional[List[int]] = None,
         decoder_use_batchnorm: bool = True,
-        decoder_channels: List[int] = (256, 128, 64, 32, 16),
+        decoder_channels: Sequence[int] = (256, 128, 64, 32, 16),
         decoder_attention_type: Optional[str] = None,
         in_channels: int = 3,
         classes: int = 1,
-        activation: Optional[Union[str, callable]] = None,
+        activation: Optional[Union[str, Callable]] = None,
         aux_params: Optional[dict] = None,
     ):
         super().__init__()
