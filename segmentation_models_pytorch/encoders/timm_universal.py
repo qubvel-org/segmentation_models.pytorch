@@ -1,35 +1,51 @@
 import timm
 import torch
 import torch.nn as nn
-from typing import List, Optional
+from typing import List, Optional, Union
 from loguru import logger
+
+
+class MisconfigurationError(ValueError):
+    pass
 
 
 def select_feature_indices(
     actual_indices: List[int],
     encoder_depth: int,
-    encoder_indices: Optional[List[int]] = None,
+    encoder_indices: Union[str, List[int]],
 ) -> List[int]:
     """Select encoder indices based on encoder depth and specified indices."""
-    if encoder_indices is not None and len(encoder_indices) != encoder_depth:
-        raise ValueError(
-            f"Invalid `encoder_indices={encoder_indices}` for encoder with `encoder_depth={encoder_depth}`. "
-            f"Expected `encoder_indices` length is equal to `encoder_depth`."
+
+    if isinstance(encoder_indices, str):
+        if encoder_indices not in ["first", "last"]:
+            raise MisconfigurationError(
+                f"Invalid `encoder_indices={encoder_indices}`. Expected 'first', 'last' or list of integer indices."
+            )
+        return (
+            actual_indices[-encoder_depth:]
+            if encoder_indices == "last"
+            else actual_indices[:encoder_depth]
         )
-    if encoder_indices is not None:
+
+    elif isinstance(encoder_indices, (list, tuple)):
+        if len(encoder_indices) > encoder_depth:
+            raise MisconfigurationError(
+                f"Invalid `encoder_indices={encoder_indices}` for encoder with `encoder_depth={encoder_depth}`. "
+                f"Expected `encoder_indices` length is less or equal to `encoder_depth`."
+            )
         selected_indices = []
         for i in encoder_indices:
             try:
                 selected_indices.append(actual_indices[i])
             except IndexError:
-                raise IndexError(
-                    f"Invalid selection on `encoder_indices={encoder_indices}` for encoder "
-                    f"with encoder indices {actual_indices}`."
+                raise MisconfigurationError(
+                    f"Wrong index `{i}` in `encoder_indices={encoder_indices}`. Allowed indices are `{actual_indices}`."
                 )
         return selected_indices
-
-    # Otherwise return last `encoder_depth` indices
-    return actual_indices[-encoder_depth:]
+    else:
+        raise MisconfigurationError(
+            f"Invalid `encoder_indices={encoder_indices}`. Expected 'first', 'last' or list of integer indices."
+        )
 
 
 def get_encoder_num_features_from_reductions(
@@ -126,7 +142,7 @@ class BaseFeatureExtractor(nn.Module):
         self,
         timm_model: nn.Module,
         num_features: int,
-        out_indices: Optional[List[int]] = None,
+        out_indices: Union[str, List[int]],
     ):
         """Initialize feature extractor with specified depth and out indices.
 
@@ -134,8 +150,9 @@ class BaseFeatureExtractor(nn.Module):
             model (nn.Module): timm model created with `features_only=True`
             num_features (int): number of features required to extract from timm model
                 (if not enough, features list will be padded with dummy features)
-            out_indices (Optional[List[int]], optional): Indices of features to extract from timm model.
-                If None, last `num_features` features will be extracted. Defaults to None.
+            out_indices (Union[str, List[int]]): Indices of features to extract from timm model.
+                If `str` is passed, can be either 'first' or 'last' to select first or last `encoder_depth` features.
+                If `List[int]` is passed, should contain indices of features to extract.
         """
         super().__init__()
 
@@ -152,23 +169,14 @@ class BaseFeatureExtractor(nn.Module):
         n_dummy_features = corrected_num_features - n_real_features
 
         if corrected_num_features != num_features:
-            logger.warning(
+            logger.info(
                 f"Encoder depth is adjusted to `encoder_depth={corrected_num_features}` "
                 f"to match `timm` model features reductions {timm_model_all_out_reductions}."
             )
         if n_dummy_features:
-            logger.info(
+            logger.debug(
                 f"Encoder has {n_dummy_features} dummy feature(s), because the real number of "
                 f"features ({n_real_features}) is less than specified encoder depth ({corrected_num_features})."
-            )
-
-        if out_indices is None and len(timm_model_selected_out_indices) < len(
-            timm_model_all_out_indices
-        ):
-            logger.info(
-                f"Selected encoder features indices {timm_model_selected_out_indices} out of timm model "
-                f"feature indices {timm_model_all_out_indices}. Consider using `encoder_out_indices` argument to "
-                f"select specific features. Use `model.encoder.visualize()` to see the full list of features."
             )
 
         # set out indices for model with specified depth
@@ -273,6 +281,8 @@ class TimmUniversalEncoder(nn.Module):
 
         try:
             feature_extractor = BaseFeatureExtractor(model, depth, out_indices)
+        except MisconfigurationError as e:
+            raise e
         except Exception as e:
             raise ValueError(
                 f"Can't create encoder with specified name `{name}`. "
@@ -293,7 +303,7 @@ class TimmUniversalEncoder(nn.Module):
             out_channels = feature_extractor.out_channels
 
         if len(out_channels) < depth:
-            raise ValueError(
+            raise MisconfigurationError(
                 f"Invalid `encoder_out_channels` argument. Expected length is equal to `encoder_depth={depth}`. "
                 f"Got {len(out_channels)} out channels {out_channels}."
             )
@@ -382,15 +392,14 @@ class TimmUniversalEncoder(nn.Module):
 
         def feature_as_string(f):
             if f is None:
-                return " " * 25
+                return " " * 23
             reduction = f["reduction"]
             num_chs = f["num_chs"]
-            ch_str = f"{num_chs:5d}"
-            h_str = f"H // {reduction}".ljust(7)
-            w_str = f"W // {reduction}".ljust(7)
-            return f"({ch_str}, {h_str}, {w_str})"
+            num_chs_str = f"{num_chs:5d}"
+            reduction_str = f"{reduction:2d}"
+            return f"     {num_chs_str}, hw / {reduction_str}    "
 
-        header = f"{'index / module ': <15}: {' Timm model features': <25} -> {' Selected features': <25} -> {' Adapted features': <25}\n"
+        header = f"{'index / module ': <15}: {'   Timm model features': <23} -> {'    Selected features': <23} -> {'    Adapted features': <23}\n"
         header += "-" * len(header) + "\n"
         rows = []
         for index in all_indexes:
@@ -404,9 +413,11 @@ class TimmUniversalEncoder(nn.Module):
             connector_str = feature_as_string(connector_feature)
             index_str = str(index) if index >= 0 else "x"
             name_str = f"({name})"
-            rows.append(
-                f"{index_str: >2} {name_str: >12}: {model_str} -> {encoder_str} -> {connector_str}"
-            )
+            if encoder_feature is None:
+                row = f"{index_str: >2} {name_str: >12}: {model_str} -x"
+            else:
+                row = f"{index_str: >2} {name_str: >12}: {model_str} -> {encoder_str} -> {connector_str}"
+            rows.append(row)
 
         return header + "\n".join(rows)
 
@@ -476,26 +487,26 @@ corrected_reductions = {
 }
 
 if __name__ == "__main__":
-    name = "swinv2_base_window8_256"
-    # name = "resnet18"
+    # name = "swinv2_base_window8_256"
+    name = "resnet18"
     # name = "darknet53"
     # name = "efficientformer_l1"
     # name = "xcit_tiny_24_p16_224"
     # name = "convformer_m36"
     # name = "efficientvit_m0" # check for error (has reduction 64)
     # name = "eva02_large_patch14_clip_224"
-    name = "vit_base_patch16_siglip_224"
+    # name = "vit_base_patch16_siglip_224"
 
     # model = timm.create_model(name, pretrained=False, features_only=True, num_classes=0, global_pool="")
     # encoder = Encoder(model, depth=5).eval()
 
     encoder = TimmUniversalEncoder(
         name,
-        depth=5,
+        depth=4,
         output_stride=32,
         pretrained=False,
-        out_channels=[32, 64, 128, 256, 512],
+        # out_channels=[32, 64, 128, 256, 512],
     )
     result = encoder(torch.randn(1, 3, 224, 224))
-    print([x.shape for x in result])
-    print(encoder.visualize())
+    # print([x.shape for x in result])
+    # print(encoder.visualize())
