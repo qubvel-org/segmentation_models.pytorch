@@ -18,6 +18,17 @@ class EncoderMixin:
     def output_stride(self):
         return min(self._output_stride, 2**self._depth)
 
+    @property
+    def depth(self):
+        return self._depth
+
+    @property
+    def features_info_str(self):
+        """Return a string with information about intermediate and output tensor shapes"""
+        raise NotImplementedError(
+            "Method is only implemented for `timm` encoders ('tu-' prefix)"
+        )
+
     def set_in_channels(self, in_channels, pretrained=True):
         """Change first convolution channels"""
         if in_channels == 3:
