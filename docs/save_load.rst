@@ -68,7 +68,7 @@ By following these steps, you can easily save, share, and load your models, faci
 |colab-badge|
 
 .. |colab-badge| image:: https://colab.research.google.com/assets/colab-badge.svg
-    :target: https://colab.research.google.com/github/qubvel/segmentation_models.pytorch/blob/master/examples/binary_segmentation_intro.ipynb
+    :target: https://colab.research.google.com/github/qubvel/segmentation_models.pytorch/blob/main/examples/binary_segmentation_intro.ipynb
     :alt: Open In Colab
 
 
