@@ -1,4 +1,4 @@
-FROM anibali/pytorch:1.13.0-cuda11.8
+FROM anibali/pytorch:2.0.1-cuda11.8-ubuntu22.04
 
 RUN pip install uv
 RUN uv pip install segmentation-models-pytorch
