@@ -16,7 +16,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip uv
-        python -m uv install setuptools wheel twine mock
+        python -m uv pip install setuptools wheel twine mock
     - name: Build and publish
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
