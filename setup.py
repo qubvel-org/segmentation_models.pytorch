@@ -35,7 +35,7 @@ except Exception:
     REQUIRED = []
 
 # What packages are optional?
-EXTRAS = {"test": ["pytest", "mock", "ruff==0.4.6"]}
+EXTRAS = {"test": ["pytest", "mock", "ruff==0.5.2"]}
 
 # Import the README and use it as the long-description.
 # Note: this will only work if 'README.md' is present in your MANIFEST.in file!
