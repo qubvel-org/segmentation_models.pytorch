@@ -1,10 +1,11 @@
-FROM anibali/pytorch:1.5.0-nocuda
+FROM anibali/pytorch:2.0.1-nocuda-ubuntu22.04
 
 WORKDIR /tmp/smp/
 
 COPY ./requirements.txt /tmp/smp/requirements.txt
-RUN pip install -r requirements.txt
-RUN pip install pytest mock
+RUN pip install uv
+RUN uv pip install -r requirements.txt
+RUN uv pip install pytest mock
 
 COPY . /tmp/smp/
-RUN pip install .
+RUN uv pip install .
