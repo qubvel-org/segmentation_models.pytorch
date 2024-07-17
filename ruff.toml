@@ -37,7 +37,7 @@ target-version = "py38"
 
 [lint]
 # Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
-select = ["E", "F", "I", "PERF", "RUFF", "SIM", "UP", "W"]
+select = ["E", "F", "I", "PERF", "PL", "RUF", "SIM", "UP", "W"]
 ignore = []
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
