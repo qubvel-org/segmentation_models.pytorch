@@ -1,4 +1,4 @@
-FROM anibali/pytorch:1.13.0-nocuda
+FROM anibali/pytorch:2.0.1-nocuda-ubuntu22.04
 
 WORKDIR /tmp/smp/
 
