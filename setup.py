@@ -17,7 +17,7 @@ DESCRIPTION = "Image segmentation models with pre-trained backbones. PyTorch."
 URL = "https://github.com/qubvel/segmentation_models.pytorch"
 EMAIL = "qubvel@gmail.com"
 AUTHOR = "Pavel Iakubovskii"
-REQUIRES_PYTHON = ">=3.7.0"
+REQUIRES_PYTHON = ">=3.9.0"
 VERSION = None
 
 # The rest you shouldn't have to touch too much :)
@@ -35,7 +35,7 @@ except Exception:
     REQUIRED = []
 
 # What packages are optional?
-EXTRAS = {"test": ["pytest", "mock", "ruff==0.4.6"]}
+EXTRAS = {"test": ["pytest", "mock", "ruff==0.5.2"]}
 
 # Import the README and use it as the long-description.
 # Note: this will only work if 'README.md' is present in your MANIFEST.in file!
