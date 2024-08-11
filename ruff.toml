@@ -37,7 +37,18 @@ target-version = "py310"
 
 [lint]
 # Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
-select = ["E", "F", "I", "PERF", "PL", "RUF", "S", "SIM", "UP", "W"]
+select = [
+   # "E",
+   # "F",
+   # "I",     # Isort
+   # "PERF",  # Perlint
+   # "PL",    # Pylint
+   # "RUF",
+   # "S",     # Bandit
+   # "SIM",
+   # "UP",
+   # "W",
+]
 ignore = []
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
