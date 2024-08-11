@@ -32,22 +32,22 @@ exclude = [
 line-length = 120
 indent-width = 4
 
-# Assume Python 3.10
-target-version = "py310"
+# Assume Python 3.11
+target-version = "py311"
 
 [lint]
 # Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
 select = [
-   # "E",
-   # "F",
+   # "E",     # pycodestyle 
+   # "F",     # pyglake
    # "I",     # Isort
    # "PERF",  # Perlint
    # "PL",    # Pylint
-   # "RUF",
+   # "RUF",   # Ruff
    # "S",     # Bandit
-   # "SIM",
-   # "UP",
-   # "W",
+   # "SIM",   # Simplify
+   # "UP",    # Upgrade
+   # "W",     # Warning
 ]
 ignore = []
 
