@@ -23,7 +23,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip uv
-          python -m uv pip install ruff==0.5.7
+          python -m uv pip install ruff==0.6.1
       # Update output format to enable automatic inline annotations.
       - name: Run Ruff Linter
         run: ruff check --output-format=github
