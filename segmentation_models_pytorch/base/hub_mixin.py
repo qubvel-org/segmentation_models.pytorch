@@ -120,7 +120,7 @@ class SMPHubMixin(PyTorchModelHubMixin):
         finally:
             # delete the additional attributes
             self._del_attrs(["save_directory", "metrics", "dataset"])
-            # self._hub_mixin_config.pop("_model_class")
+            self._hub_mixin_config.pop("_model_class")
 
         return result
 
