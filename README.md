@@ -12,13 +12,13 @@ Segmentation based on [PyTorch](https://pytorch.org/).**
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/segmentation-models-pytorch?style=for-the-badge&color=blue)](https://pepy.tech/project/segmentation-models-pytorch) 
 <br>
 [![PyTorch - Version](https://img.shields.io/badge/PYTORCH-1.4+-red?style=for-the-badge&logo=pytorch)](https://pepy.tech/project/segmentation-models-pytorch) 
-[![Python - Version](https://img.shields.io/badge/PYTHON-3.7+-red?style=for-the-badge&logo=python&logoColor=white)](https://pepy.tech/project/segmentation-models-pytorch) 
+[![Python - Version](https://img.shields.io/badge/PYTHON-3.9+-red?style=for-the-badge&logo=python&logoColor=white)](https://pepy.tech/project/segmentation-models-pytorch) 
 
 </div>
 
 The main features of this library are:
 
- - High level API (just two lines to create a neural network)
+ - High-level API (just two lines to create a neural network)
  - 9 models architectures for binary and multi class segmentation (including legendary Unet)
  - 124 available encoders (and 500+ encoders from [timm](https://github.com/rwightman/pytorch-image-models))
  - All encoders have pre-trained weights for faster and better convergence
@@ -26,7 +26,7 @@ The main features of this library are:
  
 ### [📚 Project Documentation 📚](http://smp.readthedocs.io/)
 
-Visit [Read The Docs Project Page](https://smp.readthedocs.io/) or read following README to know more about Segmentation Models Pytorch (SMP for short) library
+Visit [Read The Docs Project Page](https://smp.readthedocs.io/) or read the following README to know more about Segmentation Models Pytorch (SMP for short) library
 
 ### 📋 Table of content
  1. [Quick start](#start)
@@ -49,7 +49,7 @@ Visit [Read The Docs Project Page](https://smp.readthedocs.io/) or read followin
 
 #### 1. Create your first Segmentation model with SMP
 
-Segmentation model is just a PyTorch nn.Module, which can be created as easy as:
+The segmentation model is just a PyTorch `torch.nn.Module`, which can be created as easy as:
 
 ```python
 import segmentation_models_pytorch as smp
@@ -66,7 +66,7 @@ model = smp.Unet(
 
 #### 2. Configure data preprocessing
 
-All encoders have pretrained weights. Preparing your data the same way as during weights pre-training may give you better results (higher metric score and faster convergence). It is **not necessary** in case you train the whole model, not only decoder.
+All encoders have pretrained weights. Preparing your data the same way as during weights pre-training may give you better results (higher metric score and faster convergence). It is **not necessary** in case you train the whole model, not only the decoder.
 
 ```python
 from segmentation_models_pytorch.encoders import get_preprocessing_fn
@@ -484,7 +484,7 @@ make fixup         # Ruff for formatting and lint checks
 #### Update table with encoders  
 
 ```bash
-make table        # generate table with encoders and print to stdout
+make table        # generate a table with encoders and print to stdout
 ```
 
 ### 📝 Citing
@@ -500,4 +500,4 @@ make table        # generate table with encoders and print to stdout
 ```
 
 ### 🛡️ License <a name="license"></a>
-Project is distributed under [MIT License](https://github.com/qubvel/segmentation_models.pytorch/blob/main/LICENSE)
+The project is distributed under [MIT License](https://github.com/qubvel/segmentation_models.pytorch/blob/main/LICENSE)
