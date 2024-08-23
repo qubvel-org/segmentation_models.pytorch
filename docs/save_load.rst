@@ -59,6 +59,37 @@ For example:
     # Or saved and pushed to the Hub simultaneously
     model.save_pretrained('username/my-model', push_to_hub=True, metrics={'accuracy': 0.95}, dataset='my_dataset')
 
+Saving with preprocessing transform (Albumentations)
+----------------------------------------------------
+
+You can save the preprocessing transform along with the model and push it to the Hub. 
+This can be useful when you want to share the model with the preprocessing transform that was used during training, 
+to make sure that the inference pipeline is consistent with the training pipeline.
+
+.. code:: python
+
+    import albumentations as A
+    import segmentation_models_pytorch as smp
+
+    # Define a preprocessing transform for image that would be used during inference
+    preprocessing_transform = A.Compose([
+        A.Resize(256, 256),
+        A.Normalize()
+    ])
+
+    model = smp.Unet()
+
+    directory_or_repo_on_the_hub = "qubvel-hf/unet-with-transform"  # <username>/<repo-name>
+
+    # Save the model and transform (and pus ot hub, if needed)
+    model.save_pretrained(directory_or_repo_on_the_hub, push_to_hub=True)
+    preprocessing_transform.save_pretrained(directory_or_repo_on_the_hub, push_to_hub=True)
+
+    # Loading transform and model
+    restored_model = smp.from_pretrained(directory_or_repo_on_the_hub)
+    restored_transform = A.Compose.from_pretrained(directory_or_repo_on_the_hub)
+
+    print(restored_transform)
 
 Conclusion
 ----------
@@ -71,4 +102,6 @@ By following these steps, you can easily save, share, and load your models, faci
     :target: https://colab.research.google.com/github/qubvel/segmentation_models.pytorch/blob/main/examples/binary_segmentation_intro.ipynb
     :alt: Open In Colab
 
-
+.. |colab-badge| image:: https://colab.research.google.com/assets/colab-badge.svg
+    :target: https://colab.research.google.com/github/qubvel/segmentation_models.pytorch/blob/main/examples/save_load_model_and_share_with_hf_hub.ipynb
+    :alt: Open In Colab
