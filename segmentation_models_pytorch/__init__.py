@@ -1,3 +1,5 @@
+import warnings
+
 from . import datasets
 from . import encoders
 from . import decoders
@@ -19,6 +21,9 @@ from .__version__ import __version__
 # some private imports for create_model function
 from typing import Optional as _Optional
 import torch as _torch
+
+# Suppress the specific SyntaxWarning for `pretrainedmodels`
+warnings.filterwarnings("ignore", message="is with a literal", category=SyntaxWarning)
 
 
 def create_model(
