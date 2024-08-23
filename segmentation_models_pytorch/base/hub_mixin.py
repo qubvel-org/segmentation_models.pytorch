@@ -102,7 +102,7 @@ class SMPHubMixin(PyTorchModelHubMixin):
             model_card_kwargs["metrics"] = kwargs.pop("metrics")
         kwargs["model_card_kwargs"] = model_card_kwargs
 
-        # set additional attribute to be ble to deserialize the model
+        # set additional attribute to be able to deserialize the model
         self.config["_model_class"] = self.__class__.__name__
 
         try:
