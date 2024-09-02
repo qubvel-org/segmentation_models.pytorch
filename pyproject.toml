@@ -46,7 +46,7 @@ tests = [
 Homepage = 'https://github.com/qubvel-org/segmentation_models.pytorch'
 
 [tool.setuptools.dynamic]
-version = {attr = 'segmentation_models_pytorch.__version'}
+version = {attr = 'segmentation_models_pytorch.__version__'}
 
 [tool.setuptools.packages.find]
 include = ['segmentation_models_pytorch*']
