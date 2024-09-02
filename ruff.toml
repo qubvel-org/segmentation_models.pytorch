@@ -41,10 +41,10 @@ select = [
    # "E",     # pycodestyle 
    # "F",     # pyglake
    # "I",     # Isort
-   # "PERF",  # Perlint
+   "PERF",  # Perlint
    # "PL",    # Pylint
    # "RUF",   # Ruff
-   "S",     # Bandit
+   # "S",     # Bandit
    # "SIM",   # Simplify
    # "UP",    # Upgrade
    # "W",     # Warning
