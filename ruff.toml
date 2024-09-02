@@ -44,7 +44,7 @@ select = [
    # "PERF",  # Perlint
    # "PL",    # Pylint
    # "RUF",   # Ruff
-   # "S",     # Bandit
+   "S",     # Bandit
    # "SIM",   # Simplify
    # "UP",    # Upgrade
    # "W",     # Warning
