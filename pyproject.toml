@@ -38,7 +38,7 @@ docs = [
     'sphinx<7',
     'sphinx-book-theme==1.1.2',
 ]
-tests = [
+test = [
     'mock',
     'pytest',
     'ruff==0.5.2',
