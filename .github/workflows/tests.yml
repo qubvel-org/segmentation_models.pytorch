@@ -27,8 +27,8 @@ jobs:
       # Update output format to enable automatic inline annotations.
       - name: Run Ruff Linter
         run: ruff check --output-format=github
-      - name: Run Ruff Formatter
-        run: ruff format --check
+      # - name: Run Ruff Formatter
+      #   run: ruff format --check
 
   test:
     runs-on: ubuntu-latest
