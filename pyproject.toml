@@ -1,0 +1,52 @@
+[build-system]
+requires = ['setuptools>=61']
+build-backend = 'setuptools.build_meta'
+
+[project]
+name = 'segmentation_models_pytorch'
+description = 'Image segmentation models with pre-trained backbones. PyTorch.'
+readme = 'README.md'
+requires-python = '>=3.9'
+license = {file = 'LICENSE'}
+authors = [{name = 'Pavel Iakubovskii', email = 'qubvel@gmail.com'}]
+classifiers = [
+    'License :: OSI Approved :: MIT License',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: Implementation :: CPython',
+    'Programming Language :: Python :: Implementation :: PyPy',
+]
+dependencies = [
+    'efficientnet-pytorch==0.7.1',
+    'huggingface-hub>=0.24.6',
+    'pillow',
+    'pretrainedmodels==0.7.4',
+    'six',
+    'timm==0.9.7',
+    'torchvision>=0.5',
+    'tqdm',
+]
+dynamic = ['version']
+
+[project.optional-dependencies]
+docs = [
+    'autodocsumm',
+    'huggingface-hub',
+    'six==1.15.0',
+    'sphinx<7',
+    'sphinx-book-theme==1.1.2',
+]
+tests = [
+    'mock',
+    'pytest',
+    'ruff==0.5.2',
+]
+
+[project.urls]
+Homepage = 'https://github.com/qubvel-org/segmentation_models.pytorch'
+
+[tool.setuptools.dynamic]
+version = {attr = 'segmentation_models_pytorch.__version'}
+
+[tool.setuptools.packages.find]
+include = ['segmentation_models_pytorch*']
