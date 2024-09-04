@@ -1,5 +1,5 @@
 efficientnet-pytorch==0.6.1
-huggingface_hub==0.0.15
+huggingface_hub==0.10.0
 pillow==8.0.0
 pretrainedmodels==0.6.0
 six==1.5.0
