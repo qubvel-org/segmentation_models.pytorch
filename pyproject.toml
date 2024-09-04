@@ -22,7 +22,6 @@ dependencies = [
     'numpy',
     'pillow',
     'pretrainedmodels==0.7.4',
-    'six',
     'timm==0.9.7',
     'torch',
     'torchvision>=0.5',
@@ -34,7 +33,6 @@ dynamic = ['version']
 docs = [
     'autodocsumm',
     'huggingface-hub',
-    'six==1.15.0',
     'sphinx<7',
     'sphinx-book-theme==1.1.2',
 ]

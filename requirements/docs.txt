@@ -1,5 +1,4 @@
 autodocsumm
 huggingface_hub
-six==1.15.0
 sphinx-book-theme==1.1.2
 sphinx<7
