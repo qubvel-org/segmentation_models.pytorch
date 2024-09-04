@@ -50,6 +50,6 @@ jobs:
       with:
         python-version: 3.9
     - name: Install dependencies
-      run: python -m pip install -r requirements/minimum.old
+      run: python -m pip install -r requirements/min-reqs.old -c requirements/min-cons.old
     - name: Test with pytest
       run: pytest
