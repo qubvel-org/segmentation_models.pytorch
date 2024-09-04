@@ -34,13 +34,13 @@ dynamic = ['version']
 docs = [
     'autodocsumm',
     'huggingface-hub',
-    'six==1.15.0',
-    'sphinx<7',
-    'sphinx-book-theme==1.1.2',
+    'six',
+    'sphinx',
+    'sphinx-book-theme',
 ]
 test = [
     'pytest',
-    'ruff==0.5.2',
+    'ruff',
 ]
 
 [project.urls]
