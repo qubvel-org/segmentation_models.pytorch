@@ -5,7 +5,7 @@ pretrainedmodels==0.6.0
 six==1.5.0
 timm==0.9.0
 torchvision==0.8.2
-tqdm==2.0.0
+tqdm==4.36.0
 
 mock
 pytest
