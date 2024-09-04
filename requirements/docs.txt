@@ -1,5 +1,5 @@
-autodocsumm
-huggingface_hub
-six==1.15.0
-sphinx-book-theme==1.1.2
-sphinx<7
+autodocsumm==0.2.13
+huggingface_hub==0.24.6
+six==1.16.0
+sphinx-book-theme==1.1.3
+sphinx==8.0.2
