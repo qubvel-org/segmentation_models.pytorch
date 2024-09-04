@@ -7,6 +7,6 @@ timm==0.1.1
 torchvision==0.8.2
 tqdm==2.0.0
 
-mock==1.1.0
-pytest==2.7.1
-ruff==0.0.17
+mock
+pytest
+ruff
