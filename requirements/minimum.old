@@ -6,3 +6,7 @@ six
 timm==0.9.7
 torchvision>=0.5.0
 tqdm
+
+mock
+pytest
+ruff==0.5.2
