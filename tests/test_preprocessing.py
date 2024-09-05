@@ -1,4 +1,3 @@
-import sys
 import numpy as np
 
 import segmentation_models_pytorch as smp  # noqa
