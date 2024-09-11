@@ -46,6 +46,10 @@ test = [
 [project.urls]
 Homepage = 'https://github.com/qubvel-org/segmentation_models.pytorch'
 
+[tool.ruff]
+extend-include = ['*.ipynb']
+fix = true
+
 [tool.setuptools.dynamic]
 version = {attr = 'segmentation_models_pytorch.__version__.__version__'}
 
