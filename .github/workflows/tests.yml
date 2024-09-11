@@ -35,7 +35,7 @@ jobs:
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
-        python-version: 3.9
+        python-version: "3.11"
     - name: Install dependencies
       run: python -m pip install -r requirements/required.txt -r requirements/test.txt
     - name: Test with pytest
@@ -48,7 +48,7 @@ jobs:
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
-        python-version: 3.9
+        python-version: "3.9"
     - name: Install dependencies
       run: python -m pip install -r requirements/minimum.old -r requirements/test.txt
     - name: Test with pytest
