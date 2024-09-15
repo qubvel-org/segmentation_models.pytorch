@@ -41,7 +41,7 @@ class UPerNet(SegmentationModel):
         ``torch.nn.Module``: **UPerNet**
 
     .. _UPerNet:
-        https://arxiv.org/abs/1505.04597
+        https://arxiv.org/abs/1807.10221
 
     """
 
