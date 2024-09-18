@@ -4,6 +4,7 @@ import numpy as np
 from typing import Optional
 
 import torch
+import torch.linalg as LA
 import torch.nn.functional as F
 
 __all__ = [
@@ -190,20 +191,14 @@ def soft_tversky_score(
 
     """
     assert output.size() == target.size()
-    if dims is not None:
-        difference = torch.norm(output - target, p=1, dim=dims)
-        output_sum = torch.sum(output, dim=dims)
-        target_sum = torch.sum(target, dim=dims)
-        intersection = (output_sum + target_sum - difference) / 2  # TP
-        fp = output_sum - intersection
-        fn = target_sum - intersection
-    else:
-        difference = torch.norm(output - target, p=1)
-        output_sum = torch.sum(output)
-        target_sum = torch.sum(target)
-        intersection = (output_sum + target_sum - difference) / 2  # TP
-        fp = output_sum - intersection
-        fn = target_sum - intersection
+
+    output_sum = torch.sum(output, dim=dims)
+    target_sum = torch.sum(target, dim=dims)
+    difference = LA.vector_norm(output - target, ord=1, dim=dims)
+
+    intersection = (output_sum + target_sum - difference) / 2  # TP
+    fp = output_sum - intersection
+    fn = target_sum - intersection
 
     tversky_score = (intersection + smooth) / (
         intersection + alpha * fp + beta * fn + smooth
