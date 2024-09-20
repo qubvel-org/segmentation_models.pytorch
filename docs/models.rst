@@ -66,3 +66,10 @@ MAnet
 PAN
 ~~~
 .. autoclass:: segmentation_models_pytorch.PAN
+
+
+.. _upernet:
+
+UPerNet
+~~~
+.. autoclass:: segmentation_models_pytorch.UPerNet
