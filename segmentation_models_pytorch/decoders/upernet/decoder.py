@@ -113,8 +113,8 @@ class UPerNetDecoder(nn.Module):
         )
 
     def forward(self, *features):
-        # Resize all FPN features to the size of the largest feature
-        target_size = features[0].shape[2:]
+        output_size = features[0].shape[2:]
+        target_size = [size // 4 for size in output_size]
 
         features = features[1:]  # remove first skip with same spatial resolution
         features = features[::-1]  # reverse channels to start from head of encoder
@@ -126,6 +126,7 @@ class UPerNetDecoder(nn.Module):
             fpn_feature = stage(fpn_features[-1], feature)
             fpn_features.append(fpn_feature)
 
+        # Resize all FPN features to 1/4 of the original resolution.
         resized_fpn_features = []
         for feature in fpn_features:
             resized_feature = F.interpolate(
@@ -134,5 +135,8 @@ class UPerNetDecoder(nn.Module):
             resized_fpn_features.append(resized_feature)
 
         output = self.fpn_bottleneck(torch.cat(resized_fpn_features, dim=1))
+        output = F.interpolate(
+            output, size=output_size, mode="bilinear", align_corners=False
+        )
 
         return output
