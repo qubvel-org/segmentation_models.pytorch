@@ -1,9 +1,0 @@
-torchvision>=0.5.0
-pretrainedmodels==0.7.4
-efficientnet-pytorch==0.7.1
-timm==0.9.7
-huggingface_hub>=0.24.6
-
-tqdm
-pillow
-six

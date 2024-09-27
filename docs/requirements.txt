@@ -1,5 +1,0 @@
-sphinx<7
-sphinx-book-theme==1.1.2
-six==1.15.0
-autodocsumm
-huggingface_hub

@@ -17,16 +17,16 @@ classifiers = [
     'Programming Language :: Python :: Implementation :: PyPy',
 ]
 dependencies = [
-    'efficientnet-pytorch==0.7.1',
-    'huggingface-hub>=0.24.6',
-    'numpy',
-    'pillow',
-    'pretrainedmodels==0.7.4',
-    'six',
-    'timm==0.9.7',
-    'torch',
-    'torchvision>=0.5',
-    'tqdm',
+    'efficientnet-pytorch>=0.6.1',
+    'huggingface-hub>=0.24',
+    'numpy>=1.19.3',
+    'pillow>=8',
+    'pretrainedmodels>=0.7.1',
+    'six>=1.5',
+    'timm>=0.9',
+    'torch>=1.8',
+    'torchvision>=0.9',
+    'tqdm>=4.42.1',
 ]
 dynamic = ['version']
 
@@ -34,13 +34,13 @@ dynamic = ['version']
 docs = [
     'autodocsumm',
     'huggingface-hub',
-    'six==1.15.0',
-    'sphinx<7',
-    'sphinx-book-theme==1.1.2',
+    'six',
+    'sphinx',
+    'sphinx-book-theme',
 ]
 test = [
     'pytest',
-    'ruff==0.5.2',
+    'ruff',
 ]
 
 [project.urls]
