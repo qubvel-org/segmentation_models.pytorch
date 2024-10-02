@@ -81,7 +81,7 @@ class UPerNetDecoder(nn.Module):
         segmentation_channels=64,
     ):
         super().__init__()
-        self.out_channels = segmentation_channels
+
         if encoder_depth < 3:
             raise ValueError(
                 "Encoder depth for UPerNet decoder cannot be less than 3, got {}.".format(
@@ -135,8 +135,5 @@ class UPerNetDecoder(nn.Module):
             resized_fpn_features.append(resized_feature)
 
         output = self.fpn_bottleneck(torch.cat(resized_fpn_features, dim=1))
-        output = F.interpolate(
-            output, size=output_size, mode="bilinear", align_corners=False
-        )
 
         return output

@@ -74,10 +74,11 @@ class UPerNet(SegmentationModel):
         )
 
         self.segmentation_head = SegmentationHead(
-            in_channels=self.decoder.out_channels,
+            in_channels=decoder_segmentation_channels,
             out_channels=classes,
             activation=activation,
-            kernel_size=3,
+            kernel_size=1,
+            upsampling=4,
         )
 
         if aux_params is not None:
