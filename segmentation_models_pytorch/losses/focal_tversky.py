@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 import torch
-from ._functional import soft_tversky_score
+from ._functional import focal_tversky_loss
 from .constants import BINARY_MODE, MULTICLASS_MODE, MULTILABEL_MODE
 from .dice import DiceLoss
 
@@ -63,7 +63,7 @@ class FocalTverskyLoss(DiceLoss):
     def compute_score(
         self, output, target, smooth=0.0, eps=1e-7, dims=None
     ) -> torch.Tensor:
-        tversky_score = soft_tversky_score(
-            output, target, self.alpha, self.beta, smooth, eps, dims
+        tversky_score = focal_tversky_loss(
+            output, target, self.alpha, self.beta, self.gamma, smooth, eps, dims
         )
-        return (1 - tversky_score) ** self.gamma
+        return tversky_score

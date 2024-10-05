@@ -205,6 +205,37 @@ def soft_tversky_score(
     ).clamp_min(eps)
     return tversky_score
 
+def focal_tversky_loss(
+    output: torch.Tensor,
+    target: torch.Tensor,
+    alpha: float,
+    beta: float,
+    gamma: float,
+    smooth: float = 0.0,
+    eps: float = 1e-7,
+    dims=None,
+) -> torch.Tensor:
+    """Focal Tversky loss
+
+    References:
+        https://arxiv.org/pdf/1810.07842
+
+    """
+    assert output.size() == target.size()
+
+    output_sum = torch.sum(output, dim=dims)
+    target_sum = torch.sum(target, dim=dims)
+    difference = LA.vector_norm(output - target, ord=1, dim=dims)
+
+    intersection = (output_sum + target_sum - difference) / 2  # TP
+    fp = output_sum - intersection
+    fn = target_sum - intersection
+
+    tversky_score = (intersection + smooth) / (
+        intersection + alpha * fp + beta * fn + smooth
+    ).clamp_min(eps)
+    tversky_loss = (1 - tversky_score) ** gamma
+    return tversky_loss
 
 def wing_loss(
     output: torch.Tensor, target: torch.Tensor, width=5, curvature=0.5, reduction="mean"
