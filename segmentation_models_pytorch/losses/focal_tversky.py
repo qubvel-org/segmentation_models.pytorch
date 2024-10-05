@@ -63,6 +63,7 @@ class FocalTverskyLoss(DiceLoss):
     def compute_score(
         self, output, target, smooth=0.0, eps=1e-7, dims=None
     ) -> torch.Tensor:
-        return soft_tversky_score(
+        tversky_score = soft_tversky_score(
             output, target, self.alpha, self.beta, smooth, eps, dims
         )
+        return (1 - tversky_score) ** self.gamma
