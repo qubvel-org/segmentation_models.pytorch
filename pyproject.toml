@@ -24,8 +24,8 @@ dependencies = [
     'pretrainedmodels>=0.7.1',
     'six>=1.5',
     'timm>=0.9',
-    'torch>=1.9',
-    'torchvision>=0.10',
+    'torch>=1.10',
+    'torchvision>=0.11',
     'tqdm>=4.42.1',
 ]
 dynamic = ['version']
