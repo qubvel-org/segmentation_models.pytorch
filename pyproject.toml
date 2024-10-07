@@ -25,7 +25,7 @@ dependencies = [
     'six>=1.5',
     'timm>=0.9',
     'torch>=1.10',
-    'torchvision>=0.11',
+    'torchvision>=0.11.1',
     'tqdm>=4.42.1',
 ]
 dynamic = ['version']
