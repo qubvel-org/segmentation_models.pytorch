@@ -192,9 +192,14 @@ def soft_tversky_score(
     """
     assert output.size() == target.size()
 
-    output_sum = torch.sum(output, dim=dims)
-    target_sum = torch.sum(target, dim=dims)
-    difference = LA.vector_norm(output - target, ord=1, dim=dims)
+    if dims is not None:
+        output_sum = torch.sum(output, dim=dims)
+        target_sum = torch.sum(target, dim=dims)
+        difference = LA.vector_norm(output - target, ord=1, dim=dims)
+    else:
+        output_sum = torch.sum(output)
+        target_sum = torch.sum(target)
+        difference = LA.vector_norm(output - target, ord=1)
 
     intersection = (output_sum + target_sum - difference) / 2  # TP
     fp = output_sum - intersection
