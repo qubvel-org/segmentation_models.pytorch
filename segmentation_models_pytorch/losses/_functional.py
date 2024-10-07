@@ -191,7 +191,7 @@ def soft_tversky_score(
 
     """
     assert output.size() == target.size()
-    
+
     if dims is not None:
         output_sum = torch.sum(output, dim=dims)
         target_sum = torch.sum(target, dim=dims)
