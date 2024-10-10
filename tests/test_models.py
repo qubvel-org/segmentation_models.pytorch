@@ -29,12 +29,11 @@ def get_sample(model_class):
         smp.PSPNet,
         smp.UnetPlusPlus,
         smp.MAnet,
-        smp.UPerNet,
     ]:
         sample = torch.ones([1, 3, 64, 64])
-    elif model_class == smp.PAN:
+    elif model_class == smp.PAN or model_class == smp.UPerNet:
         sample = torch.ones([2, 3, 256, 256])
-    elif model_class == smp.DeepLabV3:
+    elif model_class == smp.DeepLabV3 or model_class == smp.DeepLabV3Plus:
         sample = torch.ones([2, 3, 128, 128])
     else:
         raise ValueError("Not supported model class {}".format(model_class))
@@ -102,6 +101,8 @@ def test_forward(model_class, encoder_name, encoder_depth, **kwargs):
         smp.UnetPlusPlus,
         smp.MAnet,
         smp.DeepLabV3,
+        smp.DeepLabV3Plus,
+        smp.UPerNet,
     ],
 )
 def test_forward_backward(model_class):
@@ -112,7 +113,18 @@ def test_forward_backward(model_class):
 
 @pytest.mark.parametrize(
     "model_class",
-    [smp.PAN, smp.FPN, smp.PSPNet, smp.Linknet, smp.Unet, smp.UnetPlusPlus, smp.MAnet],
+    [
+        smp.PAN,
+        smp.FPN,
+        smp.PSPNet,
+        smp.Linknet,
+        smp.Unet,
+        smp.UnetPlusPlus,
+        smp.MAnet,
+        smp.DeepLabV3,
+        smp.DeepLabV3Plus,
+        smp.UPerNet,
+    ],
 )
 def test_aux_output(model_class):
     model = model_class(
