@@ -9,6 +9,7 @@ from segmentation_models_pytorch.losses import (
     SoftCrossEntropyLoss,
     TverskyLoss,
     MCCLoss,
+    focal_tversky,
 )
 
 
@@ -90,6 +91,23 @@ def test_soft_tversky_score(y_true, y_pred, expected, eps, alpha, beta):
     y_true = torch.tensor(y_true, dtype=torch.float32)
     y_pred = torch.tensor(y_pred, dtype=torch.float32)
     actual = F.soft_tversky_score(y_pred, y_true, eps=eps, alpha=alpha, beta=beta)
+    assert float(actual) == pytest.approx(expected, eps)
+
+@pytest.mark.parametrize(
+    ["y_true", "y_pred", "expected", "eps", "alpha", "beta", "gamma"],
+    [
+        [[1, 1, 1, 1], [1, 1, 1, 1], 0.0, 1e-5, 0.5, 0.5, 1.0], 
+        [[0, 1, 1, 0], [0, 1, 1, 0], 0.0, 1e-5, 0.5, 0.5, 1.0], 
+        [[1, 1, 1, 1], [0, 0, 0, 0], 1.0, 1e-5, 0.5, 0.5, 1.0], 
+        [[1, 0, 1, 0], [0, 1, 0, 0], 1.0, 1e-5, 0.5, 0.5, 1.0],  
+        [[1, 0, 1, 0], [1, 1, 0, 0], 0.5, 1e-5, 0.5, 0.5, 1.0],  
+    ],
+)
+
+def test_focal_tversky_score(y_true, y_pred, expected, eps, alpha, beta, gamma):
+    y_true = torch.tensor(y_true, dtype=torch.float32)
+    y_pred = torch.tensor(y_pred, dtype=torch.float32)
+    actual = F.focal_tversky_loss(y_pred, y_true, eps=eps, alpha=alpha, beta=beta, gamma=gamma)
     assert float(actual) == pytest.approx(expected, eps)
 
 
