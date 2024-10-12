@@ -23,18 +23,21 @@ DEFAULT_ENCODER = "resnet18"
 
 def get_sample(model_class):
     if model_class in [
-        smp.Unet,
-        smp.Linknet,
         smp.FPN,
-        smp.PSPNet,
+        smp.Linknet,
+        smp.Unet,
         smp.UnetPlusPlus,
         smp.MAnet,
     ]:
         sample = torch.ones([1, 3, 64, 64])
-    elif model_class == smp.PAN or model_class == smp.UPerNet:
+    elif model_class == smp.PAN:
         sample = torch.ones([2, 3, 256, 256])
-    elif model_class == smp.DeepLabV3 or model_class == smp.DeepLabV3Plus:
+    elif model_class in [smp.DeepLabV3, smp.DeepLabV3Plus]:
         sample = torch.ones([2, 3, 128, 128])
+    elif model_class in [smp.PSPNet, smp.UPerNet]:
+        # Batch size 2 needed due to nn.BatchNorm2d not supporting (1, C, 1, 1) input
+        # from PSPModule pooling in PSPNet/UPerNet.
+        sample = torch.ones([2, 3, 64, 64])
     else:
         raise ValueError("Not supported model class {}".format(model_class))
     return sample
