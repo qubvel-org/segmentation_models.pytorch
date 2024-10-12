@@ -73,3 +73,11 @@ PAN
 UPerNet
 ~~~~~~~
 .. autoclass:: segmentation_models_pytorch.UPerNet
+
+
+.. _segformer:
+
+Segformer
+~~~~~~~~~
+.. autoclass:: segmentation_models_pytorch.Segformer
+
