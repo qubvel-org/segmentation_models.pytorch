@@ -74,7 +74,7 @@ class Segformer(SegmentationModel):
             in_channels=decoder_segmentation_channels,
             out_channels=classes,
             activation=activation,
-            kernel_size=3,
+            kernel_size=1,
             upsampling=4,
         )
 
