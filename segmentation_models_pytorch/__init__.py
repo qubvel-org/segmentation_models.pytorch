@@ -15,6 +15,7 @@ from .decoders.pspnet import PSPNet
 from .decoders.deeplabv3 import DeepLabV3, DeepLabV3Plus
 from .decoders.pan import PAN
 from .decoders.upernet import UPerNet
+from .decoders.segformer import Segformer
 from .base.hub_mixin import from_pretrained
 
 from .__version__ import __version__
@@ -50,6 +51,7 @@ def create_model(
         DeepLabV3Plus,
         PAN,
         UPerNet,
+        Segformer,
     ]
     archs_dict = {a.__name__.lower(): a for a in archs}
     try:
@@ -85,6 +87,7 @@ __all__ = [
     "DeepLabV3Plus",
     "PAN",
     "UPerNet",
+    "Segformer",
     "from_pretrained",
     "create_model",
     "__version__",
