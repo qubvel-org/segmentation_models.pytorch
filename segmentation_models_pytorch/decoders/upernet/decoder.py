@@ -63,9 +63,7 @@ class FPNBlock(nn.Module):
 
     def forward(self, x, skip):
         _, channels, height, width = skip.shape
-        x = F.interpolate(
-            x, size=(height, width), mode="bilinear", align_corners=False
-        )
+        x = F.interpolate(x, size=(height, width), mode="bilinear", align_corners=False)
         if channels != 0:
             skip = self.skip_conv(skip)
             x = x + skip
