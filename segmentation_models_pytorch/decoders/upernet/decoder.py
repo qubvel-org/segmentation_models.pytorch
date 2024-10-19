@@ -36,10 +36,10 @@ class PSPModule(nn.Module):
         )
 
     def forward(self, x):
-        _, _, height, weight = x.shape
+        _, _, height, width = x.shape
         out = [x] + [
             F.interpolate(
-                block(x), size=(height, weight), mode="bilinear", align_corners=False
+                block(x), size=(height, width), mode="bilinear", align_corners=False
             )
             for block in self.blocks
         ]
@@ -62,10 +62,8 @@ class FPNBlock(nn.Module):
         )
 
     def forward(self, x, skip):
-        _, channels, height, weight = skip.shape
-        x = F.interpolate(
-            x, size=(height, weight), mode="bilinear", align_corners=False
-        )
+        _, channels, height, width = skip.shape
+        x = F.interpolate(x, size=(height, width), mode="bilinear", align_corners=False)
         if channels != 0:
             skip = self.skip_conv(skip)
             x = x + skip
