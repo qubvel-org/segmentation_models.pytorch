@@ -1,11 +1,13 @@
-from typing import Optional
+from collections.abc import Iterable
+from typing import Literal, Optional
 
 from segmentation_models_pytorch.base import (
-    SegmentationModel,
-    SegmentationHead,
     ClassificationHead,
+    SegmentationHead,
+    SegmentationModel,
 )
 from segmentation_models_pytorch.encoders import get_encoder
+
 from .decoder import DeepLabV3Decoder, DeepLabV3PlusDecoder
 
 
@@ -101,6 +103,7 @@ class DeepLabV3Plus(SegmentationModel):
             other pretrained weights (see table with available weights for each encoder_name)
         encoder_output_stride: Downsampling factor for last encoder features (see original paper for explanation)
         decoder_atrous_rates: Dilation rates for ASPP module (should be a tuple of 3 integer values)
+        decoder_atrous_rates: Dilation rates for ASPP module (should be an iterable of 3 integer values)
         decoder_channels: A number of convolution filters in ASPP module. Default is 256
         in_channels: A number of input channels for the model, default is 3 (RGB images)
         classes: A number of classes for output mask (or you can think as a number of channels of output mask)
@@ -129,9 +132,10 @@ class DeepLabV3Plus(SegmentationModel):
         encoder_name: str = "resnet34",
         encoder_depth: int = 5,
         encoder_weights: Optional[str] = "imagenet",
-        encoder_output_stride: int = 16,
+        encoder_output_stride: Literal[8, 16] = 16,
         decoder_channels: int = 256,
         decoder_atrous_rates: tuple = (12, 24, 36),
+        decoder_atrous_rates: Iterable[int] = (12, 24, 36),
         in_channels: int = 3,
         classes: int = 1,
         activation: Optional[str] = None,
@@ -139,13 +143,6 @@ class DeepLabV3Plus(SegmentationModel):
         aux_params: Optional[dict] = None,
     ):
         super().__init__()
-
-        if encoder_output_stride not in [8, 16]:
-            raise ValueError(
-                "Encoder output stride should be 8 or 16, got {}".format(
-                    encoder_output_stride
-                )
-            )
 
         self.encoder = get_encoder(
             encoder_name,

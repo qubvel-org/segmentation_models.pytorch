@@ -111,7 +111,7 @@ class DeepLabV3PlusDecoder(nn.Module):
 
 
 class ASPPConv(nn.Sequential):
-    def __init__(self, in_channels, out_channels, dilation):
+    def __init__(self, in_channels: int, out_channels: int, dilation: int):
         super().__init__(
             nn.Conv2d(
                 in_channels,
@@ -127,7 +127,7 @@ class ASPPConv(nn.Sequential):
 
 
 class ASPPSeparableConv(nn.Sequential):
-    def __init__(self, in_channels, out_channels, dilation):
+    def __init__(self, in_channels: int, out_channels: int, dilation: int):
         super().__init__(
             SeparableConv2d(
                 in_channels,
@@ -143,7 +143,7 @@ class ASPPSeparableConv(nn.Sequential):
 
 
 class ASPPPooling(nn.Sequential):
-    def __init__(self, in_channels, out_channels):
+    def __init__(self, in_channels: int, out_channels: int):
         super().__init__(
             nn.AdaptiveAvgPool2d(1),
             nn.Conv2d(in_channels, out_channels, kernel_size=1, bias=False),
@@ -159,16 +159,21 @@ class ASPPPooling(nn.Sequential):
 
 
 class ASPP(nn.Module):
-    def __init__(self, in_channels, out_channels, atrous_rates, separable=False):
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        atrous_rates: Iterable[int],
+        separable: bool=False,
+    ):
         super(ASPP, self).__init__()
-        modules = []
-        modules.append(
+        modules = [
             nn.Sequential(
-                nn.Conv2d(in_channels, out_channels, 1, bias=False),
+                nn.Conv2d(in_channels, out_channels, kernel_size=1, bias=False),
                 nn.BatchNorm2d(out_channels),
                 nn.ReLU(),
             )
-        )
+        ]
 
         rate1, rate2, rate3 = tuple(atrous_rates)
         ASPPConvModule = ASPPConv if not separable else ASPPSeparableConv
