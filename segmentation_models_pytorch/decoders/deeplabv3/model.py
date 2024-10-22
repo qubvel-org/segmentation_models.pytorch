@@ -24,13 +24,17 @@ class DeepLabV3(SegmentationModel):
         encoder_weights: One of **None** (random initialization), **"imagenet"** (pre-training on ImageNet) and
             other pretrained weights (see table with available weights for each encoder_name)
         decoder_channels: A number of convolution filters in ASPP module. Default is 256
+        encoder_output_stride: Downsampling factor for last encoder features (see original paper for explanation)
+        decoder_atrous_rates: Dilation rates for ASPP module (should be an iterable of 3 integer values)
+        decoder_aspp_separable: Use separable convolutions in ASPP module. Default is False
+        decoder_aspp_dropout: Use dropout in ASPP module projection layer. Default is 0.5
         in_channels: A number of input channels for the model, default is 3 (RGB images)
         classes: A number of classes for output mask (or you can think as a number of channels of output mask)
         activation: An activation function to apply after the final convolution layer.
             Available options are **"sigmoid"**, **"softmax"**, **"logsoftmax"**, **"tanh"**, **"identity"**,
                 **callable** and **None**.
             Default is **None**
-        upsampling: Final upsampling factor. Default is 8 to preserve input-output spatial shape identity
+        upsampling: Final upsampling factor (should have the same value as ``encoder_output_stride`` to preserve input-output spatial shape identity).
         aux_params: Dictionary with parameters of the auxiliary output (classification head). Auxiliary output is build
             on top of encoder if **aux_params** is not **None** (default). Supported params:
                 - classes (int): A number of classes
@@ -51,11 +55,15 @@ class DeepLabV3(SegmentationModel):
         encoder_name: str = "resnet34",
         encoder_depth: int = 5,
         encoder_weights: Optional[str] = "imagenet",
+        encoder_output_stride: Literal[8, 16] = 8,
         decoder_channels: int = 256,
+        decoder_atrous_rates: Iterable[int] = (12, 24, 36),
+        decoder_aspp_separable: bool = False,
+        decoder_aspp_dropout: float = 0.5,
         in_channels: int = 3,
         classes: int = 1,
         activation: Optional[str] = None,
-        upsampling: int = 8,
+        upsampling: Optional[int] = None,
         aux_params: Optional[dict] = None,
     ):
         super().__init__()
@@ -65,11 +73,15 @@ class DeepLabV3(SegmentationModel):
             in_channels=in_channels,
             depth=encoder_depth,
             weights=encoder_weights,
-            output_stride=8,
+            output_stride=encoder_output_stride,
         )
 
         self.decoder = DeepLabV3Decoder(
-            in_channels=self.encoder.out_channels[-1], out_channels=decoder_channels
+            in_channels=self.encoder.out_channels[-1],
+            out_channels=decoder_channels,
+            atrous_rates=decoder_atrous_rates,
+            aspp_separable=decoder_aspp_separable,
+            aspp_dropout=decoder_aspp_dropout,
         )
 
         self.segmentation_head = SegmentationHead(
@@ -77,7 +89,7 @@ class DeepLabV3(SegmentationModel):
             out_channels=classes,
             activation=activation,
             kernel_size=1,
-            upsampling=upsampling,
+            upsampling=encoder_output_stride if upsampling is None else upsampling,
         )
 
         if aux_params is not None:
@@ -102,8 +114,9 @@ class DeepLabV3Plus(SegmentationModel):
         encoder_weights: One of **None** (random initialization), **"imagenet"** (pre-training on ImageNet) and
             other pretrained weights (see table with available weights for each encoder_name)
         encoder_output_stride: Downsampling factor for last encoder features (see original paper for explanation)
-        decoder_atrous_rates: Dilation rates for ASPP module (should be a tuple of 3 integer values)
         decoder_atrous_rates: Dilation rates for ASPP module (should be an iterable of 3 integer values)
+        decoder_aspp_separable: Use separable convolutions in ASPP module. Default is True
+        decoder_aspp_dropout: Use dropout in ASPP module projection layer. Default is 0.5
         decoder_channels: A number of convolution filters in ASPP module. Default is 256
         in_channels: A number of input channels for the model, default is 3 (RGB images)
         classes: A number of classes for output mask (or you can think as a number of channels of output mask)
@@ -134,8 +147,9 @@ class DeepLabV3Plus(SegmentationModel):
         encoder_weights: Optional[str] = "imagenet",
         encoder_output_stride: Literal[8, 16] = 16,
         decoder_channels: int = 256,
-        decoder_atrous_rates: tuple = (12, 24, 36),
         decoder_atrous_rates: Iterable[int] = (12, 24, 36),
+        decoder_aspp_separable: bool = True,
+        decoder_aspp_dropout: float = 0.5,
         in_channels: int = 3,
         classes: int = 1,
         activation: Optional[str] = None,
@@ -157,6 +171,8 @@ class DeepLabV3Plus(SegmentationModel):
             out_channels=decoder_channels,
             atrous_rates=decoder_atrous_rates,
             output_stride=encoder_output_stride,
+            aspp_separable=decoder_aspp_separable,
+            aspp_dropout=decoder_aspp_dropout,
         )
 
         self.segmentation_head = SegmentationHead(
