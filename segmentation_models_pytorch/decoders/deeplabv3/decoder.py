@@ -34,7 +34,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-__all__ = ["DeepLabV3Decoder"]
+__all__ = ["DeepLabV3Decoder", "DeepLabV3PlusDecoder"]
 
 
 class DeepLabV3Decoder(nn.Sequential):
