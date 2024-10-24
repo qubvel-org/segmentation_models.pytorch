@@ -1,4 +1,4 @@
-autodocsumm==0.2.13
+autodocsumm==0.2.14
 huggingface-hub==0.26.1
 six==1.16.0
 sphinx==8.1.3
