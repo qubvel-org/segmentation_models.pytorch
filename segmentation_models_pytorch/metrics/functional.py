@@ -96,7 +96,7 @@ def get_stats(
 
         mode (str): One of ``'binary'`` | ``'multilabel'`` | ``'multiclass'``
         ignore_index (Optional[int]): Label to ignore on for metric computation.
-            **Not** supproted for ``'binary'`` and ``'multilabel'`` modes.  Defaults to None.
+            **Not** supported for ``'binary'`` and ``'multilabel'`` modes.  Defaults to None.
         threshold (Optional[float, List[float]]): Binarization threshold for
             ``output`` in case of ``'binary'`` or ``'multilabel'`` modes. Defaults to None.
         num_classes (Optional[int]): Number of classes, necessary attribute
@@ -146,7 +146,7 @@ def get_stats(
 
     if mode != "multiclass" and ignore_index is not None:
         raise ValueError(
-            f"``ignore_index`` parameter is not supproted for '{mode}' mode"
+            f"``ignore_index`` parameter is not supported for '{mode}' mode"
         )
 
     if mode == "multiclass" and num_classes is None:
