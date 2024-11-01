@@ -3,7 +3,7 @@
 #
 # Licensed under the NVIDIA Source Code License. For full license
 # terms, please refer to the LICENSE file provided with this code
-# or visit NVIDIA's official repository at 
+# or visit NVIDIA's official repository at
 # https://github.com/NVlabs/SegFormer/tree/master.
 #
 # This code has been modified.
@@ -30,6 +30,7 @@ class LayerNorm(nn.LayerNorm):
                 x, self.normalized_shape, self.weight, self.bias, self.eps
             )
         return x
+
 
 class Mlp(nn.Module):
     def __init__(
@@ -466,7 +467,6 @@ class MixVisionTransformer(nn.Module):
         )
 
     def forward_features(self, x):
-        B = x.shape[0]
         outs = []
 
         # stage 1
