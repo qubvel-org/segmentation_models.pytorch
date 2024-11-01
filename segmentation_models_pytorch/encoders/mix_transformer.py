@@ -213,7 +213,7 @@ class Block(nn.Module):
             if m.bias is not None:
                 m.bias.data.zero_()
 
-    def forward(self, x: torch.Tensor):
+    def forward(self, x):
         B, _, H, W = x.shape
         x = x.flatten(2).transpose(1, 2)
         x = x + self.drop_path(self.attn(self.norm1(x), H, W))
@@ -281,7 +281,7 @@ class MixVisionTransformer(nn.Module):
         drop_rate=0.0,
         attn_drop_rate=0.0,
         drop_path_rate=0.0,
-        norm_layer=nn.LayerNorm,
+        norm_layer=LayerNorm,
         depths=[3, 4, 6, 3],
         sr_ratios=[8, 4, 2, 1],
     ):
@@ -540,17 +540,11 @@ class MixVisionTransformerEncoder(MixVisionTransformer, EncoderMixin):
             nn.Sequential(self.patch_embed4, self.block4, self.norm4),
         ]
 
-    def set_in_channels(self, in_channels, *args, **kwargs):
-        if in_channels != 3:
-            raise ValueError(
-                "MixVisionTransformer encoder does not support in_channels setting other than 3"
-            )
-
     def forward(self, x):
         stages = self.get_stages()
 
         # create dummy output for the first block
-        B, C, H, W = x.shape
+        B, _, H, W = x.shape
         dummy = torch.empty([B, 0, H // 2, W // 2], dtype=x.dtype, device=x.device)
 
         features = []
@@ -592,7 +586,7 @@ mix_transformer_encoders = {
             num_heads=[1, 2, 5, 8],
             mlp_ratios=[4, 4, 4, 4],
             qkv_bias=True,
-            norm_layer=partial(nn.LayerNorm, eps=1e-6),
+            norm_layer=partial(LayerNorm, eps=1e-6),
             depths=[2, 2, 2, 2],
             sr_ratios=[8, 4, 2, 1],
             drop_rate=0.0,
@@ -609,7 +603,7 @@ mix_transformer_encoders = {
             num_heads=[1, 2, 5, 8],
             mlp_ratios=[4, 4, 4, 4],
             qkv_bias=True,
-            norm_layer=partial(nn.LayerNorm, eps=1e-6),
+            norm_layer=partial(LayerNorm, eps=1e-6),
             depths=[2, 2, 2, 2],
             sr_ratios=[8, 4, 2, 1],
             drop_rate=0.0,
@@ -626,7 +620,7 @@ mix_transformer_encoders = {
             num_heads=[1, 2, 5, 8],
             mlp_ratios=[4, 4, 4, 4],
             qkv_bias=True,
-            norm_layer=partial(nn.LayerNorm, eps=1e-6),
+            norm_layer=partial(LayerNorm, eps=1e-6),
             depths=[3, 4, 6, 3],
             sr_ratios=[8, 4, 2, 1],
             drop_rate=0.0,
@@ -643,7 +637,7 @@ mix_transformer_encoders = {
             num_heads=[1, 2, 5, 8],
             mlp_ratios=[4, 4, 4, 4],
             qkv_bias=True,
-            norm_layer=partial(nn.LayerNorm, eps=1e-6),
+            norm_layer=partial(LayerNorm, eps=1e-6),
             depths=[3, 4, 18, 3],
             sr_ratios=[8, 4, 2, 1],
             drop_rate=0.0,
@@ -660,7 +654,7 @@ mix_transformer_encoders = {
             num_heads=[1, 2, 5, 8],
             mlp_ratios=[4, 4, 4, 4],
             qkv_bias=True,
-            norm_layer=partial(nn.LayerNorm, eps=1e-6),
+            norm_layer=partial(LayerNorm, eps=1e-6),
             depths=[3, 8, 27, 3],
             sr_ratios=[8, 4, 2, 1],
             drop_rate=0.0,
@@ -677,7 +671,7 @@ mix_transformer_encoders = {
             num_heads=[1, 2, 5, 8],
             mlp_ratios=[4, 4, 4, 4],
             qkv_bias=True,
-            norm_layer=partial(nn.LayerNorm, eps=1e-6),
+            norm_layer=partial(LayerNorm, eps=1e-6),
             depths=[3, 6, 40, 3],
             sr_ratios=[8, 4, 2, 1],
             drop_rate=0.0,
