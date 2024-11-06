@@ -28,7 +28,7 @@ class TimmUniversalEncoder(nn.Module):
             common_kwargs.pop("output_stride")
 
         self.model = timm.create_model(
-            name, **_merge_kwargs_no_dupls(common_kwargs, kwargs)
+            name, **_merge_kwargs_no_duplicates(common_kwargs, kwargs)
         )
 
         self._in_channels = in_channels
@@ -50,9 +50,9 @@ class TimmUniversalEncoder(nn.Module):
         return min(self._output_stride, 2**self._depth)
 
 
-def _merge_kwargs_no_dupls(a: dict[str, Any], b: dict[str, Any]) -> dict[str, Any]:
-    dupls = a.keys() & b.keys()
-    if dupls:
-        raise ValueError(f"'{dupls}' already specified internally")
+def _merge_kwargs_no_duplicates(a: dict[str, Any], b: dict[str, Any]) -> dict[str, Any]:
+    duplicates = a.keys() & b.keys()
+    if duplicates:
+        raise ValueError(f"'{duplicates}' already specified internally")
 
     return a | b
