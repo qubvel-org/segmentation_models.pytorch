@@ -1,11 +1,12 @@
-from typing import Optional
+from typing import Any, Optional
 
 from segmentation_models_pytorch.base import (
-    SegmentationModel,
-    SegmentationHead,
     ClassificationHead,
+    SegmentationHead,
+    SegmentationModel,
 )
 from segmentation_models_pytorch.encoders import get_encoder
+
 from .decoder import DeepLabV3Decoder, DeepLabV3PlusDecoder
 
 
@@ -36,6 +37,8 @@ class DeepLabV3(SegmentationModel):
                 - dropout (float): Dropout factor in [0, 1)
                 - activation (str): An activation function to apply "sigmoid"/"softmax"
                     (could be **None** to return logits)
+        kwargs: Arguments passed to the encoder class ``__init__()`` function. Applies only to ``timm`` models. Keys with ``None`` values are pruned before passing.
+
     Returns:
         ``torch.nn.Module``: **DeepLabV3**
 
@@ -55,6 +58,7 @@ class DeepLabV3(SegmentationModel):
         activation: Optional[str] = None,
         upsampling: int = 8,
         aux_params: Optional[dict] = None,
+        **kwargs: dict[str, Any],
     ):
         super().__init__()
 
@@ -64,6 +68,7 @@ class DeepLabV3(SegmentationModel):
             depth=encoder_depth,
             weights=encoder_weights,
             output_stride=8,
+            **kwargs,
         )
 
         self.decoder = DeepLabV3Decoder(
@@ -116,6 +121,8 @@ class DeepLabV3Plus(SegmentationModel):
                 - dropout (float): Dropout factor in [0, 1)
                 - activation (str): An activation function to apply "sigmoid"/"softmax"
                     (could be **None** to return logits)
+        kwargs: Arguments passed to the encoder class ``__init__()`` function. Applies only to ``timm`` models. Keys with ``None`` values are pruned before passing.
+
     Returns:
         ``torch.nn.Module``: **DeepLabV3Plus**
 
@@ -137,6 +144,7 @@ class DeepLabV3Plus(SegmentationModel):
         activation: Optional[str] = None,
         upsampling: int = 4,
         aux_params: Optional[dict] = None,
+        **kwargs: dict[str, Any],
     ):
         super().__init__()
 
@@ -153,6 +161,7 @@ class DeepLabV3Plus(SegmentationModel):
             depth=encoder_depth,
             weights=encoder_weights,
             output_stride=encoder_output_stride,
+            **kwargs,
         )
 
         self.decoder = DeepLabV3PlusDecoder(

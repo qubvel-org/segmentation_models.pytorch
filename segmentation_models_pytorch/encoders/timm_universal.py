@@ -1,11 +1,21 @@
+from typing import Any
+
 import timm
 import torch.nn as nn
 
 
 class TimmUniversalEncoder(nn.Module):
-    def __init__(self, name, pretrained=True, in_channels=3, depth=5, output_stride=32):
+    def __init__(
+        self,
+        name: str,
+        pretrained: bool = True,
+        in_channels: int = 3,
+        depth: int = 5,
+        output_stride: int = 32,
+        **kwargs: dict[str, Any],
+    ):
         super().__init__()
-        kwargs = dict(
+        common_kwargs = dict(
             in_chans=in_channels,
             features_only=True,
             output_stride=output_stride,
@@ -15,9 +25,11 @@ class TimmUniversalEncoder(nn.Module):
 
         # not all models support output stride argument, drop it by default
         if output_stride == 32:
-            kwargs.pop("output_stride")
+            common_kwargs.pop("output_stride")
 
-        self.model = timm.create_model(name, **kwargs)
+        self.model = timm.create_model(
+            name, **_merge_kwargs_no_duplicates(common_kwargs, kwargs)
+        )
 
         self._in_channels = in_channels
         self._out_channels = [in_channels] + self.model.feature_info.channels()
@@ -36,3 +48,11 @@ class TimmUniversalEncoder(nn.Module):
     @property
     def output_stride(self):
         return min(self._output_stride, 2**self._depth)
+
+
+def _merge_kwargs_no_duplicates(a: dict[str, Any], b: dict[str, Any]) -> dict[str, Any]:
+    duplicates = a.keys() & b.keys()
+    if duplicates:
+        raise ValueError(f"'{duplicates}' already specified internally")
+
+    return a | b
