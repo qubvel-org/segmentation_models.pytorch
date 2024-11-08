@@ -1,5 +1,5 @@
 from collections.abc import Iterable
-from typing import Literal, Optional
+from typing import Any, Literal, Optional
 
 
 from segmentation_models_pytorch.base import (
