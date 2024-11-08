@@ -1,11 +1,12 @@
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
-from segmentation_models_pytorch.encoders import get_encoder
 from segmentation_models_pytorch.base import (
-    SegmentationModel,
-    SegmentationHead,
     ClassificationHead,
+    SegmentationHead,
+    SegmentationModel,
 )
+from segmentation_models_pytorch.encoders import get_encoder
+
 from .decoder import PANDecoder
 
 
@@ -38,6 +39,7 @@ class PAN(SegmentationModel):
                 - dropout (float): Dropout factor in [0, 1)
                 - activation (str): An activation function to apply "sigmoid"/"softmax"
                     (could be **None** to return logits)
+        kwargs: Arguments passed to the encoder class ``__init__()`` function. Applies only to ``timm`` models. Keys with ``None`` values are pruned before passing.
 
     Returns:
         ``torch.nn.Module``: **PAN**
@@ -58,6 +60,7 @@ class PAN(SegmentationModel):
         activation: Optional[Union[str, callable]] = None,
         upsampling: int = 4,
         aux_params: Optional[dict] = None,
+        **kwargs: dict[str, Any],
     ):
         super().__init__()
 
@@ -74,6 +77,7 @@ class PAN(SegmentationModel):
             depth=5,
             weights=encoder_weights,
             output_stride=encoder_output_stride,
+            **kwargs,
         )
 
         self.decoder = PANDecoder(

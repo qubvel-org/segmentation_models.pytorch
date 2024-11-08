@@ -1,11 +1,12 @@
-from typing import Optional, Union, List
+from typing import Any, List, Optional, Union
 
-from segmentation_models_pytorch.encoders import get_encoder
 from segmentation_models_pytorch.base import (
-    SegmentationModel,
-    SegmentationHead,
     ClassificationHead,
+    SegmentationHead,
+    SegmentationModel,
 )
+from segmentation_models_pytorch.encoders import get_encoder
+
 from .decoder import UnetPlusPlusDecoder
 
 
@@ -44,6 +45,7 @@ class UnetPlusPlus(SegmentationModel):
                 - dropout (float): Dropout factor in [0, 1)
                 - activation (str): An activation function to apply "sigmoid"/"softmax"
                     (could be **None** to return logits)
+        kwargs: Arguments passed to the encoder class ``__init__()`` function. Applies only to ``timm`` models. Keys with ``None`` values are pruned before passing.
 
     Returns:
         ``torch.nn.Module``: **Unet++**
@@ -65,6 +67,7 @@ class UnetPlusPlus(SegmentationModel):
         classes: int = 1,
         activation: Optional[Union[str, callable]] = None,
         aux_params: Optional[dict] = None,
+        **kwargs: dict[str, Any],
     ):
         super().__init__()
 
@@ -78,6 +81,7 @@ class UnetPlusPlus(SegmentationModel):
             in_channels=in_channels,
             depth=encoder_depth,
             weights=encoder_weights,
+            **kwargs,
         )
 
         self.decoder = UnetPlusPlusDecoder(
