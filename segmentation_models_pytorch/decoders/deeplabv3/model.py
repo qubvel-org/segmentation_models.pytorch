@@ -76,7 +76,7 @@ class DeepLabV3(SegmentationModel):
             encoder_name,
             in_channels=in_channels,
             depth=encoder_depth,
-            weights=encoder_weights
+            weights=encoder_weights,
             output_stride=encoder_output_stride,
             **kwargs,
         )
