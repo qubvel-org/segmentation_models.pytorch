@@ -30,17 +30,33 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
+from collections.abc import Iterable, Sequence
+from typing import Literal
+
 import torch
 from torch import nn
 from torch.nn import functional as F
 
-__all__ = ["DeepLabV3Decoder"]
+__all__ = ["DeepLabV3Decoder", "DeepLabV3PlusDecoder"]
 
 
 class DeepLabV3Decoder(nn.Sequential):
-    def __init__(self, in_channels, out_channels=256, atrous_rates=(12, 24, 36)):
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        atrous_rates: Iterable[int],
+        aspp_separable: bool,
+        aspp_dropout: float,
+    ):
         super().__init__(
-            ASPP(in_channels, out_channels, atrous_rates),
+            ASPP(
+                in_channels,
+                out_channels,
+                atrous_rates,
+                separable=aspp_separable,
+                dropout=aspp_dropout,
+            ),
             nn.Conv2d(out_channels, out_channels, 3, padding=1, bias=False),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(),
@@ -54,10 +70,12 @@ class DeepLabV3Decoder(nn.Sequential):
 class DeepLabV3PlusDecoder(nn.Module):
     def __init__(
         self,
-        encoder_channels,
-        out_channels=256,
-        atrous_rates=(12, 24, 36),
-        output_stride=16,
+        encoder_channels: Sequence[int, ...],
+        out_channels: int,
+        atrous_rates: Iterable[int],
+        output_stride: Literal[8, 16],
+        aspp_separable: bool,
+        aspp_dropout: float,
     ):
         super().__init__()
         if output_stride not in {8, 16}:
@@ -69,7 +87,13 @@ class DeepLabV3PlusDecoder(nn.Module):
         self.output_stride = output_stride
 
         self.aspp = nn.Sequential(
-            ASPP(encoder_channels[-1], out_channels, atrous_rates, separable=True),
+            ASPP(
+                encoder_channels[-1],
+                out_channels,
+                atrous_rates,
+                separable=aspp_separable,
+                dropout=aspp_dropout,
+            ),
             SeparableConv2d(
                 out_channels, out_channels, kernel_size=3, padding=1, bias=False
             ),
@@ -111,7 +135,7 @@ class DeepLabV3PlusDecoder(nn.Module):
 
 
 class ASPPConv(nn.Sequential):
-    def __init__(self, in_channels, out_channels, dilation):
+    def __init__(self, in_channels: int, out_channels: int, dilation: int):
         super().__init__(
             nn.Conv2d(
                 in_channels,
@@ -127,7 +151,7 @@ class ASPPConv(nn.Sequential):
 
 
 class ASPPSeparableConv(nn.Sequential):
-    def __init__(self, in_channels, out_channels, dilation):
+    def __init__(self, in_channels: int, out_channels: int, dilation: int):
         super().__init__(
             SeparableConv2d(
                 in_channels,
@@ -143,7 +167,7 @@ class ASPPSeparableConv(nn.Sequential):
 
 
 class ASPPPooling(nn.Sequential):
-    def __init__(self, in_channels, out_channels):
+    def __init__(self, in_channels: int, out_channels: int):
         super().__init__(
             nn.AdaptiveAvgPool2d(1),
             nn.Conv2d(in_channels, out_channels, kernel_size=1, bias=False),
@@ -159,16 +183,22 @@ class ASPPPooling(nn.Sequential):
 
 
 class ASPP(nn.Module):
-    def __init__(self, in_channels, out_channels, atrous_rates, separable=False):
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        atrous_rates: Iterable[int],
+        separable: bool,
+        dropout: float,
+    ):
         super(ASPP, self).__init__()
-        modules = []
-        modules.append(
+        modules = [
             nn.Sequential(
-                nn.Conv2d(in_channels, out_channels, 1, bias=False),
+                nn.Conv2d(in_channels, out_channels, kernel_size=1, bias=False),
                 nn.BatchNorm2d(out_channels),
                 nn.ReLU(),
             )
-        )
+        ]
 
         rate1, rate2, rate3 = tuple(atrous_rates)
         ASPPConvModule = ASPPConv if not separable else ASPPSeparableConv
@@ -184,7 +214,7 @@ class ASPP(nn.Module):
             nn.Conv2d(5 * out_channels, out_channels, kernel_size=1, bias=False),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(),
-            nn.Dropout(0.5),
+            nn.Dropout(dropout),
         )
 
     def forward(self, x):
