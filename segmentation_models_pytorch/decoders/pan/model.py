@@ -20,6 +20,10 @@ class PAN(SegmentationModel):
     Args:
         encoder_name: Name of the classification model that will be used as an encoder (a.k.a backbone)
             to extract features of different spatial resolution
+        encoder_depth: A number of stages used in encoder in range [3, 5]. Each stage generate features
+            two times smaller in spatial dimensions than previous one (e.g. for depth 0 we will have features
+            with shapes [(N, C, H, W),], for depth 1 - [(N, C, H, W), (N, C, H // 2, W // 2)] and so on).
+            Default is 5
         encoder_weights: One of **None** (random initialization), **"imagenet"** (pre-training on ImageNet) and
             other pretrained weights (see table with available weights for each encoder_name)
         encoder_output_stride: 16 or 32, if 16 use dilation in encoder last layer.
@@ -52,6 +56,7 @@ class PAN(SegmentationModel):
     def __init__(
         self,
         encoder_name: str = "resnet34",
+        encoder_depth: int = 5,
         encoder_weights: Optional[str] = "imagenet",
         encoder_output_stride: int = 16,
         decoder_channels: int = 32,
@@ -74,7 +79,7 @@ class PAN(SegmentationModel):
         self.encoder = get_encoder(
             encoder_name,
             in_channels=in_channels,
-            depth=5,
+            depth=encoder_depth,
             weights=encoder_weights,
             output_stride=encoder_output_stride,
             **kwargs,
@@ -82,6 +87,7 @@ class PAN(SegmentationModel):
 
         self.decoder = PANDecoder(
             encoder_channels=self.encoder.out_channels,
+            encoder_depth=encoder_depth,
             decoder_channels=decoder_channels,
         )
 
