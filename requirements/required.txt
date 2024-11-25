@@ -7,4 +7,4 @@ six==1.16.0
 timm==1.0.11
 torch==2.5.1
 torchvision==0.20.1
-tqdm==4.67.0
+tqdm==4.67.1
