@@ -35,7 +35,7 @@ class DeepLabV3(SegmentationModel):
             Available options are **"sigmoid"**, **"softmax"**, **"logsoftmax"**, **"tanh"**, **"identity"**,
                 **callable** and **None**.
             Default is **None**
-        upsampling: Final upsampling factor (should have the same value as ``encoder_output_stride`` to preserve input-output spatial shape identity).
+        upsampling: Final upsampling factor. Default is **None** to preserve input-output spatial shape identity
         aux_params: Dictionary with parameters of the auxiliary output (classification head). Auxiliary output is build
             on top of encoder if **aux_params** is not **None** (default). Supported params:
                 - classes (int): A number of classes
@@ -43,7 +43,8 @@ class DeepLabV3(SegmentationModel):
                 - dropout (float): Dropout factor in [0, 1)
                 - activation (str): An activation function to apply "sigmoid"/"softmax"
                     (could be **None** to return logits)
-        kwargs: Arguments passed to the encoder class ``__init__()`` function. Applies only to ``timm`` models. Keys with ``None`` values are pruned before passing.
+        kwargs: Arguments passed to the encoder class ``__init__()`` function. Applies only to ``timm`` models. 
+            Keys with ``None`` values are pruned before passing.
 
     Returns:
         ``torch.nn.Module``: **DeepLabV3**
@@ -72,6 +73,13 @@ class DeepLabV3(SegmentationModel):
     ):
         super().__init__()
 
+        if encoder_output_stride not in [8, 16]:
+            raise ValueError(
+                "DeeplabV3 support output stride 8 or 16, got {}.".format(
+                    encoder_output_stride
+                )
+            )
+        
         self.encoder = get_encoder(
             encoder_name,
             in_channels=in_channels,
@@ -80,6 +88,14 @@ class DeepLabV3(SegmentationModel):
             output_stride=encoder_output_stride,
             **kwargs,
         )
+
+        if upsampling is None:
+            if encoder_depth <= 3:
+                scale_factor = 2 ** encoder_depth
+            else:
+                scale_factor = encoder_output_stride
+        else:
+            scale_factor = upsampling
 
         self.decoder = DeepLabV3Decoder(
             in_channels=self.encoder.out_channels[-1],
@@ -90,11 +106,11 @@ class DeepLabV3(SegmentationModel):
         )
 
         self.segmentation_head = SegmentationHead(
-            in_channels=self.decoder.out_channels,
+            in_channels=decoder_channels,
             out_channels=classes,
             activation=activation,
             kernel_size=1,
-            upsampling=encoder_output_stride if upsampling is None else upsampling,
+            upsampling=scale_factor,
         )
 
         if aux_params is not None:
@@ -137,7 +153,8 @@ class DeepLabV3Plus(SegmentationModel):
                 - dropout (float): Dropout factor in [0, 1)
                 - activation (str): An activation function to apply "sigmoid"/"softmax"
                     (could be **None** to return logits)
-        kwargs: Arguments passed to the encoder class ``__init__()`` function. Applies only to ``timm`` models. Keys with ``None`` values are pruned before passing.
+        kwargs: Arguments passed to the encoder class ``__init__()`` function. Applies only to ``timm`` models. 
+            Keys with ``None`` values are pruned before passing.
 
     Returns:
         ``torch.nn.Module``: **DeepLabV3Plus**
@@ -166,6 +183,13 @@ class DeepLabV3Plus(SegmentationModel):
     ):
         super().__init__()
 
+        if encoder_output_stride not in [8, 16]:
+            raise ValueError(
+                "DeeplabV3Plus support output stride 8 or 16, got {}.".format(
+                    encoder_output_stride
+                )
+            )
+
         self.encoder = get_encoder(
             encoder_name,
             in_channels=in_channels,
@@ -177,6 +201,7 @@ class DeepLabV3Plus(SegmentationModel):
 
         self.decoder = DeepLabV3PlusDecoder(
             encoder_channels=self.encoder.out_channels,
+            encoder_depth=encoder_depth,
             out_channels=decoder_channels,
             atrous_rates=decoder_atrous_rates,
             output_stride=encoder_output_stride,
@@ -185,7 +210,7 @@ class DeepLabV3Plus(SegmentationModel):
         )
 
         self.segmentation_head = SegmentationHead(
-            in_channels=self.decoder.out_channels,
+            in_channels=decoder_channels,
             out_channels=classes,
             activation=activation,
             kernel_size=1,
