@@ -33,7 +33,8 @@ class SegmentationModel(torch.nn.Module, SMPHubMixin):
     def forward(self, x):
         """Sequentially pass `x` trough model`s encoder, decoder and heads"""
 
-        self.check_input_shape(x)
+        if not torch.jit.is_tracing():
+            self.check_input_shape(x)
 
         features = self.encoder(x)
         decoder_output = self.decoder(*features)
