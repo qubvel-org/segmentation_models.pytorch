@@ -26,6 +26,7 @@ import torch as _torch
 
 # Suppress the specific SyntaxWarning for `pretrainedmodels`
 warnings.filterwarnings("ignore", message="is with a literal", category=SyntaxWarning)
+warnings.filterwarnings("ignore", message=r'"is" with \'str\' literal.*', category=SyntaxWarning) # for python >= 3.12
 
 
 def create_model(
