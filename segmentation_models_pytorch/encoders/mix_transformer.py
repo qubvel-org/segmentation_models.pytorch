@@ -1,7 +1,12 @@
 # ---------------------------------------------------------------
 # Copyright (c) 2021, NVIDIA Corporation. All rights reserved.
 #
-# This work is licensed under the NVIDIA Source Code License
+# Licensed under the NVIDIA Source Code License. For full license
+# terms, please refer to the LICENSE file provided with this code
+# or visit NVIDIA's official repository at
+# https://github.com/NVlabs/SegFormer/tree/master.
+#
+# This code has been modified.
 # ---------------------------------------------------------------
 import math
 import torch
@@ -9,6 +14,18 @@ import torch.nn as nn
 from functools import partial
 
 from timm.layers import DropPath, to_2tuple, trunc_normal_
+
+
+class LayerNorm(nn.LayerNorm):
+    def forward(self, x):
+        if x.ndim == 4:
+            B, C, H, W = x.shape
+            x = x.view(B, C, -1).transpose(1, 2)
+            x = super().forward(x)
+            x = x.transpose(1, 2).view(B, C, H, W)
+        else:
+            x = super().forward(x)
+        return x
 
 
 class Mlp(nn.Module):
@@ -36,9 +53,6 @@ class Mlp(nn.Module):
             trunc_normal_(m.weight, std=0.02)
             if isinstance(m, nn.Linear) and m.bias is not None:
                 nn.init.constant_(m.bias, 0)
-        elif isinstance(m, nn.LayerNorm):
-            nn.init.constant_(m.bias, 0)
-            nn.init.constant_(m.weight, 1.0)
         elif isinstance(m, nn.Conv2d):
             fan_out = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
             fan_out //= m.groups
@@ -86,7 +100,7 @@ class Attention(nn.Module):
         self.sr_ratio = sr_ratio
         if sr_ratio > 1:
             self.sr = nn.Conv2d(dim, dim, kernel_size=sr_ratio, stride=sr_ratio)
-            self.norm = nn.LayerNorm(dim)
+            self.norm = LayerNorm(dim)
 
         self.apply(self._init_weights)
 
@@ -95,7 +109,7 @@ class Attention(nn.Module):
             trunc_normal_(m.weight, std=0.02)
             if isinstance(m, nn.Linear) and m.bias is not None:
                 nn.init.constant_(m.bias, 0)
-        elif isinstance(m, nn.LayerNorm):
+        elif isinstance(m, LayerNorm):
             nn.init.constant_(m.bias, 0)
             nn.init.constant_(m.weight, 1.0)
         elif isinstance(m, nn.Conv2d):
@@ -153,7 +167,7 @@ class Block(nn.Module):
         attn_drop=0.0,
         drop_path=0.0,
         act_layer=nn.GELU,
-        norm_layer=nn.LayerNorm,
+        norm_layer=LayerNorm,
         sr_ratio=1,
     ):
         super().__init__()
@@ -185,7 +199,7 @@ class Block(nn.Module):
             trunc_normal_(m.weight, std=0.02)
             if isinstance(m, nn.Linear) and m.bias is not None:
                 nn.init.constant_(m.bias, 0)
-        elif isinstance(m, nn.LayerNorm):
+        elif isinstance(m, LayerNorm):
             nn.init.constant_(m.bias, 0)
             nn.init.constant_(m.weight, 1.0)
         elif isinstance(m, nn.Conv2d):
@@ -195,10 +209,12 @@ class Block(nn.Module):
             if m.bias is not None:
                 m.bias.data.zero_()
 
-    def forward(self, x, H, W):
+    def forward(self, x):
+        B, _, H, W = x.shape
+        x = x.flatten(2).transpose(1, 2)
         x = x + self.drop_path(self.attn(self.norm1(x), H, W))
         x = x + self.drop_path(self.mlp(self.norm2(x), H, W))
-
+        x = x.transpose(1, 2).view(B, -1, H, W)
         return x
 
 
@@ -221,7 +237,7 @@ class OverlapPatchEmbed(nn.Module):
             stride=stride,
             padding=(patch_size[0] // 2, patch_size[1] // 2),
         )
-        self.norm = nn.LayerNorm(embed_dim)
+        self.norm = LayerNorm(embed_dim)
 
         self.apply(self._init_weights)
 
@@ -230,7 +246,7 @@ class OverlapPatchEmbed(nn.Module):
             trunc_normal_(m.weight, std=0.02)
             if isinstance(m, nn.Linear) and m.bias is not None:
                 nn.init.constant_(m.bias, 0)
-        elif isinstance(m, nn.LayerNorm):
+        elif isinstance(m, LayerNorm):
             nn.init.constant_(m.bias, 0)
             nn.init.constant_(m.weight, 1.0)
         elif isinstance(m, nn.Conv2d):
@@ -242,11 +258,8 @@ class OverlapPatchEmbed(nn.Module):
 
     def forward(self, x):
         x = self.proj(x)
-        _, _, H, W = x.shape
-        x = x.flatten(2).transpose(1, 2)
         x = self.norm(x)
-
-        return x, H, W
+        return x
 
 
 class MixVisionTransformer(nn.Module):
@@ -264,7 +277,7 @@ class MixVisionTransformer(nn.Module):
         drop_rate=0.0,
         attn_drop_rate=0.0,
         drop_path_rate=0.0,
-        norm_layer=nn.LayerNorm,
+        norm_layer=LayerNorm,
         depths=[3, 4, 6, 3],
         sr_ratios=[8, 4, 2, 1],
     ):
@@ -307,8 +320,8 @@ class MixVisionTransformer(nn.Module):
             x.item() for x in torch.linspace(0, drop_path_rate, sum(depths))
         ]  # stochastic depth decay rule
         cur = 0
-        self.block1 = nn.ModuleList(
-            [
+        self.block1 = nn.Sequential(
+            *[
                 Block(
                     dim=embed_dims[0],
                     num_heads=num_heads[0],
@@ -327,8 +340,8 @@ class MixVisionTransformer(nn.Module):
         self.norm1 = norm_layer(embed_dims[0])
 
         cur += depths[0]
-        self.block2 = nn.ModuleList(
-            [
+        self.block2 = nn.Sequential(
+            *[
                 Block(
                     dim=embed_dims[1],
                     num_heads=num_heads[1],
@@ -347,8 +360,8 @@ class MixVisionTransformer(nn.Module):
         self.norm2 = norm_layer(embed_dims[1])
 
         cur += depths[1]
-        self.block3 = nn.ModuleList(
-            [
+        self.block3 = nn.Sequential(
+            *[
                 Block(
                     dim=embed_dims[2],
                     num_heads=num_heads[2],
@@ -367,8 +380,8 @@ class MixVisionTransformer(nn.Module):
         self.norm3 = norm_layer(embed_dims[2])
 
         cur += depths[2]
-        self.block4 = nn.ModuleList(
-            [
+        self.block4 = nn.Sequential(
+            *[
                 Block(
                     dim=embed_dims[3],
                     num_heads=num_heads[3],
@@ -396,7 +409,7 @@ class MixVisionTransformer(nn.Module):
             trunc_normal_(m.weight, std=0.02)
             if isinstance(m, nn.Linear) and m.bias is not None:
                 nn.init.constant_(m.bias, 0)
-        elif isinstance(m, nn.LayerNorm):
+        elif isinstance(m, LayerNorm):
             nn.init.constant_(m.bias, 0)
             nn.init.constant_(m.weight, 1.0)
         elif isinstance(m, nn.Conv2d):
@@ -450,39 +463,30 @@ class MixVisionTransformer(nn.Module):
         )
 
     def forward_features(self, x):
-        B = x.shape[0]
         outs = []
 
         # stage 1
-        x, H, W = self.patch_embed1(x)
-        for i, blk in enumerate(self.block1):
-            x = blk(x, H, W)
-        x = self.norm1(x)
-        x = x.reshape(B, H, W, -1).permute(0, 3, 1, 2).contiguous()
+        x = self.patch_embed1(x)
+        x = self.block1(x)
+        x = self.norm1(x).contiguous()
         outs.append(x)
 
         # stage 2
-        x, H, W = self.patch_embed2(x)
-        for i, blk in enumerate(self.block2):
-            x = blk(x, H, W)
-        x = self.norm2(x)
-        x = x.reshape(B, H, W, -1).permute(0, 3, 1, 2).contiguous()
+        x = self.patch_embed2(x)
+        x = self.block2(x)
+        x = self.norm2(x).contiguous()
         outs.append(x)
 
         # stage 3
-        x, H, W = self.patch_embed3(x)
-        for i, blk in enumerate(self.block3):
-            x = blk(x, H, W)
-        x = self.norm3(x)
-        x = x.reshape(B, H, W, -1).permute(0, 3, 1, 2).contiguous()
+        x = self.patch_embed3(x)
+        x = self.block3(x)
+        x = self.norm3(x).contiguous()
         outs.append(x)
 
         # stage 4
-        x, H, W = self.patch_embed4(x)
-        for i, blk in enumerate(self.block4):
-            x = blk(x, H, W)
-        x = self.norm4(x)
-        x = x.reshape(B, H, W, -1).permute(0, 3, 1, 2).contiguous()
+        x = self.patch_embed4(x)
+        x = self.block4(x)
+        x = self.norm4(x).contiguous()
         outs.append(x)
 
         return outs
@@ -500,7 +504,7 @@ class DWConv(nn.Module):
         self.dwconv = nn.Conv2d(dim, dim, 3, 1, 1, bias=True, groups=dim)
 
     def forward(self, x, H, W):
-        B, N, C = x.shape
+        B, _, C = x.shape
         x = x.transpose(1, 2).view(B, C, H, W)
         x = self.dwconv(x)
         x = x.flatten(2).transpose(1, 2)
@@ -522,21 +526,31 @@ class MixVisionTransformerEncoder(MixVisionTransformer, EncoderMixin):
         self._depth = depth
         self._in_channels = 3
 
-    def make_dilated(self, *args, **kwargs):
-        raise ValueError("MixVisionTransformer encoder does not support dilated mode")
-
-    def set_in_channels(self, in_channels, *args, **kwargs):
-        if in_channels != 3:
-            raise ValueError(
-                "MixVisionTransformer encoder does not support in_channels setting other than 3"
-            )
+    def get_stages(self):
+        return [
+            nn.Identity(),
+            nn.Identity(),
+            nn.Sequential(self.patch_embed1, self.block1, self.norm1),
+            nn.Sequential(self.patch_embed2, self.block2, self.norm2),
+            nn.Sequential(self.patch_embed3, self.block3, self.norm3),
+            nn.Sequential(self.patch_embed4, self.block4, self.norm4),
+        ]
 
     def forward(self, x):
+        stages = self.get_stages()
+
         # create dummy output for the first block
-        B, C, H, W = x.shape
+        B, _, H, W = x.shape
         dummy = torch.empty([B, 0, H // 2, W // 2], dtype=x.dtype, device=x.device)
 
-        return [x, dummy] + self.forward_features(x)[: self._depth - 1]
+        features = []
+        for i in range(self._depth + 1):
+            if i == 1:
+                features.append(dummy)
+            else:
+                x = stages[i](x).contiguous()
+                features.append(x)
+        return features
 
     def load_state_dict(self, state_dict):
         state_dict.pop("head.weight", None)
@@ -568,7 +582,7 @@ mix_transformer_encoders = {
             num_heads=[1, 2, 5, 8],
             mlp_ratios=[4, 4, 4, 4],
             qkv_bias=True,
-            norm_layer=partial(nn.LayerNorm, eps=1e-6),
+            norm_layer=partial(LayerNorm, eps=1e-6),
             depths=[2, 2, 2, 2],
             sr_ratios=[8, 4, 2, 1],
             drop_rate=0.0,
@@ -585,7 +599,7 @@ mix_transformer_encoders = {
             num_heads=[1, 2, 5, 8],
             mlp_ratios=[4, 4, 4, 4],
             qkv_bias=True,
-            norm_layer=partial(nn.LayerNorm, eps=1e-6),
+            norm_layer=partial(LayerNorm, eps=1e-6),
             depths=[2, 2, 2, 2],
             sr_ratios=[8, 4, 2, 1],
             drop_rate=0.0,
@@ -602,7 +616,7 @@ mix_transformer_encoders = {
             num_heads=[1, 2, 5, 8],
             mlp_ratios=[4, 4, 4, 4],
             qkv_bias=True,
-            norm_layer=partial(nn.LayerNorm, eps=1e-6),
+            norm_layer=partial(LayerNorm, eps=1e-6),
             depths=[3, 4, 6, 3],
             sr_ratios=[8, 4, 2, 1],
             drop_rate=0.0,
@@ -619,7 +633,7 @@ mix_transformer_encoders = {
             num_heads=[1, 2, 5, 8],
             mlp_ratios=[4, 4, 4, 4],
             qkv_bias=True,
-            norm_layer=partial(nn.LayerNorm, eps=1e-6),
+            norm_layer=partial(LayerNorm, eps=1e-6),
             depths=[3, 4, 18, 3],
             sr_ratios=[8, 4, 2, 1],
             drop_rate=0.0,
@@ -636,7 +650,7 @@ mix_transformer_encoders = {
             num_heads=[1, 2, 5, 8],
             mlp_ratios=[4, 4, 4, 4],
             qkv_bias=True,
-            norm_layer=partial(nn.LayerNorm, eps=1e-6),
+            norm_layer=partial(LayerNorm, eps=1e-6),
             depths=[3, 8, 27, 3],
             sr_ratios=[8, 4, 2, 1],
             drop_rate=0.0,
@@ -653,7 +667,7 @@ mix_transformer_encoders = {
             num_heads=[1, 2, 5, 8],
             mlp_ratios=[4, 4, 4, 4],
             qkv_bias=True,
-            norm_layer=partial(nn.LayerNorm, eps=1e-6),
+            norm_layer=partial(LayerNorm, eps=1e-6),
             depths=[3, 6, 40, 3],
             sr_ratios=[8, 4, 2, 1],
             drop_rate=0.0,
