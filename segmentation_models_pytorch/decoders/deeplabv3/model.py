@@ -43,7 +43,7 @@ class DeepLabV3(SegmentationModel):
                 - dropout (float): Dropout factor in [0, 1)
                 - activation (str): An activation function to apply "sigmoid"/"softmax"
                     (could be **None** to return logits)
-        kwargs: Arguments passed to the encoder class ``__init__()`` function. Applies only to ``timm`` models. 
+        kwargs: Arguments passed to the encoder class ``__init__()`` function. Applies only to ``timm`` models.
             Keys with ``None`` values are pruned before passing.
 
     Returns:
@@ -79,7 +79,7 @@ class DeepLabV3(SegmentationModel):
                     encoder_output_stride
                 )
             )
-        
+
         self.encoder = get_encoder(
             encoder_name,
             in_channels=in_channels,
@@ -91,7 +91,7 @@ class DeepLabV3(SegmentationModel):
 
         if upsampling is None:
             if encoder_depth <= 3:
-                scale_factor = 2 ** encoder_depth
+                scale_factor = 2**encoder_depth
             else:
                 scale_factor = encoder_output_stride
         else:
@@ -154,7 +154,7 @@ class DeepLabV3Plus(SegmentationModel):
                 - dropout (float): Dropout factor in [0, 1)
                 - activation (str): An activation function to apply "sigmoid"/"softmax"
                     (could be **None** to return logits)
-        kwargs: Arguments passed to the encoder class ``__init__()`` function. Applies only to ``timm`` models. 
+        kwargs: Arguments passed to the encoder class ``__init__()`` function. Applies only to ``timm`` models.
             Keys with ``None`` values are pruned before passing.
 
     Returns:
