@@ -61,7 +61,6 @@ class DeepLabV3Decoder(nn.Sequential):
             nn.BatchNorm2d(out_channels),
             nn.ReLU(),
         )
-        self.out_channels = out_channels
 
     def forward(self, *features):
         return super().forward(features[-1])
@@ -79,17 +78,12 @@ class DeepLabV3PlusDecoder(nn.Module):
         aspp_dropout: float,
     ):
         super().__init__()
-        if encoder_depth not in (3, 4, 5):
+        if encoder_depth < 3:
             raise ValueError(
-                "Encoder depth should be 3, 4 or 5, got {}.".format(encoder_depth)
+                "Encoder depth for DeepLabV3Plus decoder cannot be less than 3, got {}.".format(
+                    encoder_depth
+                )
             )
-        if output_stride not in (8, 16):
-            raise ValueError(
-                "Output stride should be 8 or 16, got {}.".format(output_stride)
-            )
-
-        self.out_channels = out_channels
-        self.output_stride = output_stride
 
         self.aspp = nn.Sequential(
             ASPP(
@@ -106,17 +100,10 @@ class DeepLabV3PlusDecoder(nn.Module):
             nn.ReLU(),
         )
 
-        scale_factor = 2 if output_stride == 8 else 4
+        scale_factor = 4 if output_stride == 16 and encoder_depth > 3 else 2
         self.up = nn.UpsamplingBilinear2d(scale_factor=scale_factor)
 
-        if encoder_depth == 3 and output_stride == 8:
-            self.highres_input_index = -2
-        elif encoder_depth == 3 or encoder_depth == 4:
-            self.highres_input_index = -3
-        else:
-            self.highres_input_index = -4
-
-        highres_in_channels = encoder_channels[self.highres_input_index]
+        highres_in_channels = encoder_channels[2]
         highres_out_channels = 48  # proposed by authors of paper
         self.block1 = nn.Sequential(
             nn.Conv2d(
@@ -140,7 +127,7 @@ class DeepLabV3PlusDecoder(nn.Module):
     def forward(self, *features):
         aspp_features = self.aspp(features[-1])
         aspp_features = self.up(aspp_features)
-        high_res_features = self.block1(features[self.highres_input_index])
+        high_res_features = self.block1(features[2])
         concat_features = torch.cat([aspp_features, high_res_features], dim=1)
         fused_features = self.block2(concat_features)
         return fused_features
@@ -240,13 +227,13 @@ class ASPP(nn.Module):
 class SeparableConv2d(nn.Sequential):
     def __init__(
         self,
-        in_channels,
-        out_channels,
-        kernel_size,
-        stride=1,
-        padding=0,
-        dilation=1,
-        bias=True,
+        in_channels: int,
+        out_channels: int,
+        kernel_size: int,
+        stride: int = 1,
+        padding: int = 0,
+        dilation: int = 1,
+        bias: bool = True,
     ):
         dephtwise_conv = nn.Conv2d(
             in_channels,
