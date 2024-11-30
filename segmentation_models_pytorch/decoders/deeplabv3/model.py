@@ -79,7 +79,6 @@ class DeepLabV3(SegmentationModel):
                     encoder_output_stride
                 )
             )
-
         self.encoder = get_encoder(
             encoder_name,
             in_channels=in_channels,
