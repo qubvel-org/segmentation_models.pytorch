@@ -145,9 +145,7 @@ class DeepLabV3Plus(SegmentationModel):
             Available options are **"sigmoid"**, **"softmax"**, **"logsoftmax"**, **"tanh"**, **"identity"**,
                 **callable** and **None**.
             Default is **None**
-        upsampling: Final upsampling factor. Default is 4 to preserve input-output spatial shape identity. In case
-            **encoder_depth** and **encoder_output_stride** are 3 and 16 resp., set **upsampling** to 2 to preserve.
-        aux_params: Dictionary with parameters of the auxiliary output (classification head). Auxiliary output is build
+        upsampling: Final upsampling factor. Default is 4 to preserve input-output spatial shape identity.
             on top of encoder if **aux_params** is not **None** (default). Supported params:
                 - classes (int): A number of classes
                 - pooling (str): One of "max", "avg". Default is "avg"
