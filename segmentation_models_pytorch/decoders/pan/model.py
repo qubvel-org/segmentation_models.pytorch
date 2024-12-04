@@ -1,4 +1,4 @@
-from typing import Any, Optional, Union
+from typing import Any, Callable, Literal, Optional, Union
 
 from segmentation_models_pytorch.base import (
     ClassificationHead,
@@ -56,13 +56,13 @@ class PAN(SegmentationModel):
     def __init__(
         self,
         encoder_name: str = "resnet34",
-        encoder_depth: int = 5,
+        encoder_depth: Literal[3, 4, 5] = 5,
         encoder_weights: Optional[str] = "imagenet",
-        encoder_output_stride: int = 16,
+        encoder_output_stride: Literal[16, 32] = 16,
         decoder_channels: int = 32,
         in_channels: int = 3,
         classes: int = 1,
-        activation: Optional[Union[str, callable]] = None,
+        activation: Optional[Union[str, Callable]] = None,
         upsampling: int = 4,
         aux_params: Optional[dict] = None,
         **kwargs: dict[str, Any],

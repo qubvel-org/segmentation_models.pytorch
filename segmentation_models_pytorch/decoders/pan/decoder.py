@@ -1,3 +1,6 @@
+from collections.abc import Sequence
+from typing import Literal
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -44,7 +47,9 @@ class ConvBnRelu(nn.Module):
 
 
 class FPABlock(nn.Module):
-    def __init__(self, in_channels, out_channels, upscale_mode="bilinear"):
+    def __init__(
+        self, in_channels: int, out_channels: int, upscale_mode: str = "bilinear"
+    ):
         super(FPABlock, self).__init__()
 
         self.upscale_mode = upscale_mode
@@ -118,7 +123,9 @@ class FPABlock(nn.Module):
         mid = self.mid(x)
         x1 = self.down1(x)
         x2 = self.down2(x1)
+        print(x2.shape)
         x3 = self.down3(x2)
+        print(x3.shape)
         x3 = F.interpolate(x3, size=(h // 4, w // 4), **upscale_parameters)
 
         x2 = self.conv2(x2)
@@ -176,9 +183,9 @@ class GAUBlock(nn.Module):
 class PANDecoder(nn.Module):
     def __init__(
         self,
-        encoder_channels,
-        encoder_depth,
-        decoder_channels,
+        encoder_channels: Sequence[int],
+        encoder_depth: Literal[3, 4, 5],
+        decoder_channels: int,
         upscale_mode: str = "bilinear",
     ):
         super().__init__()
@@ -197,11 +204,14 @@ class PANDecoder(nn.Module):
         )
 
         for i in range(1, len(encoder_channels)):
-            self.add_module(f"gau{len(encoder_channels)-i}", GAUBlock(
-                in_channels=encoder_channels[i],
-                out_channels=decoder_channels,
-                upscale_mode=upscale_mode,
-            ))
+            self.add_module(
+                f"gau{len(encoder_channels)-i}",
+                GAUBlock(
+                    in_channels=encoder_channels[i],
+                    out_channels=decoder_channels,
+                    upscale_mode=upscale_mode,
+                ),
+            )
 
     def forward(self, *features):
         features = features[2:]  # remove first and second skip
