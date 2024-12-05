@@ -123,9 +123,7 @@ class FPABlock(nn.Module):
         mid = self.mid(x)
         x1 = self.down1(x)
         x2 = self.down2(x1)
-        print(x2.shape)
         x3 = self.down3(x2)
-        print(x3.shape)
         x3 = F.interpolate(x3, size=(h // 4, w // 4), **upscale_parameters)
 
         x2 = self.conv2(x2)
