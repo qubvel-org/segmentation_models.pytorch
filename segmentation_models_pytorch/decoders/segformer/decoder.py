@@ -15,7 +15,7 @@ class MLP(nn.Module):
         batch, _, height, width = x.shape
         x = x.flatten(2).transpose(1, 2)
         x = self.linear(x)
-        x = x.transpose(1, 2).reshape(batch, -1, height, width).contiguous()
+        x = x.transpose(1, 2).reshape(batch, -1, height, width)
         return x
 
 
