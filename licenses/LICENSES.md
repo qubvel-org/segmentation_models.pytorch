@@ -21,5 +21,5 @@ The majority of the code is licensed under the [MIT License](LICENSE). However, 
 
 - BSD 3-Clause License
   * Applies to the DeepLabV3 decoder
-  * [segmentation_models_pytorch/decoders/deeplabv3/decoder.py](https://github.com/qubvel/segmentation_models_pytorch/blob/main/segmentation_models_pytorch/decoders/deeplabv3/decoder.py)
+  * [segmentation_models_pytorch/decoders/deeplabv3/decoder.py](https://github.com/qubvel/segmentation_models.pytorch/blob/main/segmentation_models_pytorch/decoders/deeplabv3/decoder.py)
 
