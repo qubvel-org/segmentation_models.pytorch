@@ -31,9 +31,7 @@ def get_sample(model_class):
         smp.Segformer,
     ]:
         sample = torch.ones([1, 3, 64, 64])
-    elif model_class == smp.PAN:
-        sample = torch.ones([2, 3, 256, 256])
-    elif model_class in [smp.DeepLabV3, smp.DeepLabV3Plus]:
+    elif model_class in [smp.PAN, smp.DeepLabV3, smp.DeepLabV3Plus]:
         sample = torch.ones([2, 3, 128, 128])
     elif model_class in [smp.PSPNet, smp.UPerNet]:
         # Batch size 2 needed due to nn.BatchNorm2d not supporting (1, C, 1, 1) input

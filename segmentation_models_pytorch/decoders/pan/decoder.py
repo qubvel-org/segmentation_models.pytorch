@@ -1,3 +1,6 @@
+from collections.abc import Sequence
+from typing import Literal
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -44,7 +47,9 @@ class ConvBnRelu(nn.Module):
 
 
 class FPABlock(nn.Module):
-    def __init__(self, in_channels, out_channels, upscale_mode="bilinear"):
+    def __init__(
+        self, in_channels: int, out_channels: int, upscale_mode: str = "bilinear"
+    ):
         super(FPABlock, self).__init__()
 
         self.upscale_mode = upscale_mode
@@ -175,34 +180,56 @@ class GAUBlock(nn.Module):
 
 class PANDecoder(nn.Module):
     def __init__(
-        self, encoder_channels, decoder_channels, upscale_mode: str = "bilinear"
+        self,
+        encoder_channels: Sequence[int],
+        encoder_depth: Literal[3, 4, 5],
+        decoder_channels: int,
+        upscale_mode: str = "bilinear",
     ):
         super().__init__()
+
+        if encoder_depth < 3:
+            raise ValueError(
+                "Encoder depth for PAN decoder cannot be less than 3, got {}.".format(
+                    encoder_depth
+                )
+            )
+
+        encoder_channels = encoder_channels[2:]
 
         self.fpa = FPABlock(
             in_channels=encoder_channels[-1], out_channels=decoder_channels
         )
-        self.gau3 = GAUBlock(
-            in_channels=encoder_channels[-2],
-            out_channels=decoder_channels,
-            upscale_mode=upscale_mode,
-        )
-        self.gau2 = GAUBlock(
-            in_channels=encoder_channels[-3],
-            out_channels=decoder_channels,
-            upscale_mode=upscale_mode,
-        )
-        self.gau1 = GAUBlock(
-            in_channels=encoder_channels[-4],
-            out_channels=decoder_channels,
-            upscale_mode=upscale_mode,
-        )
+
+        if encoder_depth == 5:
+            self.gau3 = GAUBlock(
+                in_channels=encoder_channels[2],
+                out_channels=decoder_channels,
+                upscale_mode=upscale_mode,
+            )
+        if encoder_depth >= 4:
+            self.gau2 = GAUBlock(
+                in_channels=encoder_channels[1],
+                out_channels=decoder_channels,
+                upscale_mode=upscale_mode,
+            )
+        if encoder_depth >= 3:
+            self.gau1 = GAUBlock(
+                in_channels=encoder_channels[0],
+                out_channels=decoder_channels,
+                upscale_mode=upscale_mode,
+            )
 
     def forward(self, *features):
-        bottleneck = features[-1]
-        x5 = self.fpa(bottleneck)  # 1/32
-        x4 = self.gau3(features[-2], x5)  # 1/16
-        x3 = self.gau2(features[-3], x4)  # 1/8
-        x2 = self.gau1(features[-4], x3)  # 1/4
+        features = features[2:]  # remove first and second skip
 
-        return x2
+        out = self.fpa(features[-1])  # 1/16 or 1/32
+
+        if hasattr(self, "gau3"):
+            out = self.gau3(features[2], out)  # 1/16
+        if hasattr(self, "gau2"):
+            out = self.gau2(features[1], out)  # 1/8
+        if hasattr(self, "gau1"):
+            out = self.gau1(features[0], out)  # 1/4
+
+        return out
