@@ -195,28 +195,41 @@ class PANDecoder(nn.Module):
                 )
             )
 
-        encoder_channels = encoder_channels[2:][::-1]
+        encoder_channels = encoder_channels[2:]
 
         self.fpa = FPABlock(
-            in_channels=encoder_channels[0], out_channels=decoder_channels
+            in_channels=encoder_channels[-1], out_channels=decoder_channels
         )
 
-        for i in range(1, len(encoder_channels)):
-            self.add_module(
-                f"gau{len(encoder_channels)-i}",
-                GAUBlock(
-                    in_channels=encoder_channels[i],
-                    out_channels=decoder_channels,
-                    upscale_mode=upscale_mode,
-                ),
+        if encoder_depth == 5:
+            self.gau3 = GAUBlock(
+                in_channels=encoder_channels[2],
+                out_channels=decoder_channels,
+                upscale_mode=upscale_mode,
+            )
+        if encoder_depth >= 4:
+            self.gau2 = GAUBlock(
+                in_channels=encoder_channels[1],
+                out_channels=decoder_channels,
+                upscale_mode=upscale_mode,
+            )
+        if encoder_depth >= 3:
+            self.gau1 = GAUBlock(
+                in_channels=encoder_channels[0],
+                out_channels=decoder_channels,
+                upscale_mode=upscale_mode,
             )
 
     def forward(self, *features):
         features = features[2:]  # remove first and second skip
-        features = features[::-1]  # reverse channels to start from head of encoder
 
-        out = self.fpa(features[0])
+        out = self.fpa(features[-1])  # 1/16 or 1/32
 
-        for i in range(1, len(features)):
-            out = getattr(self, f"gau{len(features)-i}")(features[i], out)
+        if hasattr(self, "gau3"):
+            out = self.gau3(features[2], out)  # 1/16
+        if hasattr(self, "gau2"):
+            out = self.gau2(features[1], out)  # 1/8
+        if hasattr(self, "gau1"):
+            out = self.gau1(features[0], out)  # 1/4
+
         return out
