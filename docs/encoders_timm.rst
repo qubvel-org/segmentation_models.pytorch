@@ -1183,7 +1183,7 @@ These models typically produce feature maps at the following downsampling scales
 | xception71                       |        ✅        |
 +----------------------------------+------------------+
 
-Transformer-style
+Transformer-Style
 ~~~~~~~~~~~~~~~~~
 
 Transformer-style models (e.g., Swin Transformer, ConvNeXt) typically produce feature maps starting at a 1/4 scale, followed by 1/8, 1/16, and 1/32 scales
