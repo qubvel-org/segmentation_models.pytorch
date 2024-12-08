@@ -16,8 +16,8 @@ Total number of encoders: 761 (579+182)
 
     To use following encoders you have to add prefix ``tu-``, e.g. ``tu-adv_inception_v3``
 
-Traditional-Style Models
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Traditional-Style
+~~~~~~~~~~~~~~~~~
 
 These models typically produce feature maps at the following downsampling scales relative to the input resolution: 1/2, 1/4, 1/8, 1/16, and 1/32
 

@@ -117,7 +117,7 @@ class TimmUniversalEncoder(nn.Module):
         else:
             if "dla" in name:
                 # For 'dla' models, out_indices starts at 0 and matches the input size.
-                kwargs["out_indices"] = tuple(range(1, depth + 1))
+                common_kwargs["out_indices"] = tuple(range(1, depth + 1))
 
             self.model = timm.create_model(
                 name, **_merge_kwargs_no_duplicates(common_kwargs, kwargs)
