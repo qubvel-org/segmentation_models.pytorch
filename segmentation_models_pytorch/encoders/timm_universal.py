@@ -31,9 +31,6 @@ Notes:
   transformer-like models).
 - Certain models (e.g., TResNet, DLA) require special handling to ensure correct
   feature indexing.
-- Most `timm` models output features in (B, C, H, W) format. However, some
-  (e.g., MambaOut and certain Swin/SwinV2 variants) use (B, H, W, C) format, which is
-  currently unsupported.
 """
 
 from typing import Any
@@ -85,11 +82,15 @@ class TimmUniversalEncoder(nn.Module):
             out_indices=tuple(range(depth)),
         )
 
+        # not all models support output stride argument, drop it by default
         if output_stride == 32:
             common_kwargs.pop("output_stride")
 
         # Load a preliminary model to determine its feature hierarchy structure.
         self.model = timm.create_model(name, features_only=True)
+
+        # Check if the model's output is in channel-last format (B, H, W, C).
+        self._is_channel_last = getattr(self.model, "output_fmt", None) == "NHWC"
 
         # Determine if this model uses a transformer-like hierarchy (i.e., starting at 1/4 scale)
         # rather than a traditional CNN hierarchy (starting at 1/2 scale).
@@ -139,6 +140,12 @@ class TimmUniversalEncoder(nn.Module):
             list[torch.Tensor]: A list of feature maps extracted at various scales.
         """
         features = self.model(x)
+
+        if self._is_channel_last:
+            # Convert to channel-first (B, C, H, W).
+            features = [
+                feature.permute(0, 3, 1, 2).contiguous() for feature in features
+            ]
 
         if self._is_transformer_style:
             # Models using a transformer-like hierarchy may not generate
