@@ -80,14 +80,18 @@ class TimmUniversalEncoder(nn.Module):
             common_kwargs.pop("output_stride")
 
         # Load a temporary model to analyze its feature hierarchy
-        self.model = timm.create_model(name, features_only=True)
+        try:
+            with torch.device("meta"):
+                tmp_model = timm.create_model(name, features_only=True)
+        except Exception:
+            tmp_model = timm.create_model(name, features_only=True)
 
         # Check if model output is in channel-last format (NHWC)
-        self._is_channel_last = getattr(self.model, "output_fmt", None) == "NHWC"
+        self._is_channel_last = getattr(tmp_model, "output_fmt", None) == "NHWC"
 
         # Determine the model's downsampling pattern and set hierarchy flags
-        encoder_stage = len(self.model.feature_info.reduction())
-        reduction_scales = self.model.feature_info.reduction()
+        encoder_stage = len(tmp_model.feature_info.reduction())
+        reduction_scales = tmp_model.feature_info.reduction()
 
         if reduction_scales == [2 ** (i + 2) for i in range(encoder_stage)]:
             # Transformer-style downsampling: scales (4, 8, 16, 32)
