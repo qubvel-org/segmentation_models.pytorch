@@ -91,7 +91,7 @@ class TimmUniversalEncoder(nn.Module):
 
         # Determine the model's downsampling pattern and set hierarchy flags
         encoder_stage = len(tmp_model.feature_info.reduction())
-        reduction_scales = tmp_model.feature_info.reduction()
+        reduction_scales = list(tmp_model.feature_info.reduction())
 
         if reduction_scales == [2 ** (i + 2) for i in range(encoder_stage)]:
             # Transformer-style downsampling: scales (4, 8, 16, 32)
