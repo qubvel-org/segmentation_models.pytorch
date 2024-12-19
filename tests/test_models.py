@@ -13,7 +13,9 @@ def get_encoders():
     ]
     encoders = smp.encoders.get_encoder_names()
     encoders = [e for e in encoders if e not in exclude_encoders]
-    encoders.append("tu-resnet34")  # for timm universal encoder
+    encoders.append("tu-resnet34")  # for timm universal traditional-like encoder
+    encoders.append("tu-convnext_atto")  # for timm universal transformer-like encoder
+    encoders.append("tu-darknet17")  # for timm universal vgg-like encoder
     return encoders
 
 
@@ -78,16 +80,12 @@ def test_forward(model_class, encoder_name, encoder_depth, **kwargs):
         or model_class is smp.MAnet
     ):
         kwargs["decoder_channels"] = (16, 16, 16, 16, 16)[-encoder_depth:]
-    if model_class in [smp.UnetPlusPlus, smp.Linknet] and encoder_name.startswith(
-        "mit_b"
-    ):
-        return  # skip mit_b*
-    if (
-        model_class is smp.FPN
-        and encoder_name.startswith("mit_b")
-        and encoder_depth != 5
-    ):
-        return  # skip mit_b*
+    if model_class in [smp.UnetPlusPlus, smp.Linknet]:
+        if encoder_name.startswith("mit_b") or encoder_name.startswith("tu-convnext"):
+            return  # skip transformer-like model*
+    if model_class is smp.FPN and encoder_depth != 5:
+        if encoder_name.startswith("mit_b") or encoder_name.startswith("tu-convnext"):
+            return  # skip transformer-like model*
     model = model_class(
         encoder_name, encoder_depth=encoder_depth, encoder_weights=None, **kwargs
     )
@@ -178,7 +176,6 @@ def test_dilation(encoder_name):
         or encoder_name.startswith("vgg")
         or encoder_name.startswith("densenet")
         or encoder_name.startswith("timm-res")
-        or encoder_name.startswith("mit_b")
     ):
         return
 
