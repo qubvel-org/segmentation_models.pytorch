@@ -17,7 +17,7 @@ def get_encoders():
     encoders.append("tu-convnext_atto")  # for timm universal transformer-like encoder
     encoders.append("tu-darknet17")  # for timm universal vgg-like encoder
     encoders.append("mit_b0")
-    return encoders[-3:]
+    return encoders
 
 
 ENCODERS = get_encoders()
