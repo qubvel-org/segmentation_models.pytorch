@@ -43,7 +43,7 @@ jobs:
     - name: Install dependencies
       run: python -m pip install -r requirements/required.txt -r requirements/test.txt
     - name: Test with pytest
-      run: pytest
+      run: pytest -v -n 2
 
   minimum:
     runs-on: ubuntu-latest
@@ -56,4 +56,4 @@ jobs:
     - name: Install dependencies
       run: python -m pip install -r requirements/minimum.old -r requirements/test.txt
     - name: Test with pytest
-      run: pytest
+      run: pytest -v -n 2
