@@ -48,7 +48,7 @@ jobs:
       run: |
         python -m pip list
     - name: Test with pytest
-      run: pytest -v -n 3
+      run: pytest -v -n 2
 
   minimum:
     runs-on: ubuntu-latest
@@ -66,4 +66,4 @@ jobs:
       run: |
         python -m pip list
     - name: Test with pytest
-      run: pytest -v -n 3
+      run: pytest -v -n 2
