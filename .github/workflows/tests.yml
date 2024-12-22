@@ -48,7 +48,7 @@ jobs:
         python -m pip install uv
         python -m uv pip install --system -r requirements/required.txt -r requirements/test.txt
     - name: Test with pytest
-      run: pytest -v -n 2
+      run: pytest -v -n 3
 
   minimum:
     runs-on: ubuntu-latest
@@ -66,4 +66,4 @@ jobs:
         python -m pip install uv
         python -m uv pip install --system -r requirements/minimum.old -r requirements/test.txt
     - name: Test with pytest
-      run: pytest -v -n 2
+      run: pytest -v -n 3
