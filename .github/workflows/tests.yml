@@ -40,13 +40,13 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Show installed packages
-      run: |
-        python -m pip list
     - name: Install dependencies
       run: |
         python -m pip install uv
         python -m uv pip install --system -r requirements/required.txt -r requirements/test.txt
+    - name: Show installed packages
+      run: |
+        python -m pip list
     - name: Test with pytest
       run: pytest -v -n 3
 
@@ -58,12 +58,12 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: "3.9"
-    - name: Show installed packages
-      run: |
-        python -m pip list
     - name: Install dependencies
       run: |
         python -m pip install uv
         python -m uv pip install --system -r requirements/minimum.old -r requirements/test.txt
+    - name: Show installed packages
+      run: |
+        python -m pip list
     - name: Test with pytest
       run: pytest -v -n 3
