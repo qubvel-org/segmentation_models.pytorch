@@ -36,6 +36,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 1  # Fetch the latest commit to inspect its message 
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
@@ -53,7 +55,7 @@ jobs:
 
     - name: Fetch latest commit message
       id: get_commit_message
-      run: echo "COMMIT_MESSAGE=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
+      run: echo "COMMIT_MESSAGE=$(git log -2 --pretty=%B)" >> $GITHUB_ENV
 
     - name: Test with PyTest
       env:
