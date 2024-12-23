@@ -70,3 +70,6 @@ markers = [
     "unetplusplus",
     "upernet",
 ]
+
+[tool.coverage.run]
+omit = segmentation_models_pytorch/utils/*
