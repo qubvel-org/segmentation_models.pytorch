@@ -1,4 +1,4 @@
-from typing import Any, List, Optional, Union
+from typing import Any, Optional, Union, Tuple, Callable
 
 from segmentation_models_pytorch.base import (
     ClassificationHead,
@@ -6,6 +6,7 @@ from segmentation_models_pytorch.base import (
     SegmentationModel,
 )
 from segmentation_models_pytorch.encoders import get_encoder
+from segmentation_models_pytorch.base.hub_mixin import supports_config_loading
 
 from .decoder import UnetDecoder
 
@@ -55,17 +56,18 @@ class Unet(SegmentationModel):
 
     """
 
+    @supports_config_loading
     def __init__(
         self,
         encoder_name: str = "resnet34",
         encoder_depth: int = 5,
         encoder_weights: Optional[str] = "imagenet",
         decoder_use_batchnorm: bool = True,
-        decoder_channels: List[int] = (256, 128, 64, 32, 16),
+        decoder_channels: Tuple[int, ...] = (256, 128, 64, 32, 16),
         decoder_attention_type: Optional[str] = None,
         in_channels: int = 3,
         classes: int = 1,
-        activation: Optional[Union[str, callable]] = None,
+        activation: Optional[Union[str, Callable]] = None,
         aux_params: Optional[dict] = None,
         **kwargs: dict[str, Any],
     ):

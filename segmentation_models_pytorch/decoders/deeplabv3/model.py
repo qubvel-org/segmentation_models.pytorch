@@ -8,6 +8,7 @@ from segmentation_models_pytorch.base import (
     SegmentationModel,
 )
 from segmentation_models_pytorch.encoders import get_encoder
+from segmentation_models_pytorch.base.hub_mixin import supports_config_loading
 
 from .decoder import DeepLabV3Decoder, DeepLabV3PlusDecoder
 
@@ -54,6 +55,7 @@ class DeepLabV3(SegmentationModel):
 
     """
 
+    @supports_config_loading
     def __init__(
         self,
         encoder_name: str = "resnet34",
@@ -163,6 +165,7 @@ class DeepLabV3Plus(SegmentationModel):
 
     """
 
+    @supports_config_loading
     def __init__(
         self,
         encoder_name: str = "resnet34",

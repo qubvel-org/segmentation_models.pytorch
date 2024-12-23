@@ -30,6 +30,21 @@ warnings.filterwarnings(
     "ignore", message=r'"is" with \'str\' literal.*', category=SyntaxWarning
 )  # for python >= 3.12
 
+_MODEL_ARCHITECTURES = [
+    Unet,
+    UnetPlusPlus,
+    MAnet,
+    Linknet,
+    FPN,
+    PSPNet,
+    DeepLabV3,
+    DeepLabV3Plus,
+    PAN,
+    UPerNet,
+    Segformer,
+]
+MODEL_ARCHITECTURES_MAPPING = {a.__name__.lower(): a for a in _MODEL_ARCHITECTURES}
+
 
 def create_model(
     arch: str,
@@ -43,26 +58,12 @@ def create_model(
     parameters, without using its class
     """
 
-    archs = [
-        Unet,
-        UnetPlusPlus,
-        MAnet,
-        Linknet,
-        FPN,
-        PSPNet,
-        DeepLabV3,
-        DeepLabV3Plus,
-        PAN,
-        UPerNet,
-        Segformer,
-    ]
-    archs_dict = {a.__name__.lower(): a for a in archs}
     try:
-        model_class = archs_dict[arch.lower()]
+        model_class = MODEL_ARCHITECTURES_MAPPING[arch.lower()]
     except KeyError:
         raise KeyError(
             "Wrong architecture type `{}`. Available options are: {}".format(
-                arch, list(archs_dict.keys())
+                arch, list(MODEL_ARCHITECTURES_MAPPING.keys())
             )
         )
     return model_class(

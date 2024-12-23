@@ -40,6 +40,8 @@ docs = [
 ]
 test = [
     'pytest',
+    'pytest-cov',
+    'pytest-xdist',
     'ruff',
 ]
 
@@ -55,3 +57,25 @@ version = {attr = 'segmentation_models_pytorch.__version__.__version__'}
 
 [tool.setuptools.packages.find]
 include = ['segmentation_models_pytorch*']
+
+[tool.pytest.ini_options]
+markers = [
+    "deeplabv3",
+    "deeplabv3plus",
+    "fpn",
+    "linknet",
+    "manet",
+    "pan",
+    "psp",
+    "segformer",
+    "unet",
+    "unetplusplus",
+    "upernet",
+    "logits_match",
+]
+
+[tool.coverage.run]
+omit = [
+    "segmentation_models_pytorch/utils/*",
+    "**/convert_*",
+]

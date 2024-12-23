@@ -49,7 +49,7 @@ class InceptionV4Encoder(InceptionV4, EncoderMixin):
         # remove linear layers
         del self.last_linear
 
-    def make_dilated(self, stage_list, dilation_list):
+    def make_dilated(self, *args, **kwargs):
         raise ValueError(
             "InceptionV4 encoder does not support dilated mode "
             "due to pooling operation for downsampling!"

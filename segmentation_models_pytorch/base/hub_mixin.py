@@ -136,3 +136,14 @@ def from_pretrained(pretrained_model_name_or_path: str, *args, **kwargs):
 
     model_class = getattr(smp, model_class_name)
     return model_class.from_pretrained(pretrained_model_name_or_path, *args, **kwargs)
+
+
+def supports_config_loading(func):
+    """Decorator to filter special config kwargs"""
+
+    @wraps(func)
+    def wrapper(self, *args, **kwargs):
+        kwargs = {k: v for k, v in kwargs.items() if not k.startswith("_")}
+        return func(self, *args, **kwargs)
+
+    return wrapper
