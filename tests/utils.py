@@ -11,13 +11,7 @@ default_device = "cuda" if torch.cuda.is_available() else "cpu"
 
 
 def get_commit_message():
-    # Get commit message from CI environment variables
-    # Common CI systems store commit messages in different env vars
-    commit_msg = os.getenv("COMMIT_MESSAGE", "")  # Generic
-    if not commit_msg:
-        commit_msg = os.getenv("CI_COMMIT_MESSAGE", "")  # GitLab CI
-    if not commit_msg:
-        commit_msg = os.getenv("GITHUB_EVENT_HEAD_COMMIT_MESSAGE", "")  # GitHub Actions
+    commit_msg = os.getenv("COMMIT_MESSAGE", "")
     return commit_msg.lower()
 
 
