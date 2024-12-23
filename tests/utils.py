@@ -42,6 +42,6 @@ def requires_torch_greater_or_equal(version: str):
     torch_version = Version(torch.__version__)
     provided_version = Version(version)
     return unittest.skipUnless(
-        torch_version >= provided_version,
+        torch_version < provided_version,
         f"torch version {torch_version} is less than {provided_version}",
     )

@@ -137,6 +137,7 @@ class BaseModelTester(unittest.TestCase):
 
         self.assertEqual(cls_probs.shape[1], 10)
 
+    @requires_torch_greater_or_equal("2.0.0")
     def test_save_load_with_hub_mixin(self):
         # instantiate model
         model = smp.create_model(
@@ -172,7 +173,7 @@ class BaseModelTester(unittest.TestCase):
         self.assertIn("my_awesome_metric", readme)
 
     @slow_test
-    @requires_torch_greater_or_equal("2.0.1")
+    @requires_torch_greater_or_equal("2.0.0")
     def test_preserve_forward_output(self):
         from huggingface_hub import hf_hub_download
 

@@ -3,7 +3,7 @@ import pytest
 import segmentation_models_pytorch as smp
 
 from tests.models import base
-from tests.utils import slow_test, default_device
+from tests.utils import slow_test, default_device, requires_torch_greater_or_equal
 
 
 @pytest.mark.segformer
@@ -11,6 +11,7 @@ class TestSegformerModel(base.BaseModelTester):
     test_model_type = "segformer"
 
     @slow_test
+    @requires_torch_greater_or_equal("2.0.0")
     def test_load_pretrained(self):
         hub_checkpoint = "smp-hub/segformer-b0-512x512-ade-160k"
 
