@@ -73,5 +73,6 @@ markers = [
 
 [tool.coverage.run]
 omit = [
-    "segmentation_models_pytorch/utils/*"
+    "segmentation_models_pytorch/utils/*",
+    "**/convert_*",
 ]
