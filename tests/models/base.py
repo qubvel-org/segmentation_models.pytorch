@@ -1,5 +1,6 @@
-import unittest
 import inspect
+import tempfile
+import unittest
 from functools import lru_cache
 
 import torch
@@ -89,3 +90,58 @@ class BaseModelTester(unittest.TestCase):
             output = model(sample)
 
         self.assertEqual(output.shape[1], classes)
+
+    def test_aux_params(self):
+        model = smp.create_model(
+            arch=self.model_type,
+            aux_params={
+                "pooling": "avg",
+                "classes": 10,
+                "dropout": 0.5,
+                "activation": "sigmoid",
+            },
+        )
+
+        self.assertIsNotNone(model.classification_head)
+        self.assertIsInstance(model.classification_head[0], torch.nn.AdaptiveAvgPool2d)
+        self.assertIsInstance(model.classification_head[1], torch.nn.Flatten)
+        self.assertIsInstance(model.classification_head[2], torch.nn.Dropout)
+        self.assertEqual(model.classification_head[2].p, 0.5)
+        self.assertIsInstance(model.classification_head[3], torch.nn.Linear)
+        self.assertIsInstance(model.classification_head[4].activation, torch.nn.Sigmoid)
+
+        sample = self._get_sample(
+            batch_size=self.default_batch_size,
+            num_channels=self.default_num_channels,
+            height=self.default_height,
+            width=self.default_width,
+        )
+
+        with torch.no_grad():
+            _, cls_probs = model(sample)
+
+        self.assertEqual(cls_probs.shape[1], 10)
+
+    def test_save_load(self):
+        # instantiate model
+        model = smp.create_model(arch=self.model_type)
+
+        # save model
+        with tempfile.TemporaryDirectory() as tmpdir:
+            model.save_pretrained(tmpdir)
+            restored_model = model.from_pretrained(tmpdir)
+
+        # check inference is correct
+        sample = self._get_sample(
+            batch_size=self.default_batch_size,
+            num_channels=self.default_num_channels,
+            height=self.default_height,
+            width=self.default_width,
+        )
+
+        with torch.no_grad():
+            output = model(sample)
+            restored_output = restored_model(sample)
+
+        self.assertEqual(output.shape, restored_output.shape)
+        self.assertEqual(output.shape[1], 1)
