@@ -6,6 +6,7 @@ from segmentation_models_pytorch.base import (
     SegmentationModel,
 )
 from segmentation_models_pytorch.encoders import get_encoder
+from segmentation_models_pytorch.base.hub_mixin import supports_config_loading
 
 from .decoder import UPerNetDecoder
 
@@ -47,6 +48,7 @@ class UPerNet(SegmentationModel):
 
     """
 
+    @supports_config_loading
     def __init__(
         self,
         encoder_name: str = "resnet34",
