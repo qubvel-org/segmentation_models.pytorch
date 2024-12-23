@@ -72,4 +72,6 @@ markers = [
 ]
 
 [tool.coverage.run]
-omit = "segmentation_models_pytorch/utils/*"
+omit = [
+    "segmentation_models_pytorch/utils/*"
+]
