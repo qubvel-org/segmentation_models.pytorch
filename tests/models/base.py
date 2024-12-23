@@ -7,7 +7,7 @@ from functools import lru_cache
 import torch
 import segmentation_models_pytorch as smp
 
-from tests.utils import has_timm_test_models, slow_test
+from tests.utils import has_timm_test_models, slow_test, requires_torch_greater_or_equal
 
 
 class BaseModelTester(unittest.TestCase):
@@ -172,6 +172,7 @@ class BaseModelTester(unittest.TestCase):
         self.assertIn("my_awesome_metric", readme)
 
     @slow_test
+    @requires_torch_greater_or_equal("2.0.0")
     def test_preserve_forward_output(self):
         from huggingface_hub import hf_hub_download
 
