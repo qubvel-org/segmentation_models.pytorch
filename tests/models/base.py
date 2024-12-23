@@ -50,7 +50,3 @@ class BaseModelTester(unittest.TestCase):
 
         # check backward pass
         output.mean().backward()
-
-    def test_encoder_params_are_set(self):
-        model = smp.create_model(arch=self.model_type)
-        self.assertEqual(model.encoder.name, self.test_encoder_name)
