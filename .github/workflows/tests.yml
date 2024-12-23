@@ -36,21 +36,32 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v4
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Install dependencies
       run: |
         python -m pip install uv
         python -m uv pip install --system -r requirements/required.txt -r requirements/test.txt
+
     - name: Show installed packages
       run: |
         python -m pip list
-    - name: Test with pytest
+
+    - name: Fetch latest commit message
+      id: get_commit_message
+      run: echo "COMMIT_MESSAGE=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
+
+    - name: Test with PyTest
       env:
-        COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
-      run: pytest -v -rsx -n 2 --cov=segmentation_models_pytorch --cov-report=xml --cov-config=pyproject.toml
+        COMMIT_MESSAGE: ${{ env.COMMIT_MESSAGE }}
+      run: |
+        echo "COMMIT_MESSAGE: ${{ env.COMMIT_MESSAGE }}"
+        pytest -v -rsx -n 2 --cov=segmentation_models_pytorch --cov-report=xml --cov-config=pyproject.toml
+
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v5
       with:
