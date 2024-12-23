@@ -5,6 +5,12 @@ from .hub_mixin import SMPHubMixin
 
 
 class SegmentationModel(torch.nn.Module, SMPHubMixin):
+    """Base class for all segmentation models."""
+
+    # if model supports shape not divisible by 2 ^ n
+    # set to False
+    requires_divisible_input_shape = True
+
     def initialize(self):
         init.initialize_decoder(self.decoder)
         init.initialize_head(self.segmentation_head)
@@ -12,6 +18,9 @@ class SegmentationModel(torch.nn.Module, SMPHubMixin):
             init.initialize_head(self.classification_head)
 
     def check_input_shape(self, x):
+        """Check if the input shape is divisible by the output stride.
+        If not, raise a RuntimeError.
+        """
         h, w = x.shape[-2:]
         output_stride = self.encoder.output_stride
         if h % output_stride != 0 or w % output_stride != 0:
@@ -33,7 +42,7 @@ class SegmentationModel(torch.nn.Module, SMPHubMixin):
     def forward(self, x):
         """Sequentially pass `x` trough model`s encoder, decoder and heads"""
 
-        if not torch.jit.is_tracing():
+        if not torch.jit.is_tracing() or self.requires_divisible_input_shape:
             self.check_input_shape(x)
 
         features = self.encoder(x)
