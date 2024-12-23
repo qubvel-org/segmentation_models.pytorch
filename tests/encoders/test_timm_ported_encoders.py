@@ -1,5 +1,5 @@
 from tests.encoders import base
-from tests.config import RUN_ALL_ENCODERS
+from tests.utils import RUN_ALL_ENCODERS
 
 
 class TestTimmEfficientNetEncoder(base.BaseEncoderTester):

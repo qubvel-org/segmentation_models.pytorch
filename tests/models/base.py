@@ -7,7 +7,7 @@ from functools import lru_cache
 import torch
 import segmentation_models_pytorch as smp
 
-from tests.config import has_timm_test_models
+from tests.utils import has_timm_test_models, slow_test
 
 
 class BaseModelTester(unittest.TestCase):
@@ -29,6 +29,10 @@ class BaseModelTester(unittest.TestCase):
         if self.test_model_type is None:
             raise ValueError("test_model_type is not set")
         return self.test_model_type
+
+    @property
+    def hub_checkpoint(self):
+        return f"smp-test-models/{self.model_type}-tu-resnet18"
 
     @property
     def model_class(self):
@@ -166,3 +170,27 @@ class BaseModelTester(unittest.TestCase):
         # check dataset and metrics are saved in readme
         self.assertIn("test_dataset", readme)
         self.assertIn("my_awesome_metric", readme)
+
+    @slow_test
+    def test_preserve_forward_output(self):
+        from huggingface_hub import hf_hub_download
+
+        model = smp.from_pretrained(self.hub_checkpoint).eval()
+
+        input_tensor_path = hf_hub_download(
+            repo_id=self.hub_checkpoint, filename="input-tensor.pth"
+        )
+        output_tensor_path = hf_hub_download(
+            repo_id=self.hub_checkpoint, filename="output-tensor.pth"
+        )
+
+        input_tensor = torch.load(input_tensor_path, weights_only=True)
+        output_tensor = torch.load(output_tensor_path, weights_only=True)
+
+        with torch.no_grad():
+            output = model(input_tensor)
+
+        self.assertEqual(output.shape, output_tensor.shape)
+        is_close = torch.allclose(output, output_tensor, atol=1e-3)
+        max_diff = torch.max(torch.abs(output - output_tensor))
+        self.assertTrue(is_close, f"Max diff: {max_diff}")

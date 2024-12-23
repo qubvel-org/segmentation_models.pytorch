@@ -1,5 +1,5 @@
 from tests.encoders import base
-from tests.config import has_timm_test_models
+from tests.utils import has_timm_test_models
 
 # check if timm >= 1.0.12
 timm_encoders = [
