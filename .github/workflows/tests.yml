@@ -48,7 +48,13 @@ jobs:
       run: |
         python -m pip list
     - name: Test with pytest
-      run: pytest -v -n 2
+      run: pytest -v -n 2 --cov=segmentation_models_pytorch --cov-report=xml
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        slug: qubvel-org/segmentation_models.pytorch
+      if: matrix.os == 'macos-latest' && matrix.python-version == '3.12'
 
   minimum:
     runs-on: ubuntu-latest
