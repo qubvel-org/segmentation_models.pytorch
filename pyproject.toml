@@ -40,6 +40,8 @@ docs = [
 ]
 test = [
     'pytest',
+    'pytest-cov',
+    'pytest-xdist',
     'ruff',
 ]
 

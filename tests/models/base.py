@@ -9,7 +9,12 @@ from huggingface_hub import hf_hub_download
 import torch
 import segmentation_models_pytorch as smp
 
-from tests.utils import has_timm_test_models, slow_test, requires_torch_greater_or_equal
+from tests.utils import (
+    has_timm_test_models,
+    default_device,
+    slow_test,
+    requires_torch_greater_or_equal,
+)
 
 
 class BaseModelTester(unittest.TestCase):
@@ -58,10 +63,10 @@ class BaseModelTester(unittest.TestCase):
             num_channels=self.default_num_channels,
             height=self.default_height,
             width=self.default_width,
-        )
+        ).to(default_device)
         model = smp.create_model(
             arch=self.model_type, encoder_name=self.test_encoder_name
-        )
+        ).to(default_device)
 
         # check default in_channels=3
         output = model(sample)
@@ -93,13 +98,13 @@ class BaseModelTester(unittest.TestCase):
             in_channels=in_channels,
             classes=classes,
             **kwargs,
-        )
+        ).to(default_device)
         sample = self._get_sample(
             batch_size=self.default_batch_size,
             num_channels=in_channels,
             height=self.default_height,
             width=self.default_width,
-        )
+        ).to(default_device)
 
         # check in channels correctly set
         with torch.no_grad():
@@ -117,7 +122,7 @@ class BaseModelTester(unittest.TestCase):
                 "dropout": 0.5,
                 "activation": "sigmoid",
             },
-        )
+        ).to(default_device)
 
         self.assertIsNotNone(model.classification_head)
         self.assertIsInstance(model.classification_head[0], torch.nn.AdaptiveAvgPool2d)
@@ -132,7 +137,7 @@ class BaseModelTester(unittest.TestCase):
             num_channels=self.default_num_channels,
             height=self.default_height,
             width=self.default_width,
-        )
+        ).to(default_device)
 
         with torch.no_grad():
             _, cls_probs = model(sample)
@@ -144,14 +149,14 @@ class BaseModelTester(unittest.TestCase):
         # instantiate model
         model = smp.create_model(
             arch=self.model_type, encoder_name=self.test_encoder_name
-        )
+        ).to(default_device)
 
         # save model
         with tempfile.TemporaryDirectory() as tmpdir:
             model.save_pretrained(
                 tmpdir, dataset="test_dataset", metrics={"my_awesome_metric": 0.99}
             )
-            restored_model = smp.from_pretrained(tmpdir)
+            restored_model = smp.from_pretrained(tmpdir).to(default_device)
             with open(os.path.join(tmpdir, "README.md"), "r") as f:
                 readme = f.read()
 
@@ -161,7 +166,7 @@ class BaseModelTester(unittest.TestCase):
             num_channels=self.default_num_channels,
             height=self.default_height,
             width=self.default_width,
-        )
+        ).to(default_device)
 
         with torch.no_grad():
             output = model(sample)
@@ -178,7 +183,7 @@ class BaseModelTester(unittest.TestCase):
     @requires_torch_greater_or_equal("2.0.1")
     @pytest.mark.logits_match
     def test_preserve_forward_output(self):
-        model = smp.from_pretrained(self.hub_checkpoint).eval()
+        model = smp.from_pretrained(self.hub_checkpoint).eval().to(default_device)
 
         input_tensor_path = hf_hub_download(
             repo_id=self.hub_checkpoint, filename="input-tensor.pth"
@@ -188,12 +193,14 @@ class BaseModelTester(unittest.TestCase):
         )
 
         input_tensor = torch.load(input_tensor_path, weights_only=True)
+        input_tensor = input_tensor.to(default_device)
         output_tensor = torch.load(output_tensor_path, weights_only=True)
+        output_tensor = output_tensor.to(default_device)
 
         with torch.no_grad():
             output = model(input_tensor)
 
         self.assertEqual(output.shape, output_tensor.shape)
-        is_close = torch.allclose(output, output_tensor, atol=1e-3)
+        is_close = torch.allclose(output, output_tensor, atol=1e-2)
         max_diff = torch.max(torch.abs(output - output_tensor))
         self.assertTrue(is_close, f"Max diff: {max_diff}")

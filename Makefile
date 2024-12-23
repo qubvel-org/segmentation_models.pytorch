@@ -10,7 +10,7 @@ test: .venv
 	.venv/bin/pytest -v -rsx -n 2 tests/ -k "not logits_match"
 
 test_all: .venv
-	.venv/bin/pytest -v -rsx -n 2 tests/
+	RUN_SLOW=1 .venv/bin/pytest -v -rsx -n 2 tests/
 
 table:
 	.venv/bin/python misc/generate_table.py
