@@ -5,6 +5,7 @@ import segmentation_models_pytorch as smp
 from functools import lru_cache
 from tests.utils import default_device
 
+
 class BaseEncoderTester(unittest.TestCase):
     encoder_names = []
 
