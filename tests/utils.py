@@ -12,6 +12,7 @@ default_device = "cuda" if torch.cuda.is_available() else "cpu"
 
 def get_commit_message():
     commit_msg = os.getenv("COMMIT_MESSAGE", "")
+    raise ValueError(commit_msg)
     return commit_msg.lower()
 
 
