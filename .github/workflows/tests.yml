@@ -36,8 +36,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v4
-      with:
-        fetch-depth: 1  # Fetch the latest commit to inspect its message 
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
@@ -53,16 +51,9 @@ jobs:
       run: |
         python -m pip list
 
-    - name: Fetch latest commit message
-      id: get_commit_message
-      run: echo "COMMIT_MESSAGE=$(git log -2 --pretty=%B)" >> $GITHUB_ENV
-
     - name: Test with PyTest
-      env:
-        COMMIT_MESSAGE: ${{ env.COMMIT_MESSAGE }}
       run: |
-        echo "COMMIT_MESSAGE: ${{ env.COMMIT_MESSAGE }}"
-        pytest -v -rsx -n 2 --cov=segmentation_models_pytorch --cov-report=xml --cov-config=pyproject.toml
+        pytest -v -rsx -n 2 --cov=segmentation_models_pytorch --cov-report=xml --cov-config=pyproject.toml -k "not logits_match"
 
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v5
@@ -71,11 +62,26 @@ jobs:
         slug: qubvel-org/segmentation_models.pytorch
       if: matrix.os == 'macos-latest' && matrix.python-version == '3.12'
 
+  test_logits_match:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.9"
+    - name: Install dependencies
+      run: |
+        python -m pip install uv
+        python -m uv pip install --system -r requirements/required.txt -r requirements/test.txt
+    - name: Test with PyTest
+      run: RUN_SLOW=1 pytest -v -rsx -n 2 -k "logits_match"
+
   minimum:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: "3.9"
@@ -87,4 +93,4 @@ jobs:
       run: |
         python -m pip list
     - name: Test with pytest
-      run: pytest -v -rsx -n 2
+      run: pytest -v -rsx -n 2 -k "not logits_match"

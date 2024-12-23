@@ -1,8 +1,10 @@
 import os
+import pytest
 import inspect
 import tempfile
 import unittest
 from functools import lru_cache
+from huggingface_hub import hf_hub_download
 
 import torch
 import segmentation_models_pytorch as smp
@@ -174,9 +176,8 @@ class BaseModelTester(unittest.TestCase):
 
     @slow_test
     @requires_torch_greater_or_equal("2.0.1")
+    @pytest.mark.logits_match
     def test_preserve_forward_output(self):
-        from huggingface_hub import hf_hub_download
-
         model = smp.from_pretrained(self.hub_checkpoint).eval()
 
         input_tensor_path = hf_hub_download(

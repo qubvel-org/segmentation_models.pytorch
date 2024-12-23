@@ -12,6 +12,7 @@ class TestSegformerModel(base.BaseModelTester):
 
     @slow_test
     @requires_torch_greater_or_equal("2.0.1")
+    @pytest.mark.logits_match
     def test_load_pretrained(self):
         hub_checkpoint = "smp-hub/segformer-b0-512x512-ade-160k"
 
