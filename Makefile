@@ -7,7 +7,10 @@ install_dev: .venv
 	.venv/bin/pip install -e ".[test]"
 
 test: .venv
-	.venv/bin/pytest -p no:cacheprovider tests/
+	.venv/bin/pytest -v -rsx -n 2 tests/ -k "not logits_match"
+
+test_all: .venv
+	.venv/bin/pytest -v -rsx -n 2 tests/
 
 table:
 	.venv/bin/python misc/generate_table.py
