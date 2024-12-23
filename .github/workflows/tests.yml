@@ -50,7 +50,7 @@ jobs:
     - name: Test with pytest
       env:
         COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
-      run: pytest -v -n 2 --cov=segmentation_models_pytorch --cov-report=xml --cov-config=pyproject.toml
+      run: pytest -v -rsx -n 2 --cov=segmentation_models_pytorch --cov-report=xml --cov-config=pyproject.toml
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v5
       with:
@@ -74,4 +74,4 @@ jobs:
       run: |
         python -m pip list
     - name: Test with pytest
-      run: pytest -v -n 2
+      run: pytest -v -rsx -n 2
