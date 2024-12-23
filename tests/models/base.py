@@ -48,7 +48,9 @@ class BaseModelTester(unittest.TestCase):
             height=self.default_height,
             width=self.default_width,
         )
-        model = smp.create_model(arch=self.model_type)
+        model = smp.create_model(
+            arch=self.model_type, encoder_name=self.test_encoder_name
+        )
 
         # check default in_channels=3
         output = model(sample)
@@ -65,7 +67,9 @@ class BaseModelTester(unittest.TestCase):
         # check backward pass
         output.mean().backward()
 
-    def test_base_params_are_set(self, in_channels=1, depth=3, classes=7):
+    def test_in_channels_and_depth_and_out_classes(
+        self, in_channels=1, depth=3, classes=7
+    ):
         kwargs = {}
 
         if self.model_type in ["unet", "unetplusplus", "manet"]:
@@ -73,6 +77,7 @@ class BaseModelTester(unittest.TestCase):
 
         model = smp.create_model(
             arch=self.model_type,
+            encoder_name=self.test_encoder_name,
             encoder_depth=depth,
             in_channels=in_channels,
             classes=classes,
@@ -91,9 +96,10 @@ class BaseModelTester(unittest.TestCase):
 
         self.assertEqual(output.shape[1], classes)
 
-    def test_aux_params(self):
+    def test_classification_head(self):
         model = smp.create_model(
             arch=self.model_type,
+            encoder_name=self.test_encoder_name,
             aux_params={
                 "pooling": "avg",
                 "classes": 10,
@@ -122,14 +128,16 @@ class BaseModelTester(unittest.TestCase):
 
         self.assertEqual(cls_probs.shape[1], 10)
 
-    def test_save_load(self):
+    def test_save_load_with_hub_mixin(self):
         # instantiate model
-        model = smp.create_model(arch=self.model_type)
+        model = smp.create_model(
+            arch=self.model_type, encoder_name=self.test_encoder_name
+        )
 
         # save model
         with tempfile.TemporaryDirectory() as tmpdir:
             model.save_pretrained(tmpdir)
-            restored_model = model.from_pretrained(tmpdir)
+            restored_model = smp.from_pretrained(tmpdir)
 
         # check inference is correct
         sample = self._get_sample(
