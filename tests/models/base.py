@@ -172,7 +172,7 @@ class BaseModelTester(unittest.TestCase):
         self.assertIn("my_awesome_metric", readme)
 
     @slow_test
-    @requires_torch_greater_or_equal("2.0.0")
+    @requires_torch_greater_or_equal("2.0.1")
     def test_preserve_forward_output(self):
         from huggingface_hub import hf_hub_download
 
