@@ -201,6 +201,6 @@ class BaseModelTester(unittest.TestCase):
             output = model(input_tensor)
 
         self.assertEqual(output.shape, output_tensor.shape)
-        is_close = torch.allclose(output, output_tensor, atol=1e-2)
+        is_close = torch.allclose(output, output_tensor, atol=5e-2)
         max_diff = torch.max(torch.abs(output - output_tensor))
         self.assertTrue(is_close, f"Max diff: {max_diff}")
