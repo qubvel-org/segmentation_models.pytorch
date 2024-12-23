@@ -3,7 +3,7 @@ import torch
 import segmentation_models_pytorch as smp
 
 from functools import lru_cache
-
+from tests.utils import default_device
 
 class BaseEncoderTester(unittest.TestCase):
     encoder_names = []
@@ -40,13 +40,13 @@ class BaseEncoderTester(unittest.TestCase):
             num_channels=self.default_num_channels,
             height=self.default_height,
             width=self.default_width,
-        )
+        ).to(default_device)
         for encoder_name in self.encoder_names:
             with self.subTest(encoder_name=encoder_name):
                 # init encoder
                 encoder = smp.encoders.get_encoder(
                     encoder_name, in_channels=3, encoder_weights=None
-                )
+                ).to(default_device)
 
                 # forward
                 features = encoder.forward(sample)
@@ -72,12 +72,12 @@ class BaseEncoderTester(unittest.TestCase):
                 num_channels=in_channels,
                 height=self.default_height,
                 width=self.default_width,
-            )
+            ).to(default_device)
 
             with self.subTest(encoder_name=encoder_name, in_channels=in_channels):
                 encoder = smp.encoders.get_encoder(
                     encoder_name, in_channels=in_channels, encoder_weights=None
-                )
+                ).to(default_device)
                 encoder.eval()
 
                 # forward
@@ -90,7 +90,7 @@ class BaseEncoderTester(unittest.TestCase):
             num_channels=self.default_num_channels,
             height=self.default_height,
             width=self.default_width,
-        )
+        ).to(default_device)
 
         cases = [
             (encoder_name, depth)
@@ -105,7 +105,7 @@ class BaseEncoderTester(unittest.TestCase):
                     in_channels=self.default_num_channels,
                     encoder_weights=None,
                     depth=depth,
-                )
+                ).to(default_device)
                 encoder.eval()
 
                 # forward
@@ -154,7 +154,7 @@ class BaseEncoderTester(unittest.TestCase):
             num_channels=self.default_num_channels,
             height=self.default_height,
             width=self.default_width,
-        )
+        ).to(default_device)
 
         cases = [
             (encoder_name, stride)
@@ -172,7 +172,7 @@ class BaseEncoderTester(unittest.TestCase):
                     in_channels=self.default_num_channels,
                     encoder_weights=None,
                     output_stride=stride,
-                )
+                ).to(default_device)
             return
 
         for encoder_name, stride in cases:
@@ -182,7 +182,7 @@ class BaseEncoderTester(unittest.TestCase):
                     in_channels=self.default_num_channels,
                     encoder_weights=None,
                     output_stride=stride,
-                )
+                ).to(default_device)
                 encoder.eval()
 
                 # forward
