@@ -1,4 +1,9 @@
 import os
+import timm
+from packaging.version import Version
+
+
+has_timm_test_models = Version(timm.__version__) >= Version("1.0.12")
 
 
 def get_commit_message():

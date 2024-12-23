@@ -1,6 +1,5 @@
-import timm
 from tests.encoders import base
-from packaging.version import Version
+from tests.config import has_timm_test_models
 
 # check if timm >= 1.0.12
 timm_encoders = [
@@ -9,7 +8,7 @@ timm_encoders = [
     "tu-darknet17",  # for timm universal vgg-like encoder
 ]
 
-if Version(timm.__version__) >= Version("1.0.12"):
+if has_timm_test_models:
     timm_encoders.append("tu-test_resnet.r160_in1k")
 
 

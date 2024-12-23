@@ -147,4 +147,3 @@ def supports_config_loading(func):
         return func(self, *args, **kwargs)
 
     return wrapper
-from segmentation_models_pytorch.base.hub_mixin import supports_config_loading

@@ -1,3 +1,4 @@
+import os
 import inspect
 import tempfile
 import unittest
@@ -6,9 +7,13 @@ from functools import lru_cache
 import torch
 import segmentation_models_pytorch as smp
 
+from tests.config import has_timm_test_models
+
 
 class BaseModelTester(unittest.TestCase):
-    test_encoder_name = "tu-test_resnet.r160_in1k"
+    test_encoder_name = (
+        "tu-test_resnet.r160_in1k" if has_timm_test_models else "resnet18"
+    )
 
     # should be overriden
     test_model_type = None
@@ -136,8 +141,12 @@ class BaseModelTester(unittest.TestCase):
 
         # save model
         with tempfile.TemporaryDirectory() as tmpdir:
-            model.save_pretrained(tmpdir)
+            model.save_pretrained(
+                tmpdir, dataset="test_dataset", metrics={"my_awesome_metric": 0.99}
+            )
             restored_model = smp.from_pretrained(tmpdir)
+            with open(os.path.join(tmpdir, "README.md"), "r") as f:
+                readme = f.read()
 
         # check inference is correct
         sample = self._get_sample(
@@ -153,3 +162,7 @@ class BaseModelTester(unittest.TestCase):
 
         self.assertEqual(output.shape, restored_output.shape)
         self.assertEqual(output.shape[1], 1)
+
+        # check dataset and metrics are saved in readme
+        self.assertIn("test_dataset", readme)
+        self.assertIn("my_awesome_metric", readme)
