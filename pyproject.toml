@@ -39,6 +39,7 @@ docs = [
     'sphinx-book-theme',
 ]
 test = [
+    'packaging',
     'pytest',
     'pytest-cov',
     'pytest-xdist',
