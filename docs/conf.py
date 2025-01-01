@@ -102,7 +102,6 @@ autodoc_mock_imports = [
     "PIL",
     "pretrainedmodels",
     "torchvision",
-    "efficientnet-pytorch",
     "segmentation_models_pytorch.encoders",
     "segmentation_models_pytorch.utils",
     # 'segmentation_models_pytorch.base',

@@ -17,7 +17,6 @@ classifiers = [
     'Programming Language :: Python :: Implementation :: PyPy',
 ]
 dependencies = [
-    'efficientnet-pytorch>=0.6.1',
     'huggingface-hub>=0.24',
     'numpy>=1.19.3',
     'pillow>=8',
