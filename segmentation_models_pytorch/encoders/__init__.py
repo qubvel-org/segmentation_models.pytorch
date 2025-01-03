@@ -9,7 +9,6 @@ from .senet import senet_encoders
 from .densenet import densenet_encoders
 from .inceptionresnetv2 import inceptionresnetv2_encoders
 from .inceptionv4 import inceptionv4_encoders
-from .efficientnet import efficient_net_encoders
 from .mobilenet import mobilenet_encoders
 from .xception import xception_encoders
 from .timm_efficientnet import timm_efficientnet_encoders
@@ -34,7 +33,6 @@ encoders.update(senet_encoders)
 encoders.update(densenet_encoders)
 encoders.update(inceptionresnetv2_encoders)
 encoders.update(inceptionv4_encoders)
-encoders.update(efficient_net_encoders)
 encoders.update(mobilenet_encoders)
 encoders.update(xception_encoders)
 encoders.update(timm_efficientnet_encoders)

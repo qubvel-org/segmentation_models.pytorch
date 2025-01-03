@@ -22,20 +22,3 @@ class TestMixTransformerEncoder(base.BaseEncoderTester):
         if not RUN_ALL_ENCODERS
         else ["mit_b0", "mit_b1", "mit_b2", "mit_b3", "mit_b4", "mit_b5"]
     )
-
-
-class TestEfficientNetEncoder(base.BaseEncoderTester):
-    encoder_names = (
-        ["efficientnet-b0"]
-        if not RUN_ALL_ENCODERS
-        else [
-            "efficientnet-b0",
-            "efficientnet-b1",
-            "efficientnet-b2",
-            "efficientnet-b3",
-            "efficientnet-b4",
-            "efficientnet-b5",
-            "efficientnet-b6",
-            # "efficientnet-b7",  # extra large model
-        ]
-    )
