@@ -14,9 +14,7 @@ jobs:
       with:
         python-version: '3.9'
     - name: Install dependencies
-      run: |
-        pip install --upgrade pip uv
-        uv pip install build twine
+      run: pip install --upgrade pip twine
     - name: Build and publish
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
