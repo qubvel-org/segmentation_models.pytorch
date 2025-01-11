@@ -82,9 +82,9 @@ class Attention(nn.Module):
         sr_ratio=1,
     ):
         super().__init__()
-        assert (
-            dim % num_heads == 0
-        ), f"dim {dim} should be divided by num_heads {num_heads}."
+        assert dim % num_heads == 0, (
+            f"dim {dim} should be divided by num_heads {num_heads}."
+        )
 
         self.dim = dim
         self.num_heads = num_heads

@@ -119,7 +119,7 @@ class UnetPlusPlusDecoder(nn.Module):
                 blocks[f"x_{depth_idx}_{layer_idx}"] = DecoderBlock(
                     in_ch, skip_ch, out_ch, **kwargs
                 )
-        blocks[f"x_{0}_{len(self.in_channels)-1}"] = DecoderBlock(
+        blocks[f"x_{0}_{len(self.in_channels) - 1}"] = DecoderBlock(
             self.in_channels[-1], 0, self.out_channels[-1], **kwargs
         )
         self.blocks = nn.ModuleDict(blocks)
@@ -148,8 +148,8 @@ class UnetPlusPlusDecoder(nn.Module):
                     )
                     dense_x[f"x_{depth_idx}_{dense_l_i}"] = self.blocks[
                         f"x_{depth_idx}_{dense_l_i}"
-                    ](dense_x[f"x_{depth_idx}_{dense_l_i-1}"], cat_features)
+                    ](dense_x[f"x_{depth_idx}_{dense_l_i - 1}"], cat_features)
         dense_x[f"x_{0}_{self.depth}"] = self.blocks[f"x_{0}_{self.depth}"](
-            dense_x[f"x_{0}_{self.depth-1}"]
+            dense_x[f"x_{0}_{self.depth - 1}"]
         )
         return dense_x[f"x_{0}_{self.depth}"]

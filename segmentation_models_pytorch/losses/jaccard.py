@@ -43,9 +43,9 @@ class JaccardLoss(_Loss):
 
         self.mode = mode
         if classes is not None:
-            assert (
-                mode != BINARY_MODE
-            ), "Masking classes is not supported with mode=binary"
+            assert mode != BINARY_MODE, (
+                "Masking classes is not supported with mode=binary"
+            )
             classes = to_tensor(classes, dtype=torch.long)
 
         self.classes = classes

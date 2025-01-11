@@ -127,12 +127,12 @@ class BaseEncoderTester(unittest.TestCase):
                 self.assertEqual(
                     height_strides,
                     self.output_strides[: depth + 1],
-                    f"Encoder `{encoder_name}` should have output strides {self.output_strides[:depth + 1]}, but has {height_strides}",
+                    f"Encoder `{encoder_name}` should have output strides {self.output_strides[: depth + 1]}, but has {height_strides}",
                 )
                 self.assertEqual(
                     width_strides,
                     self.output_strides[: depth + 1],
-                    f"Encoder `{encoder_name}` should have output strides {self.output_strides[:depth + 1]}, but has {width_strides}",
+                    f"Encoder `{encoder_name}` should have output strides {self.output_strides[: depth + 1]}, but has {width_strides}",
                 )
 
                 # check encoder output stride property
