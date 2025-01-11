@@ -381,9 +381,7 @@ class MobileOne(nn.Module, EncoderMixin):
         for ix, stride in enumerate(strides):
             use_se = False
             if num_se_blocks > num_blocks:
-                raise ValueError(
-                    "Number of SE blocks cannot " "exceed number of layers."
-                )
+                raise ValueError("Number of SE blocks cannot exceed number of layers.")
             if ix >= (num_blocks - num_se_blocks):
                 use_se = True
 

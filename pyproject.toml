@@ -43,7 +43,7 @@ test = [
     'pytest',
     'pytest-cov',
     'pytest-xdist',
-    'ruff',
+    'ruff>=0.9',
 ]
 
 [project.urls]
