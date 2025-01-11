@@ -93,7 +93,7 @@ def test_soft_tversky_score(y_true, y_pred, expected, eps, alpha, beta):
     assert float(actual) == pytest.approx(expected, eps)
 
 
-@torch.no_grad()
+@torch.inference_mode()
 def test_dice_loss_binary():
     eps = 1e-5
     criterion = DiceLoss(mode=smp.losses.BINARY_MODE, from_logits=False)
@@ -131,7 +131,7 @@ def test_dice_loss_binary():
     assert float(loss) == pytest.approx(1.0, abs=eps)
 
 
-@torch.no_grad()
+@torch.inference_mode()
 def test_tversky_loss_binary():
     eps = 1e-5
     # with alpha=0.5; beta=0.5 it is equal to DiceLoss
@@ -172,7 +172,7 @@ def test_tversky_loss_binary():
     assert float(loss) == pytest.approx(1.0, abs=eps)
 
 
-@torch.no_grad()
+@torch.inference_mode()
 def test_binary_jaccard_loss():
     eps = 1e-5
     criterion = JaccardLoss(mode=smp.losses.BINARY_MODE, from_logits=False)
@@ -210,7 +210,7 @@ def test_binary_jaccard_loss():
     assert float(loss) == pytest.approx(1.0, eps)
 
 
-@torch.no_grad()
+@torch.inference_mode()
 def test_multiclass_jaccard_loss():
     eps = 1e-5
     criterion = JaccardLoss(mode=smp.losses.MULTICLASS_MODE, from_logits=False)
@@ -237,7 +237,7 @@ def test_multiclass_jaccard_loss():
     assert float(loss) == pytest.approx(1.0 - 1.0 / 3.0, abs=eps)
 
 
-@torch.no_grad()
+@torch.inference_mode()
 def test_multilabel_jaccard_loss():
     eps = 1e-5
     criterion = JaccardLoss(mode=smp.losses.MULTILABEL_MODE, from_logits=False)
@@ -263,7 +263,7 @@ def test_multilabel_jaccard_loss():
     assert float(loss) == pytest.approx(1.0 - 1.0 / 3.0, abs=eps)
 
 
-@torch.no_grad()
+@torch.inference_mode()
 def test_soft_ce_loss():
     criterion = SoftCrossEntropyLoss(smooth_factor=0.1, ignore_index=-100)
 
@@ -276,7 +276,7 @@ def test_soft_ce_loss():
     assert float(loss) == pytest.approx(1.0125, abs=0.0001)
 
 
-@torch.no_grad()
+@torch.inference_mode()
 def test_soft_bce_loss():
     criterion = SoftBCEWithLogitsLoss(smooth_factor=0.1, ignore_index=-100)
 
@@ -287,7 +287,7 @@ def test_soft_bce_loss():
     assert float(loss) == pytest.approx(0.7201, abs=0.0001)
 
 
-@torch.no_grad()
+@torch.inference_mode()
 def test_binary_mcc_loss():
     eps = 1e-5
     criterion = MCCLoss(eps=eps)
