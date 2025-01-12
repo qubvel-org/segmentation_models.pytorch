@@ -25,7 +25,6 @@ Methods:
 
 import torch.nn as nn
 from pretrainedmodels.models.inceptionv4 import InceptionV4
-from pretrainedmodels.models.inceptionv4 import pretrained_settings
 
 from ._base import EncoderMixin
 
@@ -66,11 +65,26 @@ class InceptionV4Encoder(InceptionV4, EncoderMixin):
         ]
 
     def forward(self, x):
-        stages = self.get_stages()
-
         features = []
-        for i in range(self._depth + 1):
-            x = stages[i](x)
+
+        if self._depth >= 1:
+            x = self.features[: self._stage_idxs[0]](x)
+            features.append(x)
+
+        if self._depth >= 2:
+            x = self.features[self._stage_idxs[0] : self._stage_idxs[1]](x)
+            features.append(x)
+
+        if self._depth >= 3:
+            x = self.features[self._stage_idxs[1] : self._stage_idxs[2]](x)
+            features.append(x)
+
+        if self._depth >= 4:
+            x = self.features[self._stage_idxs[2] : self._stage_idxs[3]](x)
+            features.append(x)
+
+        if self._depth >= 5:
+            x = self.features[self._stage_idxs[3] :](x)
             features.append(x)
 
         return features
@@ -84,7 +98,26 @@ class InceptionV4Encoder(InceptionV4, EncoderMixin):
 inceptionv4_encoders = {
     "inceptionv4": {
         "encoder": InceptionV4Encoder,
-        "pretrained_settings": pretrained_settings["inceptionv4"],
+        "pretrained_settings": {
+            "imagenet": {
+                "url": "http://data.lip6.fr/cadene/pretrainedmodels/inceptionv4-8e4777a0.pth",
+                "input_space": "RGB",
+                "input_size": [3, 299, 299],
+                "input_range": [0, 1],
+                "mean": [0.5, 0.5, 0.5],
+                "std": [0.5, 0.5, 0.5],
+                "num_classes": 1000,
+            },
+            "imagenet+background": {
+                "url": "http://data.lip6.fr/cadene/pretrainedmodels/inceptionv4-8e4777a0.pth",
+                "input_space": "RGB",
+                "input_size": [3, 299, 299],
+                "input_range": [0, 1],
+                "mean": [0.5, 0.5, 0.5],
+                "std": [0.5, 0.5, 0.5],
+                "num_classes": 1001,
+            },
+        },
         "params": {
             "stage_idxs": (3, 5, 9, 15),
             "out_channels": (3, 64, 192, 384, 1024, 1536),
