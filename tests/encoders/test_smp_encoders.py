@@ -39,3 +39,6 @@ class TestEfficientNetEncoder(base.BaseEncoderTester):
             # "efficientnet-b7",  # extra large model
         ]
     )
+
+    def test_compile(self):
+        self.skipTest("compile fullgraph is not supported for efficientnet encoders")

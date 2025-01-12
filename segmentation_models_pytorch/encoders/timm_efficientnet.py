@@ -105,22 +105,28 @@ class EfficientNetBaseEncoder(EfficientNet, EncoderMixin):
 
         del self.classifier
 
-    def get_stages(self):
-        return [
-            nn.Identity(),
-            nn.Sequential(self.conv_stem, self.bn1),
-            self.blocks[: self._stage_idxs[0]],
-            self.blocks[self._stage_idxs[0] : self._stage_idxs[1]],
-            self.blocks[self._stage_idxs[1] : self._stage_idxs[2]],
-            self.blocks[self._stage_idxs[2] :],
-        ]
-
     def forward(self, x):
-        stages = self.get_stages()
-
         features = []
-        for i in range(self._depth + 1):
-            x = stages[i](x)
+
+        if self._depth >= 1:
+            x = self.conv_stem(x)
+            x = self.bn1(x)
+            features.append(x)
+
+        if self._depth >= 2:
+            x = self.blocks[: self._stage_idxs[0]](x)
+            features.append(x)
+
+        if self._depth >= 3:
+            x = self.blocks[self._stage_idxs[0] : self._stage_idxs[1]](x)
+            features.append(x)
+
+        if self._depth >= 4:
+            x = self.blocks[self._stage_idxs[1] : self._stage_idxs[2]](x)
+            features.append(x)
+
+        if self._depth >= 5:
+            x = self.blocks[self._stage_idxs[2] :](x)
             features.append(x)
 
         return features

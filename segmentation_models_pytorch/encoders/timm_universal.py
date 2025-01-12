@@ -65,6 +65,7 @@ class TimmUniversalEncoder(nn.Module):
             **kwargs: Additional arguments passed to `timm.create_model`.
         """
         super().__init__()
+        self.name = name
 
         # Default model configuration for feature extraction
         common_kwargs = dict(

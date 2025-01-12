@@ -1,7 +1,6 @@
 from ._base import EncoderMixin
 from timm.models.resnet import ResNet
 from timm.models.sknet import SelectiveKernelBottleneck, SelectiveKernelBasic
-import torch.nn as nn
 
 
 class SkNetEncoder(ResNet, EncoderMixin):
@@ -14,22 +13,30 @@ class SkNetEncoder(ResNet, EncoderMixin):
         del self.fc
         del self.global_pool
 
-    def get_stages(self):
-        return [
-            nn.Identity(),
-            nn.Sequential(self.conv1, self.bn1, self.act1),
-            nn.Sequential(self.maxpool, self.layer1),
-            self.layer2,
-            self.layer3,
-            self.layer4,
-        ]
-
     def forward(self, x):
-        stages = self.get_stages()
-
         features = []
-        for i in range(self._depth + 1):
-            x = stages[i](x)
+
+        if self._depth >= 1:
+            x = self.conv1(x)
+            x = self.bn1(x)
+            x = self.act1(x)
+            features.append(x)
+
+        if self._depth >= 2:
+            x = self.maxpool(x)
+            x = self.layer1(x)
+            features.append(x)
+
+        if self._depth >= 3:
+            x = self.layer2(x)
+            features.append(x)
+
+        if self._depth >= 4:
+            x = self.layer3(x)
+            features.append(x)
+
+        if self._depth >= 5:
+            x = self.layer4(x)
             features.append(x)
 
         return features
