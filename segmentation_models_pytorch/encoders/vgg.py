@@ -26,7 +26,6 @@ Methods:
 import torch.nn as nn
 from torchvision.models.vgg import VGG
 from torchvision.models.vgg import make_layers
-from pretrainedmodels.models.torchvision_models import pretrained_settings
 
 from ._base import EncoderMixin
 
@@ -66,12 +65,25 @@ class VGGEncoder(VGG, EncoderMixin):
         return stages
 
     def forward(self, x):
-        stages = self.get_stages()
-
         features = []
-        for i in range(self._depth + 1):
-            x = stages[i](x)
-            features.append(x)
+        depth = 0
+
+        for i, module in enumerate(self.features):
+            if isinstance(module, nn.MaxPool2d):
+                features.append(x)
+                depth += 1
+
+            # last layer is always maxpool, we just apply it and break
+            if i == len(self.features) - 1:
+                x = module(x)
+                features.append(x)
+                break
+
+            # if depth is reached, break
+            if depth > self._depth:
+                break
+
+            x = module(x)
 
         return features
 
@@ -82,6 +94,97 @@ class VGGEncoder(VGG, EncoderMixin):
                 state_dict.pop(k, None)
         super().load_state_dict(state_dict, **kwargs)
 
+
+pretrained_settings = {
+    "vgg11": {
+        "imagenet": {
+            "url": "https://download.pytorch.org/models/vgg11-bbd30ac9.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        }
+    },
+    "vgg11_bn": {
+        "imagenet": {
+            "url": "https://download.pytorch.org/models/vgg11_bn-6002323d.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        }
+    },
+    "vgg13": {
+        "imagenet": {
+            "url": "https://download.pytorch.org/models/vgg13-c768596a.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        }
+    },
+    "vgg13_bn": {
+        "imagenet": {
+            "url": "https://download.pytorch.org/models/vgg13_bn-abd245e5.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        }
+    },
+    "vgg16": {
+        "imagenet": {
+            "url": "https://download.pytorch.org/models/vgg16-397923af.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        }
+    },
+    "vgg16_bn": {
+        "imagenet": {
+            "url": "https://download.pytorch.org/models/vgg16_bn-6c64b313.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        }
+    },
+    "vgg19": {
+        "imagenet": {
+            "url": "https://download.pytorch.org/models/vgg19-dcbb9e9d.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        }
+    },
+    "vgg19_bn": {
+        "imagenet": {
+            "url": "https://download.pytorch.org/models/vgg19_bn-c79401a0.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        }
+    },
+}
 
 vgg_encoders = {
     "vgg11": {
