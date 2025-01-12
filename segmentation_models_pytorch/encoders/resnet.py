@@ -23,19 +23,18 @@ Methods:
         depth = 3 -> number of feature tensors = 4 (one with same resolution as input and 3 downsampled).
 """
 
-from copy import deepcopy
-
-import torch.nn as nn
+import torch
 
 from torchvision.models.resnet import ResNet
 from torchvision.models.resnet import BasicBlock
 from torchvision.models.resnet import Bottleneck
-from pretrainedmodels.models.torchvision_models import pretrained_settings
 
 from ._base import EncoderMixin
 
 
 class ResNetEncoder(ResNet, EncoderMixin):
+    """ResNet encoder implementation."""
+
     def __init__(self, out_channels, depth=5, **kwargs):
         super().__init__(**kwargs)
         self._depth = depth
@@ -45,22 +44,30 @@ class ResNetEncoder(ResNet, EncoderMixin):
         del self.fc
         del self.avgpool
 
-    def get_stages(self):
-        return [
-            nn.Identity(),
-            nn.Sequential(self.conv1, self.bn1, self.relu),
-            nn.Sequential(self.maxpool, self.layer1),
-            self.layer2,
-            self.layer3,
-            self.layer4,
-        ]
-
-    def forward(self, x):
-        stages = self.get_stages()
-
+    def forward(self, x: torch.Tensor) -> list[torch.Tensor]:
         features = []
-        for i in range(self._depth + 1):
-            x = stages[i](x)
+
+        if self._depth >= 1:
+            x = self.conv1(x)
+            x = self.bn1(x)
+            x = self.relu(x)
+            features.append(x)
+
+        if self._depth >= 2:
+            x = self.maxpool(x)
+            x = self.layer1(x)
+            features.append(x)
+
+        if self._depth >= 3:
+            x = self.layer2(x)
+            features.append(x)
+
+        if self._depth >= 4:
+            x = self.layer3(x)
+            features.append(x)
+
+        if self._depth >= 5:
+            x = self.layer4(x)
             features.append(x)
 
         return features
@@ -71,58 +78,219 @@ class ResNetEncoder(ResNet, EncoderMixin):
         super().load_state_dict(state_dict, **kwargs)
 
 
-new_settings = {
+pretrained_settings = {
     "resnet18": {
-        "ssl": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_supervised_resnet18-d92f0530.pth",  # noqa
-        "swsl": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_weakly_supervised_resnet18-118f1556.pth",  # noqa
+        "imagenet": {
+            "url": "https://download.pytorch.org/models/resnet18-5c106cde.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        },
+        "ssl": {
+            "url": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_supervised_resnet18-d92f0530.pth",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        },
+        "swsl": {
+            "url": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_weakly_supervised_resnet18-118f1556.pth",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        },
     },
-    "resnet50": {
-        "ssl": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_supervised_resnet50-08389792.pth",  # noqa
-        "swsl": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_weakly_supervised_resnet50-16a12f1b.pth",  # noqa
-    },
-    "resnext50_32x4d": {
-        "imagenet": "https://download.pytorch.org/models/resnext50_32x4d-7cdf4587.pth",
-        "ssl": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_supervised_resnext50_32x4-ddb3e555.pth",  # noqa
-        "swsl": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_weakly_supervised_resnext50_32x4-72679e44.pth",  # noqa
-    },
-    "resnext101_32x4d": {
-        "ssl": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_supervised_resnext101_32x4-dc43570a.pth",  # noqa
-        "swsl": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_weakly_supervised_resnext101_32x4-3f87e46b.pth",  # noqa
-    },
-    "resnext101_32x8d": {
-        "imagenet": "https://download.pytorch.org/models/resnext101_32x8d-8ba56ff5.pth",
-        "instagram": "https://download.pytorch.org/models/ig_resnext101_32x8-c38310e5.pth",
-        "ssl": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_supervised_resnext101_32x8-2cfe2f8b.pth",  # noqa
-        "swsl": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_weakly_supervised_resnext101_32x8-b4712904.pth",  # noqa
-    },
-    "resnext101_32x16d": {
-        "instagram": "https://download.pytorch.org/models/ig_resnext101_32x16-c6f796b0.pth",
-        "ssl": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_supervised_resnext101_32x16-15fffa57.pth",  # noqa
-        "swsl": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_weakly_supervised_resnext101_32x16-f3559a9c.pth",  # noqa
-    },
-    "resnext101_32x32d": {
-        "instagram": "https://download.pytorch.org/models/ig_resnext101_32x32-e4b90b00.pth"
-    },
-    "resnext101_32x48d": {
-        "instagram": "https://download.pytorch.org/models/ig_resnext101_32x48-3e41cc8a.pth"
-    },
-}
-
-pretrained_settings = deepcopy(pretrained_settings)
-for model_name, sources in new_settings.items():
-    if model_name not in pretrained_settings:
-        pretrained_settings[model_name] = {}
-
-    for source_name, source_url in sources.items():
-        pretrained_settings[model_name][source_name] = {
-            "url": source_url,
+    "resnet34": {
+        "imagenet": {
+            "url": "https://download.pytorch.org/models/resnet34-333f7ec4.pth",
+            "input_space": "RGB",
             "input_size": [3, 224, 224],
             "input_range": [0, 1],
             "mean": [0.485, 0.456, 0.406],
             "std": [0.229, 0.224, 0.225],
             "num_classes": 1000,
         }
-
+    },
+    "resnet50": {
+        "imagenet": {
+            "url": "https://download.pytorch.org/models/resnet50-19c8e357.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        },
+        "ssl": {
+            "url": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_supervised_resnet50-08389792.pth",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        },
+        "swsl": {
+            "url": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_weakly_supervised_resnet50-16a12f1b.pth",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        },
+    },
+    "resnet101": {
+        "imagenet": {
+            "url": "https://download.pytorch.org/models/resnet101-5d3b4d8f.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        }
+    },
+    "resnet152": {
+        "imagenet": {
+            "url": "https://download.pytorch.org/models/resnet152-b121ed2d.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        }
+    },
+    "resnext50_32x4d": {
+        "imagenet": {
+            "url": "https://download.pytorch.org/models/resnext50_32x4d-7cdf4587.pth",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        },
+        "ssl": {
+            "url": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_supervised_resnext50_32x4-ddb3e555.pth",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        },
+        "swsl": {
+            "url": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_weakly_supervised_resnext50_32x4-72679e44.pth",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        },
+    },
+    "resnext101_32x4d": {
+        "ssl": {
+            "url": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_supervised_resnext101_32x4-dc43570a.pth",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        },
+        "swsl": {
+            "url": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_weakly_supervised_resnext101_32x4-3f87e46b.pth",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        },
+    },
+    "resnext101_32x8d": {
+        "imagenet": {
+            "url": "https://download.pytorch.org/models/resnext101_32x8d-8ba56ff5.pth",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        },
+        "instagram": {
+            "url": "https://download.pytorch.org/models/ig_resnext101_32x8-c38310e5.pth",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        },
+        "ssl": {
+            "url": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_supervised_resnext101_32x8-2cfe2f8b.pth",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        },
+        "swsl": {
+            "url": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_weakly_supervised_resnext101_32x8-b4712904.pth",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        },
+    },
+    "resnext101_32x16d": {
+        "instagram": {
+            "url": "https://download.pytorch.org/models/ig_resnext101_32x16-c6f796b0.pth",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        },
+        "ssl": {
+            "url": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_supervised_resnext101_32x16-15fffa57.pth",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        },
+        "swsl": {
+            "url": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_weakly_supervised_resnext101_32x16-f3559a9c.pth",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        },
+    },
+    "resnext101_32x32d": {
+        "instagram": {
+            "url": "https://download.pytorch.org/models/ig_resnext101_32x32-e4b90b00.pth",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        }
+    },
+    "resnext101_32x48d": {
+        "instagram": {
+            "url": "https://download.pytorch.org/models/ig_resnext101_32x48-3e41cc8a.pth",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        }
+    },
+}
 
 resnet_encoders = {
     "resnet18": {
