@@ -355,16 +355,6 @@ class MobileOne(nn.Module, EncoderMixin):
             num_se_blocks=num_blocks_per_stage[3] if use_se else 0,
         )
 
-    def get_stages(self):
-        return [
-            nn.Identity(),
-            self.stage0,
-            self.stage1,
-            self.stage2,
-            self.stage3,
-            self.stage4,
-        ]
-
     def _make_stage(
         self, planes: int, num_blocks: int, num_se_blocks: int
     ) -> nn.Sequential:
@@ -417,13 +407,30 @@ class MobileOne(nn.Module, EncoderMixin):
             self.cur_layer_idx += 1
         return nn.Sequential(*blocks)
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
         """Apply forward pass."""
-        stages = self.get_stages()
         features = []
-        for i in range(self._depth + 1):
-            x = stages[i](x)
+
+        if self._depth >= 1:
+            x = self.stage0(x)
             features.append(x)
+
+        if self._depth >= 2:
+            x = self.stage1(x)
+            features.append(x)
+
+        if self._depth >= 3:
+            x = self.stage2(x)
+            features.append(x)
+
+        if self._depth >= 4:
+            x = self.stage3(x)
+            features.append(x)
+
+        if self._depth >= 5:
+            x = self.stage4(x)
+            features.append(x)
+
         return features
 
     def load_state_dict(self, state_dict, **kwargs):
