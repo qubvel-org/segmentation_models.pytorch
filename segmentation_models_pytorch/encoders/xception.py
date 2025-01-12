@@ -24,7 +24,7 @@ class XceptionEncoder(Xception, EncoderMixin):
         )
 
     def forward(self, x):
-        features = []
+        features = [x]
 
         if self._depth >= 1:
             x = self.conv1(x)

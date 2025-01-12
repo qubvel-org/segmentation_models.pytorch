@@ -533,7 +533,7 @@ class MixVisionTransformerEncoder(MixVisionTransformer, EncoderMixin):
             [batch_size, 0, height // 2, width // 2], dtype=x.dtype, device=x.device
         )
 
-        features = [dummy]
+        features = [x, dummy]
 
         if self._depth >= 2:
             x = self.patch_embed1(x)

@@ -37,7 +37,7 @@ class MobileNetV2Encoder(torchvision.models.MobileNetV2, EncoderMixin):
         del self.classifier
 
     def forward(self, x):
-        features = []
+        features = [x]
 
         if self._depth >= 1:
             x = self.features[:2](x)

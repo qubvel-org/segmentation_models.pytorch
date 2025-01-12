@@ -56,7 +56,7 @@ class EfficientNetEncoder(EfficientNet, EncoderMixin):
         return x
 
     def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
-        features = []
+        features = [x]
 
         if self._depth >= 1:
             x = self._conv_stem(x)

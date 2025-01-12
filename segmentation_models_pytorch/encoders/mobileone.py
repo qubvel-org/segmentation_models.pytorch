@@ -409,7 +409,7 @@ class MobileOne(nn.Module, EncoderMixin):
 
     def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
         """Apply forward pass."""
-        features = []
+        features = [x]
 
         if self._depth >= 1:
             x = self.stage0(x)

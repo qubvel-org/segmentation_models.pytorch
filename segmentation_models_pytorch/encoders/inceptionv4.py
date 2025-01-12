@@ -65,7 +65,7 @@ class InceptionV4Encoder(InceptionV4, EncoderMixin):
         ]
 
     def forward(self, x):
-        features = []
+        features = [x]
 
         if self._depth >= 1:
             x = self.features[: self._stage_idxs[0]](x)

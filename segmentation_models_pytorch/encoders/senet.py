@@ -56,7 +56,7 @@ class SENetEncoder(SENet, EncoderMixin):
         ]
 
     def forward(self, x):
-        features = []
+        features = [x]
 
         if self._depth >= 1:
             x = self.layer0[:-1](x)

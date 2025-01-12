@@ -106,7 +106,7 @@ class EfficientNetBaseEncoder(EfficientNet, EncoderMixin):
         del self.classifier
 
     def forward(self, x):
-        features = []
+        features = [x]
 
         if self._depth >= 1:
             x = self.conv_stem(x)

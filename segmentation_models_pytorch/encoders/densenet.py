@@ -56,7 +56,7 @@ class DenseNetEncoder(DenseNet, EncoderMixin):
         return x, intermediate
 
     def forward(self, x):
-        features = []
+        features = [x]
 
         if self._depth >= 1:
             x = self.features.conv0(x)

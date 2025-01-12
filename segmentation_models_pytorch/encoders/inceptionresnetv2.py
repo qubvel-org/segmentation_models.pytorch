@@ -56,7 +56,7 @@ class InceptionResNetV2Encoder(InceptionResNetV2, EncoderMixin):
         )
 
     def forward(self, x):
-        features = []
+        features = [x]
 
         if self._depth >= 1:
             x = self.conv2d_1a(x)

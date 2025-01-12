@@ -45,7 +45,7 @@ class ResNetEncoder(ResNet, EncoderMixin):
         del self.avgpool
 
     def forward(self, x: torch.Tensor) -> list[torch.Tensor]:
-        features = []
+        features = [x]
 
         if self._depth >= 1:
             x = self.conv1(x)

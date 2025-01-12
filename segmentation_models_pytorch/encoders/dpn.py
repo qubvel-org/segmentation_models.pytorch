@@ -44,7 +44,7 @@ class DPNEncoder(DPN, EncoderMixin):
         del self.last_linear
 
     def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
-        features = []
+        features = [x]
 
         if self._depth >= 1:
             x = self.features[0].conv(x)
