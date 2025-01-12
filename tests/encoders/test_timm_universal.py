@@ -9,7 +9,7 @@ timm_encoders = [
 ]
 
 if has_timm_test_models:
-    timm_encoders.append("tu-test_resnet.r160_in1k")
+    timm_encoders.insert(0, "tu-test_resnet.r160_in1k")
 
 
 class TestTimmUniversalEncoder(base.BaseEncoderTester):

@@ -1,3 +1,5 @@
+import segmentation_models_pytorch as smp
+
 from tests.encoders import base
 from tests.utils import RUN_ALL_ENCODERS
 
@@ -21,6 +23,14 @@ class TestResNetEncoder(base.BaseEncoderTester):
         ]
     )
 
+    def get_tiny_encoder(self):
+        params = {
+            "out_channels": None,
+            "block": smp.encoders.resnet.BasicBlock,
+            "layers": [1, 1, 1, 1],
+        }
+        return smp.encoders.resnet.ResNetEncoder(**params)
+
 
 class TestDenseNetEncoder(base.BaseEncoderTester):
     supports_dilated = False
@@ -29,6 +39,15 @@ class TestDenseNetEncoder(base.BaseEncoderTester):
         if not RUN_ALL_ENCODERS
         else ["densenet121", "densenet169", "densenet161"]
     )
+
+    def get_tiny_encoder(self):
+        params = {
+            "out_channels": None,
+            "num_init_features": 2,
+            "growth_rate": 1,
+            "block_config": (1, 1, 1, 1),
+        }
+        return smp.encoders.densenet.DenseNetEncoder(**params)
 
 
 class TestMobileNetEncoder(base.BaseEncoderTester):
@@ -51,3 +70,11 @@ class TestVggEncoder(base.BaseEncoderTester):
             "vgg19_bn",
         ]
     )
+
+    def get_tiny_encoder(self):
+        params = {
+            "out_channels": (4, 4, 4, 4, 4, 4),
+            "config": [4, "M", 4, "M", 4, "M", 4, "M", 4, "M"],
+            "batch_norm": False,
+        }
+        return smp.encoders.vgg.VGGEncoder(**params)

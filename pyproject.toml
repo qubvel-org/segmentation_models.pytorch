@@ -73,6 +73,7 @@ markers = [
     "unetplusplus",
     "upernet",
     "logits_match",
+    "compile",
 ]
 
 [tool.coverage.run]

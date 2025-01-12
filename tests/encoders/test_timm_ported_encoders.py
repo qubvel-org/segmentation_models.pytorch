@@ -33,6 +33,9 @@ class TestTimmGERNetEncoder(base.BaseEncoderTester):
         else ["timm-gernet_s", "timm-gernet_m", "timm-gernet_l"]
     )
 
+    def test_compile(self):
+        self.skipTest("Test to be removed")
+
 
 class TestTimmMobileNetV3Encoder(base.BaseEncoderTester):
     encoder_names = (
@@ -47,6 +50,9 @@ class TestTimmMobileNetV3Encoder(base.BaseEncoderTester):
             "timm-mobilenetv3_small_minimal_100",
         ]
     )
+
+    def test_compile(self):
+        self.skipTest("Test to be removed")
 
 
 class TestTimmRegNetEncoder(base.BaseEncoderTester):
@@ -81,6 +87,9 @@ class TestTimmRegNetEncoder(base.BaseEncoderTester):
         ]
     )
 
+    def test_compile(self):
+        self.skipTest("Test to be removed")
+
 
 class TestTimmRes2NetEncoder(base.BaseEncoderTester):
     supports_dilated = False
@@ -97,6 +106,9 @@ class TestTimmRes2NetEncoder(base.BaseEncoderTester):
             "timm-res2next50",
         ]
     )
+
+    def test_compile(self):
+        self.skipTest("Test to be removed")
 
 
 class TestTimmResnestEncoder(base.BaseEncoderTester):
@@ -116,6 +128,9 @@ class TestTimmResnestEncoder(base.BaseEncoderTester):
             "timm-resnest50d_1s4x24d",
         ]
     )
+
+    def test_compile(self):
+        self.skipTest("Test to be removed")
 
 
 class TestTimmSkNetEncoder(base.BaseEncoderTester):

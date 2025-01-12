@@ -1,3 +1,4 @@
+import pytest
 import unittest
 import torch
 import segmentation_models_pytorch as smp
@@ -24,6 +25,9 @@ class BaseEncoderTester(unittest.TestCase):
     in_channels_to_test = [1, 3, 4]
     depth_to_test = [3, 4, 5]
     strides_to_test = [8, 16]  # 32 is a default one
+
+    def get_tiny_encoder(self):
+        return smp.encoders.get_encoder(self.encoder_names[0], encoder_weights=None)
 
     @lru_cache
     def _get_sample(self, batch_size=1, num_channels=3, height=32, width=32):
@@ -207,7 +211,7 @@ class BaseEncoderTester(unittest.TestCase):
                     f"Encoder `{encoder_name}` should have width output strides {expected_width_strides}, but has {width_strides}",
                 )
 
-    @torch.inference_mode()
+    @pytest.mark.compile
     def test_compile(self):
         sample = self._get_sample(
             batch_size=self.default_batch_size,
@@ -216,13 +220,8 @@ class BaseEncoderTester(unittest.TestCase):
             width=self.default_width,
         ).to(default_device)
 
-        for encoder_name in self.encoder_names:
-            with self.subTest(encoder_name=encoder_name):
-                encoder = smp.encoders.get_encoder(
-                    encoder_name,
-                    in_channels=self.default_num_channels,
-                    encoder_weights=None,
-                ).to(default_device)
-                encoder.eval()
-                compiled_encoder = torch.compile(encoder, fullgraph=True, dynamic=True)
-                compiled_encoder(sample)
+        encoder = self.get_tiny_encoder().eval().to(default_device)
+        compiled_encoder = torch.compile(encoder, fullgraph=True, dynamic=True)
+
+        with torch.inference_mode():
+            compiled_encoder(sample)

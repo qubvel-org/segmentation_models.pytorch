@@ -1,3 +1,5 @@
+import segmentation_models_pytorch as smp
+
 from tests.encoders import base
 from tests.utils import RUN_ALL_ENCODERS
 
@@ -8,6 +10,21 @@ class TestDPNEncoder(base.BaseEncoderTester):
         if not RUN_ALL_ENCODERS
         else ["dpn68", "dpn68b", "dpn92", "dpn98", "dpn107", "dpn131"]
     )
+
+    def get_tiny_encoder(self):
+        params = {
+            "stage_idxs": (2, 3, 4, 5),
+            "out_channels": None,
+            "groups": 2,
+            "inc_sec": (2, 2, 2, 2),
+            "k_r": 2,
+            "k_sec": (1, 1, 1, 1),
+            "num_classes": 1000,
+            "num_init_features": 2,
+            "small": True,
+            "test_time_pool": True,
+        }
+        return smp.encoders.dpn.DPNEncoder(**params)
 
 
 class TestInceptionResNetV2Encoder(base.BaseEncoderTester):
@@ -35,6 +52,22 @@ class TestSeNetEncoder(base.BaseEncoderTester):
             # "senet154",  # extra large model
         ]
     )
+
+    def get_tiny_encoder(self):
+        params = {
+            "out_channels": None,
+            "block": smp.encoders.senet.SEResNetBottleneck,
+            "layers": [1, 1, 1, 1],
+            "downsample_kernel_size": 1,
+            "downsample_padding": 0,
+            "dropout_p": None,
+            "groups": 1,
+            "inplanes": 2,
+            "input_3x3": False,
+            "num_classes": 1000,
+            "reduction": 2,
+        }
+        return smp.encoders.senet.SENetEncoder(**params)
 
 
 class TestXceptionEncoder(base.BaseEncoderTester):
