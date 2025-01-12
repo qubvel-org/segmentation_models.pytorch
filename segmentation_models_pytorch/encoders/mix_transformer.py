@@ -526,30 +526,43 @@ class MixVisionTransformerEncoder(MixVisionTransformer, EncoderMixin):
         self._depth = depth
         self._in_channels = 3
 
-    def get_stages(self):
-        return [
-            nn.Identity(),
-            nn.Identity(),
-            nn.Sequential(self.patch_embed1, self.block1, self.norm1),
-            nn.Sequential(self.patch_embed2, self.block2, self.norm2),
-            nn.Sequential(self.patch_embed3, self.block3, self.norm3),
-            nn.Sequential(self.patch_embed4, self.block4, self.norm4),
-        ]
-
     def forward(self, x):
-        stages = self.get_stages()
-
         # create dummy output for the first block
-        B, _, H, W = x.shape
-        dummy = torch.empty([B, 0, H // 2, W // 2], dtype=x.dtype, device=x.device)
+        batch_size, _, height, width = x.shape
+        dummy = torch.empty(
+            [batch_size, 0, height // 2, width // 2], dtype=x.dtype, device=x.device
+        )
 
-        features = []
-        for i in range(self._depth + 1):
-            if i == 1:
-                features.append(dummy)
-            else:
-                x = stages[i](x).contiguous()
-                features.append(x)
+        features = [dummy]
+
+        if self._depth >= 2:
+            x = self.patch_embed1(x)
+            x = self.block1(x)
+            x = self.norm1(x)
+            x = x.contiguous()
+            features.append(x)
+
+        if self._depth >= 3:
+            x = self.patch_embed2(x)
+            x = self.block2(x)
+            x = self.norm2(x)
+            x = x.contiguous()
+            features.append(x)
+
+        if self._depth >= 4:
+            x = self.patch_embed3(x)
+            x = self.block3(x)
+            x = self.norm3(x)
+            x = x.contiguous()
+            features.append(x)
+
+        if self._depth >= 5:
+            x = self.patch_embed4(x)
+            x = self.block4(x)
+            x = self.norm4(x)
+            x = x.contiguous()
+            features.append(x)
+
         return features
 
     def load_state_dict(self, state_dict):
@@ -560,9 +573,7 @@ class MixVisionTransformerEncoder(MixVisionTransformer, EncoderMixin):
 
 def get_pretrained_cfg(name):
     return {
-        "url": "https://github.com/qubvel/segmentation_models.pytorch/releases/download/v0.0.2/{}.pth".format(
-            name
-        ),
+        "url": f"https://github.com/qubvel/segmentation_models.pytorch/releases/download/v0.0.2/{name}.pth",
         "input_space": "RGB",
         "input_size": [3, 224, 224],
         "input_range": [0, 1],
