@@ -24,8 +24,8 @@ Methods:
 """
 
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
+from typing import List
 
 from pretrainedmodels.models.dpn import DPN
 from pretrainedmodels.models.dpn import pretrained_settings
@@ -43,30 +43,34 @@ class DPNEncoder(DPN, EncoderMixin):
 
         del self.last_linear
 
-    def get_stages(self):
-        return [
-            nn.Identity(),
-            nn.Sequential(
-                self.features[0].conv, self.features[0].bn, self.features[0].act
-            ),
-            nn.Sequential(
-                self.features[0].pool, self.features[1 : self._stage_idxs[0]]
-            ),
-            self.features[self._stage_idxs[0] : self._stage_idxs[1]],
-            self.features[self._stage_idxs[1] : self._stage_idxs[2]],
-            self.features[self._stage_idxs[2] : self._stage_idxs[3]],
-        ]
-
-    def forward(self, x):
-        stages = self.get_stages()
-
+    def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
         features = []
-        for i in range(self._depth + 1):
-            x = stages[i](x)
-            if isinstance(x, (list, tuple)):
-                features.append(F.relu(torch.cat(x, dim=1), inplace=True))
-            else:
-                features.append(x)
+
+        if self._depth >= 1:
+            x = self.features[0].conv(x)
+            x = self.features[0].bn(x)
+            x = self.features[0].act(x)
+            features.append(x)
+
+        if self._depth >= 2:
+            x = self.features[0].pool(x)
+            x = self.features[1 : self._stage_idxs[0]](x)
+            skip = F.relu(torch.cat(x, dim=1), inplace=True)
+            features.append(skip)
+
+        if self._depth >= 3:
+            x = self.features[self._stage_idxs[0] : self._stage_idxs[1]](x)
+            skip = F.relu(torch.cat(x, dim=1), inplace=True)
+            features.append(skip)
+
+        if self._depth >= 4:
+            x = self.features[self._stage_idxs[1] : self._stage_idxs[2]](x)
+            skip = F.relu(torch.cat(x, dim=1), inplace=True)
+            features.append(skip)
+
+        if self._depth >= 5:
+            x = self.features[self._stage_idxs[2] : self._stage_idxs[3]](x)
+            features.append(x)
 
         return features
 
