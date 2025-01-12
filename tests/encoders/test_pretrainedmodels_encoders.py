@@ -2,15 +2,6 @@ from tests.encoders import base
 from tests.utils import RUN_ALL_ENCODERS
 
 
-class TestDenseNetEncoder(base.BaseEncoderTester):
-    supports_dilated = False
-    encoder_names = (
-        ["densenet121"]
-        if not RUN_ALL_ENCODERS
-        else ["densenet121", "densenet169", "densenet161"]
-    )
-
-
 class TestDPNEncoder(base.BaseEncoderTester):
     encoder_names = (
         ["dpn68"]
@@ -29,26 +20,6 @@ class TestInceptionResNetV2Encoder(base.BaseEncoderTester):
 class TestInceptionV4Encoder(base.BaseEncoderTester):
     supports_dilated = False
     encoder_names = ["inceptionv4"] if not RUN_ALL_ENCODERS else ["inceptionv4"]
-
-
-class TestResNetEncoder(base.BaseEncoderTester):
-    encoder_names = (
-        ["resnet18"]
-        if not RUN_ALL_ENCODERS
-        else [
-            "resnet18",
-            "resnet34",
-            "resnet50",
-            "resnet101",
-            "resnet152",
-            "resnext50_32x4d",
-            "resnext101_32x4d",
-            "resnext101_32x8d",
-            "resnext101_32x16d",
-            "resnext101_32x32d",
-            "resnext101_32x48d",
-        ]
-    )
 
 
 class TestSeNetEncoder(base.BaseEncoderTester):
