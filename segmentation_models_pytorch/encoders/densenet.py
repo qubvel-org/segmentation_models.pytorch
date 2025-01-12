@@ -24,25 +24,12 @@ Methods:
 """
 
 import re
+import torch
 import torch.nn as nn
 
-from pretrainedmodels.models.torchvision_models import pretrained_settings
 from torchvision.models.densenet import DenseNet
 
 from ._base import EncoderMixin
-
-
-class TransitionWithSkip(nn.Module):
-    def __init__(self, module):
-        super().__init__()
-        self.module = module
-
-    def forward(self, x):
-        for module in self.module:
-            x = module(x)
-            if isinstance(module, nn.ReLU):
-                skip = x
-        return x, skip
 
 
 class DenseNetEncoder(DenseNet, EncoderMixin):
@@ -59,37 +46,44 @@ class DenseNetEncoder(DenseNet, EncoderMixin):
             "due to pooling operation for downsampling!"
         )
 
-    def get_stages(self):
-        return [
-            nn.Identity(),
-            nn.Sequential(
-                self.features.conv0, self.features.norm0, self.features.relu0
-            ),
-            nn.Sequential(
-                self.features.pool0,
-                self.features.denseblock1,
-                TransitionWithSkip(self.features.transition1),
-            ),
-            nn.Sequential(
-                self.features.denseblock2, TransitionWithSkip(self.features.transition2)
-            ),
-            nn.Sequential(
-                self.features.denseblock3, TransitionWithSkip(self.features.transition3)
-            ),
-            nn.Sequential(self.features.denseblock4, self.features.norm5),
-        ]
+    def apply_transition(
+        self, transition: torch.nn.Sequential, x: torch.Tensor
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        for module in transition:
+            x = module(x)
+            if isinstance(module, nn.ReLU):
+                intermediate = x
+        return x, intermediate
 
     def forward(self, x):
-        stages = self.get_stages()
-
         features = []
-        for i in range(self._depth + 1):
-            x = stages[i](x)
-            if isinstance(x, (list, tuple)):
-                x, skip = x
-                features.append(skip)
-            else:
-                features.append(x)
+
+        if self._depth >= 1:
+            x = self.features.conv0(x)
+            x = self.features.norm0(x)
+            x = self.features.relu0(x)
+            features.append(x)
+
+        if self._depth >= 2:
+            x = self.features.pool0(x)
+            x = self.features.denseblock1(x)
+            x, intermediate = self.apply_transition(self.features.transition1, x)
+            features.append(intermediate)
+
+        if self._depth >= 3:
+            x = self.features.denseblock2(x)
+            x, intermediate = self.apply_transition(self.features.transition2, x)
+            features.append(intermediate)
+
+        if self._depth >= 4:
+            x = self.features.denseblock3(x)
+            x, intermediate = self.apply_transition(self.features.transition3, x)
+            features.append(intermediate)
+
+        if self._depth >= 5:
+            x = self.features.denseblock4(x)
+            x = self.features.norm5(x)
+            features.append(x)
 
         return features
 
@@ -110,6 +104,53 @@ class DenseNetEncoder(DenseNet, EncoderMixin):
 
         super().load_state_dict(state_dict)
 
+
+pretrained_settings = {
+    "densenet121": {
+        "imagenet": {
+            "url": "http://data.lip6.fr/cadene/pretrainedmodels/densenet121-fbdb23505.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        }
+    },
+    "densenet169": {
+        "imagenet": {
+            "url": "http://data.lip6.fr/cadene/pretrainedmodels/densenet169-f470b90a4.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        }
+    },
+    "densenet201": {
+        "imagenet": {
+            "url": "http://data.lip6.fr/cadene/pretrainedmodels/densenet201-5750cbb1e.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        }
+    },
+    "densenet161": {
+        "imagenet": {
+            "url": "http://data.lip6.fr/cadene/pretrainedmodels/densenet161-347e6b360.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        }
+    },
+}
 
 densenet_encoders = {
     "densenet121": {
