@@ -24,7 +24,6 @@ Methods:
 """
 
 import torchvision
-import torch.nn as nn
 
 from ._base import EncoderMixin
 
@@ -37,22 +36,27 @@ class MobileNetV2Encoder(torchvision.models.MobileNetV2, EncoderMixin):
         self._in_channels = 3
         del self.classifier
 
-    def get_stages(self):
-        return [
-            nn.Identity(),
-            self.features[:2],
-            self.features[2:4],
-            self.features[4:7],
-            self.features[7:14],
-            self.features[14:],
-        ]
-
     def forward(self, x):
-        stages = self.get_stages()
-
         features = []
-        for i in range(self._depth + 1):
-            x = stages[i](x)
+
+        if self._depth >= 1:
+            x = self.features[:2](x)
+            features.append(x)
+
+        if self._depth >= 2:
+            x = self.features[2:4](x)
+            features.append(x)
+
+        if self._depth >= 3:
+            x = self.features[4:7](x)
+            features.append(x)
+
+        if self._depth >= 4:
+            x = self.features[7:14](x)
+            features.append(x)
+
+        if self._depth >= 5:
+            x = self.features[14:](x)
             features.append(x)
 
         return features
@@ -68,9 +72,9 @@ mobilenet_encoders = {
         "encoder": MobileNetV2Encoder,
         "pretrained_settings": {
             "imagenet": {
+                "url": "https://download.pytorch.org/models/mobilenet_v2-b0353104.pth",
                 "mean": [0.485, 0.456, 0.406],
                 "std": [0.229, 0.224, 0.225],
-                "url": "https://download.pytorch.org/models/mobilenet_v2-b0353104.pth",
                 "input_space": "RGB",
                 "input_range": [0, 1],
             }
