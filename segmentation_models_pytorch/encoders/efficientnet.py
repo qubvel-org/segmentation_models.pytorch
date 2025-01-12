@@ -23,7 +23,9 @@ Methods:
         depth = 3 -> number of feature tensors = 4 (one with same resolution as input and 3 downsampled).
 """
 
-import torch.nn as nn
+import torch
+from typing import List
+
 from efficientnet_pytorch import EfficientNet
 from efficientnet_pytorch.utils import url_map, url_map_advprop, get_model_params
 
@@ -42,35 +44,40 @@ class EfficientNetEncoder(EfficientNet, EncoderMixin):
 
         del self._fc
 
-    def get_stages(self):
-        return [
-            nn.Identity(),
-            nn.Sequential(self._conv_stem, self._bn0, self._swish),
-            self._blocks[: self._stage_idxs[0]],
-            self._blocks[self._stage_idxs[0] : self._stage_idxs[1]],
-            self._blocks[self._stage_idxs[1] : self._stage_idxs[2]],
-            self._blocks[self._stage_idxs[2] :],
-        ]
-
-    def forward(self, x):
-        stages = self.get_stages()
-
-        block_number = 0.0
+    def apply_blocks(
+        self, x: torch.Tensor, start_idx: int, end_idx: int
+    ) -> torch.Tensor:
         drop_connect_rate = self._global_params.drop_connect_rate
 
+        for block_number in range(start_idx, end_idx):
+            drop_connect_prob = drop_connect_rate * block_number / len(self._blocks)
+            x = self._blocks[block_number](x, drop_connect_prob)
+
+        return x
+
+    def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
         features = []
-        for i in range(self._depth + 1):
-            # Identity and Sequential stages
-            if i < 2:
-                x = stages[i](x)
 
-            # Block stages need drop_connect rate
-            else:
-                for module in stages[i]:
-                    drop_connect = drop_connect_rate * block_number / len(self._blocks)
-                    block_number += 1.0
-                    x = module(x, drop_connect)
+        if self._depth >= 1:
+            x = self._conv_stem(x)
+            x = self._bn0(x)
+            x = self._swish(x)
+            features.append(x)
 
+        if self._depth >= 2:
+            x = self.apply_blocks(x, 0, self._stage_idxs[0])
+            features.append(x)
+
+        if self._depth >= 3:
+            x = self.apply_blocks(x, self._stage_idxs[0], self._stage_idxs[1])
+            features.append(x)
+
+        if self._depth >= 4:
+            x = self.apply_blocks(x, self._stage_idxs[1], self._stage_idxs[2])
+            features.append(x)
+
+        if self._depth >= 5:
+            x = self.apply_blocks(x, self._stage_idxs[2], len(self._blocks))
             features.append(x)
 
         return features
