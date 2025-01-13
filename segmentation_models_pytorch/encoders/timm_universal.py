@@ -196,6 +196,28 @@ class TimmUniversalEncoder(nn.Module):
         """
         return min(self._output_stride, 2**self._depth)
 
+    def load_state_dict(self, state_dict, **kwargs):
+        # for compatibility of weights for
+        # timm- ported encoders with TimmUniversalEncoder
+
+        patterns = ["regnet", "res2", "resnest", "mobilenetv3", "gernet"]
+
+        is_deprecated_encoder = any(
+            self.name.startswith(pattern) for pattern in patterns
+        )
+
+        if is_deprecated_encoder:
+            keys = list(state_dict.keys())
+            for key in keys:
+                new_key = key
+                if not key.startswith("model."):
+                    new_key = "model." + key
+                if "gernet" in self.name:
+                    new_key = new_key.replace(".stages.", ".stages_")
+                state_dict[new_key] = state_dict.pop(key)
+
+        return super().load_state_dict(state_dict, **kwargs)
+
 
 def _merge_kwargs_no_duplicates(a: dict[str, Any], b: dict[str, Any]) -> dict[str, Any]:
     """

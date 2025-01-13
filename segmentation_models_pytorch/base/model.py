@@ -3,7 +3,6 @@ from typing import TypeVar, Type
 
 from . import initialization as init
 from .hub_mixin import SMPHubMixin
-from ..encoders.timm_universal import TimmUniversalEncoder
 
 T = TypeVar("T", bound="SegmentationModel")
 
@@ -82,18 +81,3 @@ class SegmentationModel(torch.nn.Module, SMPHubMixin):
         x = self.forward(x)
 
         return x
-
-    def load_state_dict(self, state_dict, **kwargs):
-        # for compatibility of weights for
-        # timm- ported encoders with TimmUniversalEncoder
-        if isinstance(self.encoder, TimmUniversalEncoder):
-            keys = list(state_dict.keys())
-            for key in keys:
-                new_key = key
-                if key.startswith("encoder.") and not key.startswith("encoder.model."):
-                    new_key = key.replace("encoder.", "encoder.model.")
-                if "gernet" in self.encoder.name:
-                    new_key = new_key.replace(".stages.", ".stages_")
-                state_dict[new_key] = state_dict.pop(key)
-
-        return super().load_state_dict(state_dict, **kwargs)
