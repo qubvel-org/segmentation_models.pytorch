@@ -61,17 +61,6 @@ include = ['segmentation_models_pytorch*']
 
 [tool.pytest.ini_options]
 markers = [
-    "deeplabv3",
-    "deeplabv3plus",
-    "fpn",
-    "linknet",
-    "manet",
-    "pan",
-    "psp",
-    "segformer",
-    "unet",
-    "unetplusplus",
-    "upernet",
     "logits_match",
     "compile",
 ]

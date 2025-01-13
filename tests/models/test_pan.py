@@ -1,8 +1,6 @@
-import pytest
 from tests.models import base
 
 
-@pytest.mark.pan
 class TestPanModel(base.BaseModelTester):
     test_model_type = "pan"
 
