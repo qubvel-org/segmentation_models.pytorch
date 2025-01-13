@@ -14,6 +14,7 @@ from tests.utils import (
     default_device,
     slow_test,
     requires_torch_greater_or_equal,
+    check_run_test_on_diff_or_main,
 )
 
 
@@ -21,6 +22,7 @@ class BaseModelTester(unittest.TestCase):
     test_encoder_name = (
         "tu-test_resnet.r160_in1k" if has_timm_test_models else "resnet18"
     )
+    files_for_diff = [r".*"]
 
     # should be overriden
     test_model_type = None
@@ -234,3 +236,21 @@ class BaseModelTester(unittest.TestCase):
         is_close = torch.allclose(output, output_tensor, atol=5e-2)
         max_diff = torch.max(torch.abs(output - output_tensor))
         self.assertTrue(is_close, f"Max diff: {max_diff}")
+
+    @pytest.mark.compile
+    def test_compile(self):
+        if not check_run_test_on_diff_or_main(self.files_for_diff):
+            self.skipTest("No diff and not on `main`.")
+
+        sample = self._get_sample(
+            batch_size=self.default_batch_size,
+            num_channels=self.default_num_channels,
+            height=self.default_height,
+            width=self.default_width,
+        ).to(default_device)
+
+        model = self.get_default_model()
+        compiled_model = torch.compile(model, fullgraph=True, dynamic=True)
+
+        with torch.inference_mode():
+            compiled_model(sample)
