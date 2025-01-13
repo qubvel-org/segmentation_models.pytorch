@@ -17,6 +17,7 @@ class TestMobileoneEncoder(base.BaseEncoderTester):
             "mobileone_s4",
         ]
     )
+    files_for_diff = ["encoders/mobileone.py"]
 
 
 class TestMixTransformerEncoder(base.BaseEncoderTester):
@@ -25,6 +26,7 @@ class TestMixTransformerEncoder(base.BaseEncoderTester):
         if not RUN_ALL_ENCODERS
         else ["mit_b0", "mit_b1", "mit_b2", "mit_b3", "mit_b4", "mit_b5"]
     )
+    files_for_diff = ["encoders/mix_transformer.py"]
 
     def get_tiny_encoder(self):
         params = {
@@ -59,6 +61,7 @@ class TestEfficientNetEncoder(base.BaseEncoderTester):
             # "efficientnet-b7",  # extra large model
         ]
     )
+    files_for_diff = ["encoders/efficientnet.py"]
 
     def test_compile(self):
         self.skipTest("compile fullgraph is not supported for efficientnet encoders")

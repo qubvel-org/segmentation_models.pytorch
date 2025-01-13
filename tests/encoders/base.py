@@ -4,11 +4,14 @@ import torch
 import segmentation_models_pytorch as smp
 
 from functools import lru_cache
-from tests.utils import default_device
+from tests.utils import default_device, check_run_test_on_diff_or_main
 
 
 class BaseEncoderTester(unittest.TestCase):
     encoder_names = []
+
+    # some tests might be slow, running them only on diff
+    files_for_diff = []
 
     # standard encoder configuration
     num_output_features = 6
@@ -213,6 +216,9 @@ class BaseEncoderTester(unittest.TestCase):
 
     @pytest.mark.compile
     def test_compile(self):
+        if not check_run_test_on_diff_or_main(self.files_for_diff):
+            self.skipTest("No diff and not on `main`.")
+
         sample = self._get_sample(
             batch_size=self.default_batch_size,
             num_channels=self.default_num_channels,

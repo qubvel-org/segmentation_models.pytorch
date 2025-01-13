@@ -14,3 +14,4 @@ if has_timm_test_models:
 
 class TestTimmUniversalEncoder(base.BaseEncoderTester):
     encoder_names = timm_encoders
+    files_for_diff = ["encoders/timm_universal.py"]

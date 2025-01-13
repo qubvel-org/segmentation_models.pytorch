@@ -22,6 +22,7 @@ class TestResNetEncoder(base.BaseEncoderTester):
             "resnext101_32x48d",
         ]
     )
+    files_for_diff = ["encoders/resnet.py"]
 
     def get_tiny_encoder(self):
         params = {
@@ -39,6 +40,7 @@ class TestDenseNetEncoder(base.BaseEncoderTester):
         if not RUN_ALL_ENCODERS
         else ["densenet121", "densenet169", "densenet161"]
     )
+    files_for_diff = ["encoders/densenet.py"]
 
     def get_tiny_encoder(self):
         params = {
@@ -52,6 +54,7 @@ class TestDenseNetEncoder(base.BaseEncoderTester):
 
 class TestMobileNetEncoder(base.BaseEncoderTester):
     encoder_names = ["mobilenet_v2"] if not RUN_ALL_ENCODERS else ["mobilenet_v2"]
+    files_for_diff = ["encoders/mobilenet.py"]
 
 
 class TestVggEncoder(base.BaseEncoderTester):
@@ -70,6 +73,7 @@ class TestVggEncoder(base.BaseEncoderTester):
             "vgg19_bn",
         ]
     )
+    files_for_diff = ["encoders/vgg.py"]
 
     def get_tiny_encoder(self):
         params = {

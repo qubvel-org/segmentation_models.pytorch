@@ -24,6 +24,7 @@ class TestTimmEfficientNetEncoder(base.BaseEncoderTester):
             "timm-tf_efficientnet_lite4",
         ]
     )
+    files_for_diff = ["encoders/timm_efficientnet.py"]
 
 
 class TestTimmGERNetEncoder(base.BaseEncoderTester):
@@ -144,3 +145,4 @@ class TestTimmSkNetEncoder(base.BaseEncoderTester):
             "timm-skresnext50_32x4d",
         ]
     )
+    files_for_diff = ["encoders/timm_sknet.py"]

@@ -10,6 +10,7 @@ class TestDPNEncoder(base.BaseEncoderTester):
         if not RUN_ALL_ENCODERS
         else ["dpn68", "dpn68b", "dpn92", "dpn98", "dpn107", "dpn131"]
     )
+    files_for_diff = ["encoders/dpn.py"]
 
     def get_tiny_encoder(self):
         params = {
@@ -32,11 +33,13 @@ class TestInceptionResNetV2Encoder(base.BaseEncoderTester):
     encoder_names = (
         ["inceptionresnetv2"] if not RUN_ALL_ENCODERS else ["inceptionresnetv2"]
     )
+    files_for_diff = ["encoders/inceptionresnetv2.py"]
 
 
 class TestInceptionV4Encoder(base.BaseEncoderTester):
     supports_dilated = False
     encoder_names = ["inceptionv4"] if not RUN_ALL_ENCODERS else ["inceptionv4"]
+    files_for_diff = ["encoders/inceptionv4.py"]
 
 
 class TestSeNetEncoder(base.BaseEncoderTester):
@@ -52,6 +55,7 @@ class TestSeNetEncoder(base.BaseEncoderTester):
             # "senet154",  # extra large model
         ]
     )
+    files_for_diff = ["encoders/senet.py"]
 
     def get_tiny_encoder(self):
         params = {
@@ -73,3 +77,4 @@ class TestSeNetEncoder(base.BaseEncoderTester):
 class TestXceptionEncoder(base.BaseEncoderTester):
     supports_dilated = False
     encoder_names = ["xception"] if not RUN_ALL_ENCODERS else ["xception"]
+    files_for_diff = ["encoders/xception.py"]
