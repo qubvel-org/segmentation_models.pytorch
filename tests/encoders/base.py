@@ -4,7 +4,11 @@ import torch
 import segmentation_models_pytorch as smp
 
 from functools import lru_cache
-from tests.utils import default_device, check_run_test_on_diff_or_main
+from tests.utils import (
+    default_device,
+    check_run_test_on_diff_or_main,
+    requires_torch_greater_or_equal,
+)
 
 
 class BaseEncoderTester(unittest.TestCase):
@@ -29,11 +33,19 @@ class BaseEncoderTester(unittest.TestCase):
     depth_to_test = [3, 4, 5]
     strides_to_test = [8, 16]  # 32 is a default one
 
+    # enable/disable tests
+    do_test_torch_compile = True
+    do_test_torch_export = True
+
     def get_tiny_encoder(self):
         return smp.encoders.get_encoder(self.encoder_names[0], encoder_weights=None)
 
     @lru_cache
-    def _get_sample(self, batch_size=1, num_channels=3, height=32, width=32):
+    def _get_sample(self, batch_size=None, num_channels=None, height=None, width=None):
+        batch_size = batch_size or self.default_batch_size
+        num_channels = num_channels or self.default_num_channels
+        height = height or self.default_height
+        width = width or self.default_width
         return torch.rand(batch_size, num_channels, height, width)
 
     def get_features_output_strides(self, sample, features):
@@ -43,12 +55,7 @@ class BaseEncoderTester(unittest.TestCase):
         return height_strides, width_strides
 
     def test_forward_backward(self):
-        sample = self._get_sample(
-            batch_size=self.default_batch_size,
-            num_channels=self.default_num_channels,
-            height=self.default_height,
-            width=self.default_width,
-        ).to(default_device)
+        sample = self._get_sample().to(default_device)
         for encoder_name in self.encoder_names:
             with self.subTest(encoder_name=encoder_name):
                 # init encoder
@@ -75,12 +82,7 @@ class BaseEncoderTester(unittest.TestCase):
         ]
 
         for encoder_name, in_channels in cases:
-            sample = self._get_sample(
-                batch_size=self.default_batch_size,
-                num_channels=in_channels,
-                height=self.default_height,
-                width=self.default_width,
-            ).to(default_device)
+            sample = self._get_sample(num_channels=in_channels).to(default_device)
 
             with self.subTest(encoder_name=encoder_name, in_channels=in_channels):
                 encoder = smp.encoders.get_encoder(
@@ -93,12 +95,7 @@ class BaseEncoderTester(unittest.TestCase):
                     encoder.forward(sample)
 
     def test_depth(self):
-        sample = self._get_sample(
-            batch_size=self.default_batch_size,
-            num_channels=self.default_num_channels,
-            height=self.default_height,
-            width=self.default_width,
-        ).to(default_device)
+        sample = self._get_sample().to(default_device)
 
         cases = [
             (encoder_name, depth)
@@ -157,12 +154,7 @@ class BaseEncoderTester(unittest.TestCase):
                 )
 
     def test_dilated(self):
-        sample = self._get_sample(
-            batch_size=self.default_batch_size,
-            num_channels=self.default_num_channels,
-            height=self.default_height,
-            width=self.default_width,
-        ).to(default_device)
+        sample = self._get_sample().to(default_device)
 
         cases = [
             (encoder_name, stride)
@@ -216,15 +208,15 @@ class BaseEncoderTester(unittest.TestCase):
 
     @pytest.mark.compile
     def test_compile(self):
+        if not self.do_test_torch_compile:
+            self.skipTest(
+                f"torch_compile test is disabled for {self.encoder_names[0]}."
+            )
+
         if not check_run_test_on_diff_or_main(self.files_for_diff):
             self.skipTest("No diff and not on `main`.")
 
-        sample = self._get_sample(
-            batch_size=self.default_batch_size,
-            num_channels=self.default_num_channels,
-            height=self.default_height,
-            width=self.default_width,
-        ).to(default_device)
+        sample = self._get_sample().to(default_device)
 
         encoder = self.get_tiny_encoder().eval().to(default_device)
         compiled_encoder = torch.compile(encoder, fullgraph=True, dynamic=True)
@@ -233,16 +225,15 @@ class BaseEncoderTester(unittest.TestCase):
             compiled_encoder(sample)
 
     @pytest.mark.torch_export
+    @requires_torch_greater_or_equal("2.4.0")
     def test_torch_export(self):
+        if not self.do_test_torch_export:
+            self.skipTest(f"torch_export test is disabled for {self.encoder_names[0]}.")
+
         if not check_run_test_on_diff_or_main(self.files_for_diff):
             self.skipTest("No diff and not on `main`.")
 
-        sample = self._get_sample(
-            batch_size=self.default_batch_size,
-            num_channels=self.default_num_channels,
-            height=self.default_height,
-            width=self.default_width,
-        ).to(default_device)
+        sample = self._get_sample().to(default_device)
 
         encoder = self.get_tiny_encoder()
         encoder = encoder.eval().to(default_device)

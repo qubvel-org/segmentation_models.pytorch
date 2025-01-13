@@ -63,5 +63,5 @@ class TestEfficientNetEncoder(base.BaseEncoderTester):
     )
     files_for_diff = ["encoders/efficientnet.py"]
 
-    def test_compile(self):
-        self.skipTest("compile fullgraph is not supported for efficientnet encoders")
+    # torch_compile is not supported for efficientnet encoders
+    do_test_torch_compile = False
