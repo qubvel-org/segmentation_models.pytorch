@@ -39,11 +39,13 @@ docs = [
     'sphinx-book-theme',
 ]
 test = [
+    'gitpython',
     'packaging',
     'pytest',
     'pytest-cov',
     'pytest-xdist',
     'ruff>=0.9',
+    'setuptools',
 ]
 
 [project.urls]
