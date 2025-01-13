@@ -254,3 +254,31 @@ class BaseModelTester(unittest.TestCase):
 
         with torch.inference_mode():
             compiled_model(sample)
+
+    @pytest.mark.torch_export
+    def test_torch_export(self):
+        if not check_run_test_on_diff_or_main(self.files_for_diff):
+            self.skipTest("No diff and not on `main`.")
+
+        sample = self._get_sample(
+            batch_size=self.default_batch_size,
+            num_channels=self.default_num_channels,
+            height=self.default_height,
+            width=self.default_width,
+        ).to(default_device)
+
+        model = self.get_default_model()
+        model.eval()
+
+        exported_model = torch.export.export(
+            model,
+            args=(sample,),
+            strict=True,
+        )
+
+        with torch.inference_mode():
+            eager_output = model(sample)
+            exported_output = exported_model.module().forward(sample)
+
+        self.assertEqual(eager_output.shape, exported_output.shape)
+        torch.testing.assert_close(eager_output, exported_output)

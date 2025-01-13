@@ -3,6 +3,7 @@ from typing import TypeVar, Type
 
 from . import initialization as init
 from .hub_mixin import SMPHubMixin
+from .utils import is_torch_compiling
 
 T = TypeVar("T", bound="SegmentationModel")
 
@@ -50,7 +51,11 @@ class SegmentationModel(torch.nn.Module, SMPHubMixin):
     def forward(self, x):
         """Sequentially pass `x` trough model`s encoder, decoder and heads"""
 
-        if not torch.jit.is_tracing() and self.requires_divisible_input_shape:
+        if (
+            not torch.jit.is_tracing()
+            and not is_torch_compiling()
+            and self.requires_divisible_input_shape
+        ):
             self.check_input_shape(x)
 
         features = self.encoder(x)

@@ -65,6 +65,7 @@ include = ['segmentation_models_pytorch*']
 markers = [
     "logits_match",
     "compile",
+    "torch_export",
 ]
 
 [tool.coverage.run]

@@ -231,3 +231,31 @@ class BaseEncoderTester(unittest.TestCase):
 
         with torch.inference_mode():
             compiled_encoder(sample)
+
+    @pytest.mark.torch_export
+    def test_torch_export(self):
+        if not check_run_test_on_diff_or_main(self.files_for_diff):
+            self.skipTest("No diff and not on `main`.")
+
+        sample = self._get_sample(
+            batch_size=self.default_batch_size,
+            num_channels=self.default_num_channels,
+            height=self.default_height,
+            width=self.default_width,
+        ).to(default_device)
+
+        encoder = self.get_tiny_encoder()
+        encoder = encoder.eval().to(default_device)
+
+        exported_encoder = torch.export.export(
+            encoder,
+            args=(sample,),
+            strict=True,
+        )
+
+        with torch.inference_mode():
+            eager_output = encoder(sample)
+            exported_output = exported_encoder.module().forward(sample)
+
+        for eager_feature, exported_feature in zip(eager_output, exported_output):
+            torch.testing.assert_close(eager_feature, exported_feature)
