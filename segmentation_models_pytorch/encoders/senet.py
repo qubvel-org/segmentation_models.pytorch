@@ -23,8 +23,6 @@ Methods:
         depth = 3 -> number of feature tensors = 4 (one with same resolution as input and 3 downsampled).
 """
 
-import torch.nn as nn
-
 from pretrainedmodels.models.senet import (
     SENet,
     SEBottleneck,
@@ -46,14 +44,10 @@ class SENetEncoder(SENet, EncoderMixin):
         del self.avg_pool
 
     def get_stages(self):
-        return [
-            nn.Identity(),
-            self.layer0[:-1],
-            nn.Sequential(self.layer0[-1], self.layer1),
-            self.layer2,
-            self.layer3,
-            self.layer4,
-        ]
+        return {
+            16: self.layer3,
+            32: self.layer4,
+        }
 
     def forward(self, x):
         features = [x]

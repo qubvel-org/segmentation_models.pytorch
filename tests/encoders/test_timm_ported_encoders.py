@@ -93,7 +93,6 @@ class TestTimmRegNetEncoder(base.BaseEncoderTester):
 
 
 class TestTimmRes2NetEncoder(base.BaseEncoderTester):
-    supports_dilated = False
     encoder_names = (
         ["timm-res2net50_26w_4s"]
         if not RUN_ALL_ENCODERS
@@ -114,7 +113,6 @@ class TestTimmRes2NetEncoder(base.BaseEncoderTester):
 
 class TestTimmResnestEncoder(base.BaseEncoderTester):
     default_batch_size = 2
-    supports_dilated = False
     encoder_names = (
         ["timm-resnest14d"]
         if not RUN_ALL_ENCODERS

@@ -31,10 +31,10 @@ from ._base import EncoderMixin
 
 # fmt: off
 cfg = {
-    'A': [64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
-    'B': [64, 64, 'M', 128, 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M'],
-    'D': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 'M'],
-    'E': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M', 512, 512, 512, 512, 'M'],
+    "A": [64, "M", 128, "M", 256, 256, "M", 512, 512, "M", 512, 512, "M"],
+    "B": [64, 64, "M", 128, 128, "M", 256, 256, "M", 512, 512, "M", 512, 512, "M"],
+    "D": [64, 64, "M", 128, 128, "M", 256, 256, 256, "M", 512, 512, 512, "M", 512, 512, 512, "M"],
+    "E": [64, 64, "M", 128, 128, "M", 256, 256, 256, 256, "M", 512, 512, 512, 512, "M", 512, 512, 512, 512, "M"],
 }
 # fmt: on
 
@@ -45,6 +45,7 @@ class VGGEncoder(VGG, EncoderMixin):
         self._out_channels = out_channels
         self._depth = depth
         self._in_channels = 3
+
         del self.classifier
 
     def make_dilated(self, *args, **kwargs):
@@ -54,25 +55,21 @@ class VGGEncoder(VGG, EncoderMixin):
         )
 
     def forward(self, x):
-        features = []
-        depth = 0
-
-        for i, module in enumerate(self.features):
+        # collect stages
+        stages = []
+        stage_modules = []
+        for module in self.features:
             if isinstance(module, nn.MaxPool2d):
-                features.append(x)
-                depth += 1
+                stages.append(stage_modules)
+                stage_modules = []
+            stage_modules.append(module)
+        stages.append(stage_modules)
 
-            # last layer is always maxpool, we just apply it and break
-            if i == len(self.features) - 1:
+        features = []
+        for i in range(self._depth + 1):
+            for module in stages[i]:
                 x = module(x)
-                features.append(x)
-                break
-
-            # if depth is reached, break
-            if depth > self._depth:
-                break
-
-            x = module(x)
+            features.append(x)
 
         return features
 

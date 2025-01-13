@@ -526,6 +526,12 @@ class MixVisionTransformerEncoder(MixVisionTransformer, EncoderMixin):
         self._depth = depth
         self._in_channels = 3
 
+    def get_stages(self):
+        return {
+            16: [self.patch_embed3, self.block3, self.norm3],
+            32: [self.patch_embed4, self.block4, self.norm4],
+        }
+
     def forward(self, x):
         # create dummy output for the first block
         batch_size, _, height, width = x.shape

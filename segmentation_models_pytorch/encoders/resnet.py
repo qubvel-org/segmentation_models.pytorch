@@ -44,6 +44,12 @@ class ResNetEncoder(ResNet, EncoderMixin):
         del self.fc
         del self.avgpool
 
+    def get_stages(self):
+        return {
+            16: self.layer3,
+            32: self.layer4,
+        }
+
     def forward(self, x: torch.Tensor) -> list[torch.Tensor]:
         features = [x]
 

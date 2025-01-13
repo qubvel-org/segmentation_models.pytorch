@@ -105,6 +105,12 @@ class EfficientNetBaseEncoder(EfficientNet, EncoderMixin):
 
         del self.classifier
 
+    def get_stages(self):
+        return {
+            16: self.blocks[self._stage_idxs[1] : self._stage_idxs[2]],
+            32: self.blocks[self._stage_idxs[2] :],
+        }
+
     def forward(self, x):
         features = [x]
 

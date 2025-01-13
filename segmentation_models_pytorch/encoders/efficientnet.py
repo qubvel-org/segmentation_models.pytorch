@@ -44,6 +44,12 @@ class EfficientNetEncoder(EfficientNet, EncoderMixin):
 
         del self._fc
 
+    def get_stages(self):
+        return {
+            16: self._blocks[self._stage_idxs[1] : self._stage_idxs[2]],
+            32: self._blocks[self._stage_idxs[2] :],
+        }
+
     def apply_blocks(
         self, x: torch.Tensor, start_idx: int, end_idx: int
     ) -> torch.Tensor:

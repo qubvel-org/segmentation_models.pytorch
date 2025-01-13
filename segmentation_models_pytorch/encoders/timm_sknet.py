@@ -13,6 +13,12 @@ class SkNetEncoder(ResNet, EncoderMixin):
         del self.fc
         del self.global_pool
 
+    def get_stages(self):
+        return {
+            16: self.layer3,
+            32: self.layer4,
+        }
+
     def forward(self, x):
         features = [x]
 

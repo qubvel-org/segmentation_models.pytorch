@@ -355,6 +355,12 @@ class MobileOne(nn.Module, EncoderMixin):
             num_se_blocks=num_blocks_per_stage[3] if use_se else 0,
         )
 
+    def get_stages(self):
+        return {
+            16: self.stage3,
+            32: self.stage4,
+        }
+
     def _make_stage(
         self, planes: int, num_blocks: int, num_se_blocks: int
     ) -> nn.Sequential:
