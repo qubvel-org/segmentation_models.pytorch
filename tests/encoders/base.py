@@ -86,7 +86,7 @@ class BaseEncoderTester(unittest.TestCase):
                 encoder.eval()
 
                 # forward
-                with torch.no_grad():
+                with torch.inference_mode():
                     encoder.forward(sample)
 
     def test_depth(self):
@@ -114,7 +114,7 @@ class BaseEncoderTester(unittest.TestCase):
                 encoder.eval()
 
                 # forward
-                with torch.no_grad():
+                with torch.inference_mode():
                     features = encoder.forward(sample)
 
                 # check number of features
@@ -191,7 +191,7 @@ class BaseEncoderTester(unittest.TestCase):
                 encoder.eval()
 
                 # forward
-                with torch.no_grad():
+                with torch.inference_mode():
                     features = encoder.forward(sample)
 
                 height_strides, width_strides = self.get_features_output_strides(

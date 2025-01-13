@@ -1,8 +1,11 @@
 import torch
+from typing import TypeVar, Type
 
 from . import initialization as init
 from .hub_mixin import SMPHubMixin
 from ..encoders.timm_universal import TimmUniversalEncoder
+
+T = TypeVar("T", bound="SegmentationModel")
 
 
 class SegmentationModel(torch.nn.Module, SMPHubMixin):
@@ -11,6 +14,11 @@ class SegmentationModel(torch.nn.Module, SMPHubMixin):
     # if model supports shape not divisible by 2 ^ n
     # set to False
     requires_divisible_input_shape = True
+
+    # Fix type-hint for models, to avoid HubMixin signature
+    def __new__(cls: Type[T], *args, **kwargs) -> T:
+        instance = super().__new__(cls, *args, **kwargs)
+        return instance
 
     def initialize(self):
         init.initialize_decoder(self.decoder)
@@ -43,7 +51,7 @@ class SegmentationModel(torch.nn.Module, SMPHubMixin):
     def forward(self, x):
         """Sequentially pass `x` trough model`s encoder, decoder and heads"""
 
-        if not torch.jit.is_tracing() or self.requires_divisible_input_shape:
+        if not torch.jit.is_tracing() and self.requires_divisible_input_shape:
             self.check_input_shape(x)
 
         features = self.encoder(x)
