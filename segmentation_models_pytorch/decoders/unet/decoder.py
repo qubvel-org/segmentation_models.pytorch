@@ -6,7 +6,9 @@ from typing import Optional, Sequence
 from segmentation_models_pytorch.base import modules as md
 
 
-class DecoderBlock(nn.Module):
+class UnetDecoderBlock(nn.Module):
+    """A decoder block in the U-Net architecture that performs upsampling and feature fusion."""
+
     def __init__(
         self,
         in_channels: int,
@@ -17,7 +19,7 @@ class DecoderBlock(nn.Module):
         interpolation_mode: str = "nearest",
     ):
         super().__init__()
-        self.interpolate_mode = interpolation_mode
+        self.interpolation_mode = interpolation_mode
         self.conv1 = md.Conv2dReLU(
             in_channels + skip_channels,
             out_channels,
@@ -44,11 +46,10 @@ class DecoderBlock(nn.Module):
         target_width: int,
         skip_connection: Optional[torch.Tensor] = None,
     ) -> torch.Tensor:
-        """Upsample feature map to the given spatial shape, concatenate with skip connection,
-        apply attention block (if specified) and then apply two convolutions.
-        """
         feature_map = F.interpolate(
-            feature_map, size=(target_height, target_width), mode=self.interpolate_mode
+            feature_map,
+            size=(target_height, target_width),
+            mode=self.interpolation_mode,
         )
         if skip_connection is not None:
             feature_map = torch.cat([feature_map, skip_connection], dim=1)
@@ -59,7 +60,7 @@ class DecoderBlock(nn.Module):
         return feature_map
 
 
-class CenterBlock(nn.Sequential):
+class UnetCenterBlock(nn.Sequential):
     """Center block of the Unet decoder. Applied to the last feature map of the encoder."""
 
     def __init__(self, in_channels: int, out_channels: int, use_batchnorm: bool = True):
@@ -81,6 +82,12 @@ class CenterBlock(nn.Sequential):
 
 
 class UnetDecoder(nn.Module):
+    """The decoder part of the U-Net architecture.
+
+    Takes encoded features from different stages of the encoder and progressively upsamples them while
+    combining with skip connections. This helps preserve fine-grained details in the final segmentation.
+    """
+
     def __init__(
         self,
         encoder_channels: Sequence[int],
@@ -89,6 +96,7 @@ class UnetDecoder(nn.Module):
         use_batchnorm: bool = True,
         attention_type: Optional[str] = None,
         add_center_block: bool = False,
+        interpolation_mode: str = "nearest",
     ):
         super().__init__()
 
@@ -111,7 +119,7 @@ class UnetDecoder(nn.Module):
         out_channels = decoder_channels
 
         if add_center_block:
-            self.center = CenterBlock(
+            self.center = UnetCenterBlock(
                 head_channels, head_channels, use_batchnorm=use_batchnorm
             )
         else:
@@ -122,12 +130,13 @@ class UnetDecoder(nn.Module):
         for block_in_channels, block_skip_channels, block_out_channels in zip(
             in_channels, skip_channels, out_channels
         ):
-            block = DecoderBlock(
+            block = UnetDecoderBlock(
                 block_in_channels,
                 block_skip_channels,
                 block_out_channels,
                 use_batchnorm=use_batchnorm,
                 attention_type=attention_type,
+                interpolation_mode=interpolation_mode,
             )
             self.blocks.append(block)
 
