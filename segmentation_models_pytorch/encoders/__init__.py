@@ -72,7 +72,7 @@ def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **
     # convert timm- models to tu- models
     if is_equivalent_to_timm_universal(name):
         name = name.replace("timm-", "tu-")
-        if "minimal" in name:
+        if "mobilenetv3" in name:
             name = name.replace("tu-", "tu-tf_")
 
     if name.startswith("tu-"):
