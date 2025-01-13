@@ -57,6 +57,12 @@ class BaseModelTester(unittest.TestCase):
     def _get_sample(self, batch_size=1, num_channels=3, height=32, width=32):
         return torch.rand(batch_size, num_channels, height, width)
 
+    @lru_cache
+    def get_default_model(self):
+        model = smp.create_model(self.model_type, self.test_encoder_name)
+        model = model.to(default_device)
+        return model
+
     def test_forward_backward(self):
         sample = self._get_sample(
             batch_size=self.default_batch_size,
@@ -64,9 +70,8 @@ class BaseModelTester(unittest.TestCase):
             height=self.default_height,
             width=self.default_width,
         ).to(default_device)
-        model = smp.create_model(
-            arch=self.model_type, encoder_name=self.test_encoder_name
-        ).to(default_device)
+
+        model = self.get_default_model()
 
         # check default in_channels=3
         output = model(sample)
@@ -91,14 +96,19 @@ class BaseModelTester(unittest.TestCase):
         if self.model_type in ["unet", "unetplusplus", "manet"]:
             kwargs = {"decoder_channels": self.decoder_channels[:depth]}
 
-        model = smp.create_model(
-            arch=self.model_type,
-            encoder_name=self.test_encoder_name,
-            encoder_depth=depth,
-            in_channels=in_channels,
-            classes=classes,
-            **kwargs,
-        ).to(default_device)
+        model = (
+            smp.create_model(
+                arch=self.model_type,
+                encoder_name=self.test_encoder_name,
+                encoder_depth=depth,
+                in_channels=in_channels,
+                classes=classes,
+                **kwargs,
+            )
+            .to(default_device)
+            .eval()
+        )
+
         sample = self._get_sample(
             batch_size=self.default_batch_size,
             num_channels=in_channels,
@@ -107,7 +117,7 @@ class BaseModelTester(unittest.TestCase):
         ).to(default_device)
 
         # check in channels correctly set
-        with torch.no_grad():
+        with torch.inference_mode():
             output = model(sample)
 
         self.assertEqual(output.shape[1], classes)
@@ -122,7 +132,8 @@ class BaseModelTester(unittest.TestCase):
                 "dropout": 0.5,
                 "activation": "sigmoid",
             },
-        ).to(default_device)
+        )
+        model = model.to(default_device).eval()
 
         self.assertIsNotNone(model.classification_head)
         self.assertIsInstance(model.classification_head[0], torch.nn.AdaptiveAvgPool2d)
@@ -139,17 +150,34 @@ class BaseModelTester(unittest.TestCase):
             width=self.default_width,
         ).to(default_device)
 
-        with torch.no_grad():
+        with torch.inference_mode():
             _, cls_probs = model(sample)
 
         self.assertEqual(cls_probs.shape[1], 10)
 
+    def test_any_resolution(self):
+        model = self.get_default_model()
+        if model.requires_divisible_input_shape:
+            self.skipTest("Model requires divisible input shape")
+
+        sample = self._get_sample(
+            batch_size=self.default_batch_size,
+            num_channels=self.default_num_channels,
+            height=self.default_height + 3,
+            width=self.default_width + 7,
+        ).to(default_device)
+
+        with torch.inference_mode():
+            output = model(sample)
+
+        self.assertEqual(output.shape[2], self.default_height + 3)
+        self.assertEqual(output.shape[3], self.default_width + 7)
+
     @requires_torch_greater_or_equal("2.0.1")
     def test_save_load_with_hub_mixin(self):
         # instantiate model
-        model = smp.create_model(
-            arch=self.model_type, encoder_name=self.test_encoder_name
-        ).to(default_device)
+        model = self.get_default_model()
+        model.eval()
 
         # save model
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -157,6 +185,8 @@ class BaseModelTester(unittest.TestCase):
                 tmpdir, dataset="test_dataset", metrics={"my_awesome_metric": 0.99}
             )
             restored_model = smp.from_pretrained(tmpdir).to(default_device)
+            restored_model.eval()
+
             with open(os.path.join(tmpdir, "README.md"), "r") as f:
                 readme = f.read()
 
@@ -168,7 +198,7 @@ class BaseModelTester(unittest.TestCase):
             width=self.default_width,
         ).to(default_device)
 
-        with torch.no_grad():
+        with torch.inference_mode():
             output = model(sample)
             restored_output = restored_model(sample)
 
@@ -197,7 +227,7 @@ class BaseModelTester(unittest.TestCase):
         output_tensor = torch.load(output_tensor_path, weights_only=True)
         output_tensor = output_tensor.to(default_device)
 
-        with torch.no_grad():
+        with torch.inference_mode():
             output = model(input_tensor)
 
         self.assertEqual(output.shape, output_tensor.shape)

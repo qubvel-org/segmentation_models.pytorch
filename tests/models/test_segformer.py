@@ -21,7 +21,7 @@ class TestSegformerModel(base.BaseModelTester):
 
         sample = torch.ones([1, 3, 512, 512]).to(default_device)
 
-        with torch.no_grad():
+        with torch.inference_mode():
             output = model(sample)
 
         self.assertEqual(output.shape, (1, 150, 512, 512))
