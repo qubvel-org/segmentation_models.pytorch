@@ -199,7 +199,6 @@ class TimmUniversalEncoder(nn.Module):
     def load_state_dict(self, state_dict, **kwargs):
         # for compatibility of weights for
         # timm- ported encoders with TimmUniversalEncoder
-
         patterns = ["regnet", "res2", "resnest", "mobilenetv3", "gernet"]
 
         is_deprecated_encoder = any(
