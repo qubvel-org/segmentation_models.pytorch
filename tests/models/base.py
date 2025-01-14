@@ -228,8 +228,10 @@ class BaseModelTester(unittest.TestCase):
             self.skipTest("No diff and not on `main`.")
 
         sample = self._get_sample().to(default_device)
-
         model = self.get_default_model()
+        model = model.eval().to(default_device)
+
+        torch.compiler.reset()
         compiled_model = torch.compile(model, fullgraph=True, dynamic=True)
 
         with torch.inference_mode():
