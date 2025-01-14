@@ -23,9 +23,12 @@ Methods:
         depth = 3 -> number of feature tensors = 4 (one with same resolution as input and 3 downsampled).
 """
 
+import torch
 import torch.nn as nn
 from torchvision.models.vgg import VGG
 from torchvision.models.vgg import make_layers
+
+from typing import List, Union
 
 from ._base import EncoderMixin
 
@@ -40,11 +43,21 @@ cfg = {
 
 
 class VGGEncoder(VGG, EncoderMixin):
-    def __init__(self, out_channels, config, batch_norm=False, depth=5, **kwargs):
+    def __init__(
+        self,
+        out_channels: List[int],
+        config: List[Union[int, str]],
+        batch_norm: bool = False,
+        depth: int = 5,
+        output_stride: int = 32,
+        **kwargs,
+    ):
         super().__init__(make_layers(config, batch_norm=batch_norm), **kwargs)
-        self._out_channels = out_channels
+
         self._depth = depth
         self._in_channels = 3
+        self._out_channels = out_channels
+        self._output_stride = output_stride
 
         del self.classifier
 
@@ -54,7 +67,7 @@ class VGGEncoder(VGG, EncoderMixin):
             " operations for downsampling!"
         )
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
         # collect stages
         stages = []
         stage_modules = []
@@ -177,7 +190,7 @@ vgg_encoders = {
         "encoder": VGGEncoder,
         "pretrained_settings": pretrained_settings["vgg11"],
         "params": {
-            "out_channels": (64, 128, 256, 512, 512, 512),
+            "out_channels": [64, 128, 256, 512, 512, 512],
             "config": cfg["A"],
             "batch_norm": False,
         },
@@ -186,7 +199,7 @@ vgg_encoders = {
         "encoder": VGGEncoder,
         "pretrained_settings": pretrained_settings["vgg11_bn"],
         "params": {
-            "out_channels": (64, 128, 256, 512, 512, 512),
+            "out_channels": [64, 128, 256, 512, 512, 512],
             "config": cfg["A"],
             "batch_norm": True,
         },
@@ -195,7 +208,7 @@ vgg_encoders = {
         "encoder": VGGEncoder,
         "pretrained_settings": pretrained_settings["vgg13"],
         "params": {
-            "out_channels": (64, 128, 256, 512, 512, 512),
+            "out_channels": [64, 128, 256, 512, 512, 512],
             "config": cfg["B"],
             "batch_norm": False,
         },
@@ -204,7 +217,7 @@ vgg_encoders = {
         "encoder": VGGEncoder,
         "pretrained_settings": pretrained_settings["vgg13_bn"],
         "params": {
-            "out_channels": (64, 128, 256, 512, 512, 512),
+            "out_channels": [64, 128, 256, 512, 512, 512],
             "config": cfg["B"],
             "batch_norm": True,
         },
@@ -213,7 +226,7 @@ vgg_encoders = {
         "encoder": VGGEncoder,
         "pretrained_settings": pretrained_settings["vgg16"],
         "params": {
-            "out_channels": (64, 128, 256, 512, 512, 512),
+            "out_channels": [64, 128, 256, 512, 512, 512],
             "config": cfg["D"],
             "batch_norm": False,
         },
@@ -222,7 +235,7 @@ vgg_encoders = {
         "encoder": VGGEncoder,
         "pretrained_settings": pretrained_settings["vgg16_bn"],
         "params": {
-            "out_channels": (64, 128, 256, 512, 512, 512),
+            "out_channels": [64, 128, 256, 512, 512, 512],
             "config": cfg["D"],
             "batch_norm": True,
         },
@@ -231,7 +244,7 @@ vgg_encoders = {
         "encoder": VGGEncoder,
         "pretrained_settings": pretrained_settings["vgg19"],
         "params": {
-            "out_channels": (64, 128, 256, 512, 512, 512),
+            "out_channels": [64, 128, 256, 512, 512, 512],
             "config": cfg["E"],
             "batch_norm": False,
         },
@@ -240,7 +253,7 @@ vgg_encoders = {
         "encoder": VGGEncoder,
         "pretrained_settings": pretrained_settings["vgg19_bn"],
         "params": {
-            "out_channels": (64, 128, 256, 512, 512, 512),
+            "out_channels": [64, 128, 256, 512, 512, 512],
             "config": cfg["E"],
             "batch_norm": True,
         },

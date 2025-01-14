@@ -4,12 +4,13 @@ from ._base import EncoderMixin
 
 
 class XceptionEncoder(Xception, EncoderMixin):
-    def __init__(self, out_channels, *args, depth=5, **kwargs):
+    def __init__(self, out_channels, *args, depth=5, output_stride=32, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self._out_channels = out_channels
         self._depth = depth
         self._in_channels = 3
+        self._out_channels = out_channels
+        self._output_stride = output_stride
 
         # modify padding to maintain output shape
         self.conv1.padding = (1, 1)
@@ -93,6 +94,6 @@ xception_encoders = {
     "xception": {
         "encoder": XceptionEncoder,
         "pretrained_settings": pretrained_settings["xception"],
-        "params": {"out_channels": (3, 64, 128, 256, 728, 2048)},
+        "params": {"out_channels": [3, 64, 128, 256, 728, 2048]},
     }
 }

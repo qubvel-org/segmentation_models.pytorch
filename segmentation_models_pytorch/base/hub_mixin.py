@@ -1,3 +1,4 @@
+import torch
 import json
 from pathlib import Path
 from typing import Optional, Union
@@ -114,6 +115,7 @@ class SMPHubMixin(PyTorchModelHubMixin):
         return result
 
     @property
+    @torch.jit.unused
     def config(self) -> dict:
         return self._hub_mixin_config
 

@@ -18,7 +18,7 @@ class TestDPNEncoder(base.BaseEncoderTester):
 
     def get_tiny_encoder(self):
         params = {
-            "stage_idxs": (2, 3, 4, 5),
+            "stage_idxs": [2, 3, 4, 5],
             "out_channels": None,
             "groups": 2,
             "inc_sec": (2, 2, 2, 2),

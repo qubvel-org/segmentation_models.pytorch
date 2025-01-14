@@ -77,7 +77,7 @@ class TestVggEncoder(base.BaseEncoderTester):
 
     def get_tiny_encoder(self):
         params = {
-            "out_channels": (4, 4, 4, 4, 4, 4),
+            "out_channels": [4, 4, 4, 4, 4, 4],
             "config": [4, "M", 4, "M", 4, "M", 4, "M", 4, "M"],
             "batch_norm": False,
         }

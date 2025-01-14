@@ -23,6 +23,9 @@ Methods:
         depth = 3 -> number of feature tensors = 4 (one with same resolution as input and 3 downsampled).
 """
 
+import torch
+from typing import List, Dict, Sequence
+
 from pretrainedmodels.models.senet import (
     SENet,
     SEBottleneck,
@@ -33,23 +36,30 @@ from ._base import EncoderMixin
 
 
 class SENetEncoder(SENet, EncoderMixin):
-    def __init__(self, out_channels, depth=5, **kwargs):
+    def __init__(
+        self,
+        out_channels: List[int],
+        depth: int = 5,
+        output_stride: int = 32,
+        **kwargs,
+    ):
         super().__init__(**kwargs)
 
-        self._out_channels = out_channels
         self._depth = depth
         self._in_channels = 3
+        self._out_channels = out_channels
+        self._output_stride = output_stride
 
         del self.last_linear
         del self.avg_pool
 
-    def get_stages(self):
+    def get_stages(self) -> Dict[int, Sequence[torch.nn.Module]]:
         return {
-            16: self.layer3,
-            32: self.layer4,
+            16: [self.layer3],
+            32: [self.layer4],
         }
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
         features = [x]
 
         if self._depth >= 1:
@@ -156,7 +166,7 @@ senet_encoders = {
         "encoder": SENetEncoder,
         "pretrained_settings": pretrained_settings["senet154"],
         "params": {
-            "out_channels": (3, 128, 256, 512, 1024, 2048),
+            "out_channels": [3, 128, 256, 512, 1024, 2048],
             "block": SEBottleneck,
             "dropout_p": 0.2,
             "groups": 64,
@@ -169,7 +179,7 @@ senet_encoders = {
         "encoder": SENetEncoder,
         "pretrained_settings": pretrained_settings["se_resnet50"],
         "params": {
-            "out_channels": (3, 64, 256, 512, 1024, 2048),
+            "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": SEResNetBottleneck,
             "layers": [3, 4, 6, 3],
             "downsample_kernel_size": 1,
@@ -186,7 +196,7 @@ senet_encoders = {
         "encoder": SENetEncoder,
         "pretrained_settings": pretrained_settings["se_resnet101"],
         "params": {
-            "out_channels": (3, 64, 256, 512, 1024, 2048),
+            "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": SEResNetBottleneck,
             "layers": [3, 4, 23, 3],
             "downsample_kernel_size": 1,
@@ -203,7 +213,7 @@ senet_encoders = {
         "encoder": SENetEncoder,
         "pretrained_settings": pretrained_settings["se_resnet152"],
         "params": {
-            "out_channels": (3, 64, 256, 512, 1024, 2048),
+            "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": SEResNetBottleneck,
             "layers": [3, 8, 36, 3],
             "downsample_kernel_size": 1,
@@ -220,7 +230,7 @@ senet_encoders = {
         "encoder": SENetEncoder,
         "pretrained_settings": pretrained_settings["se_resnext50_32x4d"],
         "params": {
-            "out_channels": (3, 64, 256, 512, 1024, 2048),
+            "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": SEResNeXtBottleneck,
             "layers": [3, 4, 6, 3],
             "downsample_kernel_size": 1,
@@ -237,7 +247,7 @@ senet_encoders = {
         "encoder": SENetEncoder,
         "pretrained_settings": pretrained_settings["se_resnext101_32x4d"],
         "params": {
-            "out_channels": (3, 64, 256, 512, 1024, 2048),
+            "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": SEResNeXtBottleneck,
             "layers": [3, 4, 23, 3],
             "downsample_kernel_size": 1,

@@ -2,14 +2,23 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from typing import List, Tuple
 from segmentation_models_pytorch.base import modules
 
 
 class PSPBlock(nn.Module):
-    def __init__(self, in_channels, out_channels, pool_size, use_bathcnorm=True):
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        pool_size: int,
+        use_bathcnorm: bool = True,
+    ):
         super().__init__()
+
         if pool_size == 1:
             use_bathcnorm = False  # PyTorch does not support BatchNorm for 1x1 shape
+
         self.pool = nn.Sequential(
             nn.AdaptiveAvgPool2d(output_size=(pool_size, pool_size)),
             modules.Conv2dReLU(
@@ -17,15 +26,20 @@ class PSPBlock(nn.Module):
             ),
         )
 
-    def forward(self, x):
-        h, w = x.size(2), x.size(3)
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        height, width = x.shape[2:]
         x = self.pool(x)
-        x = F.interpolate(x, size=(h, w), mode="bilinear", align_corners=True)
+        x = F.interpolate(x, size=(height, width), mode="bilinear", align_corners=True)
         return x
 
 
 class PSPModule(nn.Module):
-    def __init__(self, in_channels, sizes=(1, 2, 3, 6), use_bathcnorm=True):
+    def __init__(
+        self,
+        in_channels: int,
+        sizes: Tuple[int, ...] = (1, 2, 3, 6),
+        use_bathcnorm: bool = True,
+    ):
         super().__init__()
 
         self.blocks = nn.ModuleList(
@@ -48,7 +62,11 @@ class PSPModule(nn.Module):
 
 class PSPDecoder(nn.Module):
     def __init__(
-        self, encoder_channels, use_batchnorm=True, out_channels=512, dropout=0.2
+        self,
+        encoder_channels: List[int],
+        use_batchnorm: bool = True,
+        out_channels: int = 512,
+        dropout: float = 0.2,
     ):
         super().__init__()
 
@@ -67,7 +85,7 @@ class PSPDecoder(nn.Module):
 
         self.dropout = nn.Dropout2d(p=dropout)
 
-    def forward(self, *features):
+    def forward(self, features: List[torch.Tensor]) -> torch.Tensor:
         x = features[-1]
         x = self.psp(x)
         x = self.conv(x)

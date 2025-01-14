@@ -3,7 +3,7 @@
 # Copyright (C) 2022 Apple Inc. All Rights Reserved.
 #
 import copy
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Dict, Sequence
 
 import torch
 import torch.nn as nn
@@ -298,13 +298,14 @@ class MobileOne(nn.Module, EncoderMixin):
 
     def __init__(
         self,
-        out_channels,
+        out_channels: List[int],
         num_blocks_per_stage: List[int] = [2, 8, 10, 1],
         width_multipliers: Optional[List[float]] = None,
         inference_mode: bool = False,
         use_se: bool = False,
         depth=5,
         in_channels=3,
+        output_stride=32,
         num_conv_branches: int = 1,
     ) -> None:
         """Construct MobileOne model.
@@ -320,13 +321,14 @@ class MobileOne(nn.Module, EncoderMixin):
 
         assert len(width_multipliers) == 4
         self.inference_mode = inference_mode
-        self._out_channels = out_channels
         self.in_planes = min(64, int(64 * width_multipliers[0]))
         self.use_se = use_se
         self.num_conv_branches = num_conv_branches
+
         self._depth = depth
         self._in_channels = in_channels
-        self.set_in_channels(self._in_channels)
+        self._out_channels = out_channels
+        self._output_stride = output_stride
 
         # Build stages
         self.stage0 = MobileOneBlock(
@@ -355,10 +357,10 @@ class MobileOne(nn.Module, EncoderMixin):
             num_se_blocks=num_blocks_per_stage[3] if use_se else 0,
         )
 
-    def get_stages(self):
+    def get_stages(self) -> Dict[int, Sequence[torch.nn.Module]]:
         return {
-            16: self.stage3,
-            32: self.stage4,
+            16: [self.stage3],
+            32: [self.stage4],
         }
 
     def _make_stage(
@@ -492,7 +494,7 @@ mobileone_encoders = {
             }
         },
         "params": {
-            "out_channels": (3, 48, 48, 128, 256, 1024),
+            "out_channels": [3, 48, 48, 128, 256, 1024],
             "width_multipliers": (0.75, 1.0, 1.0, 2.0),
             "num_conv_branches": 4,
             "inference_mode": False,
@@ -510,7 +512,7 @@ mobileone_encoders = {
             }
         },
         "params": {
-            "out_channels": (3, 64, 96, 192, 512, 1280),
+            "out_channels": [3, 64, 96, 192, 512, 1280],
             "width_multipliers": (1.5, 1.5, 2.0, 2.5),
             "inference_mode": False,
         },
@@ -527,7 +529,7 @@ mobileone_encoders = {
             }
         },
         "params": {
-            "out_channels": (3, 64, 96, 256, 640, 2048),
+            "out_channels": [3, 64, 96, 256, 640, 2048],
             "width_multipliers": (1.5, 2.0, 2.5, 4.0),
             "inference_mode": False,
         },
@@ -544,7 +546,7 @@ mobileone_encoders = {
             }
         },
         "params": {
-            "out_channels": (3, 64, 128, 320, 768, 2048),
+            "out_channels": [3, 64, 128, 320, 768, 2048],
             "width_multipliers": (2.0, 2.5, 3.0, 4.0),
             "inference_mode": False,
         },
@@ -561,7 +563,7 @@ mobileone_encoders = {
             }
         },
         "params": {
-            "out_channels": (3, 64, 192, 448, 896, 2048),
+            "out_channels": [3, 64, 192, 448, 896, 2048],
             "width_multipliers": (3.0, 3.5, 3.5, 4.0),
             "use_se": True,
             "inference_mode": False,

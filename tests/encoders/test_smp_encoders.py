@@ -30,7 +30,7 @@ class TestMixTransformerEncoder(base.BaseEncoderTester):
 
     def get_tiny_encoder(self):
         params = {
-            "out_channels": (3, 0, 4, 4, 4, 4),
+            "out_channels": [3, 0, 4, 4, 4, 4],
             "patch_size": 4,
             "embed_dims": [4, 4, 4, 4],
             "num_heads": [1, 1, 1, 1],

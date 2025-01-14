@@ -2,11 +2,12 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from typing import List
 from segmentation_models_pytorch.base import modules as md
 
 
 class MLP(nn.Module):
-    def __init__(self, skip_channels, segmentation_channels):
+    def __init__(self, skip_channels: int, segmentation_channels: int):
         super().__init__()
 
         self.linear = nn.Linear(skip_channels, segmentation_channels)
@@ -22,9 +23,9 @@ class MLP(nn.Module):
 class SegformerDecoder(nn.Module):
     def __init__(
         self,
-        encoder_channels,
-        encoder_depth=5,
-        segmentation_channels=256,
+        encoder_channels: List[int],
+        encoder_depth: int = 5,
+        segmentation_channels: int = 256,
     ):
         super().__init__()
 
@@ -36,9 +37,9 @@ class SegformerDecoder(nn.Module):
             )
 
         if encoder_channels[1] == 0:
-            encoder_channels = tuple(
+            encoder_channels = [
                 channel for index, channel in enumerate(encoder_channels) if index != 1
-            )
+            ]
         encoder_channels = encoder_channels[::-1]
 
         self.mlp_stage = nn.ModuleList(
@@ -52,7 +53,7 @@ class SegformerDecoder(nn.Module):
             use_batchnorm=True,
         )
 
-    def forward(self, *features):
+    def forward(self, features: List[torch.Tensor]) -> torch.Tensor:
         # Resize all features to the size of the largest feature
         target_size = [dim // 4 for dim in features[0].shape[2:]]
 
@@ -60,8 +61,8 @@ class SegformerDecoder(nn.Module):
         features = features[::-1]  # reverse channels to start from head of encoder
 
         resized_features = []
-        for feature, stage in zip(features, self.mlp_stage):
-            feature = stage(feature)
+        for i, mlp_layer in enumerate(self.mlp_stage):
+            feature = mlp_layer(features[i])
             resized_feature = F.interpolate(
                 feature, size=target_size, mode="bilinear", align_corners=False
             )

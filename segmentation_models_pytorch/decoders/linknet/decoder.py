@@ -1,10 +1,12 @@
+import torch
 import torch.nn as nn
 
+from typing import List, Optional
 from segmentation_models_pytorch.base import modules
 
 
 class TransposeX2(nn.Sequential):
-    def __init__(self, in_channels, out_channels, use_batchnorm=True):
+    def __init__(self, in_channels: int, out_channels: int, use_batchnorm: bool = True):
         super().__init__()
         layers = [
             nn.ConvTranspose2d(
@@ -20,7 +22,7 @@ class TransposeX2(nn.Sequential):
 
 
 class DecoderBlock(nn.Module):
-    def __init__(self, in_channels, out_channels, use_batchnorm=True):
+    def __init__(self, in_channels: int, out_channels: int, use_batchnorm: bool = True):
         super().__init__()
 
         self.block = nn.Sequential(
@@ -41,7 +43,9 @@ class DecoderBlock(nn.Module):
             ),
         )
 
-    def forward(self, x, skip=None):
+    def forward(
+        self, x: torch.Tensor, skip: Optional[torch.Tensor] = None
+    ) -> torch.Tensor:
         x = self.block(x)
         if skip is not None:
             x = x + skip
@@ -50,7 +54,11 @@ class DecoderBlock(nn.Module):
 
 class LinknetDecoder(nn.Module):
     def __init__(
-        self, encoder_channels, prefinal_channels=32, n_blocks=5, use_batchnorm=True
+        self,
+        encoder_channels: List[int],
+        prefinal_channels: int = 32,
+        n_blocks: int = 5,
+        use_batchnorm: bool = True,
     ):
         super().__init__()
 
@@ -68,7 +76,7 @@ class LinknetDecoder(nn.Module):
             ]
         )
 
-    def forward(self, *features):
+    def forward(self, features: List[torch.Tensor]) -> torch.Tensor:
         features = features[1:]  # remove first skip
         features = features[::-1]  # reverse channels to start from head of encoder
 

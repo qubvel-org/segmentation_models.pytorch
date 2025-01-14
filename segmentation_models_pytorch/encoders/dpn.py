@@ -25,7 +25,7 @@ Methods:
 
 import torch
 import torch.nn.functional as F
-from typing import List
+from typing import List, Dict, Sequence
 
 from pretrainedmodels.models.dpn import DPN
 from pretrainedmodels.models.dpn import pretrained_settings
@@ -34,19 +34,27 @@ from ._base import EncoderMixin
 
 
 class DPNEncoder(DPN, EncoderMixin):
-    def __init__(self, stage_idxs, out_channels, depth=5, **kwargs):
+    def __init__(
+        self,
+        stage_idxs: List[int],
+        out_channels: List[int],
+        depth: int = 5,
+        output_stride: int = 32,
+        **kwargs,
+    ):
         super().__init__(**kwargs)
         self._stage_idxs = stage_idxs
         self._depth = depth
-        self._out_channels = out_channels
         self._in_channels = 3
+        self._out_channels = out_channels
+        self._output_stride = output_stride
 
         del self.last_linear
 
-    def get_stages(self):
+    def get_stages(self) -> Dict[int, Sequence[torch.nn.Module]]:
         return {
-            16: self.features[self._stage_idxs[1] : self._stage_idxs[2]],
-            32: self.features[self._stage_idxs[2] : self._stage_idxs[3]],
+            16: [self.features[self._stage_idxs[1] : self._stage_idxs[2]]],
+            32: [self.features[self._stage_idxs[2] : self._stage_idxs[3]]],
         }
 
     def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
@@ -91,8 +99,8 @@ dpn_encoders = {
         "encoder": DPNEncoder,
         "pretrained_settings": pretrained_settings["dpn68"],
         "params": {
-            "stage_idxs": (4, 8, 20, 24),
-            "out_channels": (3, 10, 144, 320, 704, 832),
+            "stage_idxs": [4, 8, 20, 24],
+            "out_channels": [3, 10, 144, 320, 704, 832],
             "groups": 32,
             "inc_sec": (16, 32, 32, 64),
             "k_r": 128,
@@ -107,8 +115,8 @@ dpn_encoders = {
         "encoder": DPNEncoder,
         "pretrained_settings": pretrained_settings["dpn68b"],
         "params": {
-            "stage_idxs": (4, 8, 20, 24),
-            "out_channels": (3, 10, 144, 320, 704, 832),
+            "stage_idxs": [4, 8, 20, 24],
+            "out_channels": [3, 10, 144, 320, 704, 832],
             "b": True,
             "groups": 32,
             "inc_sec": (16, 32, 32, 64),
@@ -124,8 +132,8 @@ dpn_encoders = {
         "encoder": DPNEncoder,
         "pretrained_settings": pretrained_settings["dpn92"],
         "params": {
-            "stage_idxs": (4, 8, 28, 32),
-            "out_channels": (3, 64, 336, 704, 1552, 2688),
+            "stage_idxs": [4, 8, 28, 32],
+            "out_channels": [3, 64, 336, 704, 1552, 2688],
             "groups": 32,
             "inc_sec": (16, 32, 24, 128),
             "k_r": 96,
@@ -139,8 +147,8 @@ dpn_encoders = {
         "encoder": DPNEncoder,
         "pretrained_settings": pretrained_settings["dpn98"],
         "params": {
-            "stage_idxs": (4, 10, 30, 34),
-            "out_channels": (3, 96, 336, 768, 1728, 2688),
+            "stage_idxs": [4, 10, 30, 34],
+            "out_channels": [3, 96, 336, 768, 1728, 2688],
             "groups": 40,
             "inc_sec": (16, 32, 32, 128),
             "k_r": 160,
@@ -154,8 +162,8 @@ dpn_encoders = {
         "encoder": DPNEncoder,
         "pretrained_settings": pretrained_settings["dpn107"],
         "params": {
-            "stage_idxs": (5, 13, 33, 37),
-            "out_channels": (3, 128, 376, 1152, 2432, 2688),
+            "stage_idxs": [5, 13, 33, 37],
+            "out_channels": [3, 128, 376, 1152, 2432, 2688],
             "groups": 50,
             "inc_sec": (20, 64, 64, 128),
             "k_r": 200,
@@ -169,8 +177,8 @@ dpn_encoders = {
         "encoder": DPNEncoder,
         "pretrained_settings": pretrained_settings["dpn131"],
         "params": {
-            "stage_idxs": (5, 13, 41, 45),
-            "out_channels": (3, 128, 352, 832, 1984, 2688),
+            "stage_idxs": [5, 13, 41, 45],
+            "out_channels": [3, 128, 352, 832, 1984, 2688],
             "groups": 40,
             "inc_sec": (16, 32, 32, 128),
             "k_r": 160,

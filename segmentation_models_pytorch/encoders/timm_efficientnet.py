@@ -1,6 +1,8 @@
-from functools import partial
-
+import torch
 import torch.nn as nn
+
+from typing import List, Dict, Sequence
+from functools import partial
 
 from timm.models.efficientnet import EfficientNet
 from timm.models.efficientnet import decode_arch_def, round_channels, default_cfgs
@@ -95,23 +97,31 @@ def gen_efficientnet_lite_kwargs(
 
 
 class EfficientNetBaseEncoder(EfficientNet, EncoderMixin):
-    def __init__(self, stage_idxs, out_channels, depth=5, **kwargs):
+    def __init__(
+        self,
+        stage_idxs: List[int],
+        out_channels: List[int],
+        depth: int = 5,
+        output_stride: int = 32,
+        **kwargs,
+    ):
         super().__init__(**kwargs)
 
         self._stage_idxs = stage_idxs
-        self._out_channels = out_channels
         self._depth = depth
         self._in_channels = 3
+        self._out_channels = out_channels
+        self._output_stride = output_stride
 
         del self.classifier
 
-    def get_stages(self):
+    def get_stages(self) -> Dict[int, Sequence[torch.nn.Module]]:
         return {
-            16: self.blocks[self._stage_idxs[1] : self._stage_idxs[2]],
-            32: self.blocks[self._stage_idxs[2] :],
+            16: [self.blocks[self._stage_idxs[1] : self._stage_idxs[2]]],
+            32: [self.blocks[self._stage_idxs[2] :]],
         }
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
         features = [x]
 
         if self._depth >= 1:
@@ -200,8 +210,8 @@ timm_efficientnet_encoders = {
             ),
         },
         "params": {
-            "out_channels": (3, 32, 24, 40, 112, 320),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 32, 24, 40, 112, 320],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 1.0,
             "depth_multiplier": 1.0,
             "drop_rate": 0.2,
@@ -221,8 +231,8 @@ timm_efficientnet_encoders = {
             ),
         },
         "params": {
-            "out_channels": (3, 32, 24, 40, 112, 320),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 32, 24, 40, 112, 320],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 1.0,
             "depth_multiplier": 1.1,
             "drop_rate": 0.2,
@@ -242,8 +252,8 @@ timm_efficientnet_encoders = {
             ),
         },
         "params": {
-            "out_channels": (3, 32, 24, 48, 120, 352),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 32, 24, 48, 120, 352],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 1.1,
             "depth_multiplier": 1.2,
             "drop_rate": 0.3,
@@ -263,8 +273,8 @@ timm_efficientnet_encoders = {
             ),
         },
         "params": {
-            "out_channels": (3, 40, 32, 48, 136, 384),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 40, 32, 48, 136, 384],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 1.2,
             "depth_multiplier": 1.4,
             "drop_rate": 0.3,
@@ -284,8 +294,8 @@ timm_efficientnet_encoders = {
             ),
         },
         "params": {
-            "out_channels": (3, 48, 32, 56, 160, 448),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 48, 32, 56, 160, 448],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 1.4,
             "depth_multiplier": 1.8,
             "drop_rate": 0.4,
@@ -305,8 +315,8 @@ timm_efficientnet_encoders = {
             ),
         },
         "params": {
-            "out_channels": (3, 48, 40, 64, 176, 512),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 48, 40, 64, 176, 512],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 1.6,
             "depth_multiplier": 2.2,
             "drop_rate": 0.4,
@@ -326,8 +336,8 @@ timm_efficientnet_encoders = {
             ),
         },
         "params": {
-            "out_channels": (3, 56, 40, 72, 200, 576),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 56, 40, 72, 200, 576],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 1.8,
             "depth_multiplier": 2.6,
             "drop_rate": 0.5,
@@ -347,8 +357,8 @@ timm_efficientnet_encoders = {
             ),
         },
         "params": {
-            "out_channels": (3, 64, 48, 80, 224, 640),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 64, 48, 80, 224, 640],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 2.0,
             "depth_multiplier": 3.1,
             "drop_rate": 0.5,
@@ -365,8 +375,8 @@ timm_efficientnet_encoders = {
             ),
         },
         "params": {
-            "out_channels": (3, 72, 56, 88, 248, 704),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 72, 56, 88, 248, 704],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 2.2,
             "depth_multiplier": 3.6,
             "drop_rate": 0.5,
@@ -383,8 +393,8 @@ timm_efficientnet_encoders = {
             ),
         },
         "params": {
-            "out_channels": (3, 136, 104, 176, 480, 1376),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 136, 104, 176, 480, 1376],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 4.3,
             "depth_multiplier": 5.3,
             "drop_rate": 0.5,
@@ -398,8 +408,8 @@ timm_efficientnet_encoders = {
             )
         },
         "params": {
-            "out_channels": (3, 32, 24, 40, 112, 320),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 32, 24, 40, 112, 320],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 1.0,
             "depth_multiplier": 1.0,
             "drop_rate": 0.2,
@@ -413,8 +423,8 @@ timm_efficientnet_encoders = {
             )
         },
         "params": {
-            "out_channels": (3, 32, 24, 40, 112, 320),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 32, 24, 40, 112, 320],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 1.0,
             "depth_multiplier": 1.1,
             "drop_rate": 0.2,
@@ -428,8 +438,8 @@ timm_efficientnet_encoders = {
             )
         },
         "params": {
-            "out_channels": (3, 32, 24, 48, 120, 352),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 32, 24, 48, 120, 352],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 1.1,
             "depth_multiplier": 1.2,
             "drop_rate": 0.3,
@@ -443,8 +453,8 @@ timm_efficientnet_encoders = {
             )
         },
         "params": {
-            "out_channels": (3, 32, 32, 48, 136, 384),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 32, 32, 48, 136, 384],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 1.2,
             "depth_multiplier": 1.4,
             "drop_rate": 0.3,
@@ -458,8 +468,8 @@ timm_efficientnet_encoders = {
             )
         },
         "params": {
-            "out_channels": (3, 32, 32, 56, 160, 448),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 32, 32, 56, 160, 448],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 1.4,
             "depth_multiplier": 1.8,
             "drop_rate": 0.4,

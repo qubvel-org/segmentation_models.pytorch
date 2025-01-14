@@ -24,7 +24,7 @@ Methods:
 """
 
 import torch
-from typing import List
+from typing import List, Dict, Sequence
 
 from efficientnet_pytorch import EfficientNet
 from efficientnet_pytorch.utils import url_map, url_map_advprop, get_model_params
@@ -33,21 +33,29 @@ from ._base import EncoderMixin
 
 
 class EfficientNetEncoder(EfficientNet, EncoderMixin):
-    def __init__(self, stage_idxs, out_channels, model_name, depth=5):
+    def __init__(
+        self,
+        stage_idxs: List[int],
+        out_channels: List[int],
+        model_name: str,
+        depth: int = 5,
+        output_stride: int = 32,
+    ):
         blocks_args, global_params = get_model_params(model_name, override_params=None)
         super().__init__(blocks_args, global_params)
 
         self._stage_idxs = stage_idxs
-        self._out_channels = out_channels
         self._depth = depth
         self._in_channels = 3
+        self._out_channels = out_channels
+        self._output_stride = output_stride
 
         del self._fc
 
-    def get_stages(self):
+    def get_stages(self) -> Dict[int, Sequence[torch.nn.Module]]:
         return {
-            16: self._blocks[self._stage_idxs[1] : self._stage_idxs[2]],
-            32: self._blocks[self._stage_idxs[2] :],
+            16: [self._blocks[self._stage_idxs[1] : self._stage_idxs[2]]],
+            32: [self._blocks[self._stage_idxs[2] :]],
         }
 
     def apply_blocks(
@@ -119,8 +127,8 @@ efficient_net_encoders = {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": _get_pretrained_settings("efficientnet-b0"),
         "params": {
-            "out_channels": (3, 32, 24, 40, 112, 320),
-            "stage_idxs": (3, 5, 9, 16),
+            "out_channels": [3, 32, 24, 40, 112, 320],
+            "stage_idxs": [3, 5, 9, 16],
             "model_name": "efficientnet-b0",
         },
     },
@@ -128,8 +136,8 @@ efficient_net_encoders = {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": _get_pretrained_settings("efficientnet-b1"),
         "params": {
-            "out_channels": (3, 32, 24, 40, 112, 320),
-            "stage_idxs": (5, 8, 16, 23),
+            "out_channels": [3, 32, 24, 40, 112, 320],
+            "stage_idxs": [5, 8, 16, 23],
             "model_name": "efficientnet-b1",
         },
     },
@@ -137,8 +145,8 @@ efficient_net_encoders = {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": _get_pretrained_settings("efficientnet-b2"),
         "params": {
-            "out_channels": (3, 32, 24, 48, 120, 352),
-            "stage_idxs": (5, 8, 16, 23),
+            "out_channels": [3, 32, 24, 48, 120, 352],
+            "stage_idxs": [5, 8, 16, 23],
             "model_name": "efficientnet-b2",
         },
     },
@@ -146,8 +154,8 @@ efficient_net_encoders = {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": _get_pretrained_settings("efficientnet-b3"),
         "params": {
-            "out_channels": (3, 40, 32, 48, 136, 384),
-            "stage_idxs": (5, 8, 18, 26),
+            "out_channels": [3, 40, 32, 48, 136, 384],
+            "stage_idxs": [5, 8, 18, 26],
             "model_name": "efficientnet-b3",
         },
     },
@@ -155,8 +163,8 @@ efficient_net_encoders = {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": _get_pretrained_settings("efficientnet-b4"),
         "params": {
-            "out_channels": (3, 48, 32, 56, 160, 448),
-            "stage_idxs": (6, 10, 22, 32),
+            "out_channels": [3, 48, 32, 56, 160, 448],
+            "stage_idxs": [6, 10, 22, 32],
             "model_name": "efficientnet-b4",
         },
     },
@@ -164,8 +172,8 @@ efficient_net_encoders = {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": _get_pretrained_settings("efficientnet-b5"),
         "params": {
-            "out_channels": (3, 48, 40, 64, 176, 512),
-            "stage_idxs": (8, 13, 27, 39),
+            "out_channels": [3, 48, 40, 64, 176, 512],
+            "stage_idxs": [8, 13, 27, 39],
             "model_name": "efficientnet-b5",
         },
     },
@@ -173,8 +181,8 @@ efficient_net_encoders = {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": _get_pretrained_settings("efficientnet-b6"),
         "params": {
-            "out_channels": (3, 56, 40, 72, 200, 576),
-            "stage_idxs": (9, 15, 31, 45),
+            "out_channels": [3, 56, 40, 72, 200, 576],
+            "stage_idxs": [9, 15, 31, 45],
             "model_name": "efficientnet-b6",
         },
     },
@@ -182,8 +190,8 @@ efficient_net_encoders = {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": _get_pretrained_settings("efficientnet-b7"),
         "params": {
-            "out_channels": (3, 64, 48, 80, 224, 640),
-            "stage_idxs": (11, 18, 38, 55),
+            "out_channels": [3, 64, 48, 80, 224, 640],
+            "stage_idxs": [11, 18, 38, 55],
             "model_name": "efficientnet-b7",
         },
     },

@@ -2,17 +2,19 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from typing import Optional, List
+
 from segmentation_models_pytorch.base import modules as md
 
 
 class DecoderBlock(nn.Module):
     def __init__(
         self,
-        in_channels,
-        skip_channels,
-        out_channels,
-        use_batchnorm=True,
-        attention_type=None,
+        in_channels: int,
+        skip_channels: int,
+        out_channels: int,
+        use_batchnorm: bool = True,
+        attention_type: Optional[str] = None,
     ):
         super().__init__()
         self.conv1 = md.Conv2dReLU(
@@ -34,8 +36,10 @@ class DecoderBlock(nn.Module):
         )
         self.attention2 = md.Attention(attention_type, in_channels=out_channels)
 
-    def forward(self, x, skip=None):
-        x = F.interpolate(x, scale_factor=2, mode="nearest")
+    def forward(
+        self, x: torch.Tensor, skip: Optional[torch.Tensor] = None
+    ) -> torch.Tensor:
+        x = F.interpolate(x, scale_factor=2.0, mode="nearest")
         if skip is not None:
             x = torch.cat([x, skip], dim=1)
             x = self.attention1(x)
@@ -46,7 +50,7 @@ class DecoderBlock(nn.Module):
 
 
 class CenterBlock(nn.Sequential):
-    def __init__(self, in_channels, out_channels, use_batchnorm=True):
+    def __init__(self, in_channels: int, out_channels: int, use_batchnorm: bool = True):
         conv1 = md.Conv2dReLU(
             in_channels,
             out_channels,
@@ -67,20 +71,18 @@ class CenterBlock(nn.Sequential):
 class UnetPlusPlusDecoder(nn.Module):
     def __init__(
         self,
-        encoder_channels,
-        decoder_channels,
-        n_blocks=5,
-        use_batchnorm=True,
-        attention_type=None,
-        center=False,
+        encoder_channels: List[int],
+        decoder_channels: List[int],
+        n_blocks: int = 5,
+        use_batchnorm: bool = True,
+        attention_type: Optional[str] = None,
+        center: bool = False,
     ):
         super().__init__()
 
         if n_blocks != len(decoder_channels):
             raise ValueError(
-                "Model depth is {}, but you provide `decoder_channels` for {} blocks.".format(
-                    n_blocks, len(decoder_channels)
-                )
+                f"Model depth is {n_blocks}, but you provide `decoder_channels` for {len(decoder_channels)} blocks."
             )
 
         # remove first skip with same spatial resolution
@@ -125,9 +127,10 @@ class UnetPlusPlusDecoder(nn.Module):
         self.blocks = nn.ModuleDict(blocks)
         self.depth = len(self.in_channels) - 1
 
-    def forward(self, *features):
+    def forward(self, features: List[torch.Tensor]) -> torch.Tensor:
         features = features[1:]  # remove first skip with same spatial resolution
         features = features[::-1]  # reverse channels to start from head of encoder
+
         # start building dense connections
         dense_x = {}
         for layer_idx in range(len(self.in_channels) - 1):

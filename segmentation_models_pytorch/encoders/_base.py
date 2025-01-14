@@ -1,5 +1,5 @@
 import torch
-from typing import Sequence
+from typing import Sequence, Dict
 
 from . import _utils as utils
 
@@ -10,7 +10,10 @@ class EncoderMixin:
     - patching first convolution for arbitrary input channels
     """
 
-    _output_stride = 32
+    def __init__(self):
+        self._depth = 5
+        self._in_channels = 3
+        self._output_stride = 32
 
     @property
     def out_channels(self):
@@ -28,13 +31,13 @@ class EncoderMixin:
 
         self._in_channels = in_channels
         if self._out_channels[0] == 3:
-            self._out_channels = tuple([in_channels] + list(self._out_channels)[1:])
+            self._out_channels = [in_channels] + self._out_channels[1:]
 
         utils.patch_first_conv(
             model=self, new_in_channels=in_channels, pretrained=pretrained
         )
 
-    def get_stages(self) -> dict[int, Sequence[torch.nn.Module]]:
+    def get_stages(self) -> Dict[int, Sequence[torch.nn.Module]]:
         """Override it in your implementation, should return a dictionary with keys as
         the output stride and values as the list of modules
         """

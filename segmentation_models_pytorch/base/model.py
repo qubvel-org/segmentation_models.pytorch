@@ -11,8 +11,7 @@ T = TypeVar("T", bound="SegmentationModel")
 class SegmentationModel(torch.nn.Module, SMPHubMixin):
     """Base class for all segmentation models."""
 
-    # if model supports shape not divisible by 2 ^ n
-    # set to False
+    # if model supports shape not divisible by 2 ^ n set to False
     requires_divisible_input_shape = True
 
     # Fix type-hint for models, to avoid HubMixin signature
@@ -30,6 +29,9 @@ class SegmentationModel(torch.nn.Module, SMPHubMixin):
         """Check if the input shape is divisible by the output stride.
         If not, raise a RuntimeError.
         """
+        if not self.requires_divisible_input_shape:
+            return
+
         h, w = x.shape[-2:]
         output_stride = self.encoder.output_stride
         if h % output_stride != 0 or w % output_stride != 0:
@@ -51,15 +53,13 @@ class SegmentationModel(torch.nn.Module, SMPHubMixin):
     def forward(self, x):
         """Sequentially pass `x` trough model`s encoder, decoder and heads"""
 
-        if (
-            not torch.jit.is_tracing()
-            and not is_torch_compiling()
-            and self.requires_divisible_input_shape
+        if not (
+            torch.jit.is_scripting() or torch.jit.is_tracing() or is_torch_compiling()
         ):
             self.check_input_shape(x)
 
         features = self.encoder(x)
-        decoder_output = self.decoder(*features)
+        decoder_output = self.decoder(features)
 
         masks = self.segmentation_head(decoder_output)
 

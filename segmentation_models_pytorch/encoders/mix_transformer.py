@@ -516,23 +516,28 @@ class DWConv(nn.Module):
 # End of NVIDIA code
 # ---------------------------------------------------------------
 
+from typing import Dict, Sequence, List  # noqa E402
 from ._base import EncoderMixin  # noqa E402
 
 
 class MixVisionTransformerEncoder(MixVisionTransformer, EncoderMixin):
-    def __init__(self, out_channels, depth=5, **kwargs):
+    def __init__(
+        self, out_channels: List[int], depth: int = 5, output_stride: int = 32, **kwargs
+    ):
         super().__init__(**kwargs)
-        self._out_channels = out_channels
+
         self._depth = depth
         self._in_channels = 3
+        self._out_channels = out_channels
+        self._output_stride = output_stride
 
-    def get_stages(self):
+    def get_stages(self) -> Dict[int, Sequence[torch.nn.Module]]:
         return {
             16: [self.patch_embed3, self.block3, self.norm3],
             32: [self.patch_embed4, self.block4, self.norm4],
         }
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
         # create dummy output for the first block
         batch_size, _, height, width = x.shape
         dummy = torch.empty(
@@ -592,103 +597,103 @@ mix_transformer_encoders = {
     "mit_b0": {
         "encoder": MixVisionTransformerEncoder,
         "pretrained_settings": {"imagenet": get_pretrained_cfg("mit_b0")},
-        "params": dict(
-            out_channels=(3, 0, 32, 64, 160, 256),
-            patch_size=4,
-            embed_dims=[32, 64, 160, 256],
-            num_heads=[1, 2, 5, 8],
-            mlp_ratios=[4, 4, 4, 4],
-            qkv_bias=True,
-            norm_layer=partial(LayerNorm, eps=1e-6),
-            depths=[2, 2, 2, 2],
-            sr_ratios=[8, 4, 2, 1],
-            drop_rate=0.0,
-            drop_path_rate=0.1,
-        ),
+        "params": {
+            "out_channels": [3, 0, 32, 64, 160, 256],
+            "patch_size": 4,
+            "embed_dims": [32, 64, 160, 256],
+            "num_heads": [1, 2, 5, 8],
+            "mlp_ratios": [4, 4, 4, 4],
+            "qkv_bias": True,
+            "norm_layer": partial(LayerNorm, eps=1e-6),
+            "depths": [2, 2, 2, 2],
+            "sr_ratios": [8, 4, 2, 1],
+            "drop_rate": 0.0,
+            "drop_path_rate": 0.1,
+        },
     },
     "mit_b1": {
         "encoder": MixVisionTransformerEncoder,
         "pretrained_settings": {"imagenet": get_pretrained_cfg("mit_b1")},
-        "params": dict(
-            out_channels=(3, 0, 64, 128, 320, 512),
-            patch_size=4,
-            embed_dims=[64, 128, 320, 512],
-            num_heads=[1, 2, 5, 8],
-            mlp_ratios=[4, 4, 4, 4],
-            qkv_bias=True,
-            norm_layer=partial(LayerNorm, eps=1e-6),
-            depths=[2, 2, 2, 2],
-            sr_ratios=[8, 4, 2, 1],
-            drop_rate=0.0,
-            drop_path_rate=0.1,
-        ),
+        "params": {
+            "out_channels": [3, 0, 64, 128, 320, 512],
+            "patch_size": 4,
+            "embed_dims": [64, 128, 320, 512],
+            "num_heads": [1, 2, 5, 8],
+            "mlp_ratios": [4, 4, 4, 4],
+            "qkv_bias": True,
+            "norm_layer": partial(LayerNorm, eps=1e-6),
+            "depths": [2, 2, 2, 2],
+            "sr_ratios": [8, 4, 2, 1],
+            "drop_rate": 0.0,
+            "drop_path_rate": 0.1,
+        },
     },
     "mit_b2": {
         "encoder": MixVisionTransformerEncoder,
         "pretrained_settings": {"imagenet": get_pretrained_cfg("mit_b2")},
-        "params": dict(
-            out_channels=(3, 0, 64, 128, 320, 512),
-            patch_size=4,
-            embed_dims=[64, 128, 320, 512],
-            num_heads=[1, 2, 5, 8],
-            mlp_ratios=[4, 4, 4, 4],
-            qkv_bias=True,
-            norm_layer=partial(LayerNorm, eps=1e-6),
-            depths=[3, 4, 6, 3],
-            sr_ratios=[8, 4, 2, 1],
-            drop_rate=0.0,
-            drop_path_rate=0.1,
-        ),
+        "params": {
+            "out_channels": [3, 0, 64, 128, 320, 512],
+            "patch_size": 4,
+            "embed_dims": [64, 128, 320, 512],
+            "num_heads": [1, 2, 5, 8],
+            "mlp_ratios": [4, 4, 4, 4],
+            "qkv_bias": True,
+            "norm_layer": partial(LayerNorm, eps=1e-6),
+            "depths": [3, 4, 6, 3],
+            "sr_ratios": [8, 4, 2, 1],
+            "drop_rate": 0.0,
+            "drop_path_rate": 0.1,
+        },
     },
     "mit_b3": {
         "encoder": MixVisionTransformerEncoder,
         "pretrained_settings": {"imagenet": get_pretrained_cfg("mit_b3")},
-        "params": dict(
-            out_channels=(3, 0, 64, 128, 320, 512),
-            patch_size=4,
-            embed_dims=[64, 128, 320, 512],
-            num_heads=[1, 2, 5, 8],
-            mlp_ratios=[4, 4, 4, 4],
-            qkv_bias=True,
-            norm_layer=partial(LayerNorm, eps=1e-6),
-            depths=[3, 4, 18, 3],
-            sr_ratios=[8, 4, 2, 1],
-            drop_rate=0.0,
-            drop_path_rate=0.1,
-        ),
+        "params": {
+            "out_channels": [3, 0, 64, 128, 320, 512],
+            "patch_size": 4,
+            "embed_dims": [64, 128, 320, 512],
+            "num_heads": [1, 2, 5, 8],
+            "mlp_ratios": [4, 4, 4, 4],
+            "qkv_bias": True,
+            "norm_layer": partial(LayerNorm, eps=1e-6),
+            "depths": [3, 4, 18, 3],
+            "sr_ratios": [8, 4, 2, 1],
+            "drop_rate": 0.0,
+            "drop_path_rate": 0.1,
+        },
     },
     "mit_b4": {
         "encoder": MixVisionTransformerEncoder,
         "pretrained_settings": {"imagenet": get_pretrained_cfg("mit_b4")},
-        "params": dict(
-            out_channels=(3, 0, 64, 128, 320, 512),
-            patch_size=4,
-            embed_dims=[64, 128, 320, 512],
-            num_heads=[1, 2, 5, 8],
-            mlp_ratios=[4, 4, 4, 4],
-            qkv_bias=True,
-            norm_layer=partial(LayerNorm, eps=1e-6),
-            depths=[3, 8, 27, 3],
-            sr_ratios=[8, 4, 2, 1],
-            drop_rate=0.0,
-            drop_path_rate=0.1,
-        ),
+        "params": {
+            "out_channels": [3, 0, 64, 128, 320, 512],
+            "patch_size": 4,
+            "embed_dims": [64, 128, 320, 512],
+            "num_heads": [1, 2, 5, 8],
+            "mlp_ratios": [4, 4, 4, 4],
+            "qkv_bias": True,
+            "norm_layer": partial(LayerNorm, eps=1e-6),
+            "depths": [3, 8, 27, 3],
+            "sr_ratios": [8, 4, 2, 1],
+            "drop_rate": 0.0,
+            "drop_path_rate": 0.1,
+        },
     },
     "mit_b5": {
         "encoder": MixVisionTransformerEncoder,
         "pretrained_settings": {"imagenet": get_pretrained_cfg("mit_b5")},
-        "params": dict(
-            out_channels=(3, 0, 64, 128, 320, 512),
-            patch_size=4,
-            embed_dims=[64, 128, 320, 512],
-            num_heads=[1, 2, 5, 8],
-            mlp_ratios=[4, 4, 4, 4],
-            qkv_bias=True,
-            norm_layer=partial(LayerNorm, eps=1e-6),
-            depths=[3, 6, 40, 3],
-            sr_ratios=[8, 4, 2, 1],
-            drop_rate=0.0,
-            drop_path_rate=0.1,
-        ),
+        "params": {
+            "out_channels": [3, 0, 64, 128, 320, 512],
+            "patch_size": 4,
+            "embed_dims": [64, 128, 320, 512],
+            "num_heads": [1, 2, 5, 8],
+            "mlp_ratios": [4, 4, 4, 4],
+            "qkv_bias": True,
+            "norm_layer": partial(LayerNorm, eps=1e-6),
+            "depths": [3, 6, 40, 3],
+            "sr_ratios": [8, 4, 2, 1],
+            "drop_rate": 0.0,
+            "drop_path_rate": 0.1,
+        },
     },
 }

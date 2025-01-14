@@ -94,6 +94,7 @@ def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **
 
     params = copy.deepcopy(encoders[name]["params"])
     params["depth"] = depth
+    params["output_stride"] = output_stride
 
     EncoderClass = encoders[name]["encoder"]
     encoder = EncoderClass(**params)

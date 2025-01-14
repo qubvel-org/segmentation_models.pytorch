@@ -1,25 +1,36 @@
-from ._base import EncoderMixin
+import torch
+from typing import Dict, List, Sequence
 from timm.models.resnet import ResNet
 from timm.models.sknet import SelectiveKernelBottleneck, SelectiveKernelBasic
 
+from ._base import EncoderMixin
+
 
 class SkNetEncoder(ResNet, EncoderMixin):
-    def __init__(self, out_channels, depth=5, **kwargs):
+    def __init__(
+        self,
+        out_channels: List[int],
+        depth: int = 5,
+        output_stride: int = 32,
+        **kwargs,
+    ):
         super().__init__(**kwargs)
+
         self._depth = depth
-        self._out_channels = out_channels
         self._in_channels = 3
+        self._out_channels = out_channels
+        self._output_stride = output_stride
 
         del self.fc
         del self.global_pool
 
-    def get_stages(self):
+    def get_stages(self) -> Dict[int, Sequence[torch.nn.Module]]:
         return {
-            16: self.layer3,
-            32: self.layer4,
+            16: [self.layer3],
+            32: [self.layer4],
         }
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
         features = [x]
 
         if self._depth >= 1:
@@ -83,7 +94,7 @@ timm_sknet_encoders = {
         "encoder": SkNetEncoder,
         "pretrained_settings": pretrained_settings["timm-skresnet18"],
         "params": {
-            "out_channels": (3, 64, 64, 128, 256, 512),
+            "out_channels": [3, 64, 64, 128, 256, 512],
             "block": SelectiveKernelBasic,
             "layers": [2, 2, 2, 2],
             "zero_init_last": False,
@@ -94,7 +105,7 @@ timm_sknet_encoders = {
         "encoder": SkNetEncoder,
         "pretrained_settings": pretrained_settings["timm-skresnet34"],
         "params": {
-            "out_channels": (3, 64, 64, 128, 256, 512),
+            "out_channels": [3, 64, 64, 128, 256, 512],
             "block": SelectiveKernelBasic,
             "layers": [3, 4, 6, 3],
             "zero_init_last": False,
@@ -105,7 +116,7 @@ timm_sknet_encoders = {
         "encoder": SkNetEncoder,
         "pretrained_settings": pretrained_settings["timm-skresnext50_32x4d"],
         "params": {
-            "out_channels": (3, 64, 256, 512, 1024, 2048),
+            "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": SelectiveKernelBottleneck,
             "layers": [3, 4, 6, 3],
             "zero_init_last": False,

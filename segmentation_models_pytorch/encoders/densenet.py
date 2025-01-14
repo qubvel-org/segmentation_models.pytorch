@@ -33,11 +33,12 @@ from ._base import EncoderMixin
 
 
 class DenseNetEncoder(DenseNet, EncoderMixin):
-    def __init__(self, out_channels, depth=5, **kwargs):
+    def __init__(self, out_channels, depth=5, output_stride=32, **kwargs):
         super().__init__(**kwargs)
-        self._out_channels = out_channels
         self._depth = depth
         self._in_channels = 3
+        self._out_channels = out_channels
+        self._output_stride = output_stride
         del self.classifier
 
     def make_dilated(self, *args, **kwargs):
@@ -157,7 +158,7 @@ densenet_encoders = {
         "encoder": DenseNetEncoder,
         "pretrained_settings": pretrained_settings["densenet121"],
         "params": {
-            "out_channels": (3, 64, 256, 512, 1024, 1024),
+            "out_channels": [3, 64, 256, 512, 1024, 1024],
             "num_init_features": 64,
             "growth_rate": 32,
             "block_config": (6, 12, 24, 16),
@@ -167,7 +168,7 @@ densenet_encoders = {
         "encoder": DenseNetEncoder,
         "pretrained_settings": pretrained_settings["densenet169"],
         "params": {
-            "out_channels": (3, 64, 256, 512, 1280, 1664),
+            "out_channels": [3, 64, 256, 512, 1280, 1664],
             "num_init_features": 64,
             "growth_rate": 32,
             "block_config": (6, 12, 32, 32),
@@ -177,7 +178,7 @@ densenet_encoders = {
         "encoder": DenseNetEncoder,
         "pretrained_settings": pretrained_settings["densenet201"],
         "params": {
-            "out_channels": (3, 64, 256, 512, 1792, 1920),
+            "out_channels": [3, 64, 256, 512, 1792, 1920],
             "num_init_features": 64,
             "growth_rate": 32,
             "block_config": (6, 12, 48, 32),
@@ -187,7 +188,7 @@ densenet_encoders = {
         "encoder": DenseNetEncoder,
         "pretrained_settings": pretrained_settings["densenet161"],
         "params": {
-            "out_channels": (3, 96, 384, 768, 2112, 2208),
+            "out_channels": [3, 96, 384, 768, 2112, 2208],
             "num_init_features": 96,
             "growth_rate": 48,
             "block_config": (6, 12, 36, 24),

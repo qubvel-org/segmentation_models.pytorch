@@ -23,26 +23,33 @@ Methods:
         depth = 3 -> number of feature tensors = 4 (one with same resolution as input and 3 downsampled).
 """
 
+import torch
 import torchvision
+from typing import Dict, Sequence, List
 
 from ._base import EncoderMixin
 
 
 class MobileNetV2Encoder(torchvision.models.MobileNetV2, EncoderMixin):
-    def __init__(self, out_channels, depth=5, **kwargs):
+    def __init__(
+        self, out_channels: List[int], depth: int = 5, output_stride: int = 32, **kwargs
+    ):
         super().__init__(**kwargs)
+
         self._depth = depth
-        self._out_channels = out_channels
         self._in_channels = 3
+        self._out_channels = out_channels
+        self._output_stride = output_stride
+
         del self.classifier
 
-    def get_stages(self):
+    def get_stages(self) -> Dict[int, Sequence[torch.nn.Module]]:
         return {
-            16: self.features[7:14],
-            32: self.features[14:],
+            16: [self.features[7:14]],
+            32: [self.features[14:]],
         }
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
         features = [x]
 
         if self._depth >= 1:
@@ -85,6 +92,6 @@ mobilenet_encoders = {
                 "input_range": [0, 1],
             }
         },
-        "params": {"out_channels": (3, 16, 24, 32, 96, 1280)},
+        "params": {"out_channels": [3, 16, 24, 32, 96, 1280]},
     }
 }

@@ -23,19 +23,31 @@ Methods:
         depth = 3 -> number of feature tensors = 4 (one with same resolution as input and 3 downsampled).
 """
 
+import torch
 import torch.nn as nn
+
+from typing import List
 from pretrainedmodels.models.inceptionv4 import InceptionV4
 
 from ._base import EncoderMixin
 
 
 class InceptionV4Encoder(InceptionV4, EncoderMixin):
-    def __init__(self, stage_idxs, out_channels, depth=5, **kwargs):
+    def __init__(
+        self,
+        stage_idxs: List[int],
+        out_channels: List[int],
+        depth: int = 5,
+        output_stride: int = 32,
+        **kwargs,
+    ):
         super().__init__(**kwargs)
+
         self._stage_idxs = stage_idxs
-        self._out_channels = out_channels
         self._depth = depth
         self._in_channels = 3
+        self._out_channels = out_channels
+        self._output_stride = output_stride
 
         # correct paddings
         for m in self.modules():
@@ -54,17 +66,7 @@ class InceptionV4Encoder(InceptionV4, EncoderMixin):
             "due to pooling operation for downsampling!"
         )
 
-    def get_stages(self):
-        return [
-            nn.Identity(),
-            self.features[: self._stage_idxs[0]],
-            self.features[self._stage_idxs[0] : self._stage_idxs[1]],
-            self.features[self._stage_idxs[1] : self._stage_idxs[2]],
-            self.features[self._stage_idxs[2] : self._stage_idxs[3]],
-            self.features[self._stage_idxs[3] :],
-        ]
-
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
         features = [x]
 
         if self._depth >= 1:
@@ -119,8 +121,8 @@ inceptionv4_encoders = {
             },
         },
         "params": {
-            "stage_idxs": (3, 5, 9, 15),
-            "out_channels": (3, 64, 192, 384, 1024, 1536),
+            "stage_idxs": [3, 5, 9, 15],
+            "out_channels": [3, 64, 192, 384, 1024, 1536],
             "num_classes": 1001,
         },
     }
