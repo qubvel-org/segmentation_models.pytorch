@@ -56,7 +56,11 @@ class BaseModelTester(unittest.TestCase):
         return None
 
     @lru_cache
-    def _get_sample(self, batch_size=1, num_channels=3, height=32, width=32):
+    def _get_sample(self, batch_size=None, num_channels=None, height=None, width=None):
+        batch_size = batch_size or self.default_batch_size
+        num_channels = num_channels or self.default_num_channels
+        height = height or self.default_height
+        width = width or self.default_width
         return torch.rand(batch_size, num_channels, height, width)
 
     @lru_cache
@@ -66,12 +70,7 @@ class BaseModelTester(unittest.TestCase):
         return model
 
     def test_forward_backward(self):
-        sample = self._get_sample(
-            batch_size=self.default_batch_size,
-            num_channels=self.default_num_channels,
-            height=self.default_height,
-            width=self.default_width,
-        ).to(default_device)
+        sample = self._get_sample().to(default_device)
 
         model = self.get_default_model()
 
@@ -111,12 +110,7 @@ class BaseModelTester(unittest.TestCase):
             .eval()
         )
 
-        sample = self._get_sample(
-            batch_size=self.default_batch_size,
-            num_channels=in_channels,
-            height=self.default_height,
-            width=self.default_width,
-        ).to(default_device)
+        sample = self._get_sample(num_channels=in_channels).to(default_device)
 
         # check in channels correctly set
         with torch.inference_mode():
@@ -145,12 +139,7 @@ class BaseModelTester(unittest.TestCase):
         self.assertIsInstance(model.classification_head[3], torch.nn.Linear)
         self.assertIsInstance(model.classification_head[4].activation, torch.nn.Sigmoid)
 
-        sample = self._get_sample(
-            batch_size=self.default_batch_size,
-            num_channels=self.default_num_channels,
-            height=self.default_height,
-            width=self.default_width,
-        ).to(default_device)
+        sample = self._get_sample().to(default_device)
 
         with torch.inference_mode():
             _, cls_probs = model(sample)
@@ -163,8 +152,6 @@ class BaseModelTester(unittest.TestCase):
             self.skipTest("Model requires divisible input shape")
 
         sample = self._get_sample(
-            batch_size=self.default_batch_size,
-            num_channels=self.default_num_channels,
             height=self.default_height + 3,
             width=self.default_width + 7,
         ).to(default_device)
@@ -193,12 +180,7 @@ class BaseModelTester(unittest.TestCase):
                 readme = f.read()
 
         # check inference is correct
-        sample = self._get_sample(
-            batch_size=self.default_batch_size,
-            num_channels=self.default_num_channels,
-            height=self.default_height,
-            width=self.default_width,
-        ).to(default_device)
+        sample = self._get_sample().to(default_device)
 
         with torch.inference_mode():
             output = model(sample)
@@ -242,12 +224,7 @@ class BaseModelTester(unittest.TestCase):
         if not check_run_test_on_diff_or_main(self.files_for_diff):
             self.skipTest("No diff and not on `main`.")
 
-        sample = self._get_sample(
-            batch_size=self.default_batch_size,
-            num_channels=self.default_num_channels,
-            height=self.default_height,
-            width=self.default_width,
-        ).to(default_device)
+        sample = self._get_sample().to(default_device)
 
         model = self.get_default_model()
         compiled_model = torch.compile(model, fullgraph=True, dynamic=True)
@@ -260,13 +237,7 @@ class BaseModelTester(unittest.TestCase):
         if not check_run_test_on_diff_or_main(self.files_for_diff):
             self.skipTest("No diff and not on `main`.")
 
-        sample = self._get_sample(
-            batch_size=self.default_batch_size,
-            num_channels=self.default_num_channels,
-            height=self.default_height,
-            width=self.default_width,
-        ).to(default_device)
-
+        sample = self._get_sample().to(default_device)
         model = self.get_default_model()
         model.eval()
 
@@ -282,3 +253,21 @@ class BaseModelTester(unittest.TestCase):
 
         self.assertEqual(eager_output.shape, exported_output.shape)
         torch.testing.assert_close(eager_output, exported_output)
+
+    @pytest.mark.torch_script
+    def test_torch_script(self):
+        if not check_run_test_on_diff_or_main(self.files_for_diff):
+            self.skipTest("No diff and not on `main`.")
+
+        sample = self._get_sample().to(default_device)
+        model = self.get_default_model()
+        model.eval()
+
+        scripted_model = torch.jit.script(model)
+
+        with torch.inference_mode():
+            scripted_output = scripted_model(sample)
+            eager_output = model(sample)
+
+        self.assertEqual(scripted_output.shape, eager_output.shape)
+        torch.testing.assert_close(scripted_output, eager_output)
