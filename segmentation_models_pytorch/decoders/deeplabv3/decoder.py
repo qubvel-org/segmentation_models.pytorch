@@ -40,7 +40,7 @@ from torch.nn import functional as F
 __all__ = ["DeepLabV3Decoder", "DeepLabV3PlusDecoder"]
 
 
-class DeepLabV3Decoder(nn.Sequential):
+class DeepLabV3Decoder(nn.Module):
     def __init__(
         self,
         in_channels: int,
@@ -68,23 +68,6 @@ class DeepLabV3Decoder(nn.Sequential):
         x = self.bn(x)
         x = self.relu(x)
         return x
-
-    def load_state_dict(self, state_dict, *args, **kwargs):
-        # For backward compatibility, previously this module was Sequential
-        # and was not scriptable.
-        keys = list(state_dict.keys())
-        for key in keys:
-            new_key = key
-            if key.startswith("0."):
-                new_key = "aspp." + key[2:]
-            elif key.startswith("1."):
-                new_key = "conv." + key[2:]
-            elif key.startswith("2."):
-                new_key = "bn." + key[2:]
-            elif key.startswith("3."):
-                new_key = "relu." + key[2:]
-            state_dict[new_key] = state_dict.pop(key)
-        super().load_state_dict(state_dict, *args, **kwargs)
 
 
 class DeepLabV3PlusDecoder(nn.Module):

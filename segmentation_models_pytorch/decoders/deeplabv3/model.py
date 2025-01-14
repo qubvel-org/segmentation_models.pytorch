@@ -121,6 +121,21 @@ class DeepLabV3(SegmentationModel):
         else:
             self.classification_head = None
 
+    def load_state_dict(self, state_dict, *args, **kwargs):
+        # For backward compatibility, previously Decoder module was Sequential
+        # and was not scriptable.
+        keys = list(state_dict.keys())
+        for key in keys:
+            new_key = key
+            if key.startswith("decoder.0."):
+                new_key = key.replace("decoder.0.", "decoder.aspp.")
+            elif key.startswith("decoder.1."):
+                new_key = key.replace("decoder.1.", "decoder.conv.")
+            elif key.startswith("decoder.2."):
+                new_key = key.replace("decoder.2.", "decoder.bn.")
+            state_dict[new_key] = state_dict.pop(key)
+        return super().load_state_dict(state_dict, *args, **kwargs)
+
 
 class DeepLabV3Plus(SegmentationModel):
     """DeepLabV3+ implementation from "Encoder-Decoder with Atrous Separable
