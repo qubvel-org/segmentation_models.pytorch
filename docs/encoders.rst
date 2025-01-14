@@ -44,22 +44,21 @@ For each encoder, the table below provides detailed information:
 1. **Pretrained Weights**  
    Specifies the available pretrained weights (e.g., ``imagenet``, ``imagenet21k``).
 
-2. **Parameters (Params, M)**  
+2. **Params, M**: 
    The total number of parameters in the encoder, measured in millions. This metric helps you assess the model's size and computational requirements.
 
-3. **Scriptable**  
+3. **Script**:  
    Indicates whether the encoder can be scripted with ``torch.jit.script``.
 
-4. **Compilable**  
-   Indicates whether the encoder is compatible with ``torch.jit.compile`` for enhanced performance.
+4. **Compile**:   
+   Indicates whether the encoder is compatible with ``torch.compile`` for enhanced performance.
 
-5. **Exportable**  
+5. **Export**:   
    Indicates whether the encoder can be exported using ``torch.export.export``, making it suitable for deployment in different environments (e.g., ONNX).
 
 
-.. list-table::
 +----------------------------+--------------------------------------+-----------+--------+---------+--------+
-| Encoder                    | Pretrained weights                   | Params, M | Script | Compile | Export |
+| Encoder                    | Pretrained Weights                   | Params, M | Script | Compile | Export |
 +============================+======================================+===========+========+=========+========+
 | resnet18                   | imagenet<br>ssl<br>swsl              | 11M       | ✅      | ✅       | ✅      |
 | resnet34                   | imagenet                             | 21M       | ✅      | ✅       | ✅      |
@@ -72,12 +71,12 @@ For each encoder, the table below provides detailed information:
 | resnext101_32x16d          | instagram<br>ssl<br>swsl             | 191M      | ✅      | ✅       | ✅      |
 | resnext101_32x32d          | instagram                            | 466M      | ✅      | ✅       | ✅      |
 | resnext101_32x48d          | instagram                            | 826M      | ✅      | ✅       | ✅      |
-| dpn68                      | imagenet                             | 11M       | ❌      | ✅       | ✅      |
-| dpn68b                     | imagenet+5k                          | 11M       | ❌      | ✅       | ✅      |
-| dpn92                      | imagenet+5k                          | 34M       | ❌      | ✅       | ✅      |
-| dpn98                      | imagenet                             | 58M       | ❌      | ✅       | ✅      |
-| dpn107                     | imagenet+5k                          | 84M       | ❌      | ✅       | ✅      |
-| dpn131                     | imagenet                             | 76M       | ❌      | ✅       | ✅      |
+| dpn68                      | imagenet                             | 11M       | ❌      | ✅       | ❌      |
+| dpn68b                     | imagenet+5k                          | 11M       | ❌      | ✅       | ❌      |
+| dpn92                      | imagenet+5k                          | 34M       | ❌      | ✅       | ❌      |
+| dpn98                      | imagenet                             | 58M       | ❌      | ✅       | ❌      |
+| dpn107                     | imagenet+5k                          | 84M       | ❌      | ✅       | ❌      |
+| dpn131                     | imagenet                             | 76M       | ❌      | ✅       | ❌      |
 | vgg11                      | imagenet                             | 9M        | ✅      | ✅       | ✅      |
 | vgg11_bn                   | imagenet                             | 9M        | ✅      | ✅       | ✅      |
 | vgg13                      | imagenet                             | 9M        | ✅      | ✅       | ✅      |
