@@ -66,6 +66,7 @@ markers = [
     "logits_match",
     "compile",
     "torch_export",
+    "torch_script",
 ]
 
 [tool.coverage.run]
