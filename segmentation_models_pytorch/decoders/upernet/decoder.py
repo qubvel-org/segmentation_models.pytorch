@@ -110,7 +110,7 @@ class UPerNetDecoder(nn.Module):
             use_batchnorm=True,
         )
 
-    def forward(self, *features):
+    def forward(self, features):
         output_size = features[0].shape[2:]
         target_size = [size // 4 for size in output_size]
 
