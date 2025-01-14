@@ -121,7 +121,9 @@ class SMPHubMixin(PyTorchModelHubMixin):
 
 
 @wraps(PyTorchModelHubMixin.from_pretrained)
-def from_pretrained(pretrained_model_name_or_path: str, *args, **kwargs):
+def from_pretrained(
+    pretrained_model_name_or_path: str, *args, strict: bool = True, **kwargs
+):
     config_path = Path(pretrained_model_name_or_path) / "config.json"
     if not config_path.exists():
         config_path = hf_hub_download(
@@ -137,7 +139,9 @@ def from_pretrained(pretrained_model_name_or_path: str, *args, **kwargs):
     import segmentation_models_pytorch as smp
 
     model_class = getattr(smp, model_class_name)
-    return model_class.from_pretrained(pretrained_model_name_or_path, *args, **kwargs)
+    return model_class.from_pretrained(
+        pretrained_model_name_or_path, *args, **kwargs, strict=strict
+    )
 
 
 def supports_config_loading(func):
