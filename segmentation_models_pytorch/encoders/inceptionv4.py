@@ -35,7 +35,6 @@ from ._base import EncoderMixin
 class InceptionV4Encoder(InceptionV4, EncoderMixin):
     def __init__(
         self,
-        out_indexes: List[int],
         out_channels: List[int],
         depth: int = 5,
         output_stride: int = 32,
@@ -47,7 +46,7 @@ class InceptionV4Encoder(InceptionV4, EncoderMixin):
         self._in_channels = 3
         self._out_channels = out_channels
         self._output_stride = output_stride
-        self._out_indexes = out_indexes
+        self._out_indexes = [2, 4, 8, 14, len(self.features) - 1]
 
         # correct paddings
         for m in self.modules():
@@ -115,7 +114,6 @@ inceptionv4_encoders = {
             },
         },
         "params": {
-            "out_indexes": [2, 4, 8, 14],
             "out_channels": [3, 64, 192, 384, 1024, 1536],
             "num_classes": 1001,
         },

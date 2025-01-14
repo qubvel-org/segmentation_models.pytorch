@@ -148,13 +148,16 @@ class BaseModelTester(unittest.TestCase):
 
     def test_any_resolution(self):
         model = self.get_default_model()
-        if model.requires_divisible_input_shape:
-            self.skipTest("Model requires divisible input shape")
 
         sample = self._get_sample(
             height=self.default_height + 3,
             width=self.default_width + 7,
         ).to(default_device)
+
+        if model.requires_divisible_input_shape:
+            with self.assertRaises(RuntimeError, msg="Wrong input shape"):
+                output = model(sample)
+            return
 
         with torch.inference_mode():
             output = model(sample)

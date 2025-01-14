@@ -40,7 +40,7 @@ class MobileNetV2Encoder(torchvision.models.MobileNetV2, EncoderMixin):
         self._in_channels = 3
         self._out_channels = out_channels
         self._output_stride = output_stride
-        self._out_indexes = [2, 4, 7, 14]
+        self._out_indexes = [1, 3, 6, 13, len(self.features) - 1]
 
         del self.classifier
 
