@@ -156,33 +156,47 @@ class EfficientNetBaseEncoder(EfficientNet, EncoderMixin):
 class EfficientNetEncoder(EfficientNetBaseEncoder):
     def __init__(
         self,
-        stage_idxs,
-        out_channels,
-        depth=5,
-        channel_multiplier=1.0,
-        depth_multiplier=1.0,
-        drop_rate=0.2,
+        stage_idxs: List[int],
+        out_channels: List[int],
+        depth: int = 5,
+        channel_multiplier: float = 1.0,
+        depth_multiplier: float = 1.0,
+        drop_rate: float = 0.2,
+        output_stride: int = 32,
     ):
         kwargs = get_efficientnet_kwargs(
             channel_multiplier, depth_multiplier, drop_rate
         )
-        super().__init__(stage_idxs, out_channels, depth, **kwargs)
+        super().__init__(
+            stage_idxs=stage_idxs,
+            depth=depth,
+            out_channels=out_channels,
+            output_stride=output_stride,
+            **kwargs,
+        )
 
 
 class EfficientNetLiteEncoder(EfficientNetBaseEncoder):
     def __init__(
         self,
-        stage_idxs,
-        out_channels,
-        depth=5,
-        channel_multiplier=1.0,
-        depth_multiplier=1.0,
-        drop_rate=0.2,
+        stage_idxs: List[int],
+        out_channels: List[int],
+        depth: int = 5,
+        channel_multiplier: float = 1.0,
+        depth_multiplier: float = 1.0,
+        drop_rate: float = 0.2,
+        output_stride: int = 32,
     ):
         kwargs = gen_efficientnet_lite_kwargs(
             channel_multiplier, depth_multiplier, drop_rate
         )
-        super().__init__(stage_idxs, out_channels, depth, **kwargs)
+        super().__init__(
+            stage_idxs=stage_idxs,
+            depth=depth,
+            out_channels=out_channels,
+            output_stride=output_stride,
+            **kwargs,
+        )
 
 
 def prepare_settings(settings):
