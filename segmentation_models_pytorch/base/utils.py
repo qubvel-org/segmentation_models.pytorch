@@ -1,6 +1,7 @@
 import torch
 
 
+@torch.jit.unused
 def is_torch_compiling():
     try:
         return torch.compiler.is_compiling()

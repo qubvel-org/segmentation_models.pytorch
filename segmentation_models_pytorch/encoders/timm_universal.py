@@ -194,7 +194,7 @@ class TimmUniversalEncoder(nn.Module):
         Returns:
             int: The effective output stride.
         """
-        return min(self._output_stride, 2**self._depth)
+        return int(min(self._output_stride, 2**self._depth))
 
     def load_state_dict(self, state_dict, **kwargs):
         # for compatibility of weights for
