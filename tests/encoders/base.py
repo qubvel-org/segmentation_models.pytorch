@@ -231,6 +231,15 @@ class BaseEncoderTester(unittest.TestCase):
         encoder = self.get_tiny_encoder()
         encoder = encoder.eval().to(default_device)
 
+        if not encoder._is_torch_exportable:
+            with self.assertRaises(Exception):
+                exported_encoder = torch.export.export(
+                    encoder,
+                    args=(sample,),
+                    strict=True,
+                )
+            return
+
         exported_encoder = torch.export.export(
             encoder,
             args=(sample,),
