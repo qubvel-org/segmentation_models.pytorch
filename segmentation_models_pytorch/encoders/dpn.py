@@ -34,6 +34,8 @@ from ._base import EncoderMixin
 
 
 class DPNEncoder(DPN, EncoderMixin):
+    _is_torch_scriptable = False
+
     def __init__(
         self,
         stage_idxs: List[int],

@@ -10,6 +10,10 @@ class EncoderMixin:
     - patching first convolution for arbitrary input channels
     """
 
+    _is_torch_scriptable = True
+    _is_torch_exportable = True
+    _is_torch_compilable = True
+
     def __init__(self):
         self._depth = 5
         self._in_channels = 3

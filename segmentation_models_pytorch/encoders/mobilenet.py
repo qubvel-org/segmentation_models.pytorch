@@ -40,6 +40,7 @@ class MobileNetV2Encoder(torchvision.models.MobileNetV2, EncoderMixin):
         self._in_channels = 3
         self._out_channels = out_channels
         self._output_stride = output_stride
+        self._out_indexes = [2, 4, 7, 14]
 
         del self.classifier
 
@@ -52,25 +53,20 @@ class MobileNetV2Encoder(torchvision.models.MobileNetV2, EncoderMixin):
     def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
         features = [x]
 
-        if self._depth >= 1:
-            x = self.features[:2](x)
-            features.append(x)
+        depth = 0
+        for i, module in enumerate(self.features):
+            x = module(x)
 
-        if self._depth >= 2:
-            x = self.features[2:4](x)
-            features.append(x)
+            if i in self._out_indexes:
+                features.append(x)
+                depth += 1
 
-        if self._depth >= 3:
-            x = self.features[4:7](x)
-            features.append(x)
+            # torchscript does not support break in cycle, so we just
+            # go over all modules and then slice number of features
+            if not torch.jit.is_scripting() and depth > self._depth:
+                break
 
-        if self._depth >= 4:
-            x = self.features[7:14](x)
-            features.append(x)
-
-        if self._depth >= 5:
-            x = self.features[14:](x)
-            features.append(x)
+        features = features[: self._depth + 1]
 
         return features
 

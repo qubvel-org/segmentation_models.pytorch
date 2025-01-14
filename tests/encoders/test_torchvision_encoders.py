@@ -26,7 +26,7 @@ class TestResNetEncoder(base.BaseEncoderTester):
 
     def get_tiny_encoder(self):
         params = {
-            "out_channels": None,
+            "out_channels": [3, 64, 64, 128, 256, 512],
             "block": smp.encoders.resnet.BasicBlock,
             "layers": [1, 1, 1, 1],
         }
@@ -44,7 +44,7 @@ class TestDenseNetEncoder(base.BaseEncoderTester):
 
     def get_tiny_encoder(self):
         params = {
-            "out_channels": None,
+            "out_channels": [3, 2, 3, 2, 2, 2],
             "num_init_features": 2,
             "growth_rate": 1,
             "block_config": (1, 1, 1, 1),

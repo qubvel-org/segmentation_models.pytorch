@@ -18,8 +18,8 @@ class TestDPNEncoder(base.BaseEncoderTester):
 
     def get_tiny_encoder(self):
         params = {
-            "stage_idxs": [2, 3, 4, 5],
-            "out_channels": None,
+            "stage_idxs": [2, 3, 4, 6],
+            "out_channels": [3, 2, 70, 134, 262, 518],
             "groups": 2,
             "inc_sec": (2, 2, 2, 2),
             "k_r": 2,
@@ -67,7 +67,7 @@ class TestSeNetEncoder(base.BaseEncoderTester):
 
     def get_tiny_encoder(self):
         params = {
-            "out_channels": None,
+            "out_channels": [3, 2, 256, 512, 1024, 2048],
             "block": smp.encoders.senet.SEResNetBottleneck,
             "layers": [1, 1, 1, 1],
             "downsample_kernel_size": 1,

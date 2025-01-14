@@ -130,19 +130,22 @@ class EfficientNetBaseEncoder(EfficientNet, EncoderMixin):
             features.append(x)
 
         if self._depth >= 2:
-            x = self.blocks[: self._stage_idxs[0]](x)
+            x = self.blocks[0](x)
+            x = self.blocks[1](x)
             features.append(x)
 
         if self._depth >= 3:
-            x = self.blocks[self._stage_idxs[0] : self._stage_idxs[1]](x)
+            x = self.blocks[2](x)
             features.append(x)
 
         if self._depth >= 4:
-            x = self.blocks[self._stage_idxs[1] : self._stage_idxs[2]](x)
+            x = self.blocks[3](x)
+            x = self.blocks[4](x)
             features.append(x)
 
         if self._depth >= 5:
-            x = self.blocks[self._stage_idxs[2] :](x)
+            x = self.blocks[5](x)
+            x = self.blocks[6](x)
             features.append(x)
 
         return features

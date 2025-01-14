@@ -24,8 +24,6 @@ Methods:
 """
 
 import re
-import torch
-import torch.nn as nn
 
 from torchvision.models.densenet import DenseNet
 
@@ -47,15 +45,6 @@ class DenseNetEncoder(DenseNet, EncoderMixin):
             "due to pooling operation for downsampling!"
         )
 
-    def apply_transition(
-        self, transition: torch.nn.Sequential, x: torch.Tensor
-    ) -> tuple[torch.Tensor, torch.Tensor]:
-        for module in transition:
-            x = module(x)
-            if isinstance(module, nn.ReLU):
-                intermediate = x
-        return x, intermediate
-
     def forward(self, x):
         features = [x]
 
@@ -68,20 +57,29 @@ class DenseNetEncoder(DenseNet, EncoderMixin):
         if self._depth >= 2:
             x = self.features.pool0(x)
             x = self.features.denseblock1(x)
-            x, intermediate = self.apply_transition(self.features.transition1, x)
-            features.append(intermediate)
+            x = self.features.transition1.norm(x)
+            x = self.features.transition1.relu(x)
+            features.append(x)
 
         if self._depth >= 3:
+            x = self.features.transition1.conv(x)
+            x = self.features.transition1.pool(x)
             x = self.features.denseblock2(x)
-            x, intermediate = self.apply_transition(self.features.transition2, x)
-            features.append(intermediate)
+            x = self.features.transition2.norm(x)
+            x = self.features.transition2.relu(x)
+            features.append(x)
 
         if self._depth >= 4:
+            x = self.features.transition2.conv(x)
+            x = self.features.transition2.pool(x)
             x = self.features.denseblock3(x)
-            x, intermediate = self.apply_transition(self.features.transition3, x)
-            features.append(intermediate)
+            x = self.features.transition3.norm(x)
+            x = self.features.transition3.relu(x)
+            features.append(x)
 
         if self._depth >= 5:
+            x = self.features.transition3.conv(x)
+            x = self.features.transition3.pool(x)
             x = self.features.denseblock4(x)
             x = self.features.norm5(x)
             features.append(x)

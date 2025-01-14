@@ -35,7 +35,7 @@ from ._base import EncoderMixin
 class InceptionV4Encoder(InceptionV4, EncoderMixin):
     def __init__(
         self,
-        stage_idxs: List[int],
+        out_indexes: List[int],
         out_channels: List[int],
         depth: int = 5,
         output_stride: int = 32,
@@ -43,11 +43,11 @@ class InceptionV4Encoder(InceptionV4, EncoderMixin):
     ):
         super().__init__(**kwargs)
 
-        self._stage_idxs = stage_idxs
         self._depth = depth
         self._in_channels = 3
         self._out_channels = out_channels
         self._output_stride = output_stride
+        self._out_indexes = out_indexes
 
         # correct paddings
         for m in self.modules():
@@ -67,28 +67,22 @@ class InceptionV4Encoder(InceptionV4, EncoderMixin):
         )
 
     def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
+        depth = 0
         features = [x]
 
-        if self._depth >= 1:
-            x = self.features[: self._stage_idxs[0]](x)
-            features.append(x)
+        for i, module in enumerate(self.features):
+            x = module(x)
 
-        if self._depth >= 2:
-            x = self.features[self._stage_idxs[0] : self._stage_idxs[1]](x)
-            features.append(x)
+            if i in self._out_indexes:
+                features.append(x)
+                depth += 1
 
-        if self._depth >= 3:
-            x = self.features[self._stage_idxs[1] : self._stage_idxs[2]](x)
-            features.append(x)
+            # torchscript does not support break in cycle, so we just
+            # go over all modules and then slice number of features
+            if not torch.jit.is_scripting() and depth > self._depth:
+                break
 
-        if self._depth >= 4:
-            x = self.features[self._stage_idxs[2] : self._stage_idxs[3]](x)
-            features.append(x)
-
-        if self._depth >= 5:
-            x = self.features[self._stage_idxs[3] :](x)
-            features.append(x)
-
+        features = features[: self._depth + 1]
         return features
 
     def load_state_dict(self, state_dict, **kwargs):
@@ -121,7 +115,7 @@ inceptionv4_encoders = {
             },
         },
         "params": {
-            "stage_idxs": [3, 5, 9, 15],
+            "out_indexes": [2, 4, 8, 14],
             "out_channels": [3, 64, 192, 384, 1024, 1536],
             "num_classes": 1001,
         },

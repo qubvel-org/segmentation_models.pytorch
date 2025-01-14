@@ -54,6 +54,9 @@ class InceptionResNetV2Encoder(InceptionResNetV2, EncoderMixin):
             if isinstance(m, nn.MaxPool2d):
                 m.padding = (1, 1)
 
+        # for torchscript, block8 does not have relu defined
+        self.block8.relu = nn.Identity()
+
         # remove linear layers
         del self.avgpool_1a
         del self.last_linear

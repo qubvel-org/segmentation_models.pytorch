@@ -50,6 +50,10 @@ class SENetEncoder(SENet, EncoderMixin):
         self._out_channels = out_channels
         self._output_stride = output_stride
 
+        # for compatibility with torchscript
+        self.layer0_pool = self.layer0.pool
+        self.layer0.pool = torch.nn.Identity()
+
         del self.last_linear
         del self.avg_pool
 
@@ -63,11 +67,11 @@ class SENetEncoder(SENet, EncoderMixin):
         features = [x]
 
         if self._depth >= 1:
-            x = self.layer0[:-1](x)
+            x = self.layer0(x)
             features.append(x)
 
         if self._depth >= 2:
-            x = self.layer0[-1](x)
+            x = self.layer0_pool(x)
             x = self.layer1(x)
             features.append(x)
 

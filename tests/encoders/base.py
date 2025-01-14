@@ -250,3 +250,24 @@ class BaseEncoderTester(unittest.TestCase):
 
         for eager_feature, exported_feature in zip(eager_output, exported_output):
             torch.testing.assert_close(eager_feature, exported_feature)
+
+    @pytest.mark.torch_script
+    def test_torch_script(self):
+        sample = self._get_sample().to(default_device)
+
+        encoder = self.get_tiny_encoder()
+        encoder = encoder.eval().to(default_device)
+
+        if not encoder._is_torch_scriptable:
+            with self.assertRaises(RuntimeError, msg="not torch scriptable"):
+                scripted_encoder = torch.jit.script(encoder)
+            return
+
+        scripted_encoder = torch.jit.script(encoder)
+
+        with torch.inference_mode():
+            eager_output = encoder(sample)
+            scripted_output = scripted_encoder(sample)
+
+        for eager_feature, scripted_feature in zip(eager_output, scripted_output):
+            torch.testing.assert_close(eager_feature, scripted_feature)

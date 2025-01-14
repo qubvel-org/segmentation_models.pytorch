@@ -11,20 +11,22 @@
 import math
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from functools import partial
+from typing import Dict, Sequence, List
 
 from timm.layers import DropPath, to_2tuple, trunc_normal_
 
 
 class LayerNorm(nn.LayerNorm):
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         if x.ndim == 4:
-            B, C, H, W = x.shape
-            x = x.view(B, C, -1).transpose(1, 2)
-            x = super().forward(x)
-            x = x.transpose(1, 2).view(B, C, H, W)
+            batch_size, channels, height, width = x.shape
+            x = x.view(batch_size, channels, -1).transpose(1, 2)
+            x = F.layer_norm(x, self.normalized_shape, self.weight, self.bias, self.eps)
+            x = x.transpose(1, 2).view(batch_size, channels, height, width)
         else:
-            x = super().forward(x)
+            x = F.layer_norm(x, self.normalized_shape, self.weight, self.bias, self.eps)
         return x
 
 
@@ -60,9 +62,9 @@ class Mlp(nn.Module):
             if m.bias is not None:
                 m.bias.data.zero_()
 
-    def forward(self, x, H, W):
+    def forward(self, x: torch.Tensor, height: int, width: int) -> torch.Tensor:
         x = self.fc1(x)
-        x = self.dwconv(x, H, W)
+        x = self.dwconv(x, height, width)
         x = self.act(x)
         x = self.drop(x)
         x = self.fc2(x)
@@ -101,6 +103,10 @@ class Attention(nn.Module):
         if sr_ratio > 1:
             self.sr = nn.Conv2d(dim, dim, kernel_size=sr_ratio, stride=sr_ratio)
             self.norm = LayerNorm(dim)
+        else:
+            # for torchscript compatibility
+            self.sr = nn.Identity()
+            self.norm = nn.Identity()
 
         self.apply(self._init_weights)
 
@@ -119,27 +125,27 @@ class Attention(nn.Module):
             if m.bias is not None:
                 m.bias.data.zero_()
 
-    def forward(self, x, H, W):
-        B, N, C = x.shape
+    def forward(self, x: torch.Tensor, height: int, width: int) -> torch.Tensor:
+        batch_size, N, C = x.shape
         q = (
             self.q(x)
-            .reshape(B, N, self.num_heads, C // self.num_heads)
+            .reshape(batch_size, N, self.num_heads, C // self.num_heads)
             .permute(0, 2, 1, 3)
         )
 
         if self.sr_ratio > 1:
-            x_ = x.permute(0, 2, 1).reshape(B, C, H, W)
-            x_ = self.sr(x_).reshape(B, C, -1).permute(0, 2, 1)
+            x_ = x.permute(0, 2, 1).reshape(batch_size, C, height, width)
+            x_ = self.sr(x_).reshape(batch_size, C, -1).permute(0, 2, 1)
             x_ = self.norm(x_)
             kv = (
                 self.kv(x_)
-                .reshape(B, -1, 2, self.num_heads, C // self.num_heads)
+                .reshape(batch_size, -1, 2, self.num_heads, C // self.num_heads)
                 .permute(2, 0, 3, 1, 4)
             )
         else:
             kv = (
                 self.kv(x)
-                .reshape(B, -1, 2, self.num_heads, C // self.num_heads)
+                .reshape(batch_size, -1, 2, self.num_heads, C // self.num_heads)
                 .permute(2, 0, 3, 1, 4)
             )
         k, v = kv[0], kv[1]
@@ -148,7 +154,7 @@ class Attention(nn.Module):
         attn = attn.softmax(dim=-1)
         attn = self.attn_drop(attn)
 
-        x = (attn @ v).transpose(1, 2).reshape(B, N, C)
+        x = (attn @ v).transpose(1, 2).reshape(batch_size, N, C)
         x = self.proj(x)
         x = self.proj_drop(x)
 
@@ -209,12 +215,12 @@ class Block(nn.Module):
             if m.bias is not None:
                 m.bias.data.zero_()
 
-    def forward(self, x):
-        B, _, H, W = x.shape
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        batch_size, _, height, width = x.shape
         x = x.flatten(2).transpose(1, 2)
-        x = x + self.drop_path(self.attn(self.norm1(x), H, W))
-        x = x + self.drop_path(self.mlp(self.norm2(x), H, W))
-        x = x.transpose(1, 2).view(B, -1, H, W)
+        x = x + self.drop_path(self.attn(self.norm1(x), height, width))
+        x = x + self.drop_path(self.mlp(self.norm2(x), height, width))
+        x = x.transpose(1, 2).view(batch_size, -1, height, width)
         return x
 
 
@@ -256,7 +262,7 @@ class OverlapPatchEmbed(nn.Module):
             if m.bias is not None:
                 m.bias.data.zero_()
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.proj(x)
         x = self.norm(x)
         return x
@@ -462,7 +468,7 @@ class MixVisionTransformer(nn.Module):
             nn.Linear(self.embed_dim, num_classes) if num_classes > 0 else nn.Identity()
         )
 
-    def forward_features(self, x):
+    def forward_features(self, x: torch.Tensor) -> List[torch.Tensor]:
         outs = []
 
         # stage 1
@@ -491,11 +497,11 @@ class MixVisionTransformer(nn.Module):
 
         return outs
 
-    def forward(self, x):
-        x = self.forward_features(x)
+    def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
+        features = self.forward_features(x)
         # x = self.head(x)
 
-        return x
+        return features
 
 
 class DWConv(nn.Module):
@@ -503,9 +509,9 @@ class DWConv(nn.Module):
         super(DWConv, self).__init__()
         self.dwconv = nn.Conv2d(dim, dim, 3, 1, 1, bias=True, groups=dim)
 
-    def forward(self, x, H, W):
-        B, _, C = x.shape
-        x = x.transpose(1, 2).view(B, C, H, W)
+    def forward(self, x: torch.Tensor, height: int, width: int) -> torch.Tensor:
+        batch_size, _, channels = x.shape
+        x = x.transpose(1, 2).view(batch_size, channels, height, width)
         x = self.dwconv(x)
         x = x.flatten(2).transpose(1, 2)
 
@@ -516,7 +522,6 @@ class DWConv(nn.Module):
 # End of NVIDIA code
 # ---------------------------------------------------------------
 
-from typing import Dict, Sequence, List  # noqa E402
 from ._base import EncoderMixin  # noqa E402
 
 

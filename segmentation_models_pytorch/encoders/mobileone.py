@@ -120,6 +120,8 @@ class MobileOneBlock(nn.Module):
                 bias=True,
             )
         else:
+            self.reparam_conv = nn.Identity()
+
             # Re-parameterizable skip connection
             self.rbr_skip = (
                 nn.BatchNorm2d(num_features=in_channels)
@@ -157,8 +159,8 @@ class MobileOneBlock(nn.Module):
 
         # Other branches
         out = scale_out + identity_out
-        for ix in range(self.num_conv_branches):
-            out += self.rbr_conv[ix](x)
+        for module in self.rbr_conv:
+            out += module(x)
 
         return self.activation(self.se(out))
 

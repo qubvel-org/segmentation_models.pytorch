@@ -25,6 +25,7 @@ Methods:
 
 import torch
 import torch.nn as nn
+
 from torchvision.models.vgg import VGG
 from torchvision.models.vgg import make_layers
 
@@ -58,6 +59,12 @@ class VGGEncoder(VGG, EncoderMixin):
         self._in_channels = 3
         self._out_channels = out_channels
         self._output_stride = output_stride
+        self._out_indexes = [
+            i - 1
+            for i, module in enumerate(self.features)
+            if isinstance(module, nn.MaxPool2d)
+        ]
+        self._out_indexes.append(len(self.features) - 1)
 
         del self.classifier
 
@@ -68,21 +75,22 @@ class VGGEncoder(VGG, EncoderMixin):
         )
 
     def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
-        # collect stages
-        stages = []
-        stage_modules = []
-        for module in self.features:
-            if isinstance(module, nn.MaxPool2d):
-                stages.append(stage_modules)
-                stage_modules = []
-            stage_modules.append(module)
-        stages.append(stage_modules)
-
         features = []
-        for i in range(self._depth + 1):
-            for module in stages[i]:
-                x = module(x)
-            features.append(x)
+        depth = 0
+
+        for i, module in enumerate(self.features):
+            x = module(x)
+
+            if i in self._out_indexes:
+                features.append(x)
+                depth += 1
+
+            # torchscript does not support break in cycle, so we just
+            # go over all modules and then slice number of features
+            if not torch.jit.is_scripting() and depth > self._depth:
+                break
+
+        features = features[: self._depth + 1]
 
         return features
 

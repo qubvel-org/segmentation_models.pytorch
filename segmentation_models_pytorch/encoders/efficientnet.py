@@ -33,6 +33,8 @@ from ._base import EncoderMixin
 
 
 class EfficientNetEncoder(EfficientNet, EncoderMixin):
+    _is_torch_scriptable = False
+
     def __init__(
         self,
         stage_idxs: List[int],

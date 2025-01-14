@@ -44,6 +44,10 @@ class TimmUniversalEncoder(nn.Module):
         - Compatible with convolutional and transformer-like backbones.
     """
 
+    _is_torch_scriptable = True
+    _is_torch_exportable = True
+    _is_torch_compilable = True
+
     def __init__(
         self,
         name: str,
