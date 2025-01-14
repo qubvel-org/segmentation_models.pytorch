@@ -11,6 +11,10 @@ T = TypeVar("T", bound="SegmentationModel")
 class SegmentationModel(torch.nn.Module, SMPHubMixin):
     """Base class for all segmentation models."""
 
+    _is_torch_scriptable = True
+    _is_torch_exportable = True
+    _is_torch_compilable = True
+
     # if model supports shape not divisible by 2 ^ n set to False
     requires_divisible_input_shape = True
 

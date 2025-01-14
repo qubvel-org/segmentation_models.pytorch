@@ -35,6 +35,9 @@ from ._base import EncoderMixin
 class EfficientNetEncoder(EfficientNet, EncoderMixin):
     _is_torch_scriptable = False
 
+    # works with torch 2.4.0, but not with torch 2.5.1
+    _is_torch_compilable = False
+
     def __init__(
         self,
         stage_idxs: List[int],

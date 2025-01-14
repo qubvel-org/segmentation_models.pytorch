@@ -263,6 +263,11 @@ class BaseModelTester(unittest.TestCase):
         model = self.get_default_model()
         model.eval()
 
+        if not model._is_torch_scriptable:
+            with self.assertRaises(RuntimeError):
+                scripted_model = torch.jit.script(model)
+            return
+
         scripted_model = torch.jit.script(model)
 
         with torch.inference_mode():

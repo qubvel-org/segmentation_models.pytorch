@@ -26,9 +26,6 @@ class TestTimmEfficientNetEncoder(base.BaseEncoderTester):
     )
     files_for_diff = ["encoders/timm_efficientnet.py"]
 
-    # works with torch 2.4.0, but not with torch 2.5.1
-    do_test_torch_export = False
-
 
 class TestTimmGERNetEncoder(base.BaseEncoderTester):
     encoder_names = (

@@ -12,10 +12,6 @@ class TestDPNEncoder(base.BaseEncoderTester):
     )
     files_for_diff = ["encoders/dpn.py"]
 
-    # works with torch 2.4.0, but not with torch 2.5.1
-    # dynamo error, probably on Sequential + OrderedDict
-    do_test_torch_export = False
-
     def get_tiny_encoder(self):
         params = {
             "stage_idxs": [2, 3, 4, 6],
@@ -44,10 +40,6 @@ class TestInceptionV4Encoder(base.BaseEncoderTester):
     encoder_names = ["inceptionv4"] if not RUN_ALL_ENCODERS else ["inceptionv4"]
     files_for_diff = ["encoders/inceptionv4.py"]
     supports_dilated = False
-
-    # works with torch 2.4.0, but not with torch 2.5.1
-    # dynamo error, probably on Sequential + OrderedDict
-    do_test_torch_export = False
 
 
 class TestSeNetEncoder(base.BaseEncoderTester):
