@@ -28,7 +28,6 @@ import torch.nn.functional as F
 from typing import List, Dict, Sequence
 
 from pretrainedmodels.models.dpn import DPN
-from pretrainedmodels.models.dpn import pretrained_settings
 
 from ._base import EncoderMixin
 
@@ -96,6 +95,75 @@ class DPNEncoder(DPN, EncoderMixin):
         state_dict.pop("last_linear.weight", None)
         super().load_state_dict(state_dict, **kwargs)
 
+
+pretrained_settings = {
+    "dpn68": {
+        "imagenet": {
+            "url": "http://data.lip6.fr/cadene/pretrainedmodels/dpn68-4af7d88d2.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [124 / 255, 117 / 255, 104 / 255],
+            "std": [1 / (0.0167 * 255)] * 3,
+            "num_classes": 1000,
+        }
+    },
+    "dpn68b": {
+        "imagenet+5k": {
+            "url": "http://data.lip6.fr/cadene/pretrainedmodels/dpn68b_extra-363ab9c19.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [124 / 255, 117 / 255, 104 / 255],
+            "std": [1 / (0.0167 * 255)] * 3,
+            "num_classes": 1000,
+        }
+    },
+    "dpn92": {
+        "imagenet+5k": {
+            "url": "http://data.lip6.fr/cadene/pretrainedmodels/dpn92_extra-fda993c95.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [124 / 255, 117 / 255, 104 / 255],
+            "std": [1 / (0.0167 * 255)] * 3,
+            "num_classes": 1000,
+        }
+    },
+    "dpn98": {
+        "imagenet": {
+            "url": "http://data.lip6.fr/cadene/pretrainedmodels/dpn98-722954780.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [124 / 255, 117 / 255, 104 / 255],
+            "std": [1 / (0.0167 * 255)] * 3,
+            "num_classes": 1000,
+        }
+    },
+    "dpn131": {
+        "imagenet": {
+            "url": "http://data.lip6.fr/cadene/pretrainedmodels/dpn131-7af84be88.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [124 / 255, 117 / 255, 104 / 255],
+            "std": [1 / (0.0167 * 255)] * 3,
+            "num_classes": 1000,
+        }
+    },
+    "dpn107": {
+        "imagenet+5k": {
+            "url": "http://data.lip6.fr/cadene/pretrainedmodels/dpn107_extra-b7f9f4cc9.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [124 / 255, 117 / 255, 104 / 255],
+            "std": [1 / (0.0167 * 255)] * 3,
+            "num_classes": 1000,
+        }
+    },
+}
 
 dpn_encoders = {
     "dpn68": {
