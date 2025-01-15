@@ -51,7 +51,9 @@ For each encoder, the table below provides detailed information:
    Indicates whether the encoder can be scripted with ``torch.jit.script``.
 
 4. **Compile**:   
-   Indicates whether the encoder is compatible with ``torch.compile`` for enhanced performance.
+   Indicates whether the encoder is compatible with ``torch.compile(model, fullgraph=True, dynamic=True, backend="eager")``. 
+   You may still get some issues with another backends, such as ``inductor``, depending on the torch/cuda/... dependencies version,
+   but most of the time it will work.
 
 5. **Export**:   
    Indicates whether the encoder can be exported using ``torch.export.export``, making it suitable for deployment in different environments (e.g., ONNX).
