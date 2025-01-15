@@ -53,6 +53,10 @@ class VGGEncoder(VGG, EncoderMixin):
         output_stride: int = 32,
         **kwargs,
     ):
+        if depth > 5 or depth < 1:
+            raise ValueError(
+                f"{self.__class__.__name__} depth should be in range [1, 5], got {depth}"
+            )
         super().__init__(make_layers(config, batch_norm=batch_norm), **kwargs)
 
         self._depth = depth

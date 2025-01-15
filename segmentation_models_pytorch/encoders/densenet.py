@@ -32,7 +32,13 @@ from ._base import EncoderMixin
 
 class DenseNetEncoder(DenseNet, EncoderMixin):
     def __init__(self, out_channels, depth=5, output_stride=32, **kwargs):
+        if depth > 5 or depth < 1:
+            raise ValueError(
+                f"{self.__class__.__name__} depth should be in range [1, 5], got {depth}"
+            )
+
         super().__init__(**kwargs)
+
         self._depth = depth
         self._in_channels = 3
         self._out_channels = out_channels

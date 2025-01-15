@@ -68,6 +68,13 @@ class TimmUniversalEncoder(nn.Module):
             output_stride (int): Desired output stride (default: 32).
             **kwargs: Additional arguments passed to `timm.create_model`.
         """
+        # At the moment we do not support models with more than 5 stages,
+        # but can be reconfigured in the future.
+        if depth > 5 or depth < 1:
+            raise ValueError(
+                f"{self.__class__.__name__} depth should be in range [1, 5], got {depth}"
+            )
+
         super().__init__()
         self.name = name
 

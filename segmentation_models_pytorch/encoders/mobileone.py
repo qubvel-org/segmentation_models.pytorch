@@ -319,6 +319,11 @@ class MobileOne(nn.Module, EncoderMixin):
         :param use_se: Whether to use SE-ReLU activations.
         :param num_conv_branches: Number of linear conv branches.
         """
+        if depth > 5 or depth < 1:
+            raise ValueError(
+                f"{self.__class__.__name__} depth should be in range [1, 5], got {depth}"
+            )
+
         super().__init__()
 
         assert len(width_multipliers) == 4

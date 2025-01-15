@@ -1,10 +1,22 @@
+from typing import List
 from pretrainedmodels.models.xception import Xception
 
 from ._base import EncoderMixin
 
 
 class XceptionEncoder(Xception, EncoderMixin):
-    def __init__(self, out_channels, *args, depth=5, output_stride=32, **kwargs):
+    def __init__(
+        self,
+        out_channels: List[int],
+        *args,
+        depth: int = 5,
+        output_stride: int = 32,
+        **kwargs,
+    ):
+        if depth > 5 or depth < 1:
+            raise ValueError(
+                f"{self.__class__.__name__} depth should be in range [1, 5], got {depth}"
+            )
         super().__init__(*args, **kwargs)
 
         self._depth = depth

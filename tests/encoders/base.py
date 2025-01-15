@@ -149,6 +149,12 @@ class BaseEncoderTester(unittest.TestCase):
                     f"Encoder `{encoder_name}` should have {depth + 1} out_channels, but has {len(encoder.out_channels)}",
                 )
 
+    def test_invalid_depth(self):
+        with self.assertRaises(ValueError):
+            smp.encoders.get_encoder(self.encoder_names[0], depth=6)
+        with self.assertRaises(ValueError):
+            smp.encoders.get_encoder(self.encoder_names[0], depth=0)
+
     def test_dilated(self):
         sample = self._get_sample().to(default_device)
 

@@ -43,6 +43,11 @@ class EfficientNetEncoder(EfficientNet, EncoderMixin):
         depth: int = 5,
         output_stride: int = 32,
     ):
+        if depth > 5 or depth < 1:
+            raise ValueError(
+                f"{self.__class__.__name__} depth should be in range [1, 5], got {depth}"
+            )
+
         blocks_args, global_params = get_model_params(model_name, override_params=None)
         super().__init__(blocks_args, global_params)
 
