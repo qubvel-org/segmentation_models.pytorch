@@ -118,11 +118,11 @@ inceptionresnetv2_encoders = {
         "encoder": InceptionResNetV2Encoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/inceptionresnetv2-imagenet",
+                "repo_id": "smp-hub/inceptionresnetv2.imagenet",
                 "revision": "main",
             },
             "imagenet+background": {
-                "repo_id": "smp-hub/inceptionresnetv2-imagenet-background",
+                "repo_id": "smp-hub/inceptionresnetv2.imagenet-background",
                 "revision": "main",
             },
         },

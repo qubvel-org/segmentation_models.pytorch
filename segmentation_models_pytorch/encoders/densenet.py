@@ -121,7 +121,7 @@ densenet_encoders = {
         },
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/densenet121-imagenet",
+                "repo_id": "smp-hub/densenet121.imagenet",
                 "revision": "main",
             }
         },
@@ -136,7 +136,7 @@ densenet_encoders = {
         },
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/densenet169-imagenet",
+                "repo_id": "smp-hub/densenet169.imagenet",
                 "revision": "main",
             }
         },
@@ -151,7 +151,7 @@ densenet_encoders = {
         },
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/densenet201-imagenet",
+                "repo_id": "smp-hub/densenet201.imagenet",
                 "revision": "main",
             }
         },
@@ -166,7 +166,7 @@ densenet_encoders = {
         },
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/densenet161-imagenet",
+                "repo_id": "smp-hub/densenet161.imagenet",
                 "revision": "main",
             }
         },

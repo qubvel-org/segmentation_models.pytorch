@@ -114,11 +114,11 @@ efficient_net_encoders = {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/efficientnet-b0-imagenet",
+                "repo_id": "smp-hub/efficientnet-b0.imagenet",
                 "revision": "main",
             },
             "advprop": {
-                "repo_id": "smp-hub/efficientnet-b0-advprop",
+                "repo_id": "smp-hub/efficientnet-b0.advprop",
                 "revision": "main",
             },
         },
@@ -132,11 +132,11 @@ efficient_net_encoders = {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/efficientnet-b1-imagenet",
+                "repo_id": "smp-hub/efficientnet-b1.imagenet",
                 "revision": "main",
             },
             "advprop": {
-                "repo_id": "smp-hub/efficientnet-b1-advprop",
+                "repo_id": "smp-hub/efficientnet-b1.advprop",
                 "revision": "main",
             },
         },
@@ -150,11 +150,11 @@ efficient_net_encoders = {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/efficientnet-b2-imagenet",
+                "repo_id": "smp-hub/efficientnet-b2.imagenet",
                 "revision": "main",
             },
             "advprop": {
-                "repo_id": "smp-hub/efficientnet-b2-advprop",
+                "repo_id": "smp-hub/efficientnet-b2.advprop",
                 "revision": "main",
             },
         },
@@ -168,11 +168,11 @@ efficient_net_encoders = {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/efficientnet-b3-imagenet",
+                "repo_id": "smp-hub/efficientnet-b3.imagenet",
                 "revision": "main",
             },
             "advprop": {
-                "repo_id": "smp-hub/efficientnet-b3-advprop",
+                "repo_id": "smp-hub/efficientnet-b3.advprop",
                 "revision": "main",
             },
         },
@@ -186,11 +186,11 @@ efficient_net_encoders = {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/efficientnet-b4-imagenet",
+                "repo_id": "smp-hub/efficientnet-b4.imagenet",
                 "revision": "main",
             },
             "advprop": {
-                "repo_id": "smp-hub/efficientnet-b4-advprop",
+                "repo_id": "smp-hub/efficientnet-b4.advprop",
                 "revision": "main",
             },
         },
@@ -204,11 +204,11 @@ efficient_net_encoders = {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/efficientnet-b5-imagenet",
+                "repo_id": "smp-hub/efficientnet-b5.imagenet",
                 "revision": "main",
             },
             "advprop": {
-                "repo_id": "smp-hub/efficientnet-b5-advprop",
+                "repo_id": "smp-hub/efficientnet-b5.advprop",
                 "revision": "main",
             },
         },
@@ -222,11 +222,11 @@ efficient_net_encoders = {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/efficientnet-b6-imagenet",
+                "repo_id": "smp-hub/efficientnet-b6.imagenet",
                 "revision": "main",
             },
             "advprop": {
-                "repo_id": "smp-hub/efficientnet-b6-advprop",
+                "repo_id": "smp-hub/efficientnet-b6.advprop",
                 "revision": "main",
             },
         },
@@ -240,11 +240,11 @@ efficient_net_encoders = {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/efficientnet-b7-imagenet",
+                "repo_id": "smp-hub/efficientnet-b7.imagenet",
                 "revision": "main",
             },
             "advprop": {
-                "repo_id": "smp-hub/efficientnet-b7-advprop",
+                "repo_id": "smp-hub/efficientnet-b7.advprop",
                 "revision": "main",
             },
         },

@@ -596,7 +596,7 @@ mix_transformer_encoders = {
         "encoder": MixVisionTransformerEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/mit_b0-imagenet",
+                "repo_id": "smp-hub/mit_b0.imagenet",
                 "revision": "main",
             }
         },
@@ -618,7 +618,7 @@ mix_transformer_encoders = {
         "encoder": MixVisionTransformerEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/mit_b1-imagenet",
+                "repo_id": "smp-hub/mit_b1.imagenet",
                 "revision": "main",
             }
         },
@@ -640,7 +640,7 @@ mix_transformer_encoders = {
         "encoder": MixVisionTransformerEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/mit_b2-imagenet",
+                "repo_id": "smp-hub/mit_b2.imagenet",
                 "revision": "main",
             }
         },
@@ -662,7 +662,7 @@ mix_transformer_encoders = {
         "encoder": MixVisionTransformerEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/mit_b3-imagenet",
+                "repo_id": "smp-hub/mit_b3.imagenet",
                 "revision": "main",
             }
         },
@@ -684,7 +684,7 @@ mix_transformer_encoders = {
         "encoder": MixVisionTransformerEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/mit_b4-imagenet",
+                "repo_id": "smp-hub/mit_b4.imagenet",
                 "revision": "main",
             }
         },
@@ -706,7 +706,7 @@ mix_transformer_encoders = {
         "encoder": MixVisionTransformerEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/mit_b5-imagenet",
+                "repo_id": "smp-hub/mit_b5.imagenet",
                 "revision": "main",
             }
         },

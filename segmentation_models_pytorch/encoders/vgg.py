@@ -202,7 +202,7 @@ vgg_encoders = {
         "encoder": VGGEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/vgg11-imagenet",
+                "repo_id": "smp-hub/vgg11.imagenet",
                 "revision": "main",
             },
         },
@@ -216,7 +216,7 @@ vgg_encoders = {
         "encoder": VGGEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/vgg11_bn-imagenet",
+                "repo_id": "smp-hub/vgg11_bn.imagenet",
                 "revision": "main",
             },
         },
@@ -230,7 +230,7 @@ vgg_encoders = {
         "encoder": VGGEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/vgg13-imagenet",
+                "repo_id": "smp-hub/vgg13.imagenet",
                 "revision": "main",
             },
         },
@@ -244,7 +244,7 @@ vgg_encoders = {
         "encoder": VGGEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/vgg13_bn-imagenet",
+                "repo_id": "smp-hub/vgg13_bn.imagenet",
                 "revision": "main",
             },
         },
@@ -258,7 +258,7 @@ vgg_encoders = {
         "encoder": VGGEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/vgg16-imagenet",
+                "repo_id": "smp-hub/vgg16.imagenet",
                 "revision": "main",
             },
         },
@@ -272,7 +272,7 @@ vgg_encoders = {
         "encoder": VGGEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/vgg16_bn-imagenet",
+                "repo_id": "smp-hub/vgg16_bn.imagenet",
                 "revision": "main",
             },
         },
@@ -286,7 +286,7 @@ vgg_encoders = {
         "encoder": VGGEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/vgg19-imagenet",
+                "repo_id": "smp-hub/vgg19.imagenet",
                 "revision": "main",
             },
         },
@@ -300,7 +300,7 @@ vgg_encoders = {
         "encoder": VGGEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/vgg19_bn-imagenet",
+                "repo_id": "smp-hub/vgg19_bn.imagenet",
                 "revision": "main",
             },
         },

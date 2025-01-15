@@ -493,7 +493,7 @@ mobileone_encoders = {
         "encoder": MobileOne,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/mobileone_s0-imagenet",
+                "repo_id": "smp-hub/mobileone_s0.imagenet",
                 "revision": "main",
             }
         },
@@ -508,7 +508,7 @@ mobileone_encoders = {
         "encoder": MobileOne,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/mobileone_s1-imagenet",
+                "repo_id": "smp-hub/mobileone_s1.imagenet",
                 "revision": "main",
             }
         },
@@ -522,7 +522,7 @@ mobileone_encoders = {
         "encoder": MobileOne,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/mobileone_s2-imagenet",
+                "repo_id": "smp-hub/mobileone_s2.imagenet",
                 "revision": "main",
             }
         },
@@ -536,7 +536,7 @@ mobileone_encoders = {
         "encoder": MobileOne,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/mobileone_s3-imagenet",
+                "repo_id": "smp-hub/mobileone_s3.imagenet",
                 "revision": "main",
             }
         },
@@ -550,7 +550,7 @@ mobileone_encoders = {
         "encoder": MobileOne,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/mobileone_s4-imagenet",
+                "repo_id": "smp-hub/mobileone_s4.imagenet",
                 "revision": "main",
             }
         },

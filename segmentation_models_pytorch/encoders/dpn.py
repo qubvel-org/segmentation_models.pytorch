@@ -106,7 +106,7 @@ dpn_encoders = {
         "encoder": DPNEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/dpn68-imagenet",
+                "repo_id": "smp-hub/dpn68.imagenet",
                 "revision": "main",
             }
         },
@@ -127,7 +127,7 @@ dpn_encoders = {
         "encoder": DPNEncoder,
         "pretrained_settings": {
             "imagenet+5k": {
-                "repo_id": "smp-hub/dpn68b-imagenet-5k",
+                "repo_id": "smp-hub/dpn68b.imagenet-5k",
                 "revision": "main",
             }
         },
@@ -149,7 +149,7 @@ dpn_encoders = {
         "encoder": DPNEncoder,
         "pretrained_settings": {
             "imagenet+5k": {
-                "repo_id": "smp-hub/dpn92-imagenet-5k",
+                "repo_id": "smp-hub/dpn92.imagenet-5k",
                 "revision": "main",
             }
         },
@@ -169,7 +169,7 @@ dpn_encoders = {
         "encoder": DPNEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/dpn98-imagenet",
+                "repo_id": "smp-hub/dpn98.imagenet",
                 "revision": "main",
             }
         },
@@ -189,7 +189,7 @@ dpn_encoders = {
         "encoder": DPNEncoder,
         "pretrained_settings": {
             "imagenet+5k": {
-                "repo_id": "smp-hub/dpn107-imagenet-5k",
+                "repo_id": "smp-hub/dpn107.imagenet-5k",
                 "revision": "main",
             }
         },
@@ -209,7 +209,7 @@ dpn_encoders = {
         "encoder": DPNEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/dpn131-imagenet",
+                "repo_id": "smp-hub/dpn131.imagenet",
                 "revision": "main",
             }
         },

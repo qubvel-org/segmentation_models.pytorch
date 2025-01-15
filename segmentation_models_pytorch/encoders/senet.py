@@ -174,7 +174,7 @@ senet_encoders = {
         "encoder": SENetEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/senet154-imagenet",
+                "repo_id": "smp-hub/senet154.imagenet",
                 "revision": "main",
             }
         },
@@ -192,7 +192,7 @@ senet_encoders = {
         "encoder": SENetEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/se_resnet50-imagenet",
+                "repo_id": "smp-hub/se_resnet50.imagenet",
                 "revision": "main",
             }
         },
@@ -214,7 +214,7 @@ senet_encoders = {
         "encoder": SENetEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/se_resnet101-imagenet",
+                "repo_id": "smp-hub/se_resnet101.imagenet",
                 "revision": "main",
             }
         },
@@ -236,7 +236,7 @@ senet_encoders = {
         "encoder": SENetEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/se_resnet152-imagenet",
+                "repo_id": "smp-hub/se_resnet152.imagenet",
                 "revision": "main",
             }
         },
@@ -258,7 +258,7 @@ senet_encoders = {
         "encoder": SENetEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/se_resnext50_32x4d-imagenet",
+                "repo_id": "smp-hub/se_resnext50_32x4d.imagenet",
                 "revision": "main",
             }
         },
@@ -280,7 +280,7 @@ senet_encoders = {
         "encoder": SENetEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/se_resnext101_32x4d-imagenet",
+                "repo_id": "smp-hub/se_resnext101_32x4d.imagenet",
                 "revision": "main",
             }
         },

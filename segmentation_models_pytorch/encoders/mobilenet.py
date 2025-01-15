@@ -85,7 +85,7 @@ mobilenet_encoders = {
         "encoder": MobileNetV2Encoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/mobilenet_v2-imagenet",
+                "repo_id": "smp-hub/mobilenet_v2.imagenet",
                 "revision": "main",
             }
         },

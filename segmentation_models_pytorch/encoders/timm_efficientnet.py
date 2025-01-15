@@ -221,15 +221,15 @@ timm_efficientnet_encoders = {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/timm-efficientnet-b0-imagenet",
+                "repo_id": "smp-hub/timm-efficientnet-b0.imagenet",
                 "revision": "main",
             },
             "advprop": {
-                "repo_id": "smp-hub/timm-efficientnet-b0-advprop",
+                "repo_id": "smp-hub/timm-efficientnet-b0.advprop",
                 "revision": "main",
             },
             "noisy-student": {
-                "repo_id": "smp-hub/timm-efficientnet-b0-noisy-student",
+                "repo_id": "smp-hub/timm-efficientnet-b0.noisy-student",
                 "revision": "main",
             },
         },
@@ -245,15 +245,15 @@ timm_efficientnet_encoders = {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/timm-efficientnet-b1-imagenet",
+                "repo_id": "smp-hub/timm-efficientnet-b1.imagenet",
                 "revision": "main",
             },
             "advprop": {
-                "repo_id": "smp-hub/timm-efficientnet-b1-advprop",
+                "repo_id": "smp-hub/timm-efficientnet-b1.advprop",
                 "revision": "main",
             },
             "noisy-student": {
-                "repo_id": "smp-hub/timm-efficientnet-b1-noisy-student",
+                "repo_id": "smp-hub/timm-efficientnet-b1.noisy-student",
                 "revision": "main",
             },
         },
@@ -269,15 +269,15 @@ timm_efficientnet_encoders = {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/timm-efficientnet-b2-imagenet",
+                "repo_id": "smp-hub/timm-efficientnet-b2.imagenet",
                 "revision": "main",
             },
             "advprop": {
-                "repo_id": "smp-hub/timm-efficientnet-b2-advprop",
+                "repo_id": "smp-hub/timm-efficientnet-b2.advprop",
                 "revision": "main",
             },
             "noisy-student": {
-                "repo_id": "smp-hub/timm-efficientnet-b2-noisy-student",
+                "repo_id": "smp-hub/timm-efficientnet-b2.noisy-student",
                 "revision": "main",
             },
         },
@@ -293,15 +293,15 @@ timm_efficientnet_encoders = {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/timm-efficientnet-b3-imagenet",
+                "repo_id": "smp-hub/timm-efficientnet-b3.imagenet",
                 "revision": "main",
             },
             "advprop": {
-                "repo_id": "smp-hub/timm-efficientnet-b3-advprop",
+                "repo_id": "smp-hub/timm-efficientnet-b3.advprop",
                 "revision": "main",
             },
             "noisy-student": {
-                "repo_id": "smp-hub/timm-efficientnet-b3-noisy-student",
+                "repo_id": "smp-hub/timm-efficientnet-b3.noisy-student",
                 "revision": "main",
             },
         },
@@ -317,15 +317,15 @@ timm_efficientnet_encoders = {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/timm-efficientnet-b4-imagenet",
+                "repo_id": "smp-hub/timm-efficientnet-b4.imagenet",
                 "revision": "main",
             },
             "advprop": {
-                "repo_id": "smp-hub/timm-efficientnet-b4-advprop",
+                "repo_id": "smp-hub/timm-efficientnet-b4.advprop",
                 "revision": "main",
             },
             "noisy-student": {
-                "repo_id": "smp-hub/timm-efficientnet-b4-noisy-student",
+                "repo_id": "smp-hub/timm-efficientnet-b4.noisy-student",
                 "revision": "main",
             },
         },
@@ -341,15 +341,15 @@ timm_efficientnet_encoders = {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/timm-efficientnet-b5-imagenet",
+                "repo_id": "smp-hub/timm-efficientnet-b5.imagenet",
                 "revision": "main",
             },
             "advprop": {
-                "repo_id": "smp-hub/timm-efficientnet-b5-advprop",
+                "repo_id": "smp-hub/timm-efficientnet-b5.advprop",
                 "revision": "main",
             },
             "noisy-student": {
-                "repo_id": "smp-hub/timm-efficientnet-b5-noisy-student",
+                "repo_id": "smp-hub/timm-efficientnet-b5.noisy-student",
                 "revision": "main",
             },
         },
@@ -365,15 +365,15 @@ timm_efficientnet_encoders = {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/timm-efficientnet-b6-imagenet",
+                "repo_id": "smp-hub/timm-efficientnet-b6.imagenet",
                 "revision": "main",
             },
             "advprop": {
-                "repo_id": "smp-hub/timm-efficientnet-b6-advprop",
+                "repo_id": "smp-hub/timm-efficientnet-b6.advprop",
                 "revision": "main",
             },
             "noisy-student": {
-                "repo_id": "smp-hub/timm-efficientnet-b6-noisy-student",
+                "repo_id": "smp-hub/timm-efficientnet-b6.noisy-student",
                 "revision": "main",
             },
         },
@@ -389,15 +389,15 @@ timm_efficientnet_encoders = {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/timm-efficientnet-b7-imagenet",
+                "repo_id": "smp-hub/timm-efficientnet-b7.imagenet",
                 "revision": "main",
             },
             "advprop": {
-                "repo_id": "smp-hub/timm-efficientnet-b7-advprop",
+                "repo_id": "smp-hub/timm-efficientnet-b7.advprop",
                 "revision": "main",
             },
             "noisy-student": {
-                "repo_id": "smp-hub/timm-efficientnet-b7-noisy-student",
+                "repo_id": "smp-hub/timm-efficientnet-b7.noisy-student",
                 "revision": "main",
             },
         },
@@ -413,11 +413,11 @@ timm_efficientnet_encoders = {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/timm-efficientnet-b8-imagenet",
+                "repo_id": "smp-hub/timm-efficientnet-b8.imagenet",
                 "revision": "main",
             },
             "advprop": {
-                "repo_id": "smp-hub/timm-efficientnet-b8-advprop",
+                "repo_id": "smp-hub/timm-efficientnet-b8.advprop",
                 "revision": "main",
             },
         },
@@ -433,11 +433,11 @@ timm_efficientnet_encoders = {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
             "noisy-student": {
-                "repo_id": "smp-hub/timm-efficientnet-l2-noisy-student",
+                "repo_id": "smp-hub/timm-efficientnet-l2.noisy-student",
                 "revision": "main",
             },
             "noisy-student-475": {
-                "repo_id": "smp-hub/timm-efficientnet-l2-noisy-student-475",
+                "repo_id": "smp-hub/timm-efficientnet-l2.noisy-student-475",
                 "revision": "main",
             },
         },
@@ -453,7 +453,7 @@ timm_efficientnet_encoders = {
         "encoder": EfficientNetLiteEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/timm-tf_efficientnet_lite0-imagenet",
+                "repo_id": "smp-hub/timm-tf_efficientnet_lite0.imagenet",
                 "revision": "main",
             },
         },
@@ -469,7 +469,7 @@ timm_efficientnet_encoders = {
         "encoder": EfficientNetLiteEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/timm-tf_efficientnet_lite1-imagenet",
+                "repo_id": "smp-hub/timm-tf_efficientnet_lite1.imagenet",
                 "revision": "main",
             },
         },
@@ -485,7 +485,7 @@ timm_efficientnet_encoders = {
         "encoder": EfficientNetLiteEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/timm-tf_efficientnet_lite2-imagenet",
+                "repo_id": "smp-hub/timm-tf_efficientnet_lite2.imagenet",
                 "revision": "main",
             },
         },
@@ -501,7 +501,7 @@ timm_efficientnet_encoders = {
         "encoder": EfficientNetLiteEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/timm-tf_efficientnet_lite3-imagenet",
+                "repo_id": "smp-hub/timm-tf_efficientnet_lite3.imagenet",
                 "revision": "main",
             },
         },
@@ -517,7 +517,7 @@ timm_efficientnet_encoders = {
         "encoder": EfficientNetLiteEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/timm-tf_efficientnet_lite4-imagenet",
+                "repo_id": "smp-hub/timm-tf_efficientnet_lite4.imagenet",
                 "revision": "main",
             },
         },

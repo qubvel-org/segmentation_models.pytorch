@@ -92,7 +92,7 @@ xception_encoders = {
         "encoder": XceptionEncoder,
         "pretrained_settings": {
             "imagenet": {
-                "repo_id": "smp-hub/xception-imagenet",
+                "repo_id": "smp-hub/xception.imagenet",
                 "revision": "main",
             },
         },
