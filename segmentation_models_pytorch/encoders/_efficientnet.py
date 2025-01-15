@@ -171,12 +171,11 @@ class MBConvBlock(nn.Module):
         Args:
             memory_efficient (bool): Whether to use memory-efficient version of swish.
         """
-        self._swish = MemoryEfficientSwish() if memory_efficient else Swish()
+        self._swish = MemoryEfficientSwish() if memory_efficient else nn.SiLU()
 
 
 class EfficientNet(nn.Module):
     """EfficientNet model.
-       Most easily loaded with the .from_name or .from_pretrained methods.
 
     Args:
         blocks_args (list[namedtuple]): A list of BlockArgs to construct blocks.
@@ -275,7 +274,7 @@ class EfficientNet(nn.Module):
         Args:
             memory_efficient (bool): Whether to use memory-efficient version of swish.
         """
-        self._swish = MemoryEfficientSwish() if memory_efficient else Swish()
+        self._swish = MemoryEfficientSwish() if memory_efficient else nn.SiLU()
         for block in self._blocks:
             block.set_swish(memory_efficient)
 
@@ -375,127 +374,6 @@ class EfficientNet(nn.Module):
             x = self._fc(x)
         return x
 
-    @classmethod
-    def from_name(cls, model_name, in_channels=3, **override_params):
-        """Create an efficientnet model according to name.
-
-        Args:
-            model_name (str): Name for efficientnet.
-            in_channels (int): Input data's channel number.
-            override_params (other key word params):
-                Params to override model's global_params.
-                Optional key:
-                    'width_coefficient', 'depth_coefficient',
-                    'image_size', 'dropout_rate',
-                    'num_classes', 'batch_norm_momentum',
-                    'batch_norm_epsilon', 'drop_connect_rate',
-                    'depth_divisor', 'min_depth'
-
-        Returns:
-            An efficientnet model.
-        """
-        cls._check_model_name_is_valid(model_name)
-        blocks_args, global_params = get_model_params(model_name, override_params)
-        model = cls(blocks_args, global_params)
-        model._change_in_channels(in_channels)
-        return model
-
-    @classmethod
-    def from_pretrained(
-        cls,
-        model_name,
-        weights_path=None,
-        advprop=False,
-        in_channels=3,
-        num_classes=1000,
-        **override_params,
-    ):
-        """Create an efficientnet model according to name.
-
-        Args:
-            model_name (str): Name for efficientnet.
-            weights_path (None or str):
-                str: path to pretrained weights file on the local disk.
-                None: use pretrained weights downloaded from the Internet.
-            advprop (bool):
-                Whether to load pretrained weights
-                trained with advprop (valid when weights_path is None).
-            in_channels (int): Input data's channel number.
-            num_classes (int):
-                Number of categories for classification.
-                It controls the output size for final linear layer.
-            override_params (other key word params):
-                Params to override model's global_params.
-                Optional key:
-                    'width_coefficient', 'depth_coefficient',
-                    'image_size', 'dropout_rate',
-                    'batch_norm_momentum',
-                    'batch_norm_epsilon', 'drop_connect_rate',
-                    'depth_divisor', 'min_depth'
-
-        Returns:
-            A pretrained efficientnet model.
-        """
-        model = cls.from_name(model_name, num_classes=num_classes, **override_params)
-        load_pretrained_weights(
-            model,
-            model_name,
-            weights_path=weights_path,
-            load_fc=(num_classes == 1000),
-            advprop=advprop,
-        )
-        model._change_in_channels(in_channels)
-        return model
-
-    @classmethod
-    def get_image_size(cls, model_name):
-        """Get the input image size for a given efficientnet model.
-
-        Args:
-            model_name (str): Name for efficientnet.
-
-        Returns:
-            Input image size (resolution).
-        """
-        cls._check_model_name_is_valid(model_name)
-        _, _, res, _ = efficientnet_params(model_name)
-        return res
-
-    @classmethod
-    def _check_model_name_is_valid(cls, model_name):
-        """Validates model name.
-
-        Args:
-            model_name (str): Name for efficientnet.
-
-        Returns:
-            bool: Is a valid name or not.
-        """
-        if model_name not in VALID_MODELS:
-            raise ValueError("model_name should be one of: " + ", ".join(VALID_MODELS))
-
-    def _change_in_channels(self, in_channels):
-        """Adjust model's first convolution layer to in_channels, if in_channels not equals 3.
-
-        Args:
-            in_channels (int): Input data's channel number.
-        """
-        if in_channels != 3:
-            Conv2d = get_same_padding_conv2d(image_size=self._global_params.image_size)
-            out_channels = round_filters(32, self._global_params)
-            self._conv_stem = Conv2d(
-                in_channels, out_channels, kernel_size=3, stride=2, bias=False
-            )
-
-
-"""utils.py - Helper functions for building the model and for loading model parameters.
-   These helper functions are built to mirror those in the official TensorFlow implementation.
-"""
-
-# Author: lukemelas (github username)
-# Github repo: https://github.com/lukemelas/EfficientNet-PyTorch
-# With adjustments and added comments by workingcoder (github username).
-
 
 ################################################################################
 # Help functions for model architecture
@@ -552,15 +430,6 @@ BlockArgs = collections.namedtuple(
 # Set GlobalParams and BlockArgs's defaults
 GlobalParams.__new__.__defaults__ = (None,) * len(GlobalParams._fields)
 BlockArgs.__new__.__defaults__ = (None,) * len(BlockArgs._fields)
-
-# Swish activation function
-if hasattr(nn, "SiLU"):
-    Swish = nn.SiLU
-else:
-    # For compatibility with old PyTorch versions
-    class Swish(nn.Module):
-        def forward(self, x):
-            return x * torch.sigmoid(x)
 
 
 # A memory-efficient implementation of Swish function
