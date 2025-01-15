@@ -87,25 +87,15 @@ class XceptionEncoder(Xception, EncoderMixin):
         super().load_state_dict(state_dict)
 
 
-pretrained_settings = {
-    "xception": {
-        "imagenet": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/xception-43020ad28.pth",
-            "input_space": "RGB",
-            "input_size": [3, 299, 299],
-            "input_range": [0, 1],
-            "mean": [0.5, 0.5, 0.5],
-            "std": [0.5, 0.5, 0.5],
-            "num_classes": 1000,
-            "scale": 0.8975,  # The resize parameter of the validation transform should be 333, and make sure to center crop at 299x299
-        }
-    }
-}
-
 xception_encoders = {
     "xception": {
         "encoder": XceptionEncoder,
-        "pretrained_settings": pretrained_settings["xception"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/xception-imagenet",
+                "revision": "main",
+            },
+        },
         "params": {"out_channels": [3, 64, 128, 256, 728, 2048]},
     }
 }

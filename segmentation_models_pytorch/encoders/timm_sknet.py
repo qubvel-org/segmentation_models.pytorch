@@ -68,35 +68,15 @@ class SkNetEncoder(ResNet, EncoderMixin):
         super().load_state_dict(state_dict, **kwargs)
 
 
-sknet_weights = {
-    "timm-skresnet18": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-weights/skresnet18_ra-4eec2804.pth"  # noqa
-    },
-    "timm-skresnet34": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-weights/skresnet34_ra-bdc0ccde.pth"  # noqa
-    },
-    "timm-skresnext50_32x4d": {
-        "imagenet": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-weights/skresnext50_ra-f40e40bf.pth"  # noqa
-    },
-}
-
-pretrained_settings = {}
-for model_name, sources in sknet_weights.items():
-    pretrained_settings[model_name] = {}
-    for source_name, source_url in sources.items():
-        pretrained_settings[model_name][source_name] = {
-            "url": source_url,
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        }
-
 timm_sknet_encoders = {
     "timm-skresnet18": {
         "encoder": SkNetEncoder,
-        "pretrained_settings": pretrained_settings["timm-skresnet18"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/timm-skresnet18-imagenet",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [3, 64, 64, 128, 256, 512],
             "block": SelectiveKernelBasic,
@@ -107,7 +87,12 @@ timm_sknet_encoders = {
     },
     "timm-skresnet34": {
         "encoder": SkNetEncoder,
-        "pretrained_settings": pretrained_settings["timm-skresnet34"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/timm-skresnet34-imagenet",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [3, 64, 64, 128, 256, 512],
             "block": SelectiveKernelBasic,
@@ -118,7 +103,12 @@ timm_sknet_encoders = {
     },
     "timm-skresnext50_32x4d": {
         "encoder": SkNetEncoder,
-        "pretrained_settings": pretrained_settings["timm-skresnext50_32x4d"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/timm-skresnext50_32x4d-imagenet",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": SelectiveKernelBottleneck,

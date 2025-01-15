@@ -1,8 +1,10 @@
+import json
 import timm
 import copy
 import warnings
 import functools
-import torch.utils.model_zoo as model_zoo
+from huggingface_hub import hf_hub_download
+from safetensors.torch import load_file
 
 from .resnet import resnet_encoders
 from .dpn import dpn_encoders
@@ -101,15 +103,26 @@ def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **
     encoder = EncoderClass(**params)
 
     if weights is not None:
-        try:
-            settings = encoders[name]["pretrained_settings"][weights]
-        except KeyError:
+        if weights not in encoders[name]["pretrained_settings"]:
+            available_weights = list(encoders[name]["pretrained_settings"].keys())
             raise KeyError(
-                "Wrong pretrained weights `{}` for encoder `{}`. Available options are: {}".format(
-                    weights, name, list(encoders[name]["pretrained_settings"].keys())
-                )
+                f"Wrong pretrained weights `{weights}` for encoder `{name}`. "
+                f"Available options are: {available_weights}"
             )
-        encoder.load_state_dict(model_zoo.load_url(settings["url"]))
+
+        settings = encoders[name]["pretrained_settings"][weights]
+        repo_id = settings["repo_id"]
+        revision = settings["revision"]
+
+        # Load config and model
+        hf_hub_download(repo_id, filename="config.json", revision=revision)
+        model_path = hf_hub_download(
+            repo_id, filename="model.safetensors", revision=revision
+        )
+
+        # Load model weights
+        state_dict = load_file(model_path, device="cpu")
+        encoder.load_state_dict(state_dict)
 
     encoder.set_in_channels(in_channels, pretrained=weights is not None)
     if output_stride != 32:
@@ -136,7 +149,16 @@ def get_preprocessing_params(encoder_name, pretrained="imagenet"):
             raise ValueError(
                 "Available pretrained options {}".format(all_settings.keys())
             )
-        settings = all_settings[pretrained]
+
+        repo_id = all_settings[pretrained]["repo_id"]
+        revision = all_settings[pretrained]["revision"]
+
+        # Load config and model
+        config_path = hf_hub_download(
+            repo_id, filename="config.json", revision=revision
+        )
+        with open(config_path, "r") as f:
+            settings = json.load(f)
 
     formatted_settings = {}
     formatted_settings["input_space"] = settings.get("input_space", "RGB")

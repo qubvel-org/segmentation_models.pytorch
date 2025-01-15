@@ -5,7 +5,7 @@ from typing import List, Dict, Sequence
 from functools import partial
 
 from timm.models.efficientnet import EfficientNet
-from timm.models.efficientnet import decode_arch_def, round_channels, default_cfgs
+from timm.models.efficientnet import decode_arch_def, round_channels
 from timm.layers.activations import Swish
 
 from ._base import EncoderMixin
@@ -220,15 +220,18 @@ timm_efficientnet_encoders = {
     "timm-efficientnet-b0": {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
-            "imagenet": prepare_settings(
-                default_cfgs["tf_efficientnet_b0"].cfgs["in1k"]
-            ),
-            "advprop": prepare_settings(
-                default_cfgs["tf_efficientnet_b0"].cfgs["ap_in1k"]
-            ),
-            "noisy-student": prepare_settings(
-                default_cfgs["tf_efficientnet_b0"].cfgs["ns_jft_in1k"]
-            ),
+            "imagenet": {
+                "repo_id": "smp-hub/timm-efficientnet-b0-imagenet",
+                "revision": "main",
+            },
+            "advprop": {
+                "repo_id": "smp-hub/timm-efficientnet-b0-advprop",
+                "revision": "main",
+            },
+            "noisy-student": {
+                "repo_id": "smp-hub/timm-efficientnet-b0-noisy-student",
+                "revision": "main",
+            },
         },
         "params": {
             "out_channels": [3, 32, 24, 40, 112, 320],
@@ -241,15 +244,18 @@ timm_efficientnet_encoders = {
     "timm-efficientnet-b1": {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
-            "imagenet": prepare_settings(
-                default_cfgs["tf_efficientnet_b1"].cfgs["in1k"]
-            ),
-            "advprop": prepare_settings(
-                default_cfgs["tf_efficientnet_b1"].cfgs["ap_in1k"]
-            ),
-            "noisy-student": prepare_settings(
-                default_cfgs["tf_efficientnet_b1"].cfgs["ns_jft_in1k"]
-            ),
+            "imagenet": {
+                "repo_id": "smp-hub/timm-efficientnet-b1-imagenet",
+                "revision": "main",
+            },
+            "advprop": {
+                "repo_id": "smp-hub/timm-efficientnet-b1-advprop",
+                "revision": "main",
+            },
+            "noisy-student": {
+                "repo_id": "smp-hub/timm-efficientnet-b1-noisy-student",
+                "revision": "main",
+            },
         },
         "params": {
             "out_channels": [3, 32, 24, 40, 112, 320],
@@ -262,15 +268,18 @@ timm_efficientnet_encoders = {
     "timm-efficientnet-b2": {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
-            "imagenet": prepare_settings(
-                default_cfgs["tf_efficientnet_b2"].cfgs["in1k"]
-            ),
-            "advprop": prepare_settings(
-                default_cfgs["tf_efficientnet_b2"].cfgs["ap_in1k"]
-            ),
-            "noisy-student": prepare_settings(
-                default_cfgs["tf_efficientnet_b2"].cfgs["ns_jft_in1k"]
-            ),
+            "imagenet": {
+                "repo_id": "smp-hub/timm-efficientnet-b2-imagenet",
+                "revision": "main",
+            },
+            "advprop": {
+                "repo_id": "smp-hub/timm-efficientnet-b2-advprop",
+                "revision": "main",
+            },
+            "noisy-student": {
+                "repo_id": "smp-hub/timm-efficientnet-b2-noisy-student",
+                "revision": "main",
+            },
         },
         "params": {
             "out_channels": [3, 32, 24, 48, 120, 352],
@@ -283,15 +292,18 @@ timm_efficientnet_encoders = {
     "timm-efficientnet-b3": {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
-            "imagenet": prepare_settings(
-                default_cfgs["tf_efficientnet_b3"].cfgs["in1k"]
-            ),
-            "advprop": prepare_settings(
-                default_cfgs["tf_efficientnet_b3"].cfgs["ap_in1k"]
-            ),
-            "noisy-student": prepare_settings(
-                default_cfgs["tf_efficientnet_b3"].cfgs["ns_jft_in1k"]
-            ),
+            "imagenet": {
+                "repo_id": "smp-hub/timm-efficientnet-b3-imagenet",
+                "revision": "main",
+            },
+            "advprop": {
+                "repo_id": "smp-hub/timm-efficientnet-b3-advprop",
+                "revision": "main",
+            },
+            "noisy-student": {
+                "repo_id": "smp-hub/timm-efficientnet-b3-noisy-student",
+                "revision": "main",
+            },
         },
         "params": {
             "out_channels": [3, 40, 32, 48, 136, 384],
@@ -304,15 +316,18 @@ timm_efficientnet_encoders = {
     "timm-efficientnet-b4": {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
-            "imagenet": prepare_settings(
-                default_cfgs["tf_efficientnet_b4"].cfgs["in1k"]
-            ),
-            "advprop": prepare_settings(
-                default_cfgs["tf_efficientnet_b4"].cfgs["ap_in1k"]
-            ),
-            "noisy-student": prepare_settings(
-                default_cfgs["tf_efficientnet_b4"].cfgs["ns_jft_in1k"]
-            ),
+            "imagenet": {
+                "repo_id": "smp-hub/timm-efficientnet-b4-imagenet",
+                "revision": "main",
+            },
+            "advprop": {
+                "repo_id": "smp-hub/timm-efficientnet-b4-advprop",
+                "revision": "main",
+            },
+            "noisy-student": {
+                "repo_id": "smp-hub/timm-efficientnet-b4-noisy-student",
+                "revision": "main",
+            },
         },
         "params": {
             "out_channels": [3, 48, 32, 56, 160, 448],
@@ -325,15 +340,18 @@ timm_efficientnet_encoders = {
     "timm-efficientnet-b5": {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
-            "imagenet": prepare_settings(
-                default_cfgs["tf_efficientnet_b5"].cfgs["in1k"]
-            ),
-            "advprop": prepare_settings(
-                default_cfgs["tf_efficientnet_b5"].cfgs["ap_in1k"]
-            ),
-            "noisy-student": prepare_settings(
-                default_cfgs["tf_efficientnet_b5"].cfgs["ns_jft_in1k"]
-            ),
+            "imagenet": {
+                "repo_id": "smp-hub/timm-efficientnet-b5-imagenet",
+                "revision": "main",
+            },
+            "advprop": {
+                "repo_id": "smp-hub/timm-efficientnet-b5-advprop",
+                "revision": "main",
+            },
+            "noisy-student": {
+                "repo_id": "smp-hub/timm-efficientnet-b5-noisy-student",
+                "revision": "main",
+            },
         },
         "params": {
             "out_channels": [3, 48, 40, 64, 176, 512],
@@ -346,15 +364,18 @@ timm_efficientnet_encoders = {
     "timm-efficientnet-b6": {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
-            "imagenet": prepare_settings(
-                default_cfgs["tf_efficientnet_b6"].cfgs["aa_in1k"]
-            ),
-            "advprop": prepare_settings(
-                default_cfgs["tf_efficientnet_b6"].cfgs["ap_in1k"]
-            ),
-            "noisy-student": prepare_settings(
-                default_cfgs["tf_efficientnet_b6"].cfgs["ns_jft_in1k"]
-            ),
+            "imagenet": {
+                "repo_id": "smp-hub/timm-efficientnet-b6-imagenet",
+                "revision": "main",
+            },
+            "advprop": {
+                "repo_id": "smp-hub/timm-efficientnet-b6-advprop",
+                "revision": "main",
+            },
+            "noisy-student": {
+                "repo_id": "smp-hub/timm-efficientnet-b6-noisy-student",
+                "revision": "main",
+            },
         },
         "params": {
             "out_channels": [3, 56, 40, 72, 200, 576],
@@ -367,15 +388,18 @@ timm_efficientnet_encoders = {
     "timm-efficientnet-b7": {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
-            "imagenet": prepare_settings(
-                default_cfgs["tf_efficientnet_b7"].cfgs["aa_in1k"]
-            ),
-            "advprop": prepare_settings(
-                default_cfgs["tf_efficientnet_b7"].cfgs["ap_in1k"]
-            ),
-            "noisy-student": prepare_settings(
-                default_cfgs["tf_efficientnet_b7"].cfgs["ns_jft_in1k"]
-            ),
+            "imagenet": {
+                "repo_id": "smp-hub/timm-efficientnet-b7-imagenet",
+                "revision": "main",
+            },
+            "advprop": {
+                "repo_id": "smp-hub/timm-efficientnet-b7-advprop",
+                "revision": "main",
+            },
+            "noisy-student": {
+                "repo_id": "smp-hub/timm-efficientnet-b7-noisy-student",
+                "revision": "main",
+            },
         },
         "params": {
             "out_channels": [3, 64, 48, 80, 224, 640],
@@ -388,12 +412,14 @@ timm_efficientnet_encoders = {
     "timm-efficientnet-b8": {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
-            "imagenet": prepare_settings(
-                default_cfgs["tf_efficientnet_b8"].cfgs["ra_in1k"]
-            ),
-            "advprop": prepare_settings(
-                default_cfgs["tf_efficientnet_b8"].cfgs["ap_in1k"]
-            ),
+            "imagenet": {
+                "repo_id": "smp-hub/timm-efficientnet-b8-imagenet",
+                "revision": "main",
+            },
+            "advprop": {
+                "repo_id": "smp-hub/timm-efficientnet-b8-advprop",
+                "revision": "main",
+            },
         },
         "params": {
             "out_channels": [3, 72, 56, 88, 248, 704],
@@ -406,12 +432,14 @@ timm_efficientnet_encoders = {
     "timm-efficientnet-l2": {
         "encoder": EfficientNetEncoder,
         "pretrained_settings": {
-            "noisy-student": prepare_settings(
-                default_cfgs["tf_efficientnet_l2"].cfgs["ns_jft_in1k"]
-            ),
-            "noisy-student-475": prepare_settings(
-                default_cfgs["tf_efficientnet_l2"].cfgs["ns_jft_in1k_475"]
-            ),
+            "noisy-student": {
+                "repo_id": "smp-hub/timm-efficientnet-l2-noisy-student",
+                "revision": "main",
+            },
+            "noisy-student-475": {
+                "repo_id": "smp-hub/timm-efficientnet-l2-noisy-student-475",
+                "revision": "main",
+            },
         },
         "params": {
             "out_channels": [3, 136, 104, 176, 480, 1376],
@@ -424,9 +452,10 @@ timm_efficientnet_encoders = {
     "timm-tf_efficientnet_lite0": {
         "encoder": EfficientNetLiteEncoder,
         "pretrained_settings": {
-            "imagenet": prepare_settings(
-                default_cfgs["tf_efficientnet_lite0"].cfgs["in1k"]
-            )
+            "imagenet": {
+                "repo_id": "smp-hub/timm-tf_efficientnet_lite0-imagenet",
+                "revision": "main",
+            },
         },
         "params": {
             "out_channels": [3, 32, 24, 40, 112, 320],
@@ -439,9 +468,10 @@ timm_efficientnet_encoders = {
     "timm-tf_efficientnet_lite1": {
         "encoder": EfficientNetLiteEncoder,
         "pretrained_settings": {
-            "imagenet": prepare_settings(
-                default_cfgs["tf_efficientnet_lite1"].cfgs["in1k"]
-            )
+            "imagenet": {
+                "repo_id": "smp-hub/timm-tf_efficientnet_lite1-imagenet",
+                "revision": "main",
+            },
         },
         "params": {
             "out_channels": [3, 32, 24, 40, 112, 320],
@@ -454,9 +484,10 @@ timm_efficientnet_encoders = {
     "timm-tf_efficientnet_lite2": {
         "encoder": EfficientNetLiteEncoder,
         "pretrained_settings": {
-            "imagenet": prepare_settings(
-                default_cfgs["tf_efficientnet_lite2"].cfgs["in1k"]
-            )
+            "imagenet": {
+                "repo_id": "smp-hub/timm-tf_efficientnet_lite2-imagenet",
+                "revision": "main",
+            },
         },
         "params": {
             "out_channels": [3, 32, 24, 48, 120, 352],
@@ -469,9 +500,10 @@ timm_efficientnet_encoders = {
     "timm-tf_efficientnet_lite3": {
         "encoder": EfficientNetLiteEncoder,
         "pretrained_settings": {
-            "imagenet": prepare_settings(
-                default_cfgs["tf_efficientnet_lite3"].cfgs["in1k"]
-            )
+            "imagenet": {
+                "repo_id": "smp-hub/timm-tf_efficientnet_lite3-imagenet",
+                "revision": "main",
+            },
         },
         "params": {
             "out_channels": [3, 32, 32, 48, 136, 384],
@@ -484,9 +516,10 @@ timm_efficientnet_encoders = {
     "timm-tf_efficientnet_lite4": {
         "encoder": EfficientNetLiteEncoder,
         "pretrained_settings": {
-            "imagenet": prepare_settings(
-                default_cfgs["tf_efficientnet_lite4"].cfgs["in1k"]
-            )
+            "imagenet": {
+                "repo_id": "smp-hub/timm-tf_efficientnet_lite4-imagenet",
+                "revision": "main",
+            },
         },
         "params": {
             "out_channels": [3, 32, 32, 56, 160, 448],

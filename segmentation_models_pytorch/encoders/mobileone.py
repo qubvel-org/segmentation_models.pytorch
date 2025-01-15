@@ -493,11 +493,8 @@ mobileone_encoders = {
         "encoder": MobileOne,
         "pretrained_settings": {
             "imagenet": {
-                "mean": [0.485, 0.456, 0.406],
-                "std": [0.229, 0.224, 0.225],
-                "url": "https://docs-assets.developer.apple.com/ml-research/datasets/mobileone/mobileone_s0_unfused.pth.tar",  # noqa
-                "input_space": "RGB",
-                "input_range": [0, 1],
+                "repo_id": "smp-hub/mobileone_s0-imagenet",
+                "revision": "main",
             }
         },
         "params": {
@@ -511,11 +508,8 @@ mobileone_encoders = {
         "encoder": MobileOne,
         "pretrained_settings": {
             "imagenet": {
-                "mean": [0.485, 0.456, 0.406],
-                "std": [0.229, 0.224, 0.225],
-                "url": "https://docs-assets.developer.apple.com/ml-research/datasets/mobileone/mobileone_s1_unfused.pth.tar",  # noqa
-                "input_space": "RGB",
-                "input_range": [0, 1],
+                "repo_id": "smp-hub/mobileone_s1-imagenet",
+                "revision": "main",
             }
         },
         "params": {
@@ -528,11 +522,8 @@ mobileone_encoders = {
         "encoder": MobileOne,
         "pretrained_settings": {
             "imagenet": {
-                "mean": [0.485, 0.456, 0.406],
-                "std": [0.229, 0.224, 0.225],
-                "url": "https://docs-assets.developer.apple.com/ml-research/datasets/mobileone/mobileone_s2_unfused.pth.tar",  # noqa
-                "input_space": "RGB",
-                "input_range": [0, 1],
+                "repo_id": "smp-hub/mobileone_s2-imagenet",
+                "revision": "main",
             }
         },
         "params": {
@@ -545,11 +536,8 @@ mobileone_encoders = {
         "encoder": MobileOne,
         "pretrained_settings": {
             "imagenet": {
-                "mean": [0.485, 0.456, 0.406],
-                "std": [0.229, 0.224, 0.225],
-                "url": "https://docs-assets.developer.apple.com/ml-research/datasets/mobileone/mobileone_s3_unfused.pth.tar",  # noqa
-                "input_space": "RGB",
-                "input_range": [0, 1],
+                "repo_id": "smp-hub/mobileone_s3-imagenet",
+                "revision": "main",
             }
         },
         "params": {
@@ -562,11 +550,8 @@ mobileone_encoders = {
         "encoder": MobileOne,
         "pretrained_settings": {
             "imagenet": {
-                "mean": [0.485, 0.456, 0.406],
-                "std": [0.229, 0.224, 0.225],
-                "url": "https://docs-assets.developer.apple.com/ml-research/datasets/mobileone/mobileone_s4_unfused.pth.tar",  # noqa
-                "input_space": "RGB",
-                "input_range": [0, 1],
+                "repo_id": "smp-hub/mobileone_s4-imagenet",
+                "revision": "main",
             }
         },
         "params": {

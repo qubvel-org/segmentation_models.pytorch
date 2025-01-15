@@ -101,79 +101,15 @@ class DPNEncoder(DPN, EncoderMixin):
         super().load_state_dict(state_dict, **kwargs)
 
 
-pretrained_settings = {
-    "dpn68": {
-        "imagenet": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/dpn68-4af7d88d2.pth",
-            "input_space": "RGB",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [124 / 255, 117 / 255, 104 / 255],
-            "std": [1 / (0.0167 * 255)] * 3,
-            "num_classes": 1000,
-        }
-    },
-    "dpn68b": {
-        "imagenet+5k": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/dpn68b_extra-363ab9c19.pth",
-            "input_space": "RGB",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [124 / 255, 117 / 255, 104 / 255],
-            "std": [1 / (0.0167 * 255)] * 3,
-            "num_classes": 1000,
-        }
-    },
-    "dpn92": {
-        "imagenet+5k": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/dpn92_extra-fda993c95.pth",
-            "input_space": "RGB",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [124 / 255, 117 / 255, 104 / 255],
-            "std": [1 / (0.0167 * 255)] * 3,
-            "num_classes": 1000,
-        }
-    },
-    "dpn98": {
-        "imagenet": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/dpn98-722954780.pth",
-            "input_space": "RGB",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [124 / 255, 117 / 255, 104 / 255],
-            "std": [1 / (0.0167 * 255)] * 3,
-            "num_classes": 1000,
-        }
-    },
-    "dpn131": {
-        "imagenet": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/dpn131-7af84be88.pth",
-            "input_space": "RGB",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [124 / 255, 117 / 255, 104 / 255],
-            "std": [1 / (0.0167 * 255)] * 3,
-            "num_classes": 1000,
-        }
-    },
-    "dpn107": {
-        "imagenet+5k": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/dpn107_extra-b7f9f4cc9.pth",
-            "input_space": "RGB",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [124 / 255, 117 / 255, 104 / 255],
-            "std": [1 / (0.0167 * 255)] * 3,
-            "num_classes": 1000,
-        }
-    },
-}
-
 dpn_encoders = {
     "dpn68": {
         "encoder": DPNEncoder,
-        "pretrained_settings": pretrained_settings["dpn68"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/dpn68-imagenet",
+                "revision": "main",
+            }
+        },
         "params": {
             "stage_idxs": [4, 8, 20, 24],
             "out_channels": [3, 10, 144, 320, 704, 832],
@@ -189,7 +125,12 @@ dpn_encoders = {
     },
     "dpn68b": {
         "encoder": DPNEncoder,
-        "pretrained_settings": pretrained_settings["dpn68b"],
+        "pretrained_settings": {
+            "imagenet+5k": {
+                "repo_id": "smp-hub/dpn68b-imagenet-5k",
+                "revision": "main",
+            }
+        },
         "params": {
             "stage_idxs": [4, 8, 20, 24],
             "out_channels": [3, 10, 144, 320, 704, 832],
@@ -206,7 +147,12 @@ dpn_encoders = {
     },
     "dpn92": {
         "encoder": DPNEncoder,
-        "pretrained_settings": pretrained_settings["dpn92"],
+        "pretrained_settings": {
+            "imagenet+5k": {
+                "repo_id": "smp-hub/dpn92-imagenet-5k",
+                "revision": "main",
+            }
+        },
         "params": {
             "stage_idxs": [4, 8, 28, 32],
             "out_channels": [3, 64, 336, 704, 1552, 2688],
@@ -221,7 +167,12 @@ dpn_encoders = {
     },
     "dpn98": {
         "encoder": DPNEncoder,
-        "pretrained_settings": pretrained_settings["dpn98"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/dpn98-imagenet",
+                "revision": "main",
+            }
+        },
         "params": {
             "stage_idxs": [4, 10, 30, 34],
             "out_channels": [3, 96, 336, 768, 1728, 2688],
@@ -236,7 +187,12 @@ dpn_encoders = {
     },
     "dpn107": {
         "encoder": DPNEncoder,
-        "pretrained_settings": pretrained_settings["dpn107"],
+        "pretrained_settings": {
+            "imagenet+5k": {
+                "repo_id": "smp-hub/dpn107-imagenet-5k",
+                "revision": "main",
+            }
+        },
         "params": {
             "stage_idxs": [5, 13, 33, 37],
             "out_channels": [3, 128, 376, 1152, 2432, 2688],
@@ -251,7 +207,12 @@ dpn_encoders = {
     },
     "dpn131": {
         "encoder": DPNEncoder,
-        "pretrained_settings": pretrained_settings["dpn131"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/dpn131-imagenet",
+                "revision": "main",
+            }
+        },
         "params": {
             "stage_idxs": [5, 13, 41, 45],
             "out_channels": [3, 128, 352, 832, 1984, 2688],

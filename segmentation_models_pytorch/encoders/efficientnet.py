@@ -27,7 +27,7 @@ import torch
 from typing import List, Dict, Sequence
 
 from efficientnet_pytorch import EfficientNet
-from efficientnet_pytorch.utils import url_map, url_map_advprop, get_model_params
+from efficientnet_pytorch.utils import get_model_params
 
 from ._base import EncoderMixin
 
@@ -109,30 +109,19 @@ class EfficientNetEncoder(EfficientNet, EncoderMixin):
         super().load_state_dict(state_dict, **kwargs)
 
 
-def _get_pretrained_settings(encoder):
-    pretrained_settings = {
-        "imagenet": {
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "url": url_map[encoder],
-            "input_space": "RGB",
-            "input_range": [0, 1],
-        },
-        "advprop": {
-            "mean": [0.5, 0.5, 0.5],
-            "std": [0.5, 0.5, 0.5],
-            "url": url_map_advprop[encoder],
-            "input_space": "RGB",
-            "input_range": [0, 1],
-        },
-    }
-    return pretrained_settings
-
-
 efficient_net_encoders = {
     "efficientnet-b0": {
         "encoder": EfficientNetEncoder,
-        "pretrained_settings": _get_pretrained_settings("efficientnet-b0"),
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/efficientnet-b0-imagenet",
+                "revision": "main",
+            },
+            "advprop": {
+                "repo_id": "smp-hub/efficientnet-b0-advprop",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [3, 32, 24, 40, 112, 320],
             "stage_idxs": [3, 5, 9, 16],
@@ -141,7 +130,16 @@ efficient_net_encoders = {
     },
     "efficientnet-b1": {
         "encoder": EfficientNetEncoder,
-        "pretrained_settings": _get_pretrained_settings("efficientnet-b1"),
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/efficientnet-b1-imagenet",
+                "revision": "main",
+            },
+            "advprop": {
+                "repo_id": "smp-hub/efficientnet-b1-advprop",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [3, 32, 24, 40, 112, 320],
             "stage_idxs": [5, 8, 16, 23],
@@ -150,7 +148,16 @@ efficient_net_encoders = {
     },
     "efficientnet-b2": {
         "encoder": EfficientNetEncoder,
-        "pretrained_settings": _get_pretrained_settings("efficientnet-b2"),
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/efficientnet-b2-imagenet",
+                "revision": "main",
+            },
+            "advprop": {
+                "repo_id": "smp-hub/efficientnet-b2-advprop",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [3, 32, 24, 48, 120, 352],
             "stage_idxs": [5, 8, 16, 23],
@@ -159,7 +166,16 @@ efficient_net_encoders = {
     },
     "efficientnet-b3": {
         "encoder": EfficientNetEncoder,
-        "pretrained_settings": _get_pretrained_settings("efficientnet-b3"),
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/efficientnet-b3-imagenet",
+                "revision": "main",
+            },
+            "advprop": {
+                "repo_id": "smp-hub/efficientnet-b3-advprop",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [3, 40, 32, 48, 136, 384],
             "stage_idxs": [5, 8, 18, 26],
@@ -168,7 +184,16 @@ efficient_net_encoders = {
     },
     "efficientnet-b4": {
         "encoder": EfficientNetEncoder,
-        "pretrained_settings": _get_pretrained_settings("efficientnet-b4"),
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/efficientnet-b4-imagenet",
+                "revision": "main",
+            },
+            "advprop": {
+                "repo_id": "smp-hub/efficientnet-b4-advprop",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [3, 48, 32, 56, 160, 448],
             "stage_idxs": [6, 10, 22, 32],
@@ -177,7 +202,16 @@ efficient_net_encoders = {
     },
     "efficientnet-b5": {
         "encoder": EfficientNetEncoder,
-        "pretrained_settings": _get_pretrained_settings("efficientnet-b5"),
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/efficientnet-b5-imagenet",
+                "revision": "main",
+            },
+            "advprop": {
+                "repo_id": "smp-hub/efficientnet-b5-advprop",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [3, 48, 40, 64, 176, 512],
             "stage_idxs": [8, 13, 27, 39],
@@ -186,7 +220,16 @@ efficient_net_encoders = {
     },
     "efficientnet-b6": {
         "encoder": EfficientNetEncoder,
-        "pretrained_settings": _get_pretrained_settings("efficientnet-b6"),
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/efficientnet-b6-imagenet",
+                "revision": "main",
+            },
+            "advprop": {
+                "repo_id": "smp-hub/efficientnet-b6-advprop",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [3, 56, 40, 72, 200, 576],
             "stage_idxs": [9, 15, 31, 45],
@@ -195,7 +238,16 @@ efficient_net_encoders = {
     },
     "efficientnet-b7": {
         "encoder": EfficientNetEncoder,
-        "pretrained_settings": _get_pretrained_settings("efficientnet-b7"),
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/efficientnet-b7-imagenet",
+                "revision": "main",
+            },
+            "advprop": {
+                "repo_id": "smp-hub/efficientnet-b7-advprop",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [3, 64, 48, 80, 224, 640],
             "stage_idxs": [11, 18, 38, 55],

@@ -172,7 +172,12 @@ pretrained_settings = {
 senet_encoders = {
     "senet154": {
         "encoder": SENetEncoder,
-        "pretrained_settings": pretrained_settings["senet154"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/senet154-imagenet",
+                "revision": "main",
+            }
+        },
         "params": {
             "out_channels": [3, 128, 256, 512, 1024, 2048],
             "block": SEBottleneck,
@@ -185,7 +190,12 @@ senet_encoders = {
     },
     "se_resnet50": {
         "encoder": SENetEncoder,
-        "pretrained_settings": pretrained_settings["se_resnet50"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/se_resnet50-imagenet",
+                "revision": "main",
+            }
+        },
         "params": {
             "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": SEResNetBottleneck,
@@ -202,7 +212,12 @@ senet_encoders = {
     },
     "se_resnet101": {
         "encoder": SENetEncoder,
-        "pretrained_settings": pretrained_settings["se_resnet101"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/se_resnet101-imagenet",
+                "revision": "main",
+            }
+        },
         "params": {
             "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": SEResNetBottleneck,
@@ -219,7 +234,12 @@ senet_encoders = {
     },
     "se_resnet152": {
         "encoder": SENetEncoder,
-        "pretrained_settings": pretrained_settings["se_resnet152"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/se_resnet152-imagenet",
+                "revision": "main",
+            }
+        },
         "params": {
             "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": SEResNetBottleneck,
@@ -236,7 +256,12 @@ senet_encoders = {
     },
     "se_resnext50_32x4d": {
         "encoder": SENetEncoder,
-        "pretrained_settings": pretrained_settings["se_resnext50_32x4d"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/se_resnext50_32x4d-imagenet",
+                "revision": "main",
+            }
+        },
         "params": {
             "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": SEResNeXtBottleneck,
@@ -253,7 +278,12 @@ senet_encoders = {
     },
     "se_resnext101_32x4d": {
         "encoder": SENetEncoder,
-        "pretrained_settings": pretrained_settings["se_resnext101_32x4d"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/se_resnext101_32x4d-imagenet",
+                "revision": "main",
+            }
+        },
         "params": {
             "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": SEResNeXtBottleneck,

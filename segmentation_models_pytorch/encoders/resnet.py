@@ -92,224 +92,23 @@ class ResNetEncoder(ResNet, EncoderMixin):
         super().load_state_dict(state_dict, **kwargs)
 
 
-pretrained_settings = {
-    "resnet18": {
-        "imagenet": {
-            "url": "https://download.pytorch.org/models/resnet18-5c106cde.pth",
-            "input_space": "RGB",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        },
-        "ssl": {
-            "url": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_supervised_resnet18-d92f0530.pth",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        },
-        "swsl": {
-            "url": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_weakly_supervised_resnet18-118f1556.pth",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        },
-    },
-    "resnet34": {
-        "imagenet": {
-            "url": "https://download.pytorch.org/models/resnet34-333f7ec4.pth",
-            "input_space": "RGB",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        }
-    },
-    "resnet50": {
-        "imagenet": {
-            "url": "https://download.pytorch.org/models/resnet50-19c8e357.pth",
-            "input_space": "RGB",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        },
-        "ssl": {
-            "url": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_supervised_resnet50-08389792.pth",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        },
-        "swsl": {
-            "url": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_weakly_supervised_resnet50-16a12f1b.pth",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        },
-    },
-    "resnet101": {
-        "imagenet": {
-            "url": "https://download.pytorch.org/models/resnet101-5d3b4d8f.pth",
-            "input_space": "RGB",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        }
-    },
-    "resnet152": {
-        "imagenet": {
-            "url": "https://download.pytorch.org/models/resnet152-b121ed2d.pth",
-            "input_space": "RGB",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        }
-    },
-    "resnext50_32x4d": {
-        "imagenet": {
-            "url": "https://download.pytorch.org/models/resnext50_32x4d-7cdf4587.pth",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        },
-        "ssl": {
-            "url": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_supervised_resnext50_32x4-ddb3e555.pth",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        },
-        "swsl": {
-            "url": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_weakly_supervised_resnext50_32x4-72679e44.pth",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        },
-    },
-    "resnext101_32x4d": {
-        "ssl": {
-            "url": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_supervised_resnext101_32x4-dc43570a.pth",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        },
-        "swsl": {
-            "url": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_weakly_supervised_resnext101_32x4-3f87e46b.pth",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        },
-    },
-    "resnext101_32x8d": {
-        "imagenet": {
-            "url": "https://download.pytorch.org/models/resnext101_32x8d-8ba56ff5.pth",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        },
-        "instagram": {
-            "url": "https://download.pytorch.org/models/ig_resnext101_32x8-c38310e5.pth",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        },
-        "ssl": {
-            "url": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_supervised_resnext101_32x8-2cfe2f8b.pth",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        },
-        "swsl": {
-            "url": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_weakly_supervised_resnext101_32x8-b4712904.pth",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        },
-    },
-    "resnext101_32x16d": {
-        "instagram": {
-            "url": "https://download.pytorch.org/models/ig_resnext101_32x16-c6f796b0.pth",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        },
-        "ssl": {
-            "url": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_supervised_resnext101_32x16-15fffa57.pth",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        },
-        "swsl": {
-            "url": "https://dl.fbaipublicfiles.com/semiweaksupervision/model_files/semi_weakly_supervised_resnext101_32x16-f3559a9c.pth",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        },
-    },
-    "resnext101_32x32d": {
-        "instagram": {
-            "url": "https://download.pytorch.org/models/ig_resnext101_32x32-e4b90b00.pth",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        }
-    },
-    "resnext101_32x48d": {
-        "instagram": {
-            "url": "https://download.pytorch.org/models/ig_resnext101_32x48-3e41cc8a.pth",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        }
-    },
-}
-
 resnet_encoders = {
     "resnet18": {
         "encoder": ResNetEncoder,
-        "pretrained_settings": pretrained_settings["resnet18"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/resnet18-imagenet",
+                "revision": "main",
+            },
+            "ssl": {
+                "repo_id": "smp-hub/resnet18-ssl",
+                "revision": "main",
+            },
+            "swsl": {
+                "repo_id": "smp-hub/resnet18-swsl",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [3, 64, 64, 128, 256, 512],
             "block": BasicBlock,
@@ -318,7 +117,12 @@ resnet_encoders = {
     },
     "resnet34": {
         "encoder": ResNetEncoder,
-        "pretrained_settings": pretrained_settings["resnet34"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/resnet34-imagenet",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [3, 64, 64, 128, 256, 512],
             "block": BasicBlock,
@@ -327,7 +131,20 @@ resnet_encoders = {
     },
     "resnet50": {
         "encoder": ResNetEncoder,
-        "pretrained_settings": pretrained_settings["resnet50"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/resnet50-imagenet",
+                "revision": "main",
+            },
+            "ssl": {
+                "repo_id": "smp-hub/resnet50-ssl",
+                "revision": "main",
+            },
+            "swsl": {
+                "repo_id": "smp-hub/resnet50-swsl",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": Bottleneck,
@@ -336,7 +153,12 @@ resnet_encoders = {
     },
     "resnet101": {
         "encoder": ResNetEncoder,
-        "pretrained_settings": pretrained_settings["resnet101"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/resnet101-imagenet",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": Bottleneck,
@@ -345,7 +167,12 @@ resnet_encoders = {
     },
     "resnet152": {
         "encoder": ResNetEncoder,
-        "pretrained_settings": pretrained_settings["resnet152"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/resnet152-imagenet",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": Bottleneck,
@@ -354,7 +181,20 @@ resnet_encoders = {
     },
     "resnext50_32x4d": {
         "encoder": ResNetEncoder,
-        "pretrained_settings": pretrained_settings["resnext50_32x4d"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/resnext50_32x4d-imagenet",
+                "revision": "main",
+            },
+            "ssl": {
+                "repo_id": "smp-hub/resnext50_32x4d-ssl",
+                "revision": "main",
+            },
+            "swsl": {
+                "repo_id": "smp-hub/resnext50_32x4d-swsl",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": Bottleneck,
@@ -365,7 +205,16 @@ resnet_encoders = {
     },
     "resnext101_32x4d": {
         "encoder": ResNetEncoder,
-        "pretrained_settings": pretrained_settings["resnext101_32x4d"],
+        "pretrained_settings": {
+            "ssl": {
+                "repo_id": "smp-hub/resnext101_32x4d-ssl",
+                "revision": "main",
+            },
+            "swsl": {
+                "repo_id": "smp-hub/resnext101_32x4d-swsl",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": Bottleneck,
@@ -376,7 +225,24 @@ resnet_encoders = {
     },
     "resnext101_32x8d": {
         "encoder": ResNetEncoder,
-        "pretrained_settings": pretrained_settings["resnext101_32x8d"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/resnext101_32x8d-imagenet",
+                "revision": "main",
+            },
+            "instagram": {
+                "repo_id": "smp-hub/resnext101_32x8d-instagram",
+                "revision": "main",
+            },
+            "ssl": {
+                "repo_id": "smp-hub/resnext101_32x8d-ssl",
+                "revision": "main",
+            },
+            "swsl": {
+                "repo_id": "smp-hub/resnext101_32x8d-swsl",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": Bottleneck,
@@ -387,7 +253,20 @@ resnet_encoders = {
     },
     "resnext101_32x16d": {
         "encoder": ResNetEncoder,
-        "pretrained_settings": pretrained_settings["resnext101_32x16d"],
+        "pretrained_settings": {
+            "instagram": {
+                "repo_id": "smp-hub/resnext101_32x16d-instagram",
+                "revision": "main",
+            },
+            "ssl": {
+                "repo_id": "smp-hub/resnext101_32x16d-ssl",
+                "revision": "main",
+            },
+            "swsl": {
+                "repo_id": "smp-hub/resnext101_32x16d-swsl",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": Bottleneck,
@@ -398,7 +277,12 @@ resnet_encoders = {
     },
     "resnext101_32x32d": {
         "encoder": ResNetEncoder,
-        "pretrained_settings": pretrained_settings["resnext101_32x32d"],
+        "pretrained_settings": {
+            "instagram": {
+                "repo_id": "smp-hub/resnext101_32x32d-instagram",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": Bottleneck,
@@ -409,7 +293,12 @@ resnet_encoders = {
     },
     "resnext101_32x48d": {
         "encoder": ResNetEncoder,
-        "pretrained_settings": pretrained_settings["resnext101_32x48d"],
+        "pretrained_settings": {
+            "instagram": {
+                "repo_id": "smp-hub/resnext101_32x48d-instagram",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": Bottleneck,

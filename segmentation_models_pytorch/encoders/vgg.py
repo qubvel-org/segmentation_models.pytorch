@@ -200,7 +200,12 @@ pretrained_settings = {
 vgg_encoders = {
     "vgg11": {
         "encoder": VGGEncoder,
-        "pretrained_settings": pretrained_settings["vgg11"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/vgg11-imagenet",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [64, 128, 256, 512, 512, 512],
             "config": cfg["A"],
@@ -209,7 +214,12 @@ vgg_encoders = {
     },
     "vgg11_bn": {
         "encoder": VGGEncoder,
-        "pretrained_settings": pretrained_settings["vgg11_bn"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/vgg11_bn-imagenet",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [64, 128, 256, 512, 512, 512],
             "config": cfg["A"],
@@ -218,7 +228,12 @@ vgg_encoders = {
     },
     "vgg13": {
         "encoder": VGGEncoder,
-        "pretrained_settings": pretrained_settings["vgg13"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/vgg13-imagenet",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [64, 128, 256, 512, 512, 512],
             "config": cfg["B"],
@@ -227,7 +242,12 @@ vgg_encoders = {
     },
     "vgg13_bn": {
         "encoder": VGGEncoder,
-        "pretrained_settings": pretrained_settings["vgg13_bn"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/vgg13_bn-imagenet",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [64, 128, 256, 512, 512, 512],
             "config": cfg["B"],
@@ -236,7 +256,12 @@ vgg_encoders = {
     },
     "vgg16": {
         "encoder": VGGEncoder,
-        "pretrained_settings": pretrained_settings["vgg16"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/vgg16-imagenet",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [64, 128, 256, 512, 512, 512],
             "config": cfg["D"],
@@ -245,7 +270,12 @@ vgg_encoders = {
     },
     "vgg16_bn": {
         "encoder": VGGEncoder,
-        "pretrained_settings": pretrained_settings["vgg16_bn"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/vgg16_bn-imagenet",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [64, 128, 256, 512, 512, 512],
             "config": cfg["D"],
@@ -254,7 +284,12 @@ vgg_encoders = {
     },
     "vgg19": {
         "encoder": VGGEncoder,
-        "pretrained_settings": pretrained_settings["vgg19"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/vgg19-imagenet",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [64, 128, 256, 512, 512, 512],
             "config": cfg["E"],
@@ -263,7 +298,12 @@ vgg_encoders = {
     },
     "vgg19_bn": {
         "encoder": VGGEncoder,
-        "pretrained_settings": pretrained_settings["vgg19_bn"],
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/vgg19_bn-imagenet",
+                "revision": "main",
+            },
+        },
         "params": {
             "out_channels": [64, 128, 256, 512, 512, 512],
             "config": cfg["E"],

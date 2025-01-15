@@ -591,21 +591,15 @@ class MixVisionTransformerEncoder(MixVisionTransformer, EncoderMixin):
         return super().load_state_dict(state_dict)
 
 
-def get_pretrained_cfg(name):
-    return {
-        "url": f"https://github.com/qubvel/segmentation_models.pytorch/releases/download/v0.0.2/{name}.pth",
-        "input_space": "RGB",
-        "input_size": [3, 224, 224],
-        "input_range": [0, 1],
-        "mean": [0.485, 0.456, 0.406],
-        "std": [0.229, 0.224, 0.225],
-    }
-
-
 mix_transformer_encoders = {
     "mit_b0": {
         "encoder": MixVisionTransformerEncoder,
-        "pretrained_settings": {"imagenet": get_pretrained_cfg("mit_b0")},
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/mit_b0-imagenet",
+                "revision": "main",
+            }
+        },
         "params": {
             "out_channels": [3, 0, 32, 64, 160, 256],
             "patch_size": 4,
@@ -622,7 +616,12 @@ mix_transformer_encoders = {
     },
     "mit_b1": {
         "encoder": MixVisionTransformerEncoder,
-        "pretrained_settings": {"imagenet": get_pretrained_cfg("mit_b1")},
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/mit_b1-imagenet",
+                "revision": "main",
+            }
+        },
         "params": {
             "out_channels": [3, 0, 64, 128, 320, 512],
             "patch_size": 4,
@@ -639,7 +638,12 @@ mix_transformer_encoders = {
     },
     "mit_b2": {
         "encoder": MixVisionTransformerEncoder,
-        "pretrained_settings": {"imagenet": get_pretrained_cfg("mit_b2")},
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/mit_b2-imagenet",
+                "revision": "main",
+            }
+        },
         "params": {
             "out_channels": [3, 0, 64, 128, 320, 512],
             "patch_size": 4,
@@ -656,7 +660,12 @@ mix_transformer_encoders = {
     },
     "mit_b3": {
         "encoder": MixVisionTransformerEncoder,
-        "pretrained_settings": {"imagenet": get_pretrained_cfg("mit_b3")},
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/mit_b3-imagenet",
+                "revision": "main",
+            }
+        },
         "params": {
             "out_channels": [3, 0, 64, 128, 320, 512],
             "patch_size": 4,
@@ -673,7 +682,12 @@ mix_transformer_encoders = {
     },
     "mit_b4": {
         "encoder": MixVisionTransformerEncoder,
-        "pretrained_settings": {"imagenet": get_pretrained_cfg("mit_b4")},
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/mit_b4-imagenet",
+                "revision": "main",
+            }
+        },
         "params": {
             "out_channels": [3, 0, 64, 128, 320, 512],
             "patch_size": 4,
@@ -690,7 +704,12 @@ mix_transformer_encoders = {
     },
     "mit_b5": {
         "encoder": MixVisionTransformerEncoder,
-        "pretrained_settings": {"imagenet": get_pretrained_cfg("mit_b5")},
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/mit_b5-imagenet",
+                "revision": "main",
+            }
+        },
         "params": {
             "out_channels": [3, 0, 64, 128, 320, 512],
             "patch_size": 4,
