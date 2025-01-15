@@ -67,7 +67,7 @@ def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **
         warnings.warn(
             "`timm-` encoders are deprecated and will be removed in the future. "
             "Please use `tu-` equivalent encoders instead (see 'Timm encoders' section in the documentation).",
-            DeprecationWarning
+            DeprecationWarning,
         )
 
     # convert timm- models to tu- models
