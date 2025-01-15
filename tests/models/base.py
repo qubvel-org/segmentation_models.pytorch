@@ -232,7 +232,9 @@ class BaseModelTester(unittest.TestCase):
         model = model.eval().to(default_device)
 
         torch.compiler.reset()
-        compiled_model = torch.compile(model, fullgraph=True, dynamic=True, backend="eager")
+        compiled_model = torch.compile(
+            model, fullgraph=True, dynamic=True, backend="eager"
+        )
 
         with torch.inference_mode():
             compiled_model(sample)

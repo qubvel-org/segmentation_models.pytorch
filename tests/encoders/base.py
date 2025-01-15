@@ -213,7 +213,9 @@ class BaseEncoderTester(unittest.TestCase):
         encoder = encoder.eval().to(default_device)
 
         torch.compiler.reset()
-        compiled_encoder = torch.compile(encoder, fullgraph=True, dynamic=True, backend="eager")
+        compiled_encoder = torch.compile(
+            encoder, fullgraph=True, dynamic=True, backend="eager"
+        )
 
         if encoder._is_torch_compilable:
             compiled_encoder(sample)
