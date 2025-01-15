@@ -3,8 +3,10 @@ import timm
 import copy
 import warnings
 import functools
+from torch.utils.model_zoo import load_url
 from huggingface_hub import hf_hub_download
 from safetensors.torch import load_file
+
 
 from .resnet import resnet_encoders
 from .dpn import dpn_encoders
@@ -24,6 +26,7 @@ from .mobileone import mobileone_encoders
 from .timm_universal import TimmUniversalEncoder
 
 from ._preprocessing import preprocess_input
+from ._legacy_pretrained_settings import pretrained_settings
 
 __all__ = [
     "encoders",
@@ -114,14 +117,28 @@ def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **
         repo_id = settings["repo_id"]
         revision = settings["revision"]
 
-        # Load config and model
-        hf_hub_download(repo_id, filename="config.json", revision=revision)
-        model_path = hf_hub_download(
-            repo_id, filename="model.safetensors", revision=revision
-        )
+        # First, try to load from  HF-Hub, but as far as I know not all countries have
+        # access to the Hub (e.g. China), so we try to load from the original url if
+        # the first attempt fails.
+        try:
+            hf_hub_download(repo_id, filename="config.json", revision=revision)
+            model_path = hf_hub_download(
+                repo_id, filename="model.safetensors", revision=revision
+            )
+            state_dict = load_file(model_path, device="cpu")
+        except Exception as e:
+            if name in pretrained_settings and weights in pretrained_settings[name]:
+                message = (
+                    f"Error loading {name} `{weights}` weights from Hugging Face Hub, "
+                    "trying loading from original url..."
+                )
+                warnings.warn(message, UserWarning)
+                url = pretrained_settings[name][weights]["url"]
+                state_dict = load_url(url, map_location="cpu")
+            else:
+                raise e
 
         # Load model weights
-        state_dict = load_file(model_path, device="cpu")
         encoder.load_state_dict(state_dict)
 
     encoder.set_in_channels(in_channels, pretrained=weights is not None)
@@ -154,11 +171,20 @@ def get_preprocessing_params(encoder_name, pretrained="imagenet"):
         revision = all_settings[pretrained]["revision"]
 
         # Load config and model
-        config_path = hf_hub_download(
-            repo_id, filename="config.json", revision=revision
-        )
-        with open(config_path, "r") as f:
-            settings = json.load(f)
+        try:
+            config_path = hf_hub_download(
+                repo_id, filename="config.json", revision=revision
+            )
+            with open(config_path, "r") as f:
+                settings = json.load(f)
+        except Exception as e:
+            if (
+                encoder_name in pretrained_settings
+                and pretrained in pretrained_settings[encoder_name]
+            ):
+                settings = pretrained_settings[encoder_name][pretrained]
+            else:
+                raise e
 
     formatted_settings = {}
     formatted_settings["input_space"] = settings.get("input_space", "RGB")
