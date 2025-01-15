@@ -7,7 +7,7 @@ install_dev: .venv
 	.venv/bin/pip install -e ".[test]"
 
 test: .venv
-	.venv/bin/pytest -v -rsx -n 2 tests/ -k "not logits_match"
+	.venv/bin/pytest -v -rsx -n 2 tests/ --non-marked-only
 
 test_all: .venv
 	RUN_SLOW=1 .venv/bin/pytest -v -rsx -n 2 tests/

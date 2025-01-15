@@ -6,9 +6,9 @@ from tests.models import base
 from tests.utils import slow_test, default_device, requires_torch_greater_or_equal
 
 
-@pytest.mark.segformer
 class TestSegformerModel(base.BaseModelTester):
     test_model_type = "segformer"
+    files_for_diff = [r"decoders/segformer/", r"base/"]
 
     @slow_test
     @requires_torch_greater_or_equal("2.0.1")

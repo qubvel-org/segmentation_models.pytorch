@@ -23,20 +23,33 @@ Methods:
         depth = 3 -> number of feature tensors = 4 (one with same resolution as input and 3 downsampled).
 """
 
+import torch
 import torch.nn as nn
+from typing import List
 from pretrainedmodels.models.inceptionresnetv2 import InceptionResNetV2
-from pretrainedmodels.models.inceptionresnetv2 import pretrained_settings
 
 from ._base import EncoderMixin
 
 
 class InceptionResNetV2Encoder(InceptionResNetV2, EncoderMixin):
-    def __init__(self, out_channels, depth=5, **kwargs):
+    def __init__(
+        self,
+        out_channels: List[int],
+        depth: int = 5,
+        output_stride: int = 32,
+        **kwargs,
+    ):
+        if depth > 5 or depth < 1:
+            raise ValueError(
+                f"{self.__class__.__name__} depth should be in range [1, 5], got {depth}"
+            )
+
         super().__init__(**kwargs)
 
-        self._out_channels = out_channels
         self._depth = depth
         self._in_channels = 3
+        self._out_channels = out_channels
+        self._output_stride = output_stride
 
         # correct paddings
         for m in self.modules():
@@ -45,6 +58,9 @@ class InceptionResNetV2Encoder(InceptionResNetV2, EncoderMixin):
                     m.padding = (1, 1)
             if isinstance(m, nn.MaxPool2d):
                 m.padding = (1, 1)
+
+        # for torchscript, block8 does not have relu defined
+        self.block8.relu = nn.Identity()
 
         # remove linear layers
         del self.avgpool_1a
@@ -56,22 +72,37 @@ class InceptionResNetV2Encoder(InceptionResNetV2, EncoderMixin):
             "due to pooling operation for downsampling!"
         )
 
-    def get_stages(self):
-        return [
-            nn.Identity(),
-            nn.Sequential(self.conv2d_1a, self.conv2d_2a, self.conv2d_2b),
-            nn.Sequential(self.maxpool_3a, self.conv2d_3b, self.conv2d_4a),
-            nn.Sequential(self.maxpool_5a, self.mixed_5b, self.repeat),
-            nn.Sequential(self.mixed_6a, self.repeat_1),
-            nn.Sequential(self.mixed_7a, self.repeat_2, self.block8, self.conv2d_7b),
-        ]
+    def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
+        features = [x]
 
-    def forward(self, x):
-        stages = self.get_stages()
+        if self._depth >= 1:
+            x = self.conv2d_1a(x)
+            x = self.conv2d_2a(x)
+            x = self.conv2d_2b(x)
+            features.append(x)
 
-        features = []
-        for i in range(self._depth + 1):
-            x = stages[i](x)
+        if self._depth >= 2:
+            x = self.maxpool_3a(x)
+            x = self.conv2d_3b(x)
+            x = self.conv2d_4a(x)
+            features.append(x)
+
+        if self._depth >= 3:
+            x = self.maxpool_5a(x)
+            x = self.mixed_5b(x)
+            x = self.repeat(x)
+            features.append(x)
+
+        if self._depth >= 4:
+            x = self.mixed_6a(x)
+            x = self.repeat_1(x)
+            features.append(x)
+
+        if self._depth >= 5:
+            x = self.mixed_7a(x)
+            x = self.repeat_2(x)
+            x = self.block8(x)
+            x = self.conv2d_7b(x)
             features.append(x)
 
         return features
@@ -85,7 +116,26 @@ class InceptionResNetV2Encoder(InceptionResNetV2, EncoderMixin):
 inceptionresnetv2_encoders = {
     "inceptionresnetv2": {
         "encoder": InceptionResNetV2Encoder,
-        "pretrained_settings": pretrained_settings["inceptionresnetv2"],
-        "params": {"out_channels": (3, 64, 192, 320, 1088, 1536), "num_classes": 1000},
+        "pretrained_settings": {
+            "imagenet": {
+                "url": "http://data.lip6.fr/cadene/pretrainedmodels/inceptionresnetv2-520b38e4.pth",
+                "input_space": "RGB",
+                "input_size": [3, 299, 299],
+                "input_range": [0, 1],
+                "mean": [0.5, 0.5, 0.5],
+                "std": [0.5, 0.5, 0.5],
+                "num_classes": 1000,
+            },
+            "imagenet+background": {
+                "url": "http://data.lip6.fr/cadene/pretrainedmodels/inceptionresnetv2-520b38e4.pth",
+                "input_space": "RGB",
+                "input_size": [3, 299, 299],
+                "input_range": [0, 1],
+                "mean": [0.5, 0.5, 0.5],
+                "std": [0.5, 0.5, 0.5],
+                "num_classes": 1001,
+            },
+        },
+        "params": {"out_channels": [3, 64, 192, 320, 1088, 1536], "num_classes": 1000},
     }
 }

@@ -1,6 +1,8 @@
-from functools import partial
-
+import torch
 import torch.nn as nn
+
+from typing import List, Dict, Sequence
+from functools import partial
 
 from timm.models.efficientnet import EfficientNet
 from timm.models.efficientnet import decode_arch_def, round_channels, default_cfgs
@@ -95,32 +97,59 @@ def gen_efficientnet_lite_kwargs(
 
 
 class EfficientNetBaseEncoder(EfficientNet, EncoderMixin):
-    def __init__(self, stage_idxs, out_channels, depth=5, **kwargs):
+    def __init__(
+        self,
+        stage_idxs: List[int],
+        out_channels: List[int],
+        depth: int = 5,
+        output_stride: int = 32,
+        **kwargs,
+    ):
+        if depth > 5 or depth < 1:
+            raise ValueError(
+                f"{self.__class__.__name__} depth should be in range [1, 5], got {depth}"
+            )
         super().__init__(**kwargs)
 
         self._stage_idxs = stage_idxs
-        self._out_channels = out_channels
         self._depth = depth
         self._in_channels = 3
+        self._out_channels = out_channels
+        self._output_stride = output_stride
 
         del self.classifier
 
-    def get_stages(self):
-        return [
-            nn.Identity(),
-            nn.Sequential(self.conv_stem, self.bn1),
-            self.blocks[: self._stage_idxs[0]],
-            self.blocks[self._stage_idxs[0] : self._stage_idxs[1]],
-            self.blocks[self._stage_idxs[1] : self._stage_idxs[2]],
-            self.blocks[self._stage_idxs[2] :],
-        ]
+    def get_stages(self) -> Dict[int, Sequence[torch.nn.Module]]:
+        return {
+            16: [self.blocks[self._stage_idxs[1] : self._stage_idxs[2]]],
+            32: [self.blocks[self._stage_idxs[2] :]],
+        }
 
-    def forward(self, x):
-        stages = self.get_stages()
+    def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
+        features = [x]
 
-        features = []
-        for i in range(self._depth + 1):
-            x = stages[i](x)
+        if self._depth >= 1:
+            x = self.conv_stem(x)
+            x = self.bn1(x)
+            features.append(x)
+
+        if self._depth >= 2:
+            x = self.blocks[0](x)
+            x = self.blocks[1](x)
+            features.append(x)
+
+        if self._depth >= 3:
+            x = self.blocks[2](x)
+            features.append(x)
+
+        if self._depth >= 4:
+            x = self.blocks[3](x)
+            x = self.blocks[4](x)
+            features.append(x)
+
+        if self._depth >= 5:
+            x = self.blocks[5](x)
+            x = self.blocks[6](x)
             features.append(x)
 
         return features
@@ -134,33 +163,47 @@ class EfficientNetBaseEncoder(EfficientNet, EncoderMixin):
 class EfficientNetEncoder(EfficientNetBaseEncoder):
     def __init__(
         self,
-        stage_idxs,
-        out_channels,
-        depth=5,
-        channel_multiplier=1.0,
-        depth_multiplier=1.0,
-        drop_rate=0.2,
+        stage_idxs: List[int],
+        out_channels: List[int],
+        depth: int = 5,
+        channel_multiplier: float = 1.0,
+        depth_multiplier: float = 1.0,
+        drop_rate: float = 0.2,
+        output_stride: int = 32,
     ):
         kwargs = get_efficientnet_kwargs(
             channel_multiplier, depth_multiplier, drop_rate
         )
-        super().__init__(stage_idxs, out_channels, depth, **kwargs)
+        super().__init__(
+            stage_idxs=stage_idxs,
+            depth=depth,
+            out_channels=out_channels,
+            output_stride=output_stride,
+            **kwargs,
+        )
 
 
 class EfficientNetLiteEncoder(EfficientNetBaseEncoder):
     def __init__(
         self,
-        stage_idxs,
-        out_channels,
-        depth=5,
-        channel_multiplier=1.0,
-        depth_multiplier=1.0,
-        drop_rate=0.2,
+        stage_idxs: List[int],
+        out_channels: List[int],
+        depth: int = 5,
+        channel_multiplier: float = 1.0,
+        depth_multiplier: float = 1.0,
+        drop_rate: float = 0.2,
+        output_stride: int = 32,
     ):
         kwargs = gen_efficientnet_lite_kwargs(
             channel_multiplier, depth_multiplier, drop_rate
         )
-        super().__init__(stage_idxs, out_channels, depth, **kwargs)
+        super().__init__(
+            stage_idxs=stage_idxs,
+            depth=depth,
+            out_channels=out_channels,
+            output_stride=output_stride,
+            **kwargs,
+        )
 
 
 def prepare_settings(settings):
@@ -188,8 +231,8 @@ timm_efficientnet_encoders = {
             ),
         },
         "params": {
-            "out_channels": (3, 32, 24, 40, 112, 320),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 32, 24, 40, 112, 320],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 1.0,
             "depth_multiplier": 1.0,
             "drop_rate": 0.2,
@@ -209,8 +252,8 @@ timm_efficientnet_encoders = {
             ),
         },
         "params": {
-            "out_channels": (3, 32, 24, 40, 112, 320),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 32, 24, 40, 112, 320],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 1.0,
             "depth_multiplier": 1.1,
             "drop_rate": 0.2,
@@ -230,8 +273,8 @@ timm_efficientnet_encoders = {
             ),
         },
         "params": {
-            "out_channels": (3, 32, 24, 48, 120, 352),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 32, 24, 48, 120, 352],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 1.1,
             "depth_multiplier": 1.2,
             "drop_rate": 0.3,
@@ -251,8 +294,8 @@ timm_efficientnet_encoders = {
             ),
         },
         "params": {
-            "out_channels": (3, 40, 32, 48, 136, 384),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 40, 32, 48, 136, 384],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 1.2,
             "depth_multiplier": 1.4,
             "drop_rate": 0.3,
@@ -272,8 +315,8 @@ timm_efficientnet_encoders = {
             ),
         },
         "params": {
-            "out_channels": (3, 48, 32, 56, 160, 448),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 48, 32, 56, 160, 448],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 1.4,
             "depth_multiplier": 1.8,
             "drop_rate": 0.4,
@@ -293,8 +336,8 @@ timm_efficientnet_encoders = {
             ),
         },
         "params": {
-            "out_channels": (3, 48, 40, 64, 176, 512),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 48, 40, 64, 176, 512],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 1.6,
             "depth_multiplier": 2.2,
             "drop_rate": 0.4,
@@ -314,8 +357,8 @@ timm_efficientnet_encoders = {
             ),
         },
         "params": {
-            "out_channels": (3, 56, 40, 72, 200, 576),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 56, 40, 72, 200, 576],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 1.8,
             "depth_multiplier": 2.6,
             "drop_rate": 0.5,
@@ -335,8 +378,8 @@ timm_efficientnet_encoders = {
             ),
         },
         "params": {
-            "out_channels": (3, 64, 48, 80, 224, 640),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 64, 48, 80, 224, 640],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 2.0,
             "depth_multiplier": 3.1,
             "drop_rate": 0.5,
@@ -353,8 +396,8 @@ timm_efficientnet_encoders = {
             ),
         },
         "params": {
-            "out_channels": (3, 72, 56, 88, 248, 704),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 72, 56, 88, 248, 704],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 2.2,
             "depth_multiplier": 3.6,
             "drop_rate": 0.5,
@@ -371,8 +414,8 @@ timm_efficientnet_encoders = {
             ),
         },
         "params": {
-            "out_channels": (3, 136, 104, 176, 480, 1376),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 136, 104, 176, 480, 1376],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 4.3,
             "depth_multiplier": 5.3,
             "drop_rate": 0.5,
@@ -386,8 +429,8 @@ timm_efficientnet_encoders = {
             )
         },
         "params": {
-            "out_channels": (3, 32, 24, 40, 112, 320),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 32, 24, 40, 112, 320],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 1.0,
             "depth_multiplier": 1.0,
             "drop_rate": 0.2,
@@ -401,8 +444,8 @@ timm_efficientnet_encoders = {
             )
         },
         "params": {
-            "out_channels": (3, 32, 24, 40, 112, 320),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 32, 24, 40, 112, 320],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 1.0,
             "depth_multiplier": 1.1,
             "drop_rate": 0.2,
@@ -416,8 +459,8 @@ timm_efficientnet_encoders = {
             )
         },
         "params": {
-            "out_channels": (3, 32, 24, 48, 120, 352),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 32, 24, 48, 120, 352],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 1.1,
             "depth_multiplier": 1.2,
             "drop_rate": 0.3,
@@ -431,8 +474,8 @@ timm_efficientnet_encoders = {
             )
         },
         "params": {
-            "out_channels": (3, 32, 32, 48, 136, 384),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 32, 32, 48, 136, 384],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 1.2,
             "depth_multiplier": 1.4,
             "drop_rate": 0.3,
@@ -446,8 +489,8 @@ timm_efficientnet_encoders = {
             )
         },
         "params": {
-            "out_channels": (3, 32, 32, 56, 160, 448),
-            "stage_idxs": (2, 3, 5),
+            "out_channels": [3, 32, 32, 56, 160, 448],
+            "stage_idxs": [2, 3, 5],
             "channel_multiplier": 1.4,
             "depth_multiplier": 1.8,
             "drop_rate": 0.4,

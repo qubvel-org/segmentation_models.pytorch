@@ -1,3 +1,6 @@
+import torch
+from typing import Sequence, Dict
+
 from . import _utils as utils
 
 
@@ -7,7 +10,14 @@ class EncoderMixin:
     - patching first convolution for arbitrary input channels
     """
 
-    _output_stride = 32
+    _is_torch_scriptable = True
+    _is_torch_exportable = True
+    _is_torch_compilable = True
+
+    def __init__(self):
+        self._depth = 5
+        self._in_channels = 3
+        self._output_stride = 32
 
     @property
     def out_channels(self):
@@ -25,34 +35,27 @@ class EncoderMixin:
 
         self._in_channels = in_channels
         if self._out_channels[0] == 3:
-            self._out_channels = tuple([in_channels] + list(self._out_channels)[1:])
+            self._out_channels = [in_channels] + self._out_channels[1:]
 
         utils.patch_first_conv(
             model=self, new_in_channels=in_channels, pretrained=pretrained
         )
 
-    def get_stages(self):
-        """Override it in your implementation"""
+    def get_stages(self) -> Dict[int, Sequence[torch.nn.Module]]:
+        """Override it in your implementation, should return a dictionary with keys as
+        the output stride and values as the list of modules
+        """
         raise NotImplementedError
 
     def make_dilated(self, output_stride):
-        if output_stride == 16:
-            stage_list = [5]
-            dilation_list = [2]
-
-        elif output_stride == 8:
-            stage_list = [4, 5]
-            dilation_list = [2, 4]
-
-        else:
-            raise ValueError(
-                "Output stride should be 16 or 8, got {}.".format(output_stride)
-            )
-
-        self._output_stride = output_stride
+        if output_stride not in [8, 16]:
+            raise ValueError(f"Output stride should be 16 or 8, got {output_stride}.")
 
         stages = self.get_stages()
-        for stage_indx, dilation_rate in zip(stage_list, dilation_list):
-            utils.replace_strides_with_dilation(
-                module=stages[stage_indx], dilation_rate=dilation_rate
-            )
+        for stage_stride, stage_modules in stages.items():
+            if stage_stride <= output_stride:
+                continue
+
+            dilation_rate = stage_stride // output_stride
+            for module in stage_modules:
+                utils.replace_strides_with_dilation(module, dilation_rate)

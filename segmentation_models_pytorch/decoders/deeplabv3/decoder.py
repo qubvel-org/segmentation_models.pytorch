@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 from collections.abc import Iterable, Sequence
-from typing import Literal
+from typing import Literal, List
 
 import torch
 from torch import nn
@@ -40,7 +40,7 @@ from torch.nn import functional as F
 __all__ = ["DeepLabV3Decoder", "DeepLabV3PlusDecoder"]
 
 
-class DeepLabV3Decoder(nn.Sequential):
+class DeepLabV3Decoder(nn.Module):
     def __init__(
         self,
         in_channels: int,
@@ -49,21 +49,25 @@ class DeepLabV3Decoder(nn.Sequential):
         aspp_separable: bool,
         aspp_dropout: float,
     ):
-        super().__init__(
-            ASPP(
-                in_channels,
-                out_channels,
-                atrous_rates,
-                separable=aspp_separable,
-                dropout=aspp_dropout,
-            ),
-            nn.Conv2d(out_channels, out_channels, 3, padding=1, bias=False),
-            nn.BatchNorm2d(out_channels),
-            nn.ReLU(),
+        super().__init__()
+        self.aspp = ASPP(
+            in_channels,
+            out_channels,
+            atrous_rates,
+            separable=aspp_separable,
+            dropout=aspp_dropout,
         )
+        self.conv = nn.Conv2d(out_channels, out_channels, 3, padding=1, bias=False)
+        self.bn = nn.BatchNorm2d(out_channels)
+        self.relu = nn.ReLU()
 
-    def forward(self, *features):
-        return super().forward(features[-1])
+    def forward(self, features: List[torch.Tensor]) -> torch.Tensor:
+        x = features[-1]
+        x = self.aspp(x)
+        x = self.conv(x)
+        x = self.bn(x)
+        x = self.relu(x)
+        return x
 
 
 class DeepLabV3PlusDecoder(nn.Module):
@@ -124,7 +128,7 @@ class DeepLabV3PlusDecoder(nn.Module):
             nn.ReLU(),
         )
 
-    def forward(self, *features):
+    def forward(self, features: List[torch.Tensor]) -> torch.Tensor:
         aspp_features = self.aspp(features[-1])
         aspp_features = self.up(aspp_features)
         high_res_features = self.block1(features[2])
@@ -174,7 +178,7 @@ class ASPPPooling(nn.Sequential):
             nn.ReLU(),
         )
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         size = x.shape[-2:]
         for mod in self:
             x = mod(x)
@@ -216,7 +220,7 @@ class ASPP(nn.Module):
             nn.Dropout(dropout),
         )
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         res = []
         for conv in self.convs:
             res.append(conv(x))

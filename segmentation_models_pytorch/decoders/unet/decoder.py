@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from typing import Optional, Sequence
+from typing import Optional, Sequence, List
 from segmentation_models_pytorch.base import modules as md
 
 
@@ -140,7 +140,7 @@ class UnetDecoder(nn.Module):
             )
             self.blocks.append(block)
 
-    def forward(self, *features: torch.Tensor) -> torch.Tensor:
+    def forward(self, features: List[torch.Tensor]) -> torch.Tensor:
         # spatial shapes of features: [hw, hw/2, hw/4, hw/8, ...]
         spatial_shapes = [feature.shape[2:] for feature in features]
         spatial_shapes = spatial_shapes[::-1]

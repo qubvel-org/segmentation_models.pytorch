@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from typing import Literal
+from typing import Literal, List
 
 import torch
 import torch.nn as nn
@@ -31,18 +31,22 @@ class ConvBnRelu(nn.Module):
             bias=bias,
             groups=groups,
         )
+        self.activation = nn.ReLU(inplace=True)
+        self.bn = nn.BatchNorm2d(out_channels)
+
         self.add_relu = add_relu
         self.interpolate = interpolate
-        self.bn = nn.BatchNorm2d(out_channels)
-        self.activation = nn.ReLU(inplace=True)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.conv(x)
         x = self.bn(x)
+
         if self.add_relu:
             x = self.activation(x)
+
         if self.interpolate:
-            x = F.interpolate(x, scale_factor=2, mode="bilinear", align_corners=True)
+            x = F.interpolate(x, scale_factor=2.0, mode="bilinear", align_corners=True)
+
         return x
 
 
@@ -50,7 +54,7 @@ class FPABlock(nn.Module):
     def __init__(
         self, in_channels: int, out_channels: int, upscale_mode: str = "bilinear"
     ):
-        super(FPABlock, self).__init__()
+        super().__init__()
 
         self.upscale_mode = upscale_mode
         if self.upscale_mode == "bilinear":
@@ -70,7 +74,7 @@ class FPABlock(nn.Module):
             ),
         )
 
-        # midddle branch
+        # middle branch
         self.mid = nn.Sequential(
             ConvBnRelu(
                 in_channels=in_channels,
@@ -112,30 +116,50 @@ class FPABlock(nn.Module):
             in_channels=1, out_channels=1, kernel_size=7, stride=1, padding=3
         )
 
-    def forward(self, x):
-        h, w = x.size(2), x.size(3)
-        b1 = self.branch1(x)
-        upscale_parameters = dict(
-            mode=self.upscale_mode, align_corners=self.align_corners
-        )
-        b1 = F.interpolate(b1, size=(h, w), **upscale_parameters)
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        _, _, height, width = x.shape
 
-        mid = self.mid(x)
+        branch1_output = self.branch1(x)
+        branch1_output = F.interpolate(
+            branch1_output,
+            size=(height, width),
+            mode=self.upscale_mode,
+            align_corners=self.align_corners,
+        )
+
+        middle_output = self.mid(x)
+
         x1 = self.down1(x)
         x2 = self.down2(x1)
         x3 = self.down3(x2)
-        x3 = F.interpolate(x3, size=(h // 4, w // 4), **upscale_parameters)
+        x3 = F.interpolate(
+            x3,
+            size=(height // 4, width // 4),
+            mode=self.upscale_mode,
+            align_corners=self.align_corners,
+        )
 
         x2 = self.conv2(x2)
         x = x2 + x3
-        x = F.interpolate(x, size=(h // 2, w // 2), **upscale_parameters)
+        x = F.interpolate(
+            x,
+            size=(height // 2, width // 2),
+            mode=self.upscale_mode,
+            align_corners=self.align_corners,
+        )
 
         x1 = self.conv1(x1)
         x = x + x1
-        x = F.interpolate(x, size=(h, w), **upscale_parameters)
+        x = F.interpolate(
+            x,
+            size=(height, width),
+            mode=self.upscale_mode,
+            align_corners=self.align_corners,
+        )
 
-        x = torch.mul(x, mid)
-        x = x + b1
+        x = torch.mul(x, middle_output)
+        x = x + branch1_output
+
         return x
 
 
@@ -162,15 +186,18 @@ class GAUBlock(nn.Module):
             in_channels=in_channels, out_channels=out_channels, kernel_size=3, padding=1
         )
 
-    def forward(self, x, y):
+    def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         """
         Args:
             x: low level feature
             y: high level feature
         """
-        h, w = x.size(2), x.size(3)
+        height, width = x.shape[2:]
         y_up = F.interpolate(
-            y, size=(h, w), mode=self.upscale_mode, align_corners=self.align_corners
+            y,
+            size=(height, width),
+            mode=self.upscale_mode,
+            align_corners=self.align_corners,
         )
         x = self.conv2(x)
         y = self.conv1(y)
@@ -220,7 +247,7 @@ class PANDecoder(nn.Module):
                 upscale_mode=upscale_mode,
             )
 
-    def forward(self, *features):
+    def forward(self, features: List[torch.Tensor]) -> torch.Tensor:
         features = features[2:]  # remove first and second skip
 
         out = self.fpa(features[-1])  # 1/16 or 1/32

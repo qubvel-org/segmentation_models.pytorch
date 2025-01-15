@@ -2,12 +2,15 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from typing import List, Optional
+
 from segmentation_models_pytorch.base import modules as md
 
 
-class PAB(nn.Module):
-    def __init__(self, in_channels, out_channels, pab_channels=64):
-        super(PAB, self).__init__()
+class PABBlock(nn.Module):
+    def __init__(self, in_channels: int, pab_channels: int = 64):
+        super().__init__()
+
         # Series of 1x1 conv to generate attention feature maps
         self.pab_channels = pab_channels
         self.in_channels = in_channels
@@ -17,10 +20,9 @@ class PAB(nn.Module):
         self.map_softmax = nn.Softmax(dim=1)
         self.out_conv = nn.Conv2d(in_channels, in_channels, kernel_size=3, padding=1)
 
-    def forward(self, x):
-        bsize = x.size()[0]
-        h = x.size()[2]
-        w = x.size()[3]
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        batch_size, _, height, width = x.shape
+
         x_top = self.top_conv(x)
         x_center = self.center_conv(x)
         x_bottom = self.bottom_conv(x)
@@ -30,20 +32,28 @@ class PAB(nn.Module):
         x_bottom = x_bottom.flatten(2).transpose(1, 2)
 
         sp_map = torch.matmul(x_center, x_top)
-        sp_map = self.map_softmax(sp_map.view(bsize, -1)).view(bsize, h * w, h * w)
+        sp_map = self.map_softmax(sp_map.view(batch_size, -1))
+        sp_map = sp_map.view(batch_size, height * width, height * width)
+
         sp_map = torch.matmul(sp_map, x_bottom)
-        sp_map = sp_map.reshape(bsize, self.in_channels, h, w)
+        sp_map = sp_map.reshape(batch_size, self.in_channels, height, width)
+
         x = x + sp_map
         x = self.out_conv(x)
         return x
 
 
-class MFAB(nn.Module):
+class MFABBlock(nn.Module):
     def __init__(
-        self, in_channels, skip_channels, out_channels, use_batchnorm=True, reduction=16
+        self,
+        in_channels: int,
+        skip_channels: int,
+        out_channels: int,
+        use_batchnorm: bool = True,
+        reduction: int = 16,
     ):
-        # MFAB is just a modified version of SE-blocks, one for skip, one for input
-        super(MFAB, self).__init__()
+        # MFABBlock is just a modified version of SE-blocks, one for skip, one for input
+        super().__init__()
         self.hl_conv = nn.Sequential(
             md.Conv2dReLU(
                 in_channels,
@@ -87,9 +97,11 @@ class MFAB(nn.Module):
             use_batchnorm=use_batchnorm,
         )
 
-    def forward(self, x, skip=None):
+    def forward(
+        self, x: torch.Tensor, skip: Optional[torch.Tensor] = None
+    ) -> torch.Tensor:
         x = self.hl_conv(x)
-        x = F.interpolate(x, scale_factor=2, mode="nearest")
+        x = F.interpolate(x, scale_factor=2.0, mode="nearest")
         attention_hl = self.SE_hl(x)
         if skip is not None:
             attention_ll = self.SE_ll(skip)
@@ -102,7 +114,13 @@ class MFAB(nn.Module):
 
 
 class DecoderBlock(nn.Module):
-    def __init__(self, in_channels, skip_channels, out_channels, use_batchnorm=True):
+    def __init__(
+        self,
+        in_channels: int,
+        skip_channels: int,
+        out_channels: int,
+        use_batchnorm: bool = True,
+    ):
         super().__init__()
         self.conv1 = md.Conv2dReLU(
             in_channels + skip_channels,
@@ -119,8 +137,10 @@ class DecoderBlock(nn.Module):
             use_batchnorm=use_batchnorm,
         )
 
-    def forward(self, x, skip=None):
-        x = F.interpolate(x, scale_factor=2, mode="nearest")
+    def forward(
+        self, x: torch.Tensor, skip: Optional[torch.Tensor] = None
+    ) -> torch.Tensor:
+        x = F.interpolate(x, scale_factor=2.0, mode="nearest")
         if skip is not None:
             x = torch.cat([x, skip], dim=1)
         x = self.conv1(x)
@@ -131,12 +151,12 @@ class DecoderBlock(nn.Module):
 class MAnetDecoder(nn.Module):
     def __init__(
         self,
-        encoder_channels,
-        decoder_channels,
-        n_blocks=5,
-        reduction=16,
-        use_batchnorm=True,
-        pab_channels=64,
+        encoder_channels: List[int],
+        decoder_channels: List[int],
+        n_blocks: int = 5,
+        reduction: int = 16,
+        use_batchnorm: bool = True,
+        pab_channels: int = 64,
     ):
         super().__init__()
 
@@ -159,12 +179,12 @@ class MAnetDecoder(nn.Module):
         skip_channels = list(encoder_channels[1:]) + [0]
         out_channels = decoder_channels
 
-        self.center = PAB(head_channels, head_channels, pab_channels=pab_channels)
+        self.center = PABBlock(head_channels, pab_channels=pab_channels)
 
         # combine decoder keyword arguments
         kwargs = dict(use_batchnorm=use_batchnorm)  # no attention type here
         blocks = [
-            MFAB(in_ch, skip_ch, out_ch, reduction=reduction, **kwargs)
+            MFABBlock(in_ch, skip_ch, out_ch, reduction=reduction, **kwargs)
             if skip_ch > 0
             else DecoderBlock(in_ch, skip_ch, out_ch, **kwargs)
             for in_ch, skip_ch, out_ch in zip(in_channels, skip_channels, out_channels)
@@ -172,7 +192,7 @@ class MAnetDecoder(nn.Module):
         # for the last we dont have skip connection -> use simple decoder block
         self.blocks = nn.ModuleList(blocks)
 
-    def forward(self, *features):
+    def forward(self, features: List[torch.Tensor]) -> torch.Tensor:
         features = features[1:]  # remove first skip with same spatial resolution
         features = features[::-1]  # reverse channels to start from head of encoder
 

@@ -48,14 +48,14 @@ class PSPModule(nn.Module):
 
 
 class FPNBlock(nn.Module):
-    def __init__(self, skip_channels, pyramid_channels, use_bathcnorm=True):
+    def __init__(self, skip_channels, pyramid_channels, use_batchnorm=True):
         super().__init__()
         self.skip_conv = (
             md.Conv2dReLU(
                 skip_channels,
                 pyramid_channels,
                 kernel_size=1,
-                use_batchnorm=use_bathcnorm,
+                use_batchnorm=use_batchnorm,
             )
             if skip_channels != 0
             else nn.Identity()
@@ -110,7 +110,7 @@ class UPerNetDecoder(nn.Module):
             use_batchnorm=True,
         )
 
-    def forward(self, *features):
+    def forward(self, features):
         output_size = features[0].shape[2:]
         target_size = [size // 4 for size in output_size]
 

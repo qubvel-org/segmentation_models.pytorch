@@ -1,35 +1,63 @@
-from ._base import EncoderMixin
+import torch
+from typing import Dict, List, Sequence
 from timm.models.resnet import ResNet
 from timm.models.sknet import SelectiveKernelBottleneck, SelectiveKernelBasic
-import torch.nn as nn
+
+from ._base import EncoderMixin
 
 
 class SkNetEncoder(ResNet, EncoderMixin):
-    def __init__(self, out_channels, depth=5, **kwargs):
+    def __init__(
+        self,
+        out_channels: List[int],
+        depth: int = 5,
+        output_stride: int = 32,
+        **kwargs,
+    ):
+        if depth > 5 or depth < 1:
+            raise ValueError(
+                f"{self.__class__.__name__} depth should be in range [1, 5], got {depth}"
+            )
         super().__init__(**kwargs)
+
         self._depth = depth
-        self._out_channels = out_channels
         self._in_channels = 3
+        self._out_channels = out_channels
+        self._output_stride = output_stride
 
         del self.fc
         del self.global_pool
 
-    def get_stages(self):
-        return [
-            nn.Identity(),
-            nn.Sequential(self.conv1, self.bn1, self.act1),
-            nn.Sequential(self.maxpool, self.layer1),
-            self.layer2,
-            self.layer3,
-            self.layer4,
-        ]
+    def get_stages(self) -> Dict[int, Sequence[torch.nn.Module]]:
+        return {
+            16: [self.layer3],
+            32: [self.layer4],
+        }
 
-    def forward(self, x):
-        stages = self.get_stages()
+    def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
+        features = [x]
 
-        features = []
-        for i in range(self._depth + 1):
-            x = stages[i](x)
+        if self._depth >= 1:
+            x = self.conv1(x)
+            x = self.bn1(x)
+            x = self.act1(x)
+            features.append(x)
+
+        if self._depth >= 2:
+            x = self.maxpool(x)
+            x = self.layer1(x)
+            features.append(x)
+
+        if self._depth >= 3:
+            x = self.layer2(x)
+            features.append(x)
+
+        if self._depth >= 4:
+            x = self.layer3(x)
+            features.append(x)
+
+        if self._depth >= 5:
+            x = self.layer4(x)
             features.append(x)
 
         return features
@@ -70,7 +98,7 @@ timm_sknet_encoders = {
         "encoder": SkNetEncoder,
         "pretrained_settings": pretrained_settings["timm-skresnet18"],
         "params": {
-            "out_channels": (3, 64, 64, 128, 256, 512),
+            "out_channels": [3, 64, 64, 128, 256, 512],
             "block": SelectiveKernelBasic,
             "layers": [2, 2, 2, 2],
             "zero_init_last": False,
@@ -81,7 +109,7 @@ timm_sknet_encoders = {
         "encoder": SkNetEncoder,
         "pretrained_settings": pretrained_settings["timm-skresnet34"],
         "params": {
-            "out_channels": (3, 64, 64, 128, 256, 512),
+            "out_channels": [3, 64, 64, 128, 256, 512],
             "block": SelectiveKernelBasic,
             "layers": [3, 4, 6, 3],
             "zero_init_last": False,
@@ -92,7 +120,7 @@ timm_sknet_encoders = {
         "encoder": SkNetEncoder,
         "pretrained_settings": pretrained_settings["timm-skresnext50_32x4d"],
         "params": {
-            "out_channels": (3, 64, 256, 512, 1024, 2048),
+            "out_channels": [3, 64, 256, 512, 1024, 2048],
             "block": SelectiveKernelBottleneck,
             "layers": [3, 4, 6, 3],
             "zero_init_last": False,

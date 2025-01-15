@@ -1,16 +1,15 @@
-import pytest
 from tests.models import base
 
 
-@pytest.mark.deeplabv3
 class TestDeeplabV3Model(base.BaseModelTester):
     test_model_type = "deeplabv3"
+    files_for_diff = [r"decoders/deeplabv3/", r"base/"]
 
     default_batch_size = 2
 
 
-@pytest.mark.deeplabv3plus
 class TestDeeplabV3PlusModel(base.BaseModelTester):
     test_model_type = "deeplabv3plus"
+    files_for_diff = [r"decoders/deeplabv3plus/", r"base/"]
 
     default_batch_size = 2

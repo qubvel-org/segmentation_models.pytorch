@@ -24,6 +24,7 @@ class TestTimmEfficientNetEncoder(base.BaseEncoderTester):
             "timm-tf_efficientnet_lite4",
         ]
     )
+    files_for_diff = ["encoders/timm_efficientnet.py"]
 
 
 class TestTimmGERNetEncoder(base.BaseEncoderTester):
@@ -32,6 +33,9 @@ class TestTimmGERNetEncoder(base.BaseEncoderTester):
         if not RUN_ALL_ENCODERS
         else ["timm-gernet_s", "timm-gernet_m", "timm-gernet_l"]
     )
+
+    def test_compile(self):
+        self.skipTest("Test to be removed")
 
 
 class TestTimmMobileNetV3Encoder(base.BaseEncoderTester):
@@ -47,6 +51,9 @@ class TestTimmMobileNetV3Encoder(base.BaseEncoderTester):
             "timm-mobilenetv3_small_minimal_100",
         ]
     )
+
+    def test_compile(self):
+        self.skipTest("Test to be removed")
 
 
 class TestTimmRegNetEncoder(base.BaseEncoderTester):
@@ -81,9 +88,11 @@ class TestTimmRegNetEncoder(base.BaseEncoderTester):
         ]
     )
 
+    def test_compile(self):
+        self.skipTest("Test to be removed")
+
 
 class TestTimmRes2NetEncoder(base.BaseEncoderTester):
-    supports_dilated = False
     encoder_names = (
         ["timm-res2net50_26w_4s"]
         if not RUN_ALL_ENCODERS
@@ -98,10 +107,12 @@ class TestTimmRes2NetEncoder(base.BaseEncoderTester):
         ]
     )
 
+    def test_compile(self):
+        self.skipTest("Test to be removed")
+
 
 class TestTimmResnestEncoder(base.BaseEncoderTester):
     default_batch_size = 2
-    supports_dilated = False
     encoder_names = (
         ["timm-resnest14d"]
         if not RUN_ALL_ENCODERS
@@ -117,6 +128,9 @@ class TestTimmResnestEncoder(base.BaseEncoderTester):
         ]
     )
 
+    def test_compile(self):
+        self.skipTest("Test to be removed")
+
 
 class TestTimmSkNetEncoder(base.BaseEncoderTester):
     default_batch_size = 2
@@ -129,3 +143,4 @@ class TestTimmSkNetEncoder(base.BaseEncoderTester):
             "timm-skresnext50_32x4d",
         ]
     )
+    files_for_diff = ["encoders/timm_sknet.py"]

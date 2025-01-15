@@ -11,20 +11,22 @@
 import math
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from functools import partial
+from typing import Dict, Sequence, List
 
 from timm.layers import DropPath, to_2tuple, trunc_normal_
 
 
 class LayerNorm(nn.LayerNorm):
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         if x.ndim == 4:
-            B, C, H, W = x.shape
-            x = x.view(B, C, -1).transpose(1, 2)
-            x = super().forward(x)
-            x = x.transpose(1, 2).view(B, C, H, W)
+            batch_size, channels, height, width = x.shape
+            x = x.view(batch_size, channels, -1).transpose(1, 2)
+            x = F.layer_norm(x, self.normalized_shape, self.weight, self.bias, self.eps)
+            x = x.transpose(1, 2).view(batch_size, channels, height, width)
         else:
-            x = super().forward(x)
+            x = F.layer_norm(x, self.normalized_shape, self.weight, self.bias, self.eps)
         return x
 
 
@@ -60,9 +62,9 @@ class Mlp(nn.Module):
             if m.bias is not None:
                 m.bias.data.zero_()
 
-    def forward(self, x, H, W):
+    def forward(self, x: torch.Tensor, height: int, width: int) -> torch.Tensor:
         x = self.fc1(x)
-        x = self.dwconv(x, H, W)
+        x = self.dwconv(x, height, width)
         x = self.act(x)
         x = self.drop(x)
         x = self.fc2(x)
@@ -101,6 +103,10 @@ class Attention(nn.Module):
         if sr_ratio > 1:
             self.sr = nn.Conv2d(dim, dim, kernel_size=sr_ratio, stride=sr_ratio)
             self.norm = LayerNorm(dim)
+        else:
+            # for torchscript compatibility
+            self.sr = nn.Identity()
+            self.norm = nn.Identity()
 
         self.apply(self._init_weights)
 
@@ -119,27 +125,27 @@ class Attention(nn.Module):
             if m.bias is not None:
                 m.bias.data.zero_()
 
-    def forward(self, x, H, W):
-        B, N, C = x.shape
+    def forward(self, x: torch.Tensor, height: int, width: int) -> torch.Tensor:
+        batch_size, N, C = x.shape
         q = (
             self.q(x)
-            .reshape(B, N, self.num_heads, C // self.num_heads)
+            .reshape(batch_size, N, self.num_heads, C // self.num_heads)
             .permute(0, 2, 1, 3)
         )
 
         if self.sr_ratio > 1:
-            x_ = x.permute(0, 2, 1).reshape(B, C, H, W)
-            x_ = self.sr(x_).reshape(B, C, -1).permute(0, 2, 1)
+            x_ = x.permute(0, 2, 1).reshape(batch_size, C, height, width)
+            x_ = self.sr(x_).reshape(batch_size, C, -1).permute(0, 2, 1)
             x_ = self.norm(x_)
             kv = (
                 self.kv(x_)
-                .reshape(B, -1, 2, self.num_heads, C // self.num_heads)
+                .reshape(batch_size, -1, 2, self.num_heads, C // self.num_heads)
                 .permute(2, 0, 3, 1, 4)
             )
         else:
             kv = (
                 self.kv(x)
-                .reshape(B, -1, 2, self.num_heads, C // self.num_heads)
+                .reshape(batch_size, -1, 2, self.num_heads, C // self.num_heads)
                 .permute(2, 0, 3, 1, 4)
             )
         k, v = kv[0], kv[1]
@@ -148,7 +154,7 @@ class Attention(nn.Module):
         attn = attn.softmax(dim=-1)
         attn = self.attn_drop(attn)
 
-        x = (attn @ v).transpose(1, 2).reshape(B, N, C)
+        x = (attn @ v).transpose(1, 2).reshape(batch_size, N, C)
         x = self.proj(x)
         x = self.proj_drop(x)
 
@@ -209,12 +215,12 @@ class Block(nn.Module):
             if m.bias is not None:
                 m.bias.data.zero_()
 
-    def forward(self, x):
-        B, _, H, W = x.shape
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        batch_size, _, height, width = x.shape
         x = x.flatten(2).transpose(1, 2)
-        x = x + self.drop_path(self.attn(self.norm1(x), H, W))
-        x = x + self.drop_path(self.mlp(self.norm2(x), H, W))
-        x = x.transpose(1, 2).view(B, -1, H, W)
+        x = x + self.drop_path(self.attn(self.norm1(x), height, width))
+        x = x + self.drop_path(self.mlp(self.norm2(x), height, width))
+        x = x.transpose(1, 2).view(batch_size, -1, height, width)
         return x
 
 
@@ -256,7 +262,7 @@ class OverlapPatchEmbed(nn.Module):
             if m.bias is not None:
                 m.bias.data.zero_()
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.proj(x)
         x = self.norm(x)
         return x
@@ -462,7 +468,7 @@ class MixVisionTransformer(nn.Module):
             nn.Linear(self.embed_dim, num_classes) if num_classes > 0 else nn.Identity()
         )
 
-    def forward_features(self, x):
+    def forward_features(self, x: torch.Tensor) -> List[torch.Tensor]:
         outs = []
 
         # stage 1
@@ -491,11 +497,11 @@ class MixVisionTransformer(nn.Module):
 
         return outs
 
-    def forward(self, x):
-        x = self.forward_features(x)
+    def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
+        features = self.forward_features(x)
         # x = self.head(x)
 
-        return x
+        return features
 
 
 class DWConv(nn.Module):
@@ -503,9 +509,9 @@ class DWConv(nn.Module):
         super(DWConv, self).__init__()
         self.dwconv = nn.Conv2d(dim, dim, 3, 1, 1, bias=True, groups=dim)
 
-    def forward(self, x, H, W):
-        B, _, C = x.shape
-        x = x.transpose(1, 2).view(B, C, H, W)
+    def forward(self, x: torch.Tensor, height: int, width: int) -> torch.Tensor:
+        batch_size, _, channels = x.shape
+        x = x.transpose(1, 2).view(batch_size, channels, height, width)
         x = self.dwconv(x)
         x = x.flatten(2).transpose(1, 2)
 
@@ -520,36 +526,63 @@ from ._base import EncoderMixin  # noqa E402
 
 
 class MixVisionTransformerEncoder(MixVisionTransformer, EncoderMixin):
-    def __init__(self, out_channels, depth=5, **kwargs):
+    def __init__(
+        self, out_channels: List[int], depth: int = 5, output_stride: int = 32, **kwargs
+    ):
+        if depth > 5 or depth < 1:
+            raise ValueError(
+                f"{self.__class__.__name__} depth should be in range [1, 5], got {depth}"
+            )
         super().__init__(**kwargs)
-        self._out_channels = out_channels
+
         self._depth = depth
         self._in_channels = 3
+        self._out_channels = out_channels
+        self._output_stride = output_stride
 
-    def get_stages(self):
-        return [
-            nn.Identity(),
-            nn.Identity(),
-            nn.Sequential(self.patch_embed1, self.block1, self.norm1),
-            nn.Sequential(self.patch_embed2, self.block2, self.norm2),
-            nn.Sequential(self.patch_embed3, self.block3, self.norm3),
-            nn.Sequential(self.patch_embed4, self.block4, self.norm4),
-        ]
+    def get_stages(self) -> Dict[int, Sequence[torch.nn.Module]]:
+        return {
+            16: [self.patch_embed3, self.block3, self.norm3],
+            32: [self.patch_embed4, self.block4, self.norm4],
+        }
 
-    def forward(self, x):
-        stages = self.get_stages()
-
+    def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
         # create dummy output for the first block
-        B, _, H, W = x.shape
-        dummy = torch.empty([B, 0, H // 2, W // 2], dtype=x.dtype, device=x.device)
+        batch_size, _, height, width = x.shape
+        dummy = torch.empty(
+            [batch_size, 0, height // 2, width // 2], dtype=x.dtype, device=x.device
+        )
 
-        features = []
-        for i in range(self._depth + 1):
-            if i == 1:
-                features.append(dummy)
-            else:
-                x = stages[i](x).contiguous()
-                features.append(x)
+        features = [x, dummy]
+
+        if self._depth >= 2:
+            x = self.patch_embed1(x)
+            x = self.block1(x)
+            x = self.norm1(x)
+            x = x.contiguous()
+            features.append(x)
+
+        if self._depth >= 3:
+            x = self.patch_embed2(x)
+            x = self.block2(x)
+            x = self.norm2(x)
+            x = x.contiguous()
+            features.append(x)
+
+        if self._depth >= 4:
+            x = self.patch_embed3(x)
+            x = self.block3(x)
+            x = self.norm3(x)
+            x = x.contiguous()
+            features.append(x)
+
+        if self._depth >= 5:
+            x = self.patch_embed4(x)
+            x = self.block4(x)
+            x = self.norm4(x)
+            x = x.contiguous()
+            features.append(x)
+
         return features
 
     def load_state_dict(self, state_dict):
@@ -560,9 +593,7 @@ class MixVisionTransformerEncoder(MixVisionTransformer, EncoderMixin):
 
 def get_pretrained_cfg(name):
     return {
-        "url": "https://github.com/qubvel/segmentation_models.pytorch/releases/download/v0.0.2/{}.pth".format(
-            name
-        ),
+        "url": f"https://github.com/qubvel/segmentation_models.pytorch/releases/download/v0.0.2/{name}.pth",
         "input_space": "RGB",
         "input_size": [3, 224, 224],
         "input_range": [0, 1],
@@ -575,103 +606,103 @@ mix_transformer_encoders = {
     "mit_b0": {
         "encoder": MixVisionTransformerEncoder,
         "pretrained_settings": {"imagenet": get_pretrained_cfg("mit_b0")},
-        "params": dict(
-            out_channels=(3, 0, 32, 64, 160, 256),
-            patch_size=4,
-            embed_dims=[32, 64, 160, 256],
-            num_heads=[1, 2, 5, 8],
-            mlp_ratios=[4, 4, 4, 4],
-            qkv_bias=True,
-            norm_layer=partial(LayerNorm, eps=1e-6),
-            depths=[2, 2, 2, 2],
-            sr_ratios=[8, 4, 2, 1],
-            drop_rate=0.0,
-            drop_path_rate=0.1,
-        ),
+        "params": {
+            "out_channels": [3, 0, 32, 64, 160, 256],
+            "patch_size": 4,
+            "embed_dims": [32, 64, 160, 256],
+            "num_heads": [1, 2, 5, 8],
+            "mlp_ratios": [4, 4, 4, 4],
+            "qkv_bias": True,
+            "norm_layer": partial(LayerNorm, eps=1e-6),
+            "depths": [2, 2, 2, 2],
+            "sr_ratios": [8, 4, 2, 1],
+            "drop_rate": 0.0,
+            "drop_path_rate": 0.1,
+        },
     },
     "mit_b1": {
         "encoder": MixVisionTransformerEncoder,
         "pretrained_settings": {"imagenet": get_pretrained_cfg("mit_b1")},
-        "params": dict(
-            out_channels=(3, 0, 64, 128, 320, 512),
-            patch_size=4,
-            embed_dims=[64, 128, 320, 512],
-            num_heads=[1, 2, 5, 8],
-            mlp_ratios=[4, 4, 4, 4],
-            qkv_bias=True,
-            norm_layer=partial(LayerNorm, eps=1e-6),
-            depths=[2, 2, 2, 2],
-            sr_ratios=[8, 4, 2, 1],
-            drop_rate=0.0,
-            drop_path_rate=0.1,
-        ),
+        "params": {
+            "out_channels": [3, 0, 64, 128, 320, 512],
+            "patch_size": 4,
+            "embed_dims": [64, 128, 320, 512],
+            "num_heads": [1, 2, 5, 8],
+            "mlp_ratios": [4, 4, 4, 4],
+            "qkv_bias": True,
+            "norm_layer": partial(LayerNorm, eps=1e-6),
+            "depths": [2, 2, 2, 2],
+            "sr_ratios": [8, 4, 2, 1],
+            "drop_rate": 0.0,
+            "drop_path_rate": 0.1,
+        },
     },
     "mit_b2": {
         "encoder": MixVisionTransformerEncoder,
         "pretrained_settings": {"imagenet": get_pretrained_cfg("mit_b2")},
-        "params": dict(
-            out_channels=(3, 0, 64, 128, 320, 512),
-            patch_size=4,
-            embed_dims=[64, 128, 320, 512],
-            num_heads=[1, 2, 5, 8],
-            mlp_ratios=[4, 4, 4, 4],
-            qkv_bias=True,
-            norm_layer=partial(LayerNorm, eps=1e-6),
-            depths=[3, 4, 6, 3],
-            sr_ratios=[8, 4, 2, 1],
-            drop_rate=0.0,
-            drop_path_rate=0.1,
-        ),
+        "params": {
+            "out_channels": [3, 0, 64, 128, 320, 512],
+            "patch_size": 4,
+            "embed_dims": [64, 128, 320, 512],
+            "num_heads": [1, 2, 5, 8],
+            "mlp_ratios": [4, 4, 4, 4],
+            "qkv_bias": True,
+            "norm_layer": partial(LayerNorm, eps=1e-6),
+            "depths": [3, 4, 6, 3],
+            "sr_ratios": [8, 4, 2, 1],
+            "drop_rate": 0.0,
+            "drop_path_rate": 0.1,
+        },
     },
     "mit_b3": {
         "encoder": MixVisionTransformerEncoder,
         "pretrained_settings": {"imagenet": get_pretrained_cfg("mit_b3")},
-        "params": dict(
-            out_channels=(3, 0, 64, 128, 320, 512),
-            patch_size=4,
-            embed_dims=[64, 128, 320, 512],
-            num_heads=[1, 2, 5, 8],
-            mlp_ratios=[4, 4, 4, 4],
-            qkv_bias=True,
-            norm_layer=partial(LayerNorm, eps=1e-6),
-            depths=[3, 4, 18, 3],
-            sr_ratios=[8, 4, 2, 1],
-            drop_rate=0.0,
-            drop_path_rate=0.1,
-        ),
+        "params": {
+            "out_channels": [3, 0, 64, 128, 320, 512],
+            "patch_size": 4,
+            "embed_dims": [64, 128, 320, 512],
+            "num_heads": [1, 2, 5, 8],
+            "mlp_ratios": [4, 4, 4, 4],
+            "qkv_bias": True,
+            "norm_layer": partial(LayerNorm, eps=1e-6),
+            "depths": [3, 4, 18, 3],
+            "sr_ratios": [8, 4, 2, 1],
+            "drop_rate": 0.0,
+            "drop_path_rate": 0.1,
+        },
     },
     "mit_b4": {
         "encoder": MixVisionTransformerEncoder,
         "pretrained_settings": {"imagenet": get_pretrained_cfg("mit_b4")},
-        "params": dict(
-            out_channels=(3, 0, 64, 128, 320, 512),
-            patch_size=4,
-            embed_dims=[64, 128, 320, 512],
-            num_heads=[1, 2, 5, 8],
-            mlp_ratios=[4, 4, 4, 4],
-            qkv_bias=True,
-            norm_layer=partial(LayerNorm, eps=1e-6),
-            depths=[3, 8, 27, 3],
-            sr_ratios=[8, 4, 2, 1],
-            drop_rate=0.0,
-            drop_path_rate=0.1,
-        ),
+        "params": {
+            "out_channels": [3, 0, 64, 128, 320, 512],
+            "patch_size": 4,
+            "embed_dims": [64, 128, 320, 512],
+            "num_heads": [1, 2, 5, 8],
+            "mlp_ratios": [4, 4, 4, 4],
+            "qkv_bias": True,
+            "norm_layer": partial(LayerNorm, eps=1e-6),
+            "depths": [3, 8, 27, 3],
+            "sr_ratios": [8, 4, 2, 1],
+            "drop_rate": 0.0,
+            "drop_path_rate": 0.1,
+        },
     },
     "mit_b5": {
         "encoder": MixVisionTransformerEncoder,
         "pretrained_settings": {"imagenet": get_pretrained_cfg("mit_b5")},
-        "params": dict(
-            out_channels=(3, 0, 64, 128, 320, 512),
-            patch_size=4,
-            embed_dims=[64, 128, 320, 512],
-            num_heads=[1, 2, 5, 8],
-            mlp_ratios=[4, 4, 4, 4],
-            qkv_bias=True,
-            norm_layer=partial(LayerNorm, eps=1e-6),
-            depths=[3, 6, 40, 3],
-            sr_ratios=[8, 4, 2, 1],
-            drop_rate=0.0,
-            drop_path_rate=0.1,
-        ),
+        "params": {
+            "out_channels": [3, 0, 64, 128, 320, 512],
+            "patch_size": 4,
+            "embed_dims": [64, 128, 320, 512],
+            "num_heads": [1, 2, 5, 8],
+            "mlp_ratios": [4, 4, 4, 4],
+            "qkv_bias": True,
+            "norm_layer": partial(LayerNorm, eps=1e-6),
+            "depths": [3, 6, 40, 3],
+            "sr_ratios": [8, 4, 2, 1],
+            "drop_rate": 0.0,
+            "drop_path_rate": 0.1,
+        },
     },
 }

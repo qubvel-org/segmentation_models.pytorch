@@ -1,14 +1,7 @@
+import segmentation_models_pytorch as smp
+
 from tests.encoders import base
 from tests.utils import RUN_ALL_ENCODERS
-
-
-class TestDenseNetEncoder(base.BaseEncoderTester):
-    supports_dilated = False
-    encoder_names = (
-        ["densenet121"]
-        if not RUN_ALL_ENCODERS
-        else ["densenet121", "densenet169", "densenet161"]
-    )
 
 
 class TestDPNEncoder(base.BaseEncoderTester):
@@ -17,38 +10,36 @@ class TestDPNEncoder(base.BaseEncoderTester):
         if not RUN_ALL_ENCODERS
         else ["dpn68", "dpn68b", "dpn92", "dpn98", "dpn107", "dpn131"]
     )
+    files_for_diff = ["encoders/dpn.py"]
+
+    def get_tiny_encoder(self):
+        params = {
+            "stage_idxs": [2, 3, 4, 6],
+            "out_channels": [3, 2, 70, 134, 262, 518],
+            "groups": 2,
+            "inc_sec": (2, 2, 2, 2),
+            "k_r": 2,
+            "k_sec": (1, 1, 1, 1),
+            "num_classes": 1000,
+            "num_init_features": 2,
+            "small": True,
+            "test_time_pool": True,
+        }
+        return smp.encoders.dpn.DPNEncoder(**params)
 
 
 class TestInceptionResNetV2Encoder(base.BaseEncoderTester):
-    supports_dilated = False
     encoder_names = (
         ["inceptionresnetv2"] if not RUN_ALL_ENCODERS else ["inceptionresnetv2"]
     )
+    files_for_diff = ["encoders/inceptionresnetv2.py"]
+    supports_dilated = False
 
 
 class TestInceptionV4Encoder(base.BaseEncoderTester):
-    supports_dilated = False
     encoder_names = ["inceptionv4"] if not RUN_ALL_ENCODERS else ["inceptionv4"]
-
-
-class TestResNetEncoder(base.BaseEncoderTester):
-    encoder_names = (
-        ["resnet18"]
-        if not RUN_ALL_ENCODERS
-        else [
-            "resnet18",
-            "resnet34",
-            "resnet50",
-            "resnet101",
-            "resnet152",
-            "resnext50_32x4d",
-            "resnext101_32x4d",
-            "resnext101_32x8d",
-            "resnext101_32x16d",
-            "resnext101_32x32d",
-            "resnext101_32x48d",
-        ]
-    )
+    files_for_diff = ["encoders/inceptionv4.py"]
+    supports_dilated = False
 
 
 class TestSeNetEncoder(base.BaseEncoderTester):
@@ -64,8 +55,26 @@ class TestSeNetEncoder(base.BaseEncoderTester):
             # "senet154",  # extra large model
         ]
     )
+    files_for_diff = ["encoders/senet.py"]
+
+    def get_tiny_encoder(self):
+        params = {
+            "out_channels": [3, 2, 256, 512, 1024, 2048],
+            "block": smp.encoders.senet.SEResNetBottleneck,
+            "layers": [1, 1, 1, 1],
+            "downsample_kernel_size": 1,
+            "downsample_padding": 0,
+            "dropout_p": None,
+            "groups": 1,
+            "inplanes": 2,
+            "input_3x3": False,
+            "num_classes": 1000,
+            "reduction": 2,
+        }
+        return smp.encoders.senet.SENetEncoder(**params)
 
 
 class TestXceptionEncoder(base.BaseEncoderTester):
     supports_dilated = False
     encoder_names = ["xception"] if not RUN_ALL_ENCODERS else ["xception"]
+    files_for_diff = ["encoders/xception.py"]

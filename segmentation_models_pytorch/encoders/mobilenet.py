@@ -23,37 +23,54 @@ Methods:
         depth = 3 -> number of feature tensors = 4 (one with same resolution as input and 3 downsampled).
 """
 
+import torch
 import torchvision
-import torch.nn as nn
+from typing import Dict, Sequence, List
 
 from ._base import EncoderMixin
 
 
 class MobileNetV2Encoder(torchvision.models.MobileNetV2, EncoderMixin):
-    def __init__(self, out_channels, depth=5, **kwargs):
+    def __init__(
+        self, out_channels: List[int], depth: int = 5, output_stride: int = 32, **kwargs
+    ):
+        if depth > 5 or depth < 1:
+            raise ValueError(
+                f"{self.__class__.__name__} depth should be in range [1, 5], got {depth}"
+            )
         super().__init__(**kwargs)
+
         self._depth = depth
-        self._out_channels = out_channels
         self._in_channels = 3
+        self._out_channels = out_channels
+        self._output_stride = output_stride
+        self._out_indexes = [1, 3, 6, 13, len(self.features) - 1]
+
         del self.classifier
 
-    def get_stages(self):
-        return [
-            nn.Identity(),
-            self.features[:2],
-            self.features[2:4],
-            self.features[4:7],
-            self.features[7:14],
-            self.features[14:],
-        ]
+    def get_stages(self) -> Dict[int, Sequence[torch.nn.Module]]:
+        return {
+            16: [self.features[7:14]],
+            32: [self.features[14:]],
+        }
 
-    def forward(self, x):
-        stages = self.get_stages()
+    def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
+        features = [x]
 
-        features = []
-        for i in range(self._depth + 1):
-            x = stages[i](x)
-            features.append(x)
+        depth = 0
+        for i, module in enumerate(self.features):
+            x = module(x)
+
+            if i in self._out_indexes:
+                features.append(x)
+                depth += 1
+
+            # torchscript does not support break in cycle, so we just
+            # go over all modules and then slice number of features
+            if not torch.jit.is_scripting() and depth > self._depth:
+                break
+
+        features = features[: self._depth + 1]
 
         return features
 
@@ -68,13 +85,13 @@ mobilenet_encoders = {
         "encoder": MobileNetV2Encoder,
         "pretrained_settings": {
             "imagenet": {
+                "url": "https://download.pytorch.org/models/mobilenet_v2-b0353104.pth",
                 "mean": [0.485, 0.456, 0.406],
                 "std": [0.229, 0.224, 0.225],
-                "url": "https://download.pytorch.org/models/mobilenet_v2-b0353104.pth",
                 "input_space": "RGB",
                 "input_range": [0, 1],
             }
         },
-        "params": {"out_channels": (3, 16, 24, 32, 96, 1280)},
+        "params": {"out_channels": [3, 16, 24, 32, 96, 1280]},
     }
 }
