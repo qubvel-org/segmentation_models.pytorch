@@ -494,7 +494,7 @@ mobileone_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/mobileone_s0.imagenet",
-                "revision": "main",
+                "revision": "f52815cf0ad29278a9860c9cd5fabf19f904bedf",
             }
         },
         "params": {
@@ -509,7 +509,7 @@ mobileone_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/mobileone_s1.imagenet",
-                "revision": "main",
+                "revision": "5707a98852b762cd8e0c43b5c8c729cd28496677",
             }
         },
         "params": {
@@ -523,7 +523,7 @@ mobileone_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/mobileone_s2.imagenet",
-                "revision": "main",
+                "revision": "ddc3db8fa40d271902c7a8c95cee6691f617d551",
             }
         },
         "params": {
@@ -537,7 +537,7 @@ mobileone_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/mobileone_s3.imagenet",
-                "revision": "main",
+                "revision": "da89b84a91b7400c366c358bfbf8dd0b2fa4dde2",
             }
         },
         "params": {
@@ -551,7 +551,7 @@ mobileone_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/mobileone_s4.imagenet",
-                "revision": "main",
+                "revision": "16197c55d599076b6aae67a83d3b3f70c31b097c",
             }
         },
         "params": {

@@ -122,7 +122,7 @@ densenet_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/densenet121.imagenet",
-                "revision": "main",
+                "revision": "a17c96896a265b61338f66f61d3887b24f61995a",
             }
         },
     },
@@ -137,7 +137,7 @@ densenet_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/densenet169.imagenet",
-                "revision": "main",
+                "revision": "8facfba9fc72f7750879dac9ac6ceb3ab990de8d",
             }
         },
     },
@@ -152,7 +152,7 @@ densenet_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/densenet201.imagenet",
-                "revision": "main",
+                "revision": "ed5deb355d71659391d46fae5e7587460fbb5f84",
             }
         },
     },
@@ -167,7 +167,7 @@ densenet_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/densenet161.imagenet",
-                "revision": "main",
+                "revision": "9afe0fec51ab2a627141769d97d6f83756d78446",
             }
         },
     },

@@ -597,7 +597,7 @@ mix_transformer_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/mit_b0.imagenet",
-                "revision": "main",
+                "revision": "9ce53d104d92d75aabb00aae70677aaab67e7c84",
             }
         },
         "params": {
@@ -619,7 +619,7 @@ mix_transformer_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/mit_b1.imagenet",
-                "revision": "main",
+                "revision": "a04bf4f13a549bce677cf79b04852e7510782817",
             }
         },
         "params": {
@@ -641,7 +641,7 @@ mix_transformer_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/mit_b2.imagenet",
-                "revision": "main",
+                "revision": "868ab6f13871dcf8c3d9f90ee4519403475b65ef",
             }
         },
         "params": {
@@ -663,7 +663,7 @@ mix_transformer_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/mit_b3.imagenet",
-                "revision": "main",
+                "revision": "32558d12a65f1daa0ebcf4f4053c4285e2c1cbda",
             }
         },
         "params": {
@@ -685,7 +685,7 @@ mix_transformer_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/mit_b4.imagenet",
-                "revision": "main",
+                "revision": "3a3454e900a4b4f11dd60eeb59101a9a1a36b017",
             }
         },
         "params": {
@@ -707,7 +707,7 @@ mix_transformer_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/mit_b5.imagenet",
-                "revision": "main",
+                "revision": "ced04d96c586b6297fd59a7a1e244fc78fdb6531",
             }
         },
         "params": {

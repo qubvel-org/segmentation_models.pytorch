@@ -93,7 +93,7 @@ xception_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/xception.imagenet",
-                "revision": "main",
+                "revision": "01cfaf27c11353b1f0c578e7e26d2c000ea91049",
             },
         },
         "params": {"out_channels": [3, 64, 128, 256, 728, 2048]},

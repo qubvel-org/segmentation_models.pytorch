@@ -74,7 +74,7 @@ timm_sknet_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/timm-skresnet18.imagenet",
-                "revision": "main",
+                "revision": "6c97652bb744d89177b68274d2fda3923a7d1f95",
             },
         },
         "params": {
@@ -90,7 +90,7 @@ timm_sknet_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/timm-skresnet34.imagenet",
-                "revision": "main",
+                "revision": "2367796924a8182cc835ef6b5dc303917f923f99",
             },
         },
         "params": {
@@ -106,7 +106,7 @@ timm_sknet_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/timm-skresnext50_32x4d.imagenet",
-                "revision": "main",
+                "revision": "50207e407cc4c6ea9e6872963db6844ca7b7b9de",
             },
         },
         "params": {

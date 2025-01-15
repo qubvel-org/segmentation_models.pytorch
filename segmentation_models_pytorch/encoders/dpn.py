@@ -107,7 +107,7 @@ dpn_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/dpn68.imagenet",
-                "revision": "main",
+                "revision": "c209aefdeae6bc93937556629e974b44d4e58535",
             }
         },
         "params": {
@@ -128,7 +128,7 @@ dpn_encoders = {
         "pretrained_settings": {
             "imagenet+5k": {
                 "repo_id": "smp-hub/dpn68b.imagenet-5k",
-                "revision": "main",
+                "revision": "6c6615e77688e390ae0eaa81e26821fbd83cee4b",
             }
         },
         "params": {
@@ -150,7 +150,7 @@ dpn_encoders = {
         "pretrained_settings": {
             "imagenet+5k": {
                 "repo_id": "smp-hub/dpn92.imagenet-5k",
-                "revision": "main",
+                "revision": "d231f51ce4ad2c84ed5fcaf4ef0cfece6814a526",
             }
         },
         "params": {
@@ -170,7 +170,7 @@ dpn_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/dpn98.imagenet",
-                "revision": "main",
+                "revision": "b2836c86216c1ddce980d832f7deaa4ca22babd3",
             }
         },
         "params": {
@@ -190,7 +190,7 @@ dpn_encoders = {
         "pretrained_settings": {
             "imagenet+5k": {
                 "repo_id": "smp-hub/dpn107.imagenet-5k",
-                "revision": "main",
+                "revision": "dab4cd6b8b79de3db970f2dbff85359a8847db05",
             }
         },
         "params": {
@@ -210,7 +210,7 @@ dpn_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/dpn131.imagenet",
-                "revision": "main",
+                "revision": "04bbb9f415ca2bb59f3d8227857967b74698515e",
             }
         },
         "params": {

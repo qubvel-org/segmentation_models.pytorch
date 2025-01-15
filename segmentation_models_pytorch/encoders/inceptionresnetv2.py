@@ -119,11 +119,11 @@ inceptionresnetv2_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/inceptionresnetv2.imagenet",
-                "revision": "main",
+                "revision": "120c5afdbb80a1c989db0a7423ebb7a9db9b1e6c",
             },
             "imagenet+background": {
                 "repo_id": "smp-hub/inceptionresnetv2.imagenet-background",
-                "revision": "main",
+                "revision": "3ecf3491658dc0f6a76d69c9d1cb36511b1ee56c",
             },
         },
         "params": {"out_channels": [3, 64, 192, 320, 1088, 1536], "num_classes": 1000},

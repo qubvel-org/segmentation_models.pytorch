@@ -115,11 +115,11 @@ efficient_net_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/efficientnet-b0.imagenet",
-                "revision": "main",
+                "revision": "1bbe7ecc1d5ea1d2058de1a2db063b8701aff314",
             },
             "advprop": {
                 "repo_id": "smp-hub/efficientnet-b0.advprop",
-                "revision": "main",
+                "revision": "29043c08140d9c6ee7de1468d55923f2b06bcec2",
             },
         },
         "params": {
@@ -133,11 +133,11 @@ efficient_net_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/efficientnet-b1.imagenet",
-                "revision": "main",
+                "revision": "5d637466a5215de300a8ccb13a39357df2df2bf4",
             },
             "advprop": {
                 "repo_id": "smp-hub/efficientnet-b1.advprop",
-                "revision": "main",
+                "revision": "2e518b8b0955bbab467f50525578dab6b6086afc",
             },
         },
         "params": {
@@ -151,11 +151,11 @@ efficient_net_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/efficientnet-b2.imagenet",
-                "revision": "main",
+                "revision": "a96d4f0295ffbae18ebba173bf7f3c0c8f21990e",
             },
             "advprop": {
                 "repo_id": "smp-hub/efficientnet-b2.advprop",
-                "revision": "main",
+                "revision": "be788c20dfb0bbe83b4c439f9cfe0dd937c0783e",
             },
         },
         "params": {
@@ -169,11 +169,11 @@ efficient_net_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/efficientnet-b3.imagenet",
-                "revision": "main",
+                "revision": "074c54a6c473e0d294690d49cedb6cf463e7127d",
             },
             "advprop": {
                 "repo_id": "smp-hub/efficientnet-b3.advprop",
-                "revision": "main",
+                "revision": "9ccc166d87bd9c08d6bed4477638c7f4bb3eec78",
             },
         },
         "params": {
@@ -187,11 +187,11 @@ efficient_net_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/efficientnet-b4.imagenet",
-                "revision": "main",
+                "revision": "05cd5dde5dab658f00c463f9b9aa0ced76784f40",
             },
             "advprop": {
                 "repo_id": "smp-hub/efficientnet-b4.advprop",
-                "revision": "main",
+                "revision": "f04caa809ea4eb08ee9e7fd555f5514ebe2a9ef5",
             },
         },
         "params": {
@@ -205,11 +205,11 @@ efficient_net_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/efficientnet-b5.imagenet",
-                "revision": "main",
+                "revision": "69f4d28460a4e421b7860bc26ee7d832e03e01ca",
             },
             "advprop": {
                 "repo_id": "smp-hub/efficientnet-b5.advprop",
-                "revision": "main",
+                "revision": "dabe78fc8ab7ce93ddc2bb156b01db227caede88",
             },
         },
         "params": {
@@ -223,11 +223,11 @@ efficient_net_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/efficientnet-b6.imagenet",
-                "revision": "main",
+                "revision": "8570752016f7c62ae149cffa058550fe44e21c8b",
             },
             "advprop": {
                 "repo_id": "smp-hub/efficientnet-b6.advprop",
-                "revision": "main",
+                "revision": "c2dbb4d1359151165ec7b96cfe54a9cac2142a31",
             },
         },
         "params": {
@@ -241,11 +241,11 @@ efficient_net_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/efficientnet-b7.imagenet",
-                "revision": "main",
+                "revision": "5a5dbe687d612ebc3dca248274fd1191111deda6",
             },
             "advprop": {
                 "repo_id": "smp-hub/efficientnet-b7.advprop",
-                "revision": "main",
+                "revision": "ce33edb4e80c0cde268f098ae2299e23f615577d",
             },
         },
         "params": {

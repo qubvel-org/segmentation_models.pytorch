@@ -86,7 +86,7 @@ mobilenet_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/mobilenet_v2.imagenet",
-                "revision": "main",
+                "revision": "e67aa804e17f7b404b629127eabbd224c4e0690b",
             }
         },
         "params": {"out_channels": [3, 16, 24, 32, 96, 1280]},

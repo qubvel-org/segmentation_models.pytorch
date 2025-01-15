@@ -175,7 +175,7 @@ senet_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/senet154.imagenet",
-                "revision": "main",
+                "revision": "249f45efc9881ba560a0c480128edbc34ab87e40",
             }
         },
         "params": {
@@ -193,7 +193,7 @@ senet_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/se_resnet50.imagenet",
-                "revision": "main",
+                "revision": "e6b4bc2dc85226c3d3474544410724a485455459",
             }
         },
         "params": {
@@ -215,7 +215,7 @@ senet_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/se_resnet101.imagenet",
-                "revision": "main",
+                "revision": "71fe95cc0a27f444cf83671f354de02dc741b18b",
             }
         },
         "params": {
@@ -237,7 +237,7 @@ senet_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/se_resnet152.imagenet",
-                "revision": "main",
+                "revision": "e79fc3d9d76f197bd76a2593c2054edf1083fe32",
             }
         },
         "params": {
@@ -259,7 +259,7 @@ senet_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/se_resnext50_32x4d.imagenet",
-                "revision": "main",
+                "revision": "73246406d879a2b0e3fdfe6fddd56347d38f38ae",
             }
         },
         "params": {
@@ -281,7 +281,7 @@ senet_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/se_resnext101_32x4d.imagenet",
-                "revision": "main",
+                "revision": "18808a4276f46421d358a9de554e0b93c2795df4",
             }
         },
         "params": {

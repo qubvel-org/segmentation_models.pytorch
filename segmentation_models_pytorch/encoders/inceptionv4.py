@@ -100,11 +100,11 @@ inceptionv4_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/inceptionv4.imagenet",
-                "revision": "main",
+                "revision": "918fb54f07811d82a4ecde3a51156041d0facba9",
             },
             "imagenet+background": {
                 "repo_id": "smp-hub/inceptionv4.imagenet-background",
-                "revision": "main",
+                "revision": "8c2a48e20d2709ee64f8421c61be309f05bfa536",
             },
         },
         "params": {

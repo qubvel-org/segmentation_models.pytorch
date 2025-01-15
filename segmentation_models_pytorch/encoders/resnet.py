@@ -98,15 +98,15 @@ resnet_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/resnet18.imagenet",
-                "revision": "main",
+                "revision": "3f2325ff978283d47aa6a1d6878ca20565622683",
             },
             "ssl": {
                 "repo_id": "smp-hub/resnet18.ssl",
-                "revision": "main",
+                "revision": "d600d5116aac2e6e595f99f40612074c723c00b2",
             },
             "swsl": {
                 "repo_id": "smp-hub/resnet18.swsl",
-                "revision": "main",
+                "revision": "0e3a35d4d8e344088c14a96eee502a88ac70eae1",
             },
         },
         "params": {
@@ -120,7 +120,7 @@ resnet_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/resnet34.imagenet",
-                "revision": "main",
+                "revision": "7a57b34f723329ff020b3f8bc41771163c519d0c",
             },
         },
         "params": {
@@ -134,15 +134,15 @@ resnet_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/resnet50.imagenet",
-                "revision": "main",
+                "revision": "00cb74e366966d59cd9a35af57e618af9f88efe9",
             },
             "ssl": {
                 "repo_id": "smp-hub/resnet50.ssl",
-                "revision": "main",
+                "revision": "d07daf5b4377f3700c6ac61906b0aafbc4eca46b",
             },
             "swsl": {
                 "repo_id": "smp-hub/resnet50.swsl",
-                "revision": "main",
+                "revision": "b9520cce124f91c6fe7eee45721a2c7954f0d8c0",
             },
         },
         "params": {
@@ -156,7 +156,7 @@ resnet_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/resnet101.imagenet",
-                "revision": "main",
+                "revision": "cd7c15e8c51da86ae6a084515fdb962d0c94e7d1",
             },
         },
         "params": {
@@ -170,7 +170,7 @@ resnet_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/resnet152.imagenet",
-                "revision": "main",
+                "revision": "951dd835e9d086628e447b484584c8983f9e1dd0",
             },
         },
         "params": {
@@ -184,15 +184,15 @@ resnet_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/resnext50_32x4d.imagenet",
-                "revision": "main",
+                "revision": "329793c85d62fd340ae42ae39fb905a63df872e7",
             },
             "ssl": {
                 "repo_id": "smp-hub/resnext50_32x4d.ssl",
-                "revision": "main",
+                "revision": "9b67cff77d060c7044493a58c24d1007c1eb06c3",
             },
             "swsl": {
                 "repo_id": "smp-hub/resnext50_32x4d.swsl",
-                "revision": "main",
+                "revision": "52e6e49da61b8e26ca691e1aef2cbb952884057d",
             },
         },
         "params": {
@@ -208,11 +208,11 @@ resnet_encoders = {
         "pretrained_settings": {
             "ssl": {
                 "repo_id": "smp-hub/resnext101_32x4d.ssl",
-                "revision": "main",
+                "revision": "b39796c8459084d13523b7016c3ef13a2e9e472b",
             },
             "swsl": {
                 "repo_id": "smp-hub/resnext101_32x4d.swsl",
-                "revision": "main",
+                "revision": "3f8355b4892a31f001a832b49b2b01484d48516a",
             },
         },
         "params": {
@@ -228,19 +228,19 @@ resnet_encoders = {
         "pretrained_settings": {
             "imagenet": {
                 "repo_id": "smp-hub/resnext101_32x8d.imagenet",
-                "revision": "main",
+                "revision": "221af6198d03a4ee88992f78a1ee81b46a52d339",
             },
             "instagram": {
                 "repo_id": "smp-hub/resnext101_32x8d.instagram",
-                "revision": "main",
+                "revision": "44cd927aa6e64673ffe9d31230bad44abc18b823",
             },
             "ssl": {
                 "repo_id": "smp-hub/resnext101_32x8d.ssl",
-                "revision": "main",
+                "revision": "723a95ddeed335c9488c37c6cbef13d779ac8f97",
             },
             "swsl": {
                 "repo_id": "smp-hub/resnext101_32x8d.swsl",
-                "revision": "main",
+                "revision": "58cf0bb65f91365470398080d9588b187d1777c4",
             },
         },
         "params": {
@@ -256,15 +256,15 @@ resnet_encoders = {
         "pretrained_settings": {
             "instagram": {
                 "repo_id": "smp-hub/resnext101_32x16d.instagram",
-                "revision": "main",
+                "revision": "64e8e320eeae6501185b0627b2429a68e52d050c",
             },
             "ssl": {
                 "repo_id": "smp-hub/resnext101_32x16d.ssl",
-                "revision": "main",
+                "revision": "1283fe03fbb6aa2599b2df24095255acb93c3d5c",
             },
             "swsl": {
                 "repo_id": "smp-hub/resnext101_32x16d.swsl",
-                "revision": "main",
+                "revision": "30ba61bbd4d6af0d955c513dbb4f557b84eb094f",
             },
         },
         "params": {
@@ -280,7 +280,7 @@ resnet_encoders = {
         "pretrained_settings": {
             "instagram": {
                 "repo_id": "smp-hub/resnext101_32x32d.instagram",
-                "revision": "main",
+                "revision": "c9405de121fdaa275a89de470fb19409e3eeaa86",
             },
         },
         "params": {
@@ -296,7 +296,7 @@ resnet_encoders = {
         "pretrained_settings": {
             "instagram": {
                 "repo_id": "smp-hub/resnext101_32x48d.instagram",
-                "revision": "main",
+                "revision": "53e61a962b824ad7027409821f9ac3e3336dd024",
             },
         },
         "params": {
