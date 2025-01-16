@@ -58,8 +58,8 @@ class EfficientNetEncoder(EfficientNet, EncoderMixin):
 
     def get_stages(self) -> Dict[int, Sequence[torch.nn.Module]]:
         return {
-            16: [self._blocks[self._stage_idxs[1] : self._stage_idxs[2]]],
-            32: [self._blocks[self._stage_idxs[2] :]],
+            16: [self._blocks[self._out_indexes[1] + 1 : self._out_indexes[2] + 1]],
+            32: [self._blocks[self._out_indexes[2] + 1 :]],
         }
 
     def forward(self, x: torch.Tensor) -> List[torch.Tensor]:
