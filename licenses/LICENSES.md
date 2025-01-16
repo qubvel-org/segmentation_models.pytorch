@@ -23,3 +23,6 @@ The majority of the code is licensed under the [MIT License](LICENSE). However, 
   * Applies to the DeepLabV3 decoder
   * [segmentation_models_pytorch/decoders/deeplabv3/decoder.py](https://github.com/qubvel/segmentation_models.pytorch/blob/main/segmentation_models_pytorch/decoders/deeplabv3/decoder.py)
 
+- Apache-2.0 License
+  * Applies to the EfficientNet encoder
+  * [segmentation_models_pytorch/encoders/_efficientnet.py](https://github.com/qubvel/segmentation_models.pytorch/blob/main/segmentation_models_pytorch/encoders/_efficientnet.py)

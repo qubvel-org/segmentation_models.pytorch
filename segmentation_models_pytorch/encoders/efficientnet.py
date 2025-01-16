@@ -26,10 +26,8 @@ Methods:
 import torch
 from typing import List, Dict, Sequence
 
-from efficientnet_pytorch import EfficientNet
-from efficientnet_pytorch.utils import get_model_params
-
 from ._base import EncoderMixin
+from ._efficientnet import EfficientNet, get_model_params
 
 
 class EfficientNetEncoder(EfficientNet, EncoderMixin):
