@@ -113,7 +113,7 @@ class MBConvBlock(nn.Module):
         self._bn2 = nn.BatchNorm2d(
             num_features=final_oup, momentum=self._bn_mom, eps=self._bn_eps
         )
-        self._swish = MemoryEfficientSwish()
+        self._swish = nn.SiLU()
 
     def forward(self, inputs, drop_connect_rate=None):
         """MBConvBlock's forward function.
@@ -164,14 +164,6 @@ class MBConvBlock(nn.Module):
                 x = drop_connect(x, p=drop_connect_rate, training=self.training)
             x = x + inputs  # skip connection
         return x
-
-    def set_swish(self, memory_efficient=True):
-        """Sets swish function as memory efficient (for training) or standard (for export).
-
-        Args:
-            memory_efficient (bool): Whether to use memory-efficient version of swish.
-        """
-        self._swish = MemoryEfficientSwish() if memory_efficient else nn.SiLU()
 
 
 class EfficientNet(nn.Module):
@@ -265,18 +257,7 @@ class EfficientNet(nn.Module):
             self._dropout = nn.Dropout(self._global_params.dropout_rate)
             self._fc = nn.Linear(out_channels, self._global_params.num_classes)
 
-        # set activation to memory efficient swish by default
-        self._swish = MemoryEfficientSwish()
-
-    def set_swish(self, memory_efficient=True):
-        """Sets swish function as memory efficient (for training) or standard (for export).
-
-        Args:
-            memory_efficient (bool): Whether to use memory-efficient version of swish.
-        """
-        self._swish = MemoryEfficientSwish() if memory_efficient else nn.SiLU()
-        for block in self._blocks:
-            block.set_swish(memory_efficient)
+        self._swish = nn.SiLU()
 
     def extract_endpoints(self, inputs):
         """Use convolution layer to extract features
@@ -380,7 +361,6 @@ class EfficientNet(nn.Module):
 ################################################################################
 
 # GlobalParams and BlockArgs: Two namedtuples
-# Swish and MemoryEfficientSwish: Two implementations of the method
 # round_filters and round_repeats:
 #     Functions to calculate params for scaling model width and depth ! ! !
 # get_width_and_height_from_size and calculate_output_image_size
@@ -430,26 +410,6 @@ BlockArgs = collections.namedtuple(
 # Set GlobalParams and BlockArgs's defaults
 GlobalParams.__new__.__defaults__ = (None,) * len(GlobalParams._fields)
 BlockArgs.__new__.__defaults__ = (None,) * len(BlockArgs._fields)
-
-
-# A memory-efficient implementation of Swish function
-class SwishImplementation(torch.autograd.Function):
-    @staticmethod
-    def forward(ctx, i):
-        result = i * torch.sigmoid(i)
-        ctx.save_for_backward(i)
-        return result
-
-    @staticmethod
-    def backward(ctx, grad_output):
-        i = ctx.saved_tensors[0]
-        sigmoid_i = torch.sigmoid(i)
-        return grad_output * (sigmoid_i * (1 + i * (1 - sigmoid_i)))
-
-
-class MemoryEfficientSwish(nn.Module):
-    def forward(self, x):
-        return SwishImplementation.apply(x)
 
 
 def round_filters(filters, global_params):
