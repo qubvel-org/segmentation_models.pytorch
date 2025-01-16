@@ -120,12 +120,12 @@ def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **
         # First, try to load from  HF-Hub, but as far as I know not all countries have
         # access to the Hub (e.g. China), so we try to load from the original url if
         # the first attempt fails.
+        weights_path = None
         try:
             hf_hub_download(repo_id, filename="config.json", revision=revision)
-            model_path = hf_hub_download(
+            weights_path = hf_hub_download(
                 repo_id, filename="model.safetensors", revision=revision
             )
-            state_dict = load_file(model_path, device="cpu")
         except Exception as e:
             if name in pretrained_settings and weights in pretrained_settings[name]:
                 message = (
@@ -137,6 +137,9 @@ def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **
                 state_dict = load_url(url, map_location="cpu")
             else:
                 raise e
+
+        if weights_path is not None:
+            state_dict = load_file(weights_path, device="cpu")
 
         # Load model weights
         encoder.load_state_dict(state_dict)
