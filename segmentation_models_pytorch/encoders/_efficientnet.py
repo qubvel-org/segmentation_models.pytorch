@@ -13,7 +13,6 @@ import re
 import math
 import collections
 from functools import partial
-from torch.utils import model_zoo
 
 
 class MBConvBlock(nn.Module):
