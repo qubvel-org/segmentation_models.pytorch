@@ -27,7 +27,7 @@ import torch
 from typing import List, Dict, Sequence
 
 from ._base import EncoderMixin
-from ._efficientnet import EfficientNet, url_map, url_map_advprop, get_model_params
+from ._efficientnet import EfficientNet, get_model_params
 
 
 class EfficientNetEncoder(EfficientNet, EncoderMixin):
@@ -107,30 +107,19 @@ class EfficientNetEncoder(EfficientNet, EncoderMixin):
         super().load_state_dict(state_dict, **kwargs)
 
 
-def _get_pretrained_settings(encoder):
-    pretrained_settings = {
-        "imagenet": {
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "url": url_map[encoder],
-            "input_space": "RGB",
-            "input_range": [0, 1],
-        },
-        "advprop": {
-            "mean": [0.5, 0.5, 0.5],
-            "std": [0.5, 0.5, 0.5],
-            "url": url_map_advprop[encoder],
-            "input_space": "RGB",
-            "input_range": [0, 1],
-        },
-    }
-    return pretrained_settings
-
-
 efficient_net_encoders = {
     "efficientnet-b0": {
         "encoder": EfficientNetEncoder,
-        "pretrained_settings": _get_pretrained_settings("efficientnet-b0"),
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/efficientnet-b0.imagenet",
+                "revision": "1bbe7ecc1d5ea1d2058de1a2db063b8701aff314",
+            },
+            "advprop": {
+                "repo_id": "smp-hub/efficientnet-b0.advprop",
+                "revision": "29043c08140d9c6ee7de1468d55923f2b06bcec2",
+            },
+        },
         "params": {
             "out_channels": [3, 32, 24, 40, 112, 320],
             "stage_idxs": [3, 5, 9, 16],
@@ -139,7 +128,16 @@ efficient_net_encoders = {
     },
     "efficientnet-b1": {
         "encoder": EfficientNetEncoder,
-        "pretrained_settings": _get_pretrained_settings("efficientnet-b1"),
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/efficientnet-b1.imagenet",
+                "revision": "5d637466a5215de300a8ccb13a39357df2df2bf4",
+            },
+            "advprop": {
+                "repo_id": "smp-hub/efficientnet-b1.advprop",
+                "revision": "2e518b8b0955bbab467f50525578dab6b6086afc",
+            },
+        },
         "params": {
             "out_channels": [3, 32, 24, 40, 112, 320],
             "stage_idxs": [5, 8, 16, 23],
@@ -148,7 +146,16 @@ efficient_net_encoders = {
     },
     "efficientnet-b2": {
         "encoder": EfficientNetEncoder,
-        "pretrained_settings": _get_pretrained_settings("efficientnet-b2"),
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/efficientnet-b2.imagenet",
+                "revision": "a96d4f0295ffbae18ebba173bf7f3c0c8f21990e",
+            },
+            "advprop": {
+                "repo_id": "smp-hub/efficientnet-b2.advprop",
+                "revision": "be788c20dfb0bbe83b4c439f9cfe0dd937c0783e",
+            },
+        },
         "params": {
             "out_channels": [3, 32, 24, 48, 120, 352],
             "stage_idxs": [5, 8, 16, 23],
@@ -157,7 +164,16 @@ efficient_net_encoders = {
     },
     "efficientnet-b3": {
         "encoder": EfficientNetEncoder,
-        "pretrained_settings": _get_pretrained_settings("efficientnet-b3"),
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/efficientnet-b3.imagenet",
+                "revision": "074c54a6c473e0d294690d49cedb6cf463e7127d",
+            },
+            "advprop": {
+                "repo_id": "smp-hub/efficientnet-b3.advprop",
+                "revision": "9ccc166d87bd9c08d6bed4477638c7f4bb3eec78",
+            },
+        },
         "params": {
             "out_channels": [3, 40, 32, 48, 136, 384],
             "stage_idxs": [5, 8, 18, 26],
@@ -166,7 +182,16 @@ efficient_net_encoders = {
     },
     "efficientnet-b4": {
         "encoder": EfficientNetEncoder,
-        "pretrained_settings": _get_pretrained_settings("efficientnet-b4"),
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/efficientnet-b4.imagenet",
+                "revision": "05cd5dde5dab658f00c463f9b9aa0ced76784f40",
+            },
+            "advprop": {
+                "repo_id": "smp-hub/efficientnet-b4.advprop",
+                "revision": "f04caa809ea4eb08ee9e7fd555f5514ebe2a9ef5",
+            },
+        },
         "params": {
             "out_channels": [3, 48, 32, 56, 160, 448],
             "stage_idxs": [6, 10, 22, 32],
@@ -175,7 +200,16 @@ efficient_net_encoders = {
     },
     "efficientnet-b5": {
         "encoder": EfficientNetEncoder,
-        "pretrained_settings": _get_pretrained_settings("efficientnet-b5"),
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/efficientnet-b5.imagenet",
+                "revision": "69f4d28460a4e421b7860bc26ee7d832e03e01ca",
+            },
+            "advprop": {
+                "repo_id": "smp-hub/efficientnet-b5.advprop",
+                "revision": "dabe78fc8ab7ce93ddc2bb156b01db227caede88",
+            },
+        },
         "params": {
             "out_channels": [3, 48, 40, 64, 176, 512],
             "stage_idxs": [8, 13, 27, 39],
@@ -184,7 +218,16 @@ efficient_net_encoders = {
     },
     "efficientnet-b6": {
         "encoder": EfficientNetEncoder,
-        "pretrained_settings": _get_pretrained_settings("efficientnet-b6"),
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/efficientnet-b6.imagenet",
+                "revision": "8570752016f7c62ae149cffa058550fe44e21c8b",
+            },
+            "advprop": {
+                "repo_id": "smp-hub/efficientnet-b6.advprop",
+                "revision": "c2dbb4d1359151165ec7b96cfe54a9cac2142a31",
+            },
+        },
         "params": {
             "out_channels": [3, 56, 40, 72, 200, 576],
             "stage_idxs": [9, 15, 31, 45],
@@ -193,7 +236,16 @@ efficient_net_encoders = {
     },
     "efficientnet-b7": {
         "encoder": EfficientNetEncoder,
-        "pretrained_settings": _get_pretrained_settings("efficientnet-b7"),
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/efficientnet-b7.imagenet",
+                "revision": "5a5dbe687d612ebc3dca248274fd1191111deda6",
+            },
+            "advprop": {
+                "repo_id": "smp-hub/efficientnet-b7.advprop",
+                "revision": "ce33edb4e80c0cde268f098ae2299e23f615577d",
+            },
+        },
         "params": {
             "out_channels": [3, 64, 48, 80, 224, 640],
             "stage_idxs": [11, 18, 38, 55],

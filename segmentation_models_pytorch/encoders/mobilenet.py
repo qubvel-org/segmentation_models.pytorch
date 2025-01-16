@@ -85,11 +85,8 @@ mobilenet_encoders = {
         "encoder": MobileNetV2Encoder,
         "pretrained_settings": {
             "imagenet": {
-                "url": "https://download.pytorch.org/models/mobilenet_v2-b0353104.pth",
-                "mean": [0.485, 0.456, 0.406],
-                "std": [0.229, 0.224, 0.225],
-                "input_space": "RGB",
-                "input_range": [0, 1],
+                "repo_id": "smp-hub/mobilenet_v2.imagenet",
+                "revision": "e67aa804e17f7b404b629127eabbd224c4e0690b",
             }
         },
         "params": {"out_channels": [3, 16, 24, 32, 96, 1280]},

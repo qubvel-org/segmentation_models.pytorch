@@ -110,92 +110,65 @@ class DenseNetEncoder(DenseNet, EncoderMixin):
         super().load_state_dict(state_dict)
 
 
-pretrained_settings = {
-    "densenet121": {
-        "imagenet": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/densenet121-fbdb23505.pth",
-            "input_space": "RGB",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        }
-    },
-    "densenet169": {
-        "imagenet": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/densenet169-f470b90a4.pth",
-            "input_space": "RGB",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        }
-    },
-    "densenet201": {
-        "imagenet": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/densenet201-5750cbb1e.pth",
-            "input_space": "RGB",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        }
-    },
-    "densenet161": {
-        "imagenet": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/densenet161-347e6b360.pth",
-            "input_space": "RGB",
-            "input_size": [3, 224, 224],
-            "input_range": [0, 1],
-            "mean": [0.485, 0.456, 0.406],
-            "std": [0.229, 0.224, 0.225],
-            "num_classes": 1000,
-        }
-    },
-}
-
 densenet_encoders = {
     "densenet121": {
         "encoder": DenseNetEncoder,
-        "pretrained_settings": pretrained_settings["densenet121"],
         "params": {
             "out_channels": [3, 64, 256, 512, 1024, 1024],
             "num_init_features": 64,
             "growth_rate": 32,
             "block_config": (6, 12, 24, 16),
         },
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/densenet121.imagenet",
+                "revision": "a17c96896a265b61338f66f61d3887b24f61995a",
+            }
+        },
     },
     "densenet169": {
         "encoder": DenseNetEncoder,
-        "pretrained_settings": pretrained_settings["densenet169"],
         "params": {
             "out_channels": [3, 64, 256, 512, 1280, 1664],
             "num_init_features": 64,
             "growth_rate": 32,
             "block_config": (6, 12, 32, 32),
         },
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/densenet169.imagenet",
+                "revision": "8facfba9fc72f7750879dac9ac6ceb3ab990de8d",
+            }
+        },
     },
     "densenet201": {
         "encoder": DenseNetEncoder,
-        "pretrained_settings": pretrained_settings["densenet201"],
         "params": {
             "out_channels": [3, 64, 256, 512, 1792, 1920],
             "num_init_features": 64,
             "growth_rate": 32,
             "block_config": (6, 12, 48, 32),
         },
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/densenet201.imagenet",
+                "revision": "ed5deb355d71659391d46fae5e7587460fbb5f84",
+            }
+        },
     },
     "densenet161": {
         "encoder": DenseNetEncoder,
-        "pretrained_settings": pretrained_settings["densenet161"],
         "params": {
             "out_channels": [3, 96, 384, 768, 2112, 2208],
             "num_init_features": 96,
             "growth_rate": 48,
             "block_config": (6, 12, 36, 24),
+        },
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/densenet161.imagenet",
+                "revision": "9afe0fec51ab2a627141769d97d6f83756d78446",
+            }
         },
     },
 }

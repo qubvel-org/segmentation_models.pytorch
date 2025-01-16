@@ -99,22 +99,12 @@ inceptionv4_encoders = {
         "encoder": InceptionV4Encoder,
         "pretrained_settings": {
             "imagenet": {
-                "url": "http://data.lip6.fr/cadene/pretrainedmodels/inceptionv4-8e4777a0.pth",
-                "input_space": "RGB",
-                "input_size": [3, 299, 299],
-                "input_range": [0, 1],
-                "mean": [0.5, 0.5, 0.5],
-                "std": [0.5, 0.5, 0.5],
-                "num_classes": 1000,
+                "repo_id": "smp-hub/inceptionv4.imagenet",
+                "revision": "918fb54f07811d82a4ecde3a51156041d0facba9",
             },
             "imagenet+background": {
-                "url": "http://data.lip6.fr/cadene/pretrainedmodels/inceptionv4-8e4777a0.pth",
-                "input_space": "RGB",
-                "input_size": [3, 299, 299],
-                "input_range": [0, 1],
-                "mean": [0.5, 0.5, 0.5],
-                "std": [0.5, 0.5, 0.5],
-                "num_classes": 1001,
+                "repo_id": "smp-hub/inceptionv4.imagenet-background",
+                "revision": "8c2a48e20d2709ee64f8421c61be309f05bfa536",
             },
         },
         "params": {
