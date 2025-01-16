@@ -16,21 +16,6 @@ from functools import partial
 from torch.utils import model_zoo
 
 
-VALID_MODELS = (
-    "efficientnet-b0",
-    "efficientnet-b1",
-    "efficientnet-b2",
-    "efficientnet-b3",
-    "efficientnet-b4",
-    "efficientnet-b5",
-    "efficientnet-b6",
-    "efficientnet-b7",
-    "efficientnet-b8",
-    # Support the construction of 'efficientnet-l2' without pretrained weights
-    "efficientnet-l2",
-)
-
-
 class MBConvBlock(nn.Module):
     """Mobile Inverted Residual Bottleneck Block.
 
@@ -772,7 +757,6 @@ class MaxPool2dStaticSamePadding(nn.MaxPool2d):
 # get_model_params and efficientnet:
 #     Functions to get BlockArgs and GlobalParams for efficientnet
 # url_map and url_map_advprop: Dicts of url_map for pretrained weights
-# load_pretrained_weights: A function to load pretrained weights
 
 
 class BlockDecoder(object):
@@ -818,30 +802,6 @@ class BlockDecoder(object):
         )
 
     @staticmethod
-    def _encode_block_string(block):
-        """Encode a block to a string.
-
-        Args:
-            block (namedtuple): A BlockArgs type argument.
-
-        Returns:
-            block_string: A String form of BlockArgs.
-        """
-        args = [
-            "r%d" % block.num_repeat,
-            "k%d" % block.kernel_size,
-            "s%d%d" % (block.strides[0], block.strides[1]),
-            "e%s" % block.expand_ratio,
-            "i%d" % block.input_filters,
-            "o%d" % block.output_filters,
-        ]
-        if 0 < block.se_ratio <= 1:
-            args.append("se%s" % block.se_ratio)
-        if block.id_skip is False:
-            args.append("noskip")
-        return "_".join(args)
-
-    @staticmethod
     def decode(string_list):
         """Decode a list of string notations to specify blocks inside the network.
 
@@ -856,21 +816,6 @@ class BlockDecoder(object):
         for block_string in string_list:
             blocks_args.append(BlockDecoder._decode_block_string(block_string))
         return blocks_args
-
-    @staticmethod
-    def encode(blocks_args):
-        """Encode a list of BlockArgs to a list of strings.
-
-        Args:
-            blocks_args (list[namedtuples]): A list of BlockArgs namedtuples of block args.
-
-        Returns:
-            block_strings: A list of strings, each string is a notation of block.
-        """
-        block_strings = []
-        for block in blocks_args:
-            block_strings.append(BlockDecoder._encode_block_string(block))
-        return block_strings
 
 
 def efficientnet_params(model_name):
@@ -1005,47 +950,3 @@ url_map_advprop = {
     "efficientnet-b7": "https://github.com/lukemelas/EfficientNet-PyTorch/releases/download/1.0/adv-efficientnet-b7-4652b6dd.pth",
     "efficientnet-b8": "https://github.com/lukemelas/EfficientNet-PyTorch/releases/download/1.0/adv-efficientnet-b8-22a8fe65.pth",
 }
-
-# TODO: add the petrained weights url map of 'efficientnet-l2'
-
-
-def load_pretrained_weights(
-    model, model_name, weights_path=None, load_fc=True, advprop=False, verbose=True
-):
-    """Loads pretrained weights from weights path or download using url.
-
-    Args:
-        model (Module): The whole model of efficientnet.
-        model_name (str): Model name of efficientnet.
-        weights_path (None or str):
-            str: path to pretrained weights file on the local disk.
-            None: use pretrained weights downloaded from the Internet.
-        load_fc (bool): Whether to load pretrained weights for fc layer at the end of the model.
-        advprop (bool): Whether to load pretrained weights
-                        trained with advprop (valid when weights_path is None).
-    """
-    if isinstance(weights_path, str):
-        state_dict = torch.load(weights_path)
-    else:
-        # AutoAugment or Advprop (different preprocessing)
-        url_map_ = url_map_advprop if advprop else url_map
-        state_dict = model_zoo.load_url(url_map_[model_name])
-
-    if load_fc:
-        ret = model.load_state_dict(state_dict, strict=False)
-        assert not ret.missing_keys, (
-            "Missing keys when loading pretrained weights: {}".format(ret.missing_keys)
-        )
-    else:
-        state_dict.pop("_fc.weight")
-        state_dict.pop("_fc.bias")
-        ret = model.load_state_dict(state_dict, strict=False)
-        assert set(ret.missing_keys) == set(["_fc.weight", "_fc.bias"]), (
-            "Missing keys when loading pretrained weights: {}".format(ret.missing_keys)
-        )
-    assert not ret.unexpected_keys, (
-        "Missing keys when loading pretrained weights: {}".format(ret.unexpected_keys)
-    )
-
-    if verbose:
-        print("Loaded pretrained weights for {}".format(model_name))
