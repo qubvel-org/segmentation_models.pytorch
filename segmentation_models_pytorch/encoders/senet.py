@@ -29,6 +29,9 @@ from typing import List, Dict, Sequence
 from ._base import EncoderMixin
 from ._senet import (
     SENet,
+    SEBottleneck,
+    SEResNetBottleneck,
+    SEResNeXtBottleneck,
 )
 
 
@@ -94,3 +97,135 @@ class SENetEncoder(SENet, EncoderMixin):
         state_dict.pop("last_linear.bias", None)
         state_dict.pop("last_linear.weight", None)
         super().load_state_dict(state_dict, **kwargs)
+
+
+senet_encoders = {
+    "senet154": {
+        "encoder": SENetEncoder,
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/senet154.imagenet",
+                "revision": "249f45efc9881ba560a0c480128edbc34ab87e40",
+            }
+        },
+        "params": {
+            "out_channels": [3, 128, 256, 512, 1024, 2048],
+            "block": SEBottleneck,
+            "dropout_p": 0.2,
+            "groups": 64,
+            "layers": [3, 8, 36, 3],
+            "num_classes": 1000,
+            "reduction": 16,
+        },
+    },
+    "se_resnet50": {
+        "encoder": SENetEncoder,
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/se_resnet50.imagenet",
+                "revision": "e6b4bc2dc85226c3d3474544410724a485455459",
+            }
+        },
+        "params": {
+            "out_channels": [3, 64, 256, 512, 1024, 2048],
+            "block": SEResNetBottleneck,
+            "layers": [3, 4, 6, 3],
+            "downsample_kernel_size": 1,
+            "downsample_padding": 0,
+            "dropout_p": None,
+            "groups": 1,
+            "inplanes": 64,
+            "input_3x3": False,
+            "num_classes": 1000,
+            "reduction": 16,
+        },
+    },
+    "se_resnet101": {
+        "encoder": SENetEncoder,
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/se_resnet101.imagenet",
+                "revision": "71fe95cc0a27f444cf83671f354de02dc741b18b",
+            }
+        },
+        "params": {
+            "out_channels": [3, 64, 256, 512, 1024, 2048],
+            "block": SEResNetBottleneck,
+            "layers": [3, 4, 23, 3],
+            "downsample_kernel_size": 1,
+            "downsample_padding": 0,
+            "dropout_p": None,
+            "groups": 1,
+            "inplanes": 64,
+            "input_3x3": False,
+            "num_classes": 1000,
+            "reduction": 16,
+        },
+    },
+    "se_resnet152": {
+        "encoder": SENetEncoder,
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/se_resnet152.imagenet",
+                "revision": "e79fc3d9d76f197bd76a2593c2054edf1083fe32",
+            }
+        },
+        "params": {
+            "out_channels": [3, 64, 256, 512, 1024, 2048],
+            "block": SEResNetBottleneck,
+            "layers": [3, 8, 36, 3],
+            "downsample_kernel_size": 1,
+            "downsample_padding": 0,
+            "dropout_p": None,
+            "groups": 1,
+            "inplanes": 64,
+            "input_3x3": False,
+            "num_classes": 1000,
+            "reduction": 16,
+        },
+    },
+    "se_resnext50_32x4d": {
+        "encoder": SENetEncoder,
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/se_resnext50_32x4d.imagenet",
+                "revision": "73246406d879a2b0e3fdfe6fddd56347d38f38ae",
+            }
+        },
+        "params": {
+            "out_channels": [3, 64, 256, 512, 1024, 2048],
+            "block": SEResNeXtBottleneck,
+            "layers": [3, 4, 6, 3],
+            "downsample_kernel_size": 1,
+            "downsample_padding": 0,
+            "dropout_p": None,
+            "groups": 32,
+            "inplanes": 64,
+            "input_3x3": False,
+            "num_classes": 1000,
+            "reduction": 16,
+        },
+    },
+    "se_resnext101_32x4d": {
+        "encoder": SENetEncoder,
+        "pretrained_settings": {
+            "imagenet": {
+                "repo_id": "smp-hub/se_resnext101_32x4d.imagenet",
+                "revision": "18808a4276f46421d358a9de554e0b93c2795df4",
+            }
+        },
+        "params": {
+            "out_channels": [3, 64, 256, 512, 1024, 2048],
+            "block": SEResNeXtBottleneck,
+            "layers": [3, 4, 23, 3],
+            "downsample_kernel_size": 1,
+            "downsample_padding": 0,
+            "dropout_p": None,
+            "groups": 32,
+            "inplanes": 64,
+            "input_3x3": False,
+            "num_classes": 1000,
+            "reduction": 16,
+        },
+    },
+}
