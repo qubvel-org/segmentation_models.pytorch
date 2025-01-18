@@ -1,7 +1,7 @@
 from typing import List
-from pretrainedmodels.models.xception import Xception
 
 from ._base import EncoderMixin
+from ._xception import Xception
 
 
 class XceptionEncoder(Xception, EncoderMixin):
