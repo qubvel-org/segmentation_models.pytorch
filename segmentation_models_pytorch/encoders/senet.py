@@ -29,9 +29,6 @@ from typing import List, Dict, Sequence
 from ._base import EncoderMixin
 from ._senet import (
     SENet,
-    SEBottleneck,
-    SEResNetBottleneck,
-    SEResNeXtBottleneck,
 )
 
 
