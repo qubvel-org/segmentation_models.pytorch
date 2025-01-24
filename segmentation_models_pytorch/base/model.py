@@ -25,7 +25,8 @@ class SegmentationModel(torch.nn.Module, SMPHubMixin):
 
     def initialize(self):
         init.initialize_decoder(self.decoder)
-        init.initialize_head(self.segmentation_head)
+        if self.segmentation_head is not None:
+            init.initialize_head(self.segmentation_head)
         if self.classification_head is not None:
             init.initialize_head(self.classification_head)
 
@@ -65,7 +66,10 @@ class SegmentationModel(torch.nn.Module, SMPHubMixin):
         features = self.encoder(x)
         decoder_output = self.decoder(features)
 
-        masks = self.segmentation_head(decoder_output)
+        if self.segmentation_head is not None:
+            masks = self.segmentation_head(decoder_output)
+        else:
+            masks = decoder_output
 
         if self.classification_head is not None:
             labels = self.classification_head(features[-1])

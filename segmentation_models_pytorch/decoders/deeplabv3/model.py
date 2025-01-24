@@ -67,6 +67,7 @@ class DeepLabV3(SegmentationModel):
         decoder_aspp_separable: bool = False,
         decoder_aspp_dropout: float = 0.5,
         in_channels: int = 3,
+        add_segmentation_head: bool = True,
         classes: int = 1,
         activation: Optional[str] = None,
         upsampling: Optional[int] = None,
@@ -106,13 +107,16 @@ class DeepLabV3(SegmentationModel):
             aspp_dropout=decoder_aspp_dropout,
         )
 
-        self.segmentation_head = SegmentationHead(
-            in_channels=decoder_channels,
-            out_channels=classes,
-            activation=activation,
-            kernel_size=1,
-            upsampling=scale_factor,
-        )
+        if add_segmentation_head:
+            self.segmentation_head = SegmentationHead(
+                in_channels=decoder_channels,
+                out_channels=classes,
+                activation=activation,
+                kernel_size=1,
+                upsampling=scale_factor,
+            )
+        else:
+            self.segmentation_head = None
 
         if aux_params is not None:
             self.classification_head = ClassificationHead(

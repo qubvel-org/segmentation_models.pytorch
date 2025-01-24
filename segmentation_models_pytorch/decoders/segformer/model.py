@@ -55,6 +55,7 @@ class Segformer(SegmentationModel):
         encoder_weights: Optional[str] = "imagenet",
         decoder_segmentation_channels: int = 256,
         in_channels: int = 3,
+        add_segmentation_head: bool = True,
         classes: int = 1,
         activation: Optional[Union[str, Callable]] = None,
         aux_params: Optional[dict] = None,
@@ -76,13 +77,16 @@ class Segformer(SegmentationModel):
             segmentation_channels=decoder_segmentation_channels,
         )
 
-        self.segmentation_head = SegmentationHead(
-            in_channels=decoder_segmentation_channels,
-            out_channels=classes,
-            activation=activation,
-            kernel_size=1,
-            upsampling=4,
-        )
+        if add_segmentation_head:
+            self.segmentation_head = SegmentationHead(
+                in_channels=decoder_segmentation_channels,
+                out_channels=classes,
+                activation=activation,
+                kernel_size=1,
+                upsampling=4,
+            )
+        else:
+            self.segmentation_head = None
 
         if aux_params is not None:
             self.classification_head = ClassificationHead(

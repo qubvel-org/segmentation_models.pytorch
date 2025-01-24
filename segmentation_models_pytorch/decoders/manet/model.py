@@ -67,6 +67,7 @@ class MAnet(SegmentationModel):
         decoder_channels: List[int] = (256, 128, 64, 32, 16),
         decoder_pab_channels: int = 64,
         in_channels: int = 3,
+        add_segmentation_head: bool = True,
         classes: int = 1,
         activation: Optional[Union[str, callable]] = None,
         aux_params: Optional[dict] = None,
@@ -90,12 +91,15 @@ class MAnet(SegmentationModel):
             pab_channels=decoder_pab_channels,
         )
 
-        self.segmentation_head = SegmentationHead(
-            in_channels=decoder_channels[-1],
-            out_channels=classes,
-            activation=activation,
-            kernel_size=3,
-        )
+        if add_segmentation_head:
+            self.segmentation_head = SegmentationHead(
+                in_channels=decoder_channels[-1],
+                out_channels=classes,
+                activation=activation,
+                kernel_size=3,
+            )
+        else:
+            self.segmentation_head = None
 
         if aux_params is not None:
             self.classification_head = ClassificationHead(

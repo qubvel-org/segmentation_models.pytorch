@@ -65,6 +65,7 @@ class PSPNet(SegmentationModel):
         psp_use_batchnorm: bool = True,
         psp_dropout: float = 0.2,
         in_channels: int = 3,
+        add_segmentation_head: bool = True,
         classes: int = 1,
         activation: Optional[Union[str, callable]] = None,
         upsampling: int = 8,
@@ -88,13 +89,16 @@ class PSPNet(SegmentationModel):
             dropout=psp_dropout,
         )
 
-        self.segmentation_head = SegmentationHead(
-            in_channels=psp_out_channels,
-            out_channels=classes,
-            kernel_size=3,
-            activation=activation,
-            upsampling=upsampling,
-        )
+        if add_segmentation_head:
+            self.segmentation_head = SegmentationHead(
+                in_channels=psp_out_channels,
+                out_channels=classes,
+                kernel_size=3,
+                activation=activation,
+                upsampling=upsampling,
+            )
+        else:
+            self.segmentation_head = None
 
         if aux_params:
             self.classification_head = ClassificationHead(

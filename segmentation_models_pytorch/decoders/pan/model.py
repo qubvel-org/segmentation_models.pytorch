@@ -63,6 +63,7 @@ class PAN(SegmentationModel):
         encoder_output_stride: Literal[16, 32] = 16,
         decoder_channels: int = 32,
         in_channels: int = 3,
+        add_segmentation_head: bool = True,
         classes: int = 1,
         activation: Optional[Union[str, Callable]] = None,
         upsampling: int = 4,
@@ -93,13 +94,16 @@ class PAN(SegmentationModel):
             decoder_channels=decoder_channels,
         )
 
-        self.segmentation_head = SegmentationHead(
-            in_channels=decoder_channels,
-            out_channels=classes,
-            activation=activation,
-            kernel_size=3,
-            upsampling=upsampling,
-        )
+        if add_segmentation_head:
+            self.segmentation_head = SegmentationHead(
+                in_channels=decoder_channels,
+                out_channels=classes,
+                activation=activation,
+                kernel_size=3,
+                upsampling=upsampling,
+            )
+        else:
+            self.segmentation_head = None
 
         if aux_params is not None:
             self.classification_head = ClassificationHead(

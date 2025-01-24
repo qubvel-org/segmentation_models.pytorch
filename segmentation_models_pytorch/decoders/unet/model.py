@@ -100,6 +100,7 @@ class Unet(SegmentationModel):
         decoder_attention_type: Optional[str] = None,
         decoder_interpolation_mode: str = "nearest",
         in_channels: int = 3,
+        add_segmentation_head: bool = True,
         classes: int = 1,
         activation: Optional[Union[str, Callable]] = None,
         aux_params: Optional[dict] = None,
@@ -126,12 +127,15 @@ class Unet(SegmentationModel):
             interpolation_mode=decoder_interpolation_mode,
         )
 
-        self.segmentation_head = SegmentationHead(
-            in_channels=decoder_channels[-1],
-            out_channels=classes,
-            activation=activation,
-            kernel_size=3,
-        )
+        if add_segmentation_head:
+            self.segmentation_head = SegmentationHead(
+                in_channels=decoder_channels[-1],
+                out_channels=classes,
+                activation=activation,
+                kernel_size=3,
+            )
+        else:
+            self.segmentation_head = None
 
         if aux_params is not None:
             self.classification_head = ClassificationHead(

@@ -63,6 +63,7 @@ class FPN(SegmentationModel):
         decoder_merge_policy: str = "add",
         decoder_dropout: float = 0.2,
         in_channels: int = 3,
+        add_segmentation_head: bool = True,
         classes: int = 1,
         activation: Optional[str] = None,
         upsampling: int = 4,
@@ -94,13 +95,16 @@ class FPN(SegmentationModel):
             merge_policy=decoder_merge_policy,
         )
 
-        self.segmentation_head = SegmentationHead(
-            in_channels=self.decoder.out_channels,
-            out_channels=classes,
-            activation=activation,
-            kernel_size=1,
-            upsampling=upsampling,
-        )
+        if add_segmentation_head:
+            self.segmentation_head = SegmentationHead(
+                in_channels=self.decoder.out_channels,
+                out_channels=classes,
+                activation=activation,
+                kernel_size=1,
+                upsampling=upsampling,
+            )
+        else:
+            self.segmentation_head = None
 
         if aux_params is not None:
             self.classification_head = ClassificationHead(
