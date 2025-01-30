@@ -27,9 +27,8 @@ import torch
 import torch.nn.functional as F
 from typing import List, Dict, Sequence
 
-from pretrainedmodels.models.dpn import DPN
-
 from ._base import EncoderMixin
+from ._dpn import DPN
 
 
 class DPNEncoder(DPN, EncoderMixin):

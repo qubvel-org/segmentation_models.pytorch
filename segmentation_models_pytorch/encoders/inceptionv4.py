@@ -27,9 +27,9 @@ import torch
 import torch.nn as nn
 
 from typing import List
-from pretrainedmodels.models.inceptionv4 import InceptionV4
 
 from ._base import EncoderMixin
+from ._inceptionv4 import InceptionV4
 
 
 class InceptionV4Encoder(InceptionV4, EncoderMixin):
