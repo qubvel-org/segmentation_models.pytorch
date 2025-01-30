@@ -29,21 +29,6 @@ import torch.utils.model_zoo as model_zoo
 
 __all__ = ["xception"]
 
-pretrained_settings = {
-    "xception": {
-        "imagenet": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/xception-43020ad28.pth",
-            "input_space": "RGB",
-            "input_size": [3, 299, 299],
-            "input_range": [0, 1],
-            "mean": [0.5, 0.5, 0.5],
-            "std": [0.5, 0.5, 0.5],
-            "num_classes": 1000,
-            "scale": 0.8975,  # The resize parameter of the validation transform should be 333, and make sure to center crop at 299x299
-        }
-    }
-}
-
 
 class SeparableConv2d(nn.Module):
     def __init__(

@@ -5,29 +5,6 @@ import torch.utils.model_zoo as model_zoo
 
 __all__ = ["InceptionResNetV2", "inceptionresnetv2"]
 
-pretrained_settings = {
-    "inceptionresnetv2": {
-        "imagenet": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/inceptionresnetv2-520b38e4.pth",
-            "input_space": "RGB",
-            "input_size": [3, 299, 299],
-            "input_range": [0, 1],
-            "mean": [0.5, 0.5, 0.5],
-            "std": [0.5, 0.5, 0.5],
-            "num_classes": 1000,
-        },
-        "imagenet+background": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/inceptionresnetv2-520b38e4.pth",
-            "input_space": "RGB",
-            "input_size": [3, 299, 299],
-            "input_range": [0, 1],
-            "mean": [0.5, 0.5, 0.5],
-            "std": [0.5, 0.5, 0.5],
-            "num_classes": 1001,
-        },
-    }
-}
-
 
 class BasicConv2d(nn.Module):
     def __init__(self, in_planes, out_planes, kernel_size, stride, padding=0):
@@ -359,23 +336,3 @@ def inceptionresnetv2(num_classes=1000, pretrained="imagenet"):
     else:
         model = InceptionResNetV2(num_classes=num_classes)
     return model
-
-
-"""
-TEST
-Run this code with:
-```
-cd $HOME/pretrained-models.pytorch
-python -m pretrainedmodels.inceptionresnetv2
-```
-"""
-if __name__ == "__main__":
-    assert inceptionresnetv2(num_classes=10, pretrained=None)
-    print("success")
-    assert inceptionresnetv2(num_classes=1000, pretrained="imagenet")
-    print("success")
-    assert inceptionresnetv2(num_classes=1001, pretrained="imagenet+background")
-    print("success")
-
-    # fail
-    assert inceptionresnetv2(num_classes=1001, pretrained="imagenet")
