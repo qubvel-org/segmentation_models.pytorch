@@ -22,12 +22,8 @@ normalize = transforms.Normalize(mean=[0.5, 0.5, 0.5],
 The resize parameter of the validation transform should be 333, and make sure to center crop at 299x299
 """
 
-from __future__ import print_function, division, absolute_import
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.utils.model_zoo as model_zoo
-
-__all__ = ["xception"]
 
 
 class SeparableConv2d(nn.Module):
@@ -233,28 +229,3 @@ class Xception(nn.Module):
         x = self.features(input)
         x = self.logits(x)
         return x
-
-
-def xception(num_classes=1000, pretrained="imagenet"):
-    model = Xception(num_classes=num_classes)
-    if pretrained:
-        settings = pretrained_settings["xception"][pretrained]
-        assert num_classes == settings["num_classes"], (
-            "num_classes should be {}, but is {}".format(
-                settings["num_classes"], num_classes
-            )
-        )
-
-        model = Xception(num_classes=num_classes)
-        model.load_state_dict(model_zoo.load_url(settings["url"]))
-
-        model.input_space = settings["input_space"]
-        model.input_size = settings["input_size"]
-        model.input_range = settings["input_range"]
-        model.mean = settings["mean"]
-        model.std = settings["std"]
-
-    # TODO: ugly
-    model.last_linear = model.fc
-    del model.fc
-    return model
