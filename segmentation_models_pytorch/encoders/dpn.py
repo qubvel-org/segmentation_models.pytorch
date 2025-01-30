@@ -34,7 +34,7 @@ from ._base import EncoderMixin
 
 class DPNEncoder(DPN, EncoderMixin):
     _is_torch_scriptable = False
-    _is_torch_exportable = False
+    _is_torch_exportable = True  # since torch 2.6.0
 
     def __init__(
         self,
