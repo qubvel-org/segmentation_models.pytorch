@@ -563,11 +563,11 @@ def get_pretrained_cfg(name):
         "url": "https://github.com/qubvel/segmentation_models.pytorch/releases/download/v0.0.2/{}.pth".format(
             name
         ),
-        "input_space": "RGB",
-        "input_size": [3, 224, 224],
+        "input_space": "RGBA", # Edited RGB to RGBA
+        "input_size": [4, 224, 224], # Edited first ele from 3 to 4
         "input_range": [0, 1],
-        "mean": [0.485, 0.456, 0.406],
-        "std": [0.229, 0.224, 0.225],
+        "mean": [0.485, 0.456, 0.406, 0.400], # Added last ele (an approximation)
+        "std": [0.229, 0.224, 0.225, 0.223], # Added last ele (an approximation)
     }
 
 
@@ -576,7 +576,7 @@ mix_transformer_encoders = {
         "encoder": MixVisionTransformerEncoder,
         "pretrained_settings": {"imagenet": get_pretrained_cfg("mit_b0")},
         "params": dict(
-            out_channels=(3, 0, 32, 64, 160, 256),
+            out_channels=(4, 0, 32, 64, 160, 256), # Edited first ele from 3 to 4
             patch_size=4,
             embed_dims=[32, 64, 160, 256],
             num_heads=[1, 2, 5, 8],
