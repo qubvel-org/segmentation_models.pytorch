@@ -100,7 +100,6 @@ autodoc_mock_imports = [
     "timm",
     "cv2",
     "PIL",
-    "pretrainedmodels",
     "torchvision",
     "segmentation_models_pytorch.encoders",
     "segmentation_models_pytorch.utils",

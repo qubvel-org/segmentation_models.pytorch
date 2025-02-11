@@ -1,7 +1,7 @@
 from typing import List
-from pretrainedmodels.models.xception import Xception
 
 from ._base import EncoderMixin
+from ._xception import Xception
 
 
 class XceptionEncoder(Xception, EncoderMixin):
@@ -42,10 +42,10 @@ class XceptionEncoder(Xception, EncoderMixin):
         if self._depth >= 1:
             x = self.conv1(x)
             x = self.bn1(x)
-            x = self.relu(x)
+            x = self.relu1(x)
             x = self.conv2(x)
             x = self.bn2(x)
-            x = self.relu(x)
+            x = self.relu2(x)
             features.append(x)
 
         if self._depth >= 2:
@@ -72,7 +72,7 @@ class XceptionEncoder(Xception, EncoderMixin):
             x = self.block12(x)
             x = self.conv3(x)
             x = self.bn3(x)
-            x = self.relu(x)
+            x = self.relu3(x)
             x = self.conv4(x)
             x = self.bn4(x)
             features.append(x)
