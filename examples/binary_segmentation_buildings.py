@@ -72,9 +72,9 @@ if device == "cpu":
 # ----------------------------
 # Download the CamVid dataset, if needed
 # ----------------------------
-main_dir = "/tmp/examples"  # Change this to your desired directory
+main_dir = "./examples/binary_segmentation_data/"  # Change this to your desired directory
 
-data_dir = os.path.join(main_dir, "data")
+data_dir = os.path.join(main_dir, "dataset")
 if not os.path.exists(data_dir):
     logging.info("Loading data...")
     os.system(f"git clone https://github.com/alexgkendall/SegNet-Tutorial {data_dir}")
@@ -496,4 +496,4 @@ plt.close()
 test_loss = test_model(model, output_dir, test_dataloader, loss_fn, device)
 
 logging.info(f"Test Loss: {test_loss[0]}, IoU Score: {test_loss[1]}")
-logging.info(f"The outout masks are saved in {output_dir}.")
+logging.info(f"The output masks are saved in {output_dir}.")
