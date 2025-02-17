@@ -72,7 +72,9 @@ if device == "cpu":
 # ----------------------------
 # Download the CamVid dataset, if needed
 # ----------------------------
-main_dir = "./examples/binary_segmentation_data/"  # Change this to your desired directory
+main_dir = (
+    "./examples/binary_segmentation_data/"  # Change this to your desired directory
+)
 
 data_dir = os.path.join(main_dir, "dataset")
 if not os.path.exists(data_dir):
@@ -246,7 +248,6 @@ def visualize(output_dir, image_filename, **images):
 def train_and_evaluate_one_epoch(
     model, train_dataloader, valid_dataloader, optimizer, scheduler, loss_fn, device
 ):
-    
     # Set the model to training mode
     model.train()
     train_loss = 0
@@ -321,7 +322,6 @@ def train_model(
 
 
 def test_model(model, output_dir, test_dataloader, loss_fn, device):
-    
     # Set the model to evaluation mode
     model.eval()
     test_loss = 0
