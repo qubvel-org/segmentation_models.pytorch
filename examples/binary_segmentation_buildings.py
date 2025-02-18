@@ -72,9 +72,8 @@ if device == "cpu":
 # ----------------------------
 # Download the CamVid dataset, if needed
 # ----------------------------
-main_dir = (
-    "./examples/binary_segmentation_data/"  # Change this to your desired directory
-)
+# Change this to your desired directory
+main_dir = "./examples/binary_segmentation_data/"
 
 data_dir = os.path.join(main_dir, "dataset")
 if not os.path.exists(data_dir):
