@@ -1,0 +1,196 @@
+"""
+TimmUniversalEncoder provides a unified feature extraction interface built on the
+`timm` library, supporting both traditional-style (e.g., ResNet) and transformer-style
+models (e.g., Swin Transformer, ConvNeXt).
+
+This encoder produces consistent multi-level feature maps for semantic segmentation tasks.
+It allows configuring the number of feature extraction stages (`depth`) and adjusting
+`output_stride` when supported.
+
+Key Features:
+- Flexible model selection using `timm.create_model`.
+- Unified multi-level output across different model hierarchies.
+- Automatic alignment for inconsistent feature scales:
+  - Transformer-style models (start at 1/4 scale): Insert dummy features for 1/2 scale.
+  - VGG-style models (include scale-1 features): Align outputs for compatibility.
+- Easy access to feature scale information via the `reduction` property.
+
+Feature Scale Differences:
+- Traditional-style models (e.g., ResNet): Scales at 1/2, 1/4, 1/8, 1/16, 1/32.
+- Transformer-style models (e.g., Swin Transformer): Start at 1/4 scale, skip 1/2 scale.
+- VGG-style models: Include scale-1 features (input resolution).
+
+Notes:
+- `output_stride` is unsupported in some models, especially transformer-based architectures.
+- Special handling for models like TResNet and DLA to ensure correct feature indexing.
+- VGG-style models use `_is_vgg_style` to align scale-1 features with standard outputs.
+"""
+
+from typing import Any, Optional
+
+import timm
+import torch
+import torch.nn as nn
+
+
+class TimmViTEncoder(nn.Module):
+    """
+    TODO
+    """
+
+    _is_torch_scriptable = True
+    _is_torch_exportable = True
+    _is_torch_compilable = True
+
+    def __init__(
+        self,
+        name: str,
+        pretrained: bool = True,
+        in_channels: int = 3,
+        depth: int = 4,
+        out_indices : Optional[list[int]] = None,
+        **kwargs: dict[str, Any],
+    ):
+        """
+        Initialize the encoder.
+
+        Args:
+            name (str): Model name to load from `timm`.
+            pretrained (bool): Load pretrained weights (default: True).
+            in_channels (int): Number of input channels (default: 3 for RGB).
+            depth (int): Number of feature stages to extract (default: 5).
+            **kwargs: Additional arguments passed to `timm.create_model`.
+        """
+        # At the moment we do not support models with more than 4 stages,
+        # but can be reconfigured in the future.
+        if depth > 4 or depth < 1:
+            raise ValueError(
+                f"{self.__class__.__name__} depth should be in range [1, 4], got {depth}"
+            )
+
+        super().__init__()
+        self.name = name
+
+        # Default model configuration for feature extraction
+        common_kwargs = dict(
+            in_chans=in_channels,
+            features_only=True,
+            pretrained=pretrained,
+            out_indices=tuple(range(depth)),
+        )
+
+        # Load a temporary model to analyze its feature hierarchy
+        try:
+            with torch.device("meta"):
+                tmp_model = timm.create_model(name, features_only=True)
+        except Exception:
+            tmp_model = timm.create_model(name, features_only=True)
+
+        # Check if model output is in channel-last format (NHWC)
+        self._is_channel_last = getattr(tmp_model, "output_fmt", None) == "NHWC"
+
+        # Determine the model's downsampling pattern and set hierarchy flags
+        reduction_scales = list(tmp_model.feature_info.reduction())
+        output_stride = reduction_scales[0]
+
+        # Need model to output ViT style features with no downsampling
+        if len(set(reduction_scales)) != 1:
+            raise ValueError("Unsupported model downsampling pattern.")
+        
+        num_blocks = len(tmp_model.blocks)
+        if out_indices is None:
+            out_indices = [int(index * (num_blocks / 4)) - 1 for index in range(1,depth+1)]
+
+            # Model with 24 blocks should use features from layers [5,12,18,24]
+            if num_blocks == 24:
+                out_indices[0] -= 1
+
+
+        common_kwargs['out_indices'] = out_indices 
+        self.model = timm.create_model(
+                name, **_merge_kwargs_no_duplicates(common_kwargs, kwargs)
+            )
+        
+        self._out_channels = self.model.feature_info.channels()
+        self._in_channels = in_channels
+        self._depth = depth
+        self._output_stride = output_stride
+
+    def forward(self, x: torch.Tensor) -> list[torch.Tensor]:
+        """
+        Forward pass to extract multi-stage features.
+
+        Args:
+            x (torch.Tensor): Input tensor of shape (B, C, H, W).
+
+        Returns:
+            list[torch.Tensor]: List of feature maps at different scales.
+        """
+        features = self.model(x)
+
+        # Convert NHWC to NCHW if needed
+        if self._is_channel_last:
+            features = [
+                feature.permute(0, 3, 1, 2).contiguous() for feature in features
+            ]
+
+        return features
+
+    @property
+    def out_channels(self) -> list[int]:
+        """
+        Returns the number of output channels for each feature stage.
+
+        Returns:
+            list[int]: A list of channel dimensions at each scale.
+        """
+        return self._out_channels
+
+    @property
+    def output_stride(self) -> int:
+        """
+        Returns the effective output stride based on the model depth.
+
+        Returns:
+            int: The effective output stride.
+        """
+        return self._output_stride
+
+    def load_state_dict(self, state_dict, **kwargs):
+        # for compatibility of weights for
+        # timm- ported encoders with TimmUniversalEncoder
+        patterns = ["regnet", "res2", "resnest", "mobilenetv3", "gernet"]
+
+        is_deprecated_encoder = any(
+            self.name.startswith(pattern) for pattern in patterns
+        )
+
+        if is_deprecated_encoder:
+            keys = list(state_dict.keys())
+            for key in keys:
+                new_key = key
+                if not key.startswith("model."):
+                    new_key = "model." + key
+                if "gernet" in self.name:
+                    new_key = new_key.replace(".stages.", ".stages_")
+                state_dict[new_key] = state_dict.pop(key)
+
+        return super().load_state_dict(state_dict, **kwargs)
+
+
+def _merge_kwargs_no_duplicates(a: dict[str, Any], b: dict[str, Any]) -> dict[str, Any]:
+    """
+    Merge two dictionaries, ensuring no duplicate keys exist.
+
+    Args:
+        a (dict): Base dictionary.
+        b (dict): Additional parameters to merge.
+
+    Returns:
+        dict: A merged dictionary.
+    """
+    duplicates = a.keys() & b.keys()
+    if duplicates:
+        raise ValueError(f"'{duplicates}' already specified internally")
+
+    return a | b

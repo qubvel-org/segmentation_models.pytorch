@@ -24,6 +24,7 @@ from .mix_transformer import mix_transformer_encoders
 from .mobileone import mobileone_encoders
 
 from .timm_universal import TimmUniversalEncoder
+from .timm_vit import TimmViTEncoder
 
 from ._preprocessing import preprocess_input
 from ._legacy_pretrained_settings import pretrained_settings
@@ -81,8 +82,20 @@ def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **
         if "mobilenetv3" in name:
             name = name.replace("tu-", "tu-tf_")
 
+    use_vit_encoder = kwargs.pop("use_vit_encoder",False)
     if name.startswith("tu-"):
         name = name[3:]
+
+        if use_vit_encoder:
+            encoder = TimmViTEncoder(
+                name = name,
+                in_channels = in_channels,
+                depth = depth,
+                pretrained = weights is not None,
+                **kwargs
+            )
+            return encoder
+
         encoder = TimmUniversalEncoder(
             name=name,
             in_channels=in_channels,
