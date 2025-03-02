@@ -1,31 +1,3 @@
-"""
-TimmUniversalEncoder provides a unified feature extraction interface built on the
-`timm` library, supporting both traditional-style (e.g., ResNet) and transformer-style
-models (e.g., Swin Transformer, ConvNeXt).
-
-This encoder produces consistent multi-level feature maps for semantic segmentation tasks.
-It allows configuring the number of feature extraction stages (`depth`) and adjusting
-`output_stride` when supported.
-
-Key Features:
-- Flexible model selection using `timm.create_model`.
-- Unified multi-level output across different model hierarchies.
-- Automatic alignment for inconsistent feature scales:
-  - Transformer-style models (start at 1/4 scale): Insert dummy features for 1/2 scale.
-  - VGG-style models (include scale-1 features): Align outputs for compatibility.
-- Easy access to feature scale information via the `reduction` property.
-
-Feature Scale Differences:
-- Traditional-style models (e.g., ResNet): Scales at 1/2, 1/4, 1/8, 1/16, 1/32.
-- Transformer-style models (e.g., Swin Transformer): Start at 1/4 scale, skip 1/2 scale.
-- VGG-style models: Include scale-1 features (input resolution).
-
-Notes:
-- `output_stride` is unsupported in some models, especially transformer-based architectures.
-- Special handling for models like TResNet and DLA to ensure correct feature indexing.
-- VGG-style models use `_is_vgg_style` to align scale-1 features with standard outputs.
-"""
-
 from typing import Any, Optional
 
 import timm
