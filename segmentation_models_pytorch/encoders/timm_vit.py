@@ -35,7 +35,13 @@ import torch.nn as nn
 
 class TimmViTEncoder(nn.Module):
     """
-    TODO
+    A universal encoder leveraging the `timm` library for feature extraction from
+    ViT style models
+
+    Features:
+        - Supports configurable depth and output stride.
+        - Ensures consistent multi-level feature extraction across diverse models.
+        - Compatible with convolutional and transformer-like backbones.
     """
 
     _is_torch_scriptable = True
@@ -48,17 +54,18 @@ class TimmViTEncoder(nn.Module):
         pretrained: bool = True,
         in_channels: int = 3,
         depth: int = 4,
-        out_indices : Optional[list[int]] = None,
+        output_indices: Optional[list[int] | int] = None,
         **kwargs: dict[str, Any],
     ):
         """
         Initialize the encoder.
 
         Args:
-            name (str): Model name to load from `timm`.
+            name (str): ViT model name to load from `timm`.
             pretrained (bool): Load pretrained weights (default: True).
             in_channels (int): Number of input channels (default: 3 for RGB).
-            depth (int): Number of feature stages to extract (default: 5).
+            depth (int): Number of feature stages to extract (default: 4).
+            output_indices (Optional[list[int] | int]): Indices of blocks in the model to be used for feature extraction.
             **kwargs: Additional arguments passed to `timm.create_model`.
         """
         # At the moment we do not support models with more than 4 stages,
@@ -82,41 +89,69 @@ class TimmViTEncoder(nn.Module):
         # Load a temporary model to analyze its feature hierarchy
         try:
             with torch.device("meta"):
-                tmp_model = timm.create_model(name, features_only=True)
+                tmp_model = timm.create_model(name)
         except Exception:
-            tmp_model = timm.create_model(name, features_only=True)
+            tmp_model = timm.create_model(name)
 
         # Check if model output is in channel-last format (NHWC)
         self._is_channel_last = getattr(tmp_model, "output_fmt", None) == "NHWC"
 
-        # Determine the model's downsampling pattern and set hierarchy flags
-        reduction_scales = list(tmp_model.feature_info.reduction())
-        output_stride = reduction_scales[0]
+        feature_info = tmp_model.feature_info
+        model_num_blocks = len(feature_info)
 
-        # Need model to output ViT style features with no downsampling
-        if len(set(reduction_scales)) != 1:
-            raise ValueError("Unsupported model downsampling pattern.")
-        
-        num_blocks = len(tmp_model.blocks)
-        if out_indices is None:
-            out_indices = [int(index * (num_blocks / 4)) - 1 for index in range(1,depth+1)]
-
-            # Model with 24 blocks should use features from layers [5,12,18,24]
-            if num_blocks == 24:
-                out_indices[0] -= 1
-
-
-        common_kwargs['out_indices'] = out_indices 
-        self.model = timm.create_model(
-                name, **_merge_kwargs_no_duplicates(common_kwargs, kwargs)
+        if depth > model_num_blocks:
+            raise ValueError(
+                f"Depth of the encoder cannot exceed the number of blocks in the model \
+                               got {depth} depth, model has {model_num_blocks} blocks"
             )
-        
-        self._out_channels = self.model.feature_info.channels()
+
+        if output_indices is None:
+            output_indices = [
+                int((model_num_blocks / 4) * index) - 1 for index in range(1, depth + 1)
+            ]
+
+        common_kwargs["out_indices"] = self.out_indices = output_indices
+        feature_info_obj = timm.models.FeatureInfo(
+            feature_info=feature_info, out_indices=output_indices
+        )
+
+        # Determine the model's downsampling pattern and set hierarchy flags
+        reduction_scales = list(feature_info_obj.reduction())
+
+        allow_downsampling = kwargs.pop("allow_downsampling", True)
+        allow_output_stride_not_power_of_two = kwargs.pop(
+            "allow_output_stride_not_power_of_two", True
+        )
+        # Raise an error if downsampling is not allowed and encoder outputs have progressive downsampling
+        if len(set(reduction_scales)) > 1 and not allow_downsampling:
+            raise ValueError("Unsupported model downsampling pattern.")
+
+        self._output_stride = reduction_scales[0]
+
+        if (
+            int(self._output_stride).bit_count() != 1
+            and not allow_output_stride_not_power_of_two
+        ):
+            raise ValueError(
+                f"Models with stride which is not a power of 2 are not supported, \
+                              got output stride {self._output_stride}"
+            )
+
+        self.prefix_token_supported = getattr(tmp_model, "has_class_token", False)
+        self.num_prefix_tokens = getattr(tmp_model, "num_prefix_tokens", 0)
+        if self.prefix_token_supported:
+            common_kwargs["features_only"] = False
+
+        self.model = timm.create_model(
+            name, **_merge_kwargs_no_duplicates(common_kwargs, kwargs)
+        )
+
+        self._out_channels = feature_info_obj.channels()
         self._in_channels = in_channels
         self._depth = depth
-        self._output_stride = output_stride
+        self._embed_dim = tmp_model.embed_dim
 
-    def forward(self, x: torch.Tensor) -> list[torch.Tensor]:
+    def forward(self, x: torch.Tensor) -> list[list[torch.Tensor], list[torch.Tensor]]:
         """
         Forward pass to extract multi-stage features.
 
@@ -126,6 +161,26 @@ class TimmViTEncoder(nn.Module):
         Returns:
             list[torch.Tensor]: List of feature maps at different scales.
         """
+        if self.prefix_token_supported:
+            intermediate_outputs = self.model.forward_intermediates(
+                x,
+                indices=self.out_indices,
+                return_prefix_tokens=True,
+                intermediates_only=True,
+            )
+            features, cls_tokens = zip(*intermediate_outputs)
+
+            # Convert NHWC to NCHW if needed
+            if self._is_channel_last:
+                features = [
+                    feature.permute(0, 3, 1, 2).contiguous() for feature in features
+                ]
+
+            if self.num_prefix_tokens > 1:
+                cls_tokens = [cls_token[:, 0, :] for cls_token in cls_tokens]
+
+            return [features, cls_tokens]
+
         features = self.model(x)
 
         # Convert NHWC to NCHW if needed
@@ -134,7 +189,19 @@ class TimmViTEncoder(nn.Module):
                 feature.permute(0, 3, 1, 2).contiguous() for feature in features
             ]
 
-        return features
+        cls_tokens = [None] * len(features)
+
+        return [features, cls_tokens]
+
+    @property
+    def embed_dim(self) -> int:
+        """
+        Returns the embedding dimension for the ViT encoder.
+
+        Returns:
+            int: Embedding dimension.
+        """
+        return self._embed_dim
 
     @property
     def out_channels(self) -> list[int]:
