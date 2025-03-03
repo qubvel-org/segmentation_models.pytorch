@@ -96,6 +96,7 @@ class Unet(SegmentationModel):
         encoder_depth: int = 5,
         encoder_weights: Optional[str] = "imagenet",
         decoder_use_batchnorm: bool = True,
+        decoder_depth: int = 5,
         decoder_channels: Sequence[int] = (256, 128, 64, 32, 16),
         decoder_attention_type: Optional[str] = None,
         decoder_interpolation_mode: str = "nearest",
@@ -120,7 +121,7 @@ class Unet(SegmentationModel):
         self.decoder = UnetDecoder(
             encoder_channels=self.encoder.out_channels,
             decoder_channels=decoder_channels,
-            n_blocks=encoder_depth,
+            n_blocks=decoder_depth,
             use_batchnorm=decoder_use_batchnorm,
             add_center_block=add_center_block,
             attention_type=decoder_attention_type,

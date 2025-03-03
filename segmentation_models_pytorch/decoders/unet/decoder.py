@@ -99,14 +99,14 @@ class UnetDecoder(nn.Module):
         interpolation_mode: str = "nearest",
     ):
         super().__init__()
-
-        if n_blocks != len(decoder_channels):
-            raise ValueError(
-                "Model depth is {}, but you provide `decoder_channels` for {} blocks.".format(
-                    n_blocks, len(decoder_channels)
-                )
-            )
-
+        # TODO: Redundant check if we have lesser decoder
+        # if n_blocks != len(decoder_channels):
+        #     raise ValueError(
+        #         "Model depth is {}, but you provide `decoder_channels` for {} blocks.".format(
+        #             n_blocks, len(decoder_channels)
+        #         )
+        #     )
+ 
         # remove first skip with same spatial resolution
         encoder_channels = encoder_channels[1:]
         # reverse channels to start from head of encoder

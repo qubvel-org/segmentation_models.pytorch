@@ -80,10 +80,10 @@ class UnetPlusPlusDecoder(nn.Module):
     ):
         super().__init__()
 
-        if n_blocks != len(decoder_channels):
-            raise ValueError(
-                f"Model depth is {n_blocks}, but you provide `decoder_channels` for {len(decoder_channels)} blocks."
-            )
+        # if n_blocks != len(decoder_channels):
+        #     raise ValueError(
+        #         f"Model depth is {n_blocks}, but you provide `decoder_channels` for {len(decoder_channels)} blocks."
+        #     )
 
         # remove first skip with same spatial resolution
         encoder_channels = encoder_channels[1:]
