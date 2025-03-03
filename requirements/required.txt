@@ -1,8 +1,8 @@
-huggingface_hub==0.28.1
-numpy==2.2.2
+huggingface_hub==0.29.1
+numpy==2.2.3
 pillow==11.1.0
-safetensors==0.5.2
-timm==1.0.14
+safetensors==0.5.3
+timm==1.0.15
 torch==2.6.0
 torchvision==0.21.0
 tqdm==4.67.1
