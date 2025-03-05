@@ -11,9 +11,8 @@ class TimmViTEncoder(nn.Module):
     ViT style models
 
     Features:
-        - Supports configurable depth and output stride.
-        - Ensures consistent multi-level feature extraction across diverse models.
-        - Compatible with convolutional and transformer-like backbones.
+        - Supports configurable depth.
+        - Ensures consistent multi-level feature extraction across all ViT models.
     """
 
     _is_torch_scriptable = True
@@ -50,6 +49,12 @@ class TimmViTEncoder(nn.Module):
         super().__init__()
         self.name = name
 
+        output_stride = kwargs.pop("output_stride",None)
+        if output_stride is not None:
+            raise ValueError(
+                "Dilated mode not supported, set output stride to None"
+            )
+
         # Default model configuration for feature extraction
         common_kwargs = dict(
             in_chans=in_channels,
@@ -81,6 +86,9 @@ class TimmViTEncoder(nn.Module):
             output_indices = [
                 int((model_num_blocks / 4) * index) - 1 for index in range(1, depth + 1)
             ]
+
+        if isinstance(output_indices,int):
+            output_indices = list(output_indices)
 
         common_kwargs["out_indices"] = self.out_indices = output_indices
         feature_info_obj = timm.models.FeatureInfo(
