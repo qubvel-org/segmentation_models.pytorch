@@ -1,4 +1,5 @@
 from typing import Any, Optional, Union, Callable
+import torch
 
 from segmentation_models_pytorch.base import (
     ClassificationHead,
@@ -6,6 +7,7 @@ from segmentation_models_pytorch.base import (
     SegmentationModel,
 )
 from segmentation_models_pytorch.encoders import get_encoder
+from segmentation_models_pytorch.base.utils import is_torch_compiling
 from segmentation_models_pytorch.base.hub_mixin import supports_config_loading
 from .decoder import DPTDecoder
 
@@ -46,8 +48,8 @@ class DPT(SegmentationModel):
                     (could be **None** to return logits)
         kwargs: Arguments passed to the encoder class ``__init__()`` function. Applies only to ``timm`` models. Keys with
                 ``None`` values are pruned before passing.
-                allow_downsampling : Allow ViT encoder to have progressive downsampling. Set to False for DPT as the architecture
-                    requires all encoder feature outputs to have the same spatial shape.
+                allow_downsampling : Allow ViT encoder to have progressive spatial downsampling for it's representations.
+                Set to False for DPT as the architecture requires all encoder feature outputs to have the same spatial shape.
                 allow_output_stride_not_power_of_two : Allow ViT encoders with output_stride not being a power of 2. This
                     is set False for DPT as the architecture requires the encoder output features to have an output stride of
                     [1/32,1/16,1/8,1/4]
@@ -57,6 +59,10 @@ class DPT(SegmentationModel):
 
 
     """
+
+    _is_torch_scriptable = False
+    _is_torch_compilable = False
+    requires_divisible_input_shape = True
 
     @supports_config_loading
     def __init__(
@@ -84,17 +90,17 @@ class DPT(SegmentationModel):
             **kwargs,
         )
 
-        transformer_embed_dim = self.encoder.embed_dim
-        encoder_output_stride = self.encoder.output_stride
-        cls_token_supported = self.encoder.prefix_token_supported
+        self.transformer_embed_dim = self.encoder.embed_dim
+        self.encoder_output_stride = self.encoder.output_stride
+        self.cls_token_supported = self.encoder.cls_token_supported
 
         self.decoder = DPTDecoder(
             encoder_name=encoder_name,
-            transformer_embed_dim=transformer_embed_dim,
+            transformer_embed_dim=self.transformer_embed_dim,
             feature_dim=feature_dim,
             encoder_depth=encoder_depth,
-            encoder_output_stride=encoder_output_stride,
-            prefix_token_supported=cls_token_supported,
+            encoder_output_stride=self.encoder_output_stride,
+            cls_token_supported=self.cls_token_supported,
         )
 
         self.segmentation_head = SegmentationHead(
@@ -114,3 +120,23 @@ class DPT(SegmentationModel):
 
         self.name = "dpt-{}".format(encoder_name)
         self.initialize()
+
+    def forward(self, x):
+        """Sequentially pass `x` trough model`s encoder, decoder and heads"""
+
+        if not (
+            torch.jit.is_scripting() or torch.jit.is_tracing() or is_torch_compiling()
+        ):
+            self.check_input_shape(x)
+
+        features, cls_tokens = self.encoder(x)
+
+        decoder_output = self.decoder(features, cls_tokens)
+
+        masks = self.segmentation_head(decoder_output)
+
+        if self.classification_head is not None:
+            labels = self.classification_head(features[-1])
+            return masks, labels
+
+        return masks

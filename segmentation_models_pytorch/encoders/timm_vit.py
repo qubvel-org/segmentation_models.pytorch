@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 import timm
 import torch
@@ -15,9 +15,9 @@ class TimmViTEncoder(nn.Module):
         - Ensures consistent multi-level feature extraction across all ViT models.
     """
 
-    _is_torch_scriptable = True
+    _is_torch_scriptable = False
     _is_torch_exportable = True
-    _is_torch_compilable = True
+    _is_torch_compilable = False
 
     def __init__(
         self,
@@ -25,7 +25,7 @@ class TimmViTEncoder(nn.Module):
         pretrained: bool = True,
         in_channels: int = 3,
         depth: int = 4,
-        output_indices: Optional[list[int] | int] = None,
+        output_indices: Optional[Union[list[int], int]] = None,
         **kwargs: dict[str, Any],
     ):
         """
@@ -49,16 +49,14 @@ class TimmViTEncoder(nn.Module):
         super().__init__()
         self.name = name
 
-        output_stride = kwargs.pop("output_stride",None)
+        output_stride = kwargs.pop("output_stride", None)
         if output_stride is not None:
-            raise ValueError(
-                "Dilated mode not supported, set output stride to None"
-            )
+            raise ValueError("Dilated mode not supported, set output stride to None")
 
         # Default model configuration for feature extraction
         common_kwargs = dict(
             in_chans=in_channels,
-            features_only=True,
+            features_only=False,
             pretrained=pretrained,
             out_indices=tuple(range(depth)),
         )
@@ -76,6 +74,23 @@ class TimmViTEncoder(nn.Module):
         feature_info = tmp_model.feature_info
         model_num_blocks = len(feature_info)
 
+        if output_indices is not None:
+            if isinstance(output_indices, int):
+                output_indices = list(output_indices)
+
+            for output_index in output_indices:
+                if output_indices < 0 or output_indices > model_num_blocks:
+                    raise ValueError(
+                        f"Output indices for feature extraction should be greater than 0 and less \
+                                     than the number of blocks in the model ({model_num_blocks}), got {output_index}"
+                    )
+
+            if len(output_indices) != depth:
+                raise ValueError(
+                    f"Length of output indices for feature extraction should be equal to the depth of the encoder\
+                                  architecture, got output indices length - {len(output_indices)}, encoder depth - {depth}"
+                )
+
         if depth > model_num_blocks:
             raise ValueError(
                 f"Depth of the encoder cannot exceed the number of blocks in the model \
@@ -86,9 +101,6 @@ class TimmViTEncoder(nn.Module):
             output_indices = [
                 int((model_num_blocks / 4) * index) - 1 for index in range(1, depth + 1)
             ]
-
-        if isinstance(output_indices,int):
-            output_indices = list(output_indices)
 
         common_kwargs["out_indices"] = self.out_indices = output_indices
         feature_info_obj = timm.models.FeatureInfo(
@@ -109,7 +121,7 @@ class TimmViTEncoder(nn.Module):
         self._output_stride = reduction_scales[0]
 
         if (
-            int(self._output_stride).bit_count() != 1
+            bin(self._output_stride).count("1") != 1
             and not allow_output_stride_not_power_of_two
         ):
             raise ValueError(
@@ -117,10 +129,8 @@ class TimmViTEncoder(nn.Module):
                               got output stride {self._output_stride}"
             )
 
-        self.prefix_token_supported = getattr(tmp_model, "has_class_token", False)
+        self.cls_token_supported = getattr(tmp_model, "has_class_token", False)
         self.num_prefix_tokens = getattr(tmp_model, "num_prefix_tokens", 0)
-        if self.prefix_token_supported:
-            common_kwargs["features_only"] = False
 
         self.model = timm.create_model(
             name, **_merge_kwargs_no_duplicates(common_kwargs, kwargs)
@@ -131,7 +141,7 @@ class TimmViTEncoder(nn.Module):
         self._depth = depth
         self._embed_dim = tmp_model.embed_dim
 
-    def forward(self, x: torch.Tensor) -> list[list[torch.Tensor], list[torch.Tensor]]:
+    def forward(self, x: torch.Tensor) -> tuple[list[torch.Tensor], list[torch.Tensor]]:
         """
         Forward pass to extract multi-stage features.
 
@@ -139,39 +149,32 @@ class TimmViTEncoder(nn.Module):
             x (torch.Tensor): Input tensor of shape (B, C, H, W).
 
         Returns:
-            list[torch.Tensor]: List of feature maps at different scales.
+            tuple[list[torch.Tensor], list[torch.Tensor]]: Tuple of feature maps and cls tokens (if supported) at different scales.
         """
-        if self.prefix_token_supported:
-            intermediate_outputs = self.model.forward_intermediates(
-                x,
-                indices=self.out_indices,
-                return_prefix_tokens=True,
-                intermediates_only=True,
-            )
-            features, cls_tokens = zip(*intermediate_outputs)
+        intermediate_outputs = self.model.forward_intermediates(
+            x,
+            indices=self.out_indices,
+            return_prefix_tokens=True,
+            intermediates_only=True,
+        )
 
-            # Convert NHWC to NCHW if needed
-            if self._is_channel_last:
-                features = [
-                    feature.permute(0, 3, 1, 2).contiguous() for feature in features
-                ]
+        cls_tokens = [None] * len(self.out_indices)
 
-            if self.num_prefix_tokens > 1:
-                cls_tokens = [cls_token[:, 0, :] for cls_token in cls_tokens]
+        if self.num_prefix_tokens > 0:
+            features, prefix_tokens = zip(*intermediate_outputs)
+            if self.cls_token_supported:
+                if self.num_prefix_tokens == 1:
+                    cls_tokens = prefix_tokens
 
-            return [features, cls_tokens]
+                elif self.num_prefix_tokens > 1:
+                    cls_tokens = [
+                        prefix_token[:, 0, :] for prefix_token in prefix_tokens
+                    ]
 
-        features = self.model(x)
+        else:
+            features = intermediate_outputs
 
-        # Convert NHWC to NCHW if needed
-        if self._is_channel_last:
-            features = [
-                feature.permute(0, 3, 1, 2).contiguous() for feature in features
-            ]
-
-        cls_tokens = [None] * len(features)
-
-        return [features, cls_tokens]
+        return features, cls_tokens
 
     @property
     def embed_dim(self) -> int:

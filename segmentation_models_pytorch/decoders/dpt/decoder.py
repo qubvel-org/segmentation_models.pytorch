@@ -196,16 +196,16 @@ class DPTDecoder(nn.Module):
         encoder_output_stride: int,
         feature_dim: int = 256,
         encoder_depth: int = 4,
-        prefix_token_supported: bool = False,
+        cls_token_supported: bool = False,
     ):
         super().__init__()
 
-        self.prefix_token_supported = prefix_token_supported
+        self.cls_token_supported = cls_token_supported
 
         # If encoder has cls token, then concatenate it with the features along the embedding dimension and project it
         # back to the feature_dim dimension. Else, ignore the non-existent cls token
 
-        if prefix_token_supported:
+        if cls_token_supported:
             self.readout_blocks = nn.ModuleList(
                 [
                     ProjectionReadout(
@@ -246,9 +246,8 @@ class DPTDecoder(nn.Module):
         )
 
     def forward(
-        self, encoder_output: list[list[torch.Tensor], list[torch.Tensor]]
+        self, features: list[torch.Tensor], cls_tokens: list[torch.Tensor]
     ) -> torch.Tensor:
-        features, cls_tokens = encoder_output
         processed_features = []
 
         # Process the encoder features to scale of [1/32,1/16,1/8,1/4]

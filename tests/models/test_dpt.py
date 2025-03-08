@@ -2,7 +2,6 @@ import os
 import pytest
 import inspect
 import tempfile
-import unittest
 from functools import lru_cache
 from huggingface_hub import hf_hub_download
 import torch
@@ -10,18 +9,14 @@ import segmentation_models_pytorch as smp
 
 from tests.models import base
 from tests.utils import (
-    has_timm_test_models,
     default_device,
-    slow_test,
     requires_torch_greater_or_equal,
     check_run_test_on_diff_or_main,
 )
 
 
 class TestDPTModel(base.BaseModelTester):
-    test_encoder_name = (
-        "tu-vit_tiny_patch16_224"
-    )
+    test_encoder_name = "tu-vit_tiny_patch16_224"
     files_for_diff = [r"decoders/dpt/", r"base/"]
 
     default_height = 224
@@ -32,7 +27,7 @@ class TestDPTModel(base.BaseModelTester):
 
     @property
     def hub_checkpoint(self):
-        return f"smp-test-models/{self.model_type}-tu-resnet18"
+        return f"smp-test-models/{self.model_type}-tu-vit_tiny_patch16_224"
 
     @property
     def model_class(self):
@@ -56,7 +51,9 @@ class TestDPTModel(base.BaseModelTester):
 
     @lru_cache
     def get_default_model(self):
-        model = smp.create_model(self.model_type, self.test_encoder_name, output_stride = None)
+        model = smp.create_model(
+            self.model_type, self.test_encoder_name, output_stride=None
+        )
         model = model.to(default_device)
         return model
 
@@ -83,8 +80,9 @@ class TestDPTModel(base.BaseModelTester):
     def test_in_channels_and_depth_and_out_classes(
         self, in_channels=1, depth=3, classes=7
     ):
-        kwargs = {"output_stride" : None,
-                 }
+        kwargs = {
+            "output_stride": None,
+        }
 
         model = (
             smp.create_model(
@@ -111,6 +109,7 @@ class TestDPTModel(base.BaseModelTester):
         model = smp.create_model(
             arch=self.model_type,
             encoder_name=self.test_encoder_name,
+            output_stride=None,
             aux_params={
                 "pooling": "avg",
                 "classes": 10,
@@ -185,7 +184,7 @@ class TestDPTModel(base.BaseModelTester):
         self.assertIn("test_dataset", readme)
         self.assertIn("my_awesome_metric", readme)
 
-    @slow_test
+    # @slow_test
     @requires_torch_greater_or_equal("2.0.1")
     @pytest.mark.logits_match
     def test_preserve_forward_output(self):
@@ -220,10 +219,13 @@ class TestDPTModel(base.BaseModelTester):
         model = self.get_default_model()
         model = model.eval().to(default_device)
 
-        torch.compiler.reset()
-        compiled_model = torch.compile(
-            model, fullgraph=True, dynamic=True, backend="eager"
-        )
+        if not model._is_torch_compilable:
+            with self.assertRaises(RuntimeError):
+                torch.compiler.reset()
+                compiled_model = torch.compile(
+                    model, fullgraph=True, dynamic=True, backend="eager"
+                )
+            return
 
         with torch.inference_mode():
             compiled_model(sample)

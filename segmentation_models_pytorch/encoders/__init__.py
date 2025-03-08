@@ -92,7 +92,7 @@ def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **
                 in_channels=in_channels,
                 depth=depth,
                 pretrained=weights is not None,
-                output_stride = output_stride,
+                output_stride=output_stride,
                 **kwargs,
             )
             return encoder

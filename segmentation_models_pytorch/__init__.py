@@ -35,7 +35,7 @@ _MODEL_ARCHITECTURES = [
     PAN,
     UPerNet,
     Segformer,
-    DPT
+    DPT,
 ]
 MODEL_ARCHITECTURES_MAPPING = {a.__name__.lower(): a for a in _MODEL_ARCHITECTURES}
 
