@@ -1,4 +1,4 @@
-from typing import Any, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 from segmentation_models_pytorch.base import (
     ClassificationHead,
@@ -29,9 +29,27 @@ class Linknet(SegmentationModel):
             Default is 5
         encoder_weights: One of **None** (random initialization), **"imagenet"** (pre-training on ImageNet) and
             other pretrained weights (see table with available weights for each encoder_name)
-        decoder_use_batchnorm: If **True**, BatchNorm2d layer between Conv2D and Activation layers
+        decoder_use_batchnorm: (**Deprecated**) If **True**, BatchNorm2d layer between Conv2D and Activation layers
             is used. If **"inplace"** InplaceABN will be used, allows to decrease memory consumption.
             Available options are **True, False, "inplace"**
+
+            **Note:** Deprecated, prefer using `decoder_use_norm` and set this to None.
+        decoder_use_norm:     Specifies normalization between Conv2D and activation.
+            Accepts the following types:
+            - **True**: Defaults to `"batchnorm"`.
+            - **False**: No normalization (`nn.Identity`).
+            - **str**: Specifies normalization type using default parameters. Available values:
+              `"batchnorm"`, `"identity"`, `"layernorm"`, `"groupnorm"`, `"instancenorm"`, `"inplace"`.
+            - **dict**: Fully customizable normalization settings. Structure:
+              ```python
+              {"type": <norm_type>, **kwargs}
+              ```
+              where `norm_name` corresponds to normalization type (see above), and `kwargs` are passed directly to the normalization layer as defined in PyTorch documentation.
+
+            **Example**:
+            ```python
+            use_norm={"type": "groupnorm", "num_groups": 8}
+            ```
         in_channels: A number of input channels for the model, default is 3 (RGB images)
         classes: A number of classes for output mask (or you can think as a number of channels of output mask)
         activation: An activation function to apply after the final convolution layer.
@@ -60,7 +78,8 @@ class Linknet(SegmentationModel):
         encoder_name: str = "resnet34",
         encoder_depth: int = 5,
         encoder_weights: Optional[str] = "imagenet",
-        decoder_use_batchnorm: bool = True,
+        decoder_use_batchnorm: Union[bool, str, None] = True,
+        decoder_use_norm: Union[bool, str, Dict[str, Any]] = True,
         in_channels: int = 3,
         classes: int = 1,
         activation: Optional[Union[str, callable]] = None,
@@ -87,6 +106,7 @@ class Linknet(SegmentationModel):
             n_blocks=encoder_depth,
             prefinal_channels=32,
             use_batchnorm=decoder_use_batchnorm,
+            use_norm=decoder_use_norm,
         )
 
         self.segmentation_head = SegmentationHead(

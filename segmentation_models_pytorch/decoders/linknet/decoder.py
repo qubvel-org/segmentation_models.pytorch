@@ -1,12 +1,18 @@
 import torch
 import torch.nn as nn
 
-from typing import List, Optional
+from typing import Any, Dict, List, Optional, Union
 from segmentation_models_pytorch.base import modules
 
 
 class TransposeX2(nn.Sequential):
-    def __init__(self, in_channels: int, out_channels: int, use_batchnorm: bool = True):
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        use_batchnorm: Union[bool, str, None] = True,
+        use_norm: Union[bool, str, Dict[str, Any]] = True,
+    ):
         super().__init__()
         layers = [
             nn.ConvTranspose2d(
@@ -15,14 +21,20 @@ class TransposeX2(nn.Sequential):
             nn.ReLU(inplace=True),
         ]
 
-        if use_batchnorm:
+        if use_batchnorm or use_norm:
             layers.insert(1, nn.BatchNorm2d(out_channels))
 
         super().__init__(*layers)
 
 
 class DecoderBlock(nn.Module):
-    def __init__(self, in_channels: int, out_channels: int, use_batchnorm: bool = True):
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        use_batchnorm: Union[bool, str, None] = True,
+        use_norm: Union[bool, str, Dict[str, Any]] = True,
+    ):
         super().__init__()
 
         self.block = nn.Sequential(
@@ -31,6 +43,7 @@ class DecoderBlock(nn.Module):
                 in_channels // 4,
                 kernel_size=1,
                 use_batchnorm=use_batchnorm,
+                use_norm=use_norm,
             ),
             TransposeX2(
                 in_channels // 4, in_channels // 4, use_batchnorm=use_batchnorm
@@ -40,6 +53,7 @@ class DecoderBlock(nn.Module):
                 out_channels,
                 kernel_size=1,
                 use_batchnorm=use_batchnorm,
+                use_norm=use_norm,
             ),
         )
 
@@ -58,7 +72,8 @@ class LinknetDecoder(nn.Module):
         encoder_channels: List[int],
         prefinal_channels: int = 32,
         n_blocks: int = 5,
-        use_batchnorm: bool = True,
+        use_batchnorm: Union[bool, str, None] = True,
+        use_norm: Union[bool, str, Dict[str, Any]] = True,
     ):
         super().__init__()
 
@@ -71,7 +86,12 @@ class LinknetDecoder(nn.Module):
 
         self.blocks = nn.ModuleList(
             [
-                DecoderBlock(channels[i], channels[i + 1], use_batchnorm=use_batchnorm)
+                DecoderBlock(
+                    channels[i],
+                    channels[i + 1],
+                    use_batchnorm=use_batchnorm,
+                    use_norm=use_norm,
+                )
                 for i in range(n_blocks)
             ]
         )

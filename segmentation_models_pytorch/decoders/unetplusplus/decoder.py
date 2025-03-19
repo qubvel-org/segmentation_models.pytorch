@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from typing import Optional, List
+from typing import Any, Dict, List, Optional, Union
 
 from segmentation_models_pytorch.base import modules as md
 
@@ -13,7 +13,8 @@ class DecoderBlock(nn.Module):
         in_channels: int,
         skip_channels: int,
         out_channels: int,
-        use_batchnorm: bool = True,
+        use_batchnorm: Union[bool, str, None] = True,
+        use_norm: Union[bool, str, Dict[str, Any]] = True,
         attention_type: Optional[str] = None,
     ):
         super().__init__()
@@ -23,6 +24,7 @@ class DecoderBlock(nn.Module):
             kernel_size=3,
             padding=1,
             use_batchnorm=use_batchnorm,
+            use_norm=use_norm,
         )
         self.attention1 = md.Attention(
             attention_type, in_channels=in_channels + skip_channels
@@ -33,6 +35,7 @@ class DecoderBlock(nn.Module):
             kernel_size=3,
             padding=1,
             use_batchnorm=use_batchnorm,
+            use_norm=use_norm,
         )
         self.attention2 = md.Attention(attention_type, in_channels=out_channels)
 
@@ -50,13 +53,20 @@ class DecoderBlock(nn.Module):
 
 
 class CenterBlock(nn.Sequential):
-    def __init__(self, in_channels: int, out_channels: int, use_batchnorm: bool = True):
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        use_batchnorm: Union[bool, str, None] = True,
+        use_norm: Union[bool, str, Dict[str, Any]] = True,
+    ):
         conv1 = md.Conv2dReLU(
             in_channels,
             out_channels,
             kernel_size=3,
             padding=1,
             use_batchnorm=use_batchnorm,
+            use_norm=use_norm,
         )
         conv2 = md.Conv2dReLU(
             out_channels,
@@ -64,6 +74,7 @@ class CenterBlock(nn.Sequential):
             kernel_size=3,
             padding=1,
             use_batchnorm=use_batchnorm,
+            use_norm=use_norm,
         )
         super().__init__(conv1, conv2)
 
@@ -74,7 +85,8 @@ class UnetPlusPlusDecoder(nn.Module):
         encoder_channels: List[int],
         decoder_channels: List[int],
         n_blocks: int = 5,
-        use_batchnorm: bool = True,
+        use_batchnorm: Union[bool, str, None] = True,
+        use_norm: Union[bool, str, Dict[str, Any]] = True,
         attention_type: Optional[str] = None,
         center: bool = False,
     ):
@@ -97,13 +109,20 @@ class UnetPlusPlusDecoder(nn.Module):
         self.out_channels = decoder_channels
         if center:
             self.center = CenterBlock(
-                head_channels, head_channels, use_batchnorm=use_batchnorm
+                head_channels,
+                head_channels,
+                use_batchnorm=use_batchnorm,
+                use_norm=use_norm,
             )
         else:
             self.center = nn.Identity()
 
         # combine decoder keyword arguments
-        kwargs = dict(use_batchnorm=use_batchnorm, attention_type=attention_type)
+        kwargs = dict(
+            use_batchnorm=use_batchnorm,
+            use_norm=use_norm,
+            attention_type=attention_type,
+        )
 
         blocks = {}
         for layer_idx in range(len(self.in_channels) - 1):

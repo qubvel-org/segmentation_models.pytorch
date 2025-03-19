@@ -1,8 +1,8 @@
+from typing import Any, Dict, List, Optional, Union
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
-from typing import List, Optional
 
 from segmentation_models_pytorch.base import modules as md
 
@@ -49,7 +49,8 @@ class MFABBlock(nn.Module):
         in_channels: int,
         skip_channels: int,
         out_channels: int,
-        use_batchnorm: bool = True,
+        use_batchnorm: Union[bool, str, None] = True,
+        use_norm: Union[bool, str, Dict[str, Any]] = True,
         reduction: int = 16,
     ):
         # MFABBlock is just a modified version of SE-blocks, one for skip, one for input
@@ -61,9 +62,14 @@ class MFABBlock(nn.Module):
                 kernel_size=3,
                 padding=1,
                 use_batchnorm=use_batchnorm,
+                use_norm=use_norm,
             ),
             md.Conv2dReLU(
-                in_channels, skip_channels, kernel_size=1, use_batchnorm=use_batchnorm
+                in_channels,
+                skip_channels,
+                kernel_size=1,
+                use_batchnorm=use_batchnorm,
+                use_norm=use_norm,
             ),
         )
         reduced_channels = max(1, skip_channels // reduction)
@@ -88,6 +94,7 @@ class MFABBlock(nn.Module):
             kernel_size=3,
             padding=1,
             use_batchnorm=use_batchnorm,
+            use_norm=use_norm,
         )
         self.conv2 = md.Conv2dReLU(
             out_channels,
@@ -95,6 +102,7 @@ class MFABBlock(nn.Module):
             kernel_size=3,
             padding=1,
             use_batchnorm=use_batchnorm,
+            use_norm=use_norm,
         )
 
     def forward(
@@ -119,7 +127,8 @@ class DecoderBlock(nn.Module):
         in_channels: int,
         skip_channels: int,
         out_channels: int,
-        use_batchnorm: bool = True,
+        use_batchnorm: Union[bool, str, None] = True,
+        use_norm: Union[bool, str, Dict[str, Any]] = True,
     ):
         super().__init__()
         self.conv1 = md.Conv2dReLU(
@@ -128,6 +137,7 @@ class DecoderBlock(nn.Module):
             kernel_size=3,
             padding=1,
             use_batchnorm=use_batchnorm,
+            use_norm=use_norm,
         )
         self.conv2 = md.Conv2dReLU(
             out_channels,
@@ -135,6 +145,7 @@ class DecoderBlock(nn.Module):
             kernel_size=3,
             padding=1,
             use_batchnorm=use_batchnorm,
+            use_norm=use_norm,
         )
 
     def forward(
@@ -155,7 +166,8 @@ class MAnetDecoder(nn.Module):
         decoder_channels: List[int],
         n_blocks: int = 5,
         reduction: int = 16,
-        use_batchnorm: bool = True,
+        use_batchnorm: Union[bool, str, None] = True,
+        use_norm: Union[bool, str, Dict[str, Any]] = True,
         pab_channels: int = 64,
     ):
         super().__init__()
@@ -182,7 +194,9 @@ class MAnetDecoder(nn.Module):
         self.center = PABBlock(head_channels, pab_channels=pab_channels)
 
         # combine decoder keyword arguments
-        kwargs = dict(use_batchnorm=use_batchnorm)  # no attention type here
+        kwargs = dict(
+            use_batchnorm=use_batchnorm, use_norm=use_norm
+        )  # no attention type here
         blocks = [
             MFABBlock(in_ch, skip_ch, out_ch, reduction=reduction, **kwargs)
             if skip_ch > 0

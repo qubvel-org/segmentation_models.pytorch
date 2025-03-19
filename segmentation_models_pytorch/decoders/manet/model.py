@@ -1,4 +1,4 @@
-from typing import Any, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from segmentation_models_pytorch.base import (
     ClassificationHead,
@@ -29,9 +29,27 @@ class MAnet(SegmentationModel):
             other pretrained weights (see table with available weights for each encoder_name)
         decoder_channels: List of integers which specify **in_channels** parameter for convolutions used in decoder.
             Length of the list should be the same as **encoder_depth**
-        decoder_use_batchnorm: If **True**, BatchNorm2d layer between Conv2D and Activation layers
+        decoder_use_batchnorm: (**Deprecated**) If **True**, BatchNorm2d layer between Conv2D and Activation layers
             is used. If **"inplace"** InplaceABN will be used, allows to decrease memory consumption.
             Available options are **True, False, "inplace"**
+
+            **Note:** Deprecated, prefer using `decoder_use_norm` and set this to None.
+        decoder_use_norm:     Specifies normalization between Conv2D and activation.
+            Accepts the following types:
+            - **True**: Defaults to `"batchnorm"`.
+            - **False**: No normalization (`nn.Identity`).
+            - **str**: Specifies normalization type using default parameters. Available values:
+              `"batchnorm"`, `"identity"`, `"layernorm"`, `"groupnorm"`, `"instancenorm"`, `"inplace"`.
+            - **dict**: Fully customizable normalization settings. Structure:
+              ```python
+              {"type": <norm_type>, **kwargs}
+              ```
+              where `norm_name` corresponds to normalization type (see above), and `kwargs` are passed directly to the normalization layer as defined in PyTorch documentation.
+
+            **Example**:
+            ```python
+            use_norm={"type": "groupnorm", "num_groups": 8}
+            ```
         decoder_pab_channels: A number of channels for PAB module in decoder.
             Default is 64.
         in_channels: A number of input channels for the model, default is 3 (RGB images)
@@ -63,7 +81,8 @@ class MAnet(SegmentationModel):
         encoder_name: str = "resnet34",
         encoder_depth: int = 5,
         encoder_weights: Optional[str] = "imagenet",
-        decoder_use_batchnorm: bool = True,
+        decoder_use_batchnorm: Union[bool, str, None] = True,
+        decoder_use_norm: Union[bool, str, Dict[str, Any], None] = True,
         decoder_channels: List[int] = (256, 128, 64, 32, 16),
         decoder_pab_channels: int = 64,
         in_channels: int = 3,
@@ -87,6 +106,7 @@ class MAnet(SegmentationModel):
             decoder_channels=decoder_channels,
             n_blocks=encoder_depth,
             use_batchnorm=decoder_use_batchnorm,
+            use_norm=decoder_use_norm,
             pab_channels=decoder_pab_channels,
         )
 

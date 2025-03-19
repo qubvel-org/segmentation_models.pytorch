@@ -1,3 +1,5 @@
+import warnings
+
 import torch
 import torch.nn as nn
 
@@ -16,11 +18,53 @@ class Conv2dReLU(nn.Sequential):
         padding=0,
         stride=1,
         use_batchnorm=True,
+        use_norm="batchnorm",
     ):
-        if use_batchnorm == "inplace" and InPlaceABN is None:
+        if use_batchnorm is not None:
+            warnings.warn(
+                "The usage of use_batchnorm is deprecated. Please modify your code for use_norm",
+                DeprecationWarning,
+            )
+            if use_batchnorm is True:
+                use_norm = {"type": "batchnorm"}
+            elif use_batchnorm is False:
+                use_norm = {"type": "identity"}
+            elif use_batchnorm == "inplace":
+                use_norm = {
+                    "type": "inplace",
+                    "activation": "leaky_relu",
+                    "activation_param": 0.0,
+                }
+            else:
+                raise ValueError("Unrecognized value for use_batchnorm")
+
+        if isinstance(use_norm, str):
+            norm_str = use_norm.lower()
+            if norm_str == "inplace":
+                use_norm = {
+                    "type": "inplace",
+                    "activation": "leaky_relu",
+                    "activation_param": 0.0,
+                }
+            elif norm_str in (
+                "batchnorm",
+                "identity",
+                "layernorm",
+                "groupnorm",
+                "instancenorm",
+            ):
+                use_norm = {"type": norm_str}
+            else:
+                raise ValueError("Unrecognized normalization type string provided")
+        elif isinstance(use_norm, bool):
+            use_norm = {"type": "batchnorm" if use_norm else "identity"}
+        elif not isinstance(use_norm, dict):
+            raise ValueError("use_norm must be a dictionary, boolean, or string")
+
+        if use_norm["type"] == "inplace" and InPlaceABN is None:
             raise RuntimeError(
-                "In order to use `use_batchnorm='inplace'` inplace_abn package must be installed. "
-                + "To install see: https://github.com/mapillary/inplace_abn"
+                "In order to use `use_batchnorm='inplace'` or `use_norm='inplace'` the inplace_abn package must be installed. "
+                "To install see: https://github.com/mapillary/inplace_abn"
             )
 
         conv = nn.Conv2d(
@@ -29,21 +73,30 @@ class Conv2dReLU(nn.Sequential):
             kernel_size,
             stride=stride,
             padding=padding,
-            bias=not (use_batchnorm),
+            bias=use_norm["type"] != "inplace",
         )
         relu = nn.ReLU(inplace=True)
 
-        if use_batchnorm == "inplace":
-            bn = InPlaceABN(out_channels, activation="leaky_relu", activation_param=0.0)
+        norm_type = use_norm["type"]
+        extra_kwargs = {k: v for k, v in use_norm.items() if k != "type"}
+
+        if norm_type == "inplace":
+            norm = InPlaceABN(out_channels, **extra_kwargs)
             relu = nn.Identity()
-
-        elif use_batchnorm and use_batchnorm != "inplace":
-            bn = nn.BatchNorm2d(out_channels)
-
+        elif norm_type == "batchnorm":
+            norm = nn.BatchNorm2d(out_channels, **extra_kwargs)
+        elif norm_type == "identity":
+            norm = nn.Identity()
+        elif norm_type == "layernorm":
+            norm = nn.LayerNorm(out_channels, **extra_kwargs)
+        elif norm_type == "groupnorm":
+            norm = nn.GroupNorm(out_channels, **extra_kwargs)
+        elif norm_type == "instancenorm":
+            norm = nn.InstanceNorm2d(out_channels, **extra_kwargs)
         else:
-            bn = nn.Identity()
+            raise ValueError(f"Unrecognized normalization type: {norm_type}")
 
-        super(Conv2dReLU, self).__init__(conv, bn, relu)
+        super(Conv2dReLU, self).__init__(conv, norm, relu)
 
 
 class SCSEModule(nn.Module):
@@ -127,3 +180,9 @@ class Attention(nn.Module):
 
     def forward(self, x):
         return self.attention(x)
+
+
+if __name__ == "__main__":
+    print(Conv2dReLU(3, 12, 4))
+    print(Conv2dReLU(3, 12, 4, use_norm={"type": "batchnorm"}))
+    print(Conv2dReLU(3, 12, 4, use_norm={"type": "layernorm", "eps": 1e-3}))
