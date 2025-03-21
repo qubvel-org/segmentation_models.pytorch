@@ -13,7 +13,6 @@ class DecoderBlock(nn.Module):
         in_channels: int,
         skip_channels: int,
         out_channels: int,
-        use_batchnorm: Union[bool, str, None] = True,
         use_norm: Union[bool, str, Dict[str, Any]] = True,
         attention_type: Optional[str] = None,
     ):
@@ -23,7 +22,6 @@ class DecoderBlock(nn.Module):
             out_channels,
             kernel_size=3,
             padding=1,
-            use_batchnorm=use_batchnorm,
             use_norm=use_norm,
         )
         self.attention1 = md.Attention(
@@ -34,7 +32,6 @@ class DecoderBlock(nn.Module):
             out_channels,
             kernel_size=3,
             padding=1,
-            use_batchnorm=use_batchnorm,
             use_norm=use_norm,
         )
         self.attention2 = md.Attention(attention_type, in_channels=out_channels)
@@ -57,7 +54,6 @@ class CenterBlock(nn.Sequential):
         self,
         in_channels: int,
         out_channels: int,
-        use_batchnorm: Union[bool, str, None] = True,
         use_norm: Union[bool, str, Dict[str, Any]] = True,
     ):
         conv1 = md.Conv2dReLU(
@@ -65,7 +61,6 @@ class CenterBlock(nn.Sequential):
             out_channels,
             kernel_size=3,
             padding=1,
-            use_batchnorm=use_batchnorm,
             use_norm=use_norm,
         )
         conv2 = md.Conv2dReLU(
@@ -73,7 +68,6 @@ class CenterBlock(nn.Sequential):
             out_channels,
             kernel_size=3,
             padding=1,
-            use_batchnorm=use_batchnorm,
             use_norm=use_norm,
         )
         super().__init__(conv1, conv2)
@@ -85,7 +79,6 @@ class UnetPlusPlusDecoder(nn.Module):
         encoder_channels: List[int],
         decoder_channels: List[int],
         n_blocks: int = 5,
-        use_batchnorm: Union[bool, str, None] = True,
         use_norm: Union[bool, str, Dict[str, Any]] = True,
         attention_type: Optional[str] = None,
         center: bool = False,
@@ -111,7 +104,6 @@ class UnetPlusPlusDecoder(nn.Module):
             self.center = CenterBlock(
                 head_channels,
                 head_channels,
-                use_batchnorm=use_batchnorm,
                 use_norm=use_norm,
             )
         else:
@@ -119,7 +111,6 @@ class UnetPlusPlusDecoder(nn.Module):
 
         # combine decoder keyword arguments
         kwargs = dict(
-            use_batchnorm=use_batchnorm,
             use_norm=use_norm,
             attention_type=attention_type,
         )

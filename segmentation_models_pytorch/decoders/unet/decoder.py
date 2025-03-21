@@ -15,7 +15,6 @@ class UnetDecoderBlock(nn.Module):
         in_channels: int,
         skip_channels: int,
         out_channels: int,
-        use_batchnorm: Union[bool, str, None] = True,
         use_norm: Union[bool, str, Dict[str, Any]] = True,
         attention_type: Optional[str] = None,
         interpolation_mode: str = "nearest",
@@ -27,7 +26,6 @@ class UnetDecoderBlock(nn.Module):
             out_channels,
             kernel_size=3,
             padding=1,
-            use_batchnorm=use_batchnorm,
             use_norm=use_norm,
         )
         self.attention1 = md.Attention(
@@ -38,7 +36,6 @@ class UnetDecoderBlock(nn.Module):
             out_channels,
             kernel_size=3,
             padding=1,
-            use_batchnorm=use_batchnorm,
             use_norm=use_norm,
         )
         self.attention2 = md.Attention(attention_type, in_channels=out_channels)
@@ -71,7 +68,6 @@ class UnetCenterBlock(nn.Sequential):
         self,
         in_channels: int,
         out_channels: int,
-        use_batchnorm: Union[bool, str, None] = True,
         use_norm: Union[bool, str, Dict[str, Any]] = True,
     ):
         conv1 = md.Conv2dReLU(
@@ -79,7 +75,6 @@ class UnetCenterBlock(nn.Sequential):
             out_channels,
             kernel_size=3,
             padding=1,
-            use_batchnorm=use_batchnorm,
             use_norm=use_norm,
         )
         conv2 = md.Conv2dReLU(
@@ -87,7 +82,6 @@ class UnetCenterBlock(nn.Sequential):
             out_channels,
             kernel_size=3,
             padding=1,
-            use_batchnorm=use_batchnorm,
             use_norm=use_norm,
         )
         super().__init__(conv1, conv2)
@@ -105,7 +99,6 @@ class UnetDecoder(nn.Module):
         encoder_channels: Sequence[int],
         decoder_channels: Sequence[int],
         n_blocks: int = 5,
-        use_batchnorm: Union[bool, str, None] = True,
         use_norm: Union[bool, str, Dict[str, Any]] = True,
         attention_type: Optional[str] = None,
         add_center_block: bool = False,
@@ -135,7 +128,6 @@ class UnetDecoder(nn.Module):
             self.center = UnetCenterBlock(
                 head_channels,
                 head_channels,
-                use_batchnorm=use_batchnorm,
                 use_norm=use_norm,
             )
         else:
@@ -150,7 +142,6 @@ class UnetDecoder(nn.Module):
                 block_in_channels,
                 block_skip_channels,
                 block_out_channels,
-                use_batchnorm=use_batchnorm,
                 use_norm=use_norm,
                 attention_type=attention_type,
                 interpolation_mode=interpolation_mode,

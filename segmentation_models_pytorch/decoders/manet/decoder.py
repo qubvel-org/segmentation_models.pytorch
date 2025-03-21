@@ -49,7 +49,6 @@ class MFABBlock(nn.Module):
         in_channels: int,
         skip_channels: int,
         out_channels: int,
-        use_batchnorm: Union[bool, str, None] = True,
         use_norm: Union[bool, str, Dict[str, Any]] = True,
         reduction: int = 16,
     ):
@@ -61,14 +60,12 @@ class MFABBlock(nn.Module):
                 in_channels,
                 kernel_size=3,
                 padding=1,
-                use_batchnorm=use_batchnorm,
                 use_norm=use_norm,
             ),
             md.Conv2dReLU(
                 in_channels,
                 skip_channels,
                 kernel_size=1,
-                use_batchnorm=use_batchnorm,
                 use_norm=use_norm,
             ),
         )
@@ -93,7 +90,6 @@ class MFABBlock(nn.Module):
             out_channels,
             kernel_size=3,
             padding=1,
-            use_batchnorm=use_batchnorm,
             use_norm=use_norm,
         )
         self.conv2 = md.Conv2dReLU(
@@ -101,7 +97,6 @@ class MFABBlock(nn.Module):
             out_channels,
             kernel_size=3,
             padding=1,
-            use_batchnorm=use_batchnorm,
             use_norm=use_norm,
         )
 
@@ -127,7 +122,6 @@ class DecoderBlock(nn.Module):
         in_channels: int,
         skip_channels: int,
         out_channels: int,
-        use_batchnorm: Union[bool, str, None] = True,
         use_norm: Union[bool, str, Dict[str, Any]] = True,
     ):
         super().__init__()
@@ -136,7 +130,6 @@ class DecoderBlock(nn.Module):
             out_channels,
             kernel_size=3,
             padding=1,
-            use_batchnorm=use_batchnorm,
             use_norm=use_norm,
         )
         self.conv2 = md.Conv2dReLU(
@@ -144,7 +137,6 @@ class DecoderBlock(nn.Module):
             out_channels,
             kernel_size=3,
             padding=1,
-            use_batchnorm=use_batchnorm,
             use_norm=use_norm,
         )
 
@@ -166,7 +158,6 @@ class MAnetDecoder(nn.Module):
         decoder_channels: List[int],
         n_blocks: int = 5,
         reduction: int = 16,
-        use_batchnorm: Union[bool, str, None] = True,
         use_norm: Union[bool, str, Dict[str, Any]] = True,
         pab_channels: int = 64,
     ):
@@ -195,7 +186,7 @@ class MAnetDecoder(nn.Module):
 
         # combine decoder keyword arguments
         kwargs = dict(
-            use_batchnorm=use_batchnorm, use_norm=use_norm
+            use_norm=use_norm
         )  # no attention type here
         blocks = [
             MFABBlock(in_ch, skip_ch, out_ch, reduction=reduction, **kwargs)

@@ -7,6 +7,7 @@ from segmentation_models_pytorch.base import (
 )
 from segmentation_models_pytorch.encoders import get_encoder
 from segmentation_models_pytorch.base.hub_mixin import supports_config_loading
+from segmentation_models_pytorch.base.modules import handle_decoder_use_batchnorm_deprecation
 
 from .decoder import LinknetDecoder
 
@@ -101,11 +102,11 @@ class Linknet(SegmentationModel):
             **kwargs,
         )
 
+        decoder_use_norm = handle_decoder_use_batchnorm_deprecation(decoder_use_batchnorm, decoder_use_norm)
         self.decoder = LinknetDecoder(
             encoder_channels=self.encoder.out_channels,
             n_blocks=encoder_depth,
             prefinal_channels=32,
-            use_batchnorm=decoder_use_batchnorm,
             use_norm=decoder_use_norm,
         )
 

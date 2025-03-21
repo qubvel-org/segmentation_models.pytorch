@@ -7,6 +7,7 @@ from segmentation_models_pytorch.base import (
 )
 from segmentation_models_pytorch.encoders import get_encoder
 from segmentation_models_pytorch.base.hub_mixin import supports_config_loading
+from segmentation_models_pytorch.base.modules import handle_decoder_use_batchnorm_deprecation
 
 from .decoder import MAnetDecoder
 
@@ -101,11 +102,12 @@ class MAnet(SegmentationModel):
             **kwargs,
         )
 
+        decoder_use_norm = handle_decoder_use_batchnorm_deprecation(decoder_use_batchnorm, decoder_use_norm)
+
         self.decoder = MAnetDecoder(
             encoder_channels=self.encoder.out_channels,
             decoder_channels=decoder_channels,
             n_blocks=encoder_depth,
-            use_batchnorm=decoder_use_batchnorm,
             use_norm=decoder_use_norm,
             pab_channels=decoder_pab_channels,
         )
