@@ -1,4 +1,4 @@
-from typing import Any, Optional, Union, Callable, Sequence
+from typing import Any, Dict, Optional, Union, Callable, Sequence
 
 from segmentation_models_pytorch.base import (
     ClassificationHead,
@@ -7,6 +7,7 @@ from segmentation_models_pytorch.base import (
 )
 from segmentation_models_pytorch.encoders import get_encoder
 from segmentation_models_pytorch.base.hub_mixin import supports_config_loading
+from segmentation_models_pytorch.base.modules import handle_decoder_use_batchnorm_deprecation
 
 from .decoder import UnetDecoder
 
@@ -39,9 +40,27 @@ class Unet(SegmentationModel):
             other pretrained weights (see table with available weights for each encoder_name)
         decoder_channels: List of integers which specify **in_channels** parameter for convolutions used in decoder.
             Length of the list should be the same as **encoder_depth**
-        decoder_use_batchnorm: If **True**, BatchNorm2d layer between Conv2D and Activation layers
+        decoder_use_batchnorm: (**Deprecated**) If **True**, BatchNorm2d layer between Conv2D and Activation layers
             is used. If **"inplace"** InplaceABN will be used, allows to decrease memory consumption.
             Available options are **True, False, "inplace"**
+
+            **Note:** Deprecated, prefer using `decoder_use_norm` and set this to None.
+        decoder_use_norm:     Specifies normalization between Conv2D and activation.
+            Accepts the following types:
+            - **True**: Defaults to `"batchnorm"`.
+            - **False**: No normalization (`nn.Identity`).
+            - **str**: Specifies normalization type using default parameters. Available values:
+              `"batchnorm"`, `"identity"`, `"layernorm"`, `"groupnorm"`, `"instancenorm"`, `"inplace"`.
+            - **dict**: Fully customizable normalization settings. Structure:
+              ```python
+              {"type": <norm_type>, **kwargs}
+              ```
+              where `norm_name` corresponds to normalization type (see above), and `kwargs` are passed directly to the normalization layer as defined in PyTorch documentation.
+
+            **Example**:
+            ```python
+            use_norm={"type": "groupnorm", "num_groups": 8}
+            ```
         decoder_attention_type: Attention module used in decoder of the model. Available options are
             **None** and **scse** (https://arxiv.org/abs/1808.08127).
         decoder_interpolation_mode: Interpolation mode used in decoder of the model. Available options are
@@ -95,7 +114,8 @@ class Unet(SegmentationModel):
         encoder_name: str = "resnet34",
         encoder_depth: int = 5,
         encoder_weights: Optional[str] = "imagenet",
-        decoder_use_batchnorm: bool = True,
+        decoder_use_batchnorm: Union[bool, str, None] = True,
+        decoder_use_norm: Union[bool, str, Dict[str, Any]] = True,
         decoder_channels: Sequence[int] = (256, 128, 64, 32, 16),
         decoder_attention_type: Optional[str] = None,
         decoder_interpolation_mode: str = "nearest",
@@ -116,11 +136,12 @@ class Unet(SegmentationModel):
         )
 
         add_center_block = encoder_name.startswith("vgg")
+        decoder_use_norm = handle_decoder_use_batchnorm_deprecation(decoder_use_batchnorm, decoder_use_norm)
         self.decoder = UnetDecoder(
             encoder_channels=self.encoder.out_channels,
             decoder_channels=decoder_channels,
             n_blocks=encoder_depth,
-            use_batchnorm=decoder_use_batchnorm,
+            use_norm=decoder_use_norm,
             add_center_block=add_center_block,
             attention_type=decoder_attention_type,
             interpolation_mode=decoder_interpolation_mode,
