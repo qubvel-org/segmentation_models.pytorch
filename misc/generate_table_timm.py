@@ -15,24 +15,25 @@ def has_dilation_support(name):
         return True
     except Exception:
         return False
-    
+
+
 def valid_vit_encoder_for_dpt(name):
     if "vit" not in name:
         return False
     encoder = timm.create_model(name)
     feature_info = encoder.feature_info
     feature_info_obj = timm.models.FeatureInfo(
-                                                feature_info=feature_info, out_indices=[0,1,2,3]
-                                            )
+        feature_info=feature_info, out_indices=[0, 1, 2, 3]
+    )
     reduction_scales = list(feature_info_obj.reduction())
 
     if len(set(reduction_scales)) > 1:
         return False
-    
+
     output_stride = reduction_scales[0]
     if bin(output_stride).count("1") != 1:
         return False
-    
+
     return True
 
 
@@ -57,20 +58,27 @@ def make_table(data):
     table = l1 + top + l2
 
     for k in sorted(data.keys()):
-
         if "has_dilation" in data[k] and data[k]["has_dilation"]:
-            support = ("✅".center(max_len2 - 3))
+            support = "✅".center(max_len2 - 3)
 
         else:
-            support = (" ".center(max_len2 - 2))
+            support = " ".center(max_len2 - 2)
 
         if "supported_only_for_dpt" in data[k]:
-            supported_for_dpt = ("✅".center(max_len3 - 3))
+            supported_for_dpt = "✅".center(max_len3 - 3)
 
         else:
-            supported_for_dpt = (" ".center(max_len3 - 2))
+            supported_for_dpt = " ".center(max_len3 - 2)
 
-        table += "| " + k.ljust(max_len1 - 2) + " | " + support + " | " + supported_for_dpt + " |\n"
+        table += (
+            "| "
+            + k.ljust(max_len1 - 2)
+            + " | "
+            + support
+            + " | "
+            + supported_for_dpt
+            + " |\n"
+        )
         table += l1
 
     return table
@@ -89,11 +97,9 @@ if __name__ == "__main__":
             except Exception:
                 try:
                     if valid_vit_encoder_for_dpt(name):
-                        supported_models[name] = dict(supported_only_for_dpt = True)
-                except:
+                        supported_models[name] = dict(supported_only_for_dpt=True)
+                except Exception:
                     continue
-            
-
 
     table = make_table(supported_models)
     print(table)

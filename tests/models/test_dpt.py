@@ -1,9 +1,4 @@
-import os
 import pytest
-import inspect
-import tempfile
-from functools import lru_cache
-from huggingface_hub import hf_hub_download
 import torch
 import segmentation_models_pytorch as smp
 
@@ -28,7 +23,7 @@ class TestDPTModel(base.BaseModelTester):
 
     @property
     def hub_checkpoint(self):
-        return f"vedantdalimkar/DPT"
+        return "vedantdalimkar/DPT"
 
     @pytest.mark.compile
     def test_compile(self):
