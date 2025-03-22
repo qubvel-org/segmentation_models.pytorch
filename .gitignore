@@ -75,6 +75,7 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+*ipynb*
 
 # pyenv
 .python-version
@@ -110,3 +111,6 @@ venv.bak/
 
 # ruff
 .ruff_cache/
+
+# model weight folder
+dpt_large-ade20k-b12dca68
