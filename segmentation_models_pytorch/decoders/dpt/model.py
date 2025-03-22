@@ -9,7 +9,7 @@ from segmentation_models_pytorch.base import (
 from segmentation_models_pytorch.encoders import get_encoder
 from segmentation_models_pytorch.base.utils import is_torch_compiling
 from segmentation_models_pytorch.base.hub_mixin import supports_config_loading
-from .decoder import DPTDecoder
+from .decoder import DPTDecoder, DPTSegmentationHead
 
 
 class DPT(SegmentationModel):
@@ -75,6 +75,7 @@ class DPT(SegmentationModel):
         classes: int = 1,
         activation: Optional[Union[str, Callable]] = None,
         aux_params: Optional[dict] = None,
+        output_stride: Optional[int] = None,
         **kwargs: dict[str, Any],
     ):
         super().__init__()
@@ -86,6 +87,7 @@ class DPT(SegmentationModel):
             weights=encoder_weights,
             use_vit_encoder=True,
             allow_downsampling=False,
+            output_stride=output_stride,
             allow_output_stride_not_power_of_two=False,
             **kwargs,
         )
@@ -103,11 +105,11 @@ class DPT(SegmentationModel):
             cls_token_supported=self.cls_token_supported,
         )
 
-        self.segmentation_head = SegmentationHead(
+        self.segmentation_head = DPTSegmentationHead(
             in_channels=feature_dim,
             out_channels=classes,
             activation=activation,
-            kernel_size=1,
+            kernel_size=3,
             upsampling=2,
         )
 

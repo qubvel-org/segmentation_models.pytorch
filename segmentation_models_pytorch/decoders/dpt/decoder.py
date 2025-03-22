@@ -1,5 +1,7 @@
 import torch
 import torch.nn as nn
+from segmentation_models_pytorch.base.modules import Activation
+from typing import Optional
 
 
 def _get_feature_processing_out_channels(encoder_name: str) -> list[int]:
@@ -71,7 +73,7 @@ class IgnoreReadout(nn.Module):
         return feature
 
 
-class FeatureProcessBlock(nn.Module):
+class ReassembleBlock(nn.Module):
     """
     Processes the features such that they have progressively increasing embedding size and progressively decreasing
     spatial dimension
@@ -107,7 +109,11 @@ class FeatureProcessBlock(nn.Module):
             )
 
         self.project_to_feature_dim = nn.Conv2d(
-            in_channels=out_channel, out_channels=feature_dim, kernel_size=3, padding=1
+            in_channels=out_channel,
+            out_channels=feature_dim,
+            kernel_size=3,
+            padding=1,
+            bias=False,
         )
 
     def forward(self, x: torch.Tensor):
@@ -121,29 +127,34 @@ class FeatureProcessBlock(nn.Module):
 class ResidualConvBlock(nn.Module):
     def __init__(self, feature_dim: int):
         super().__init__()
-        self.conv_block = nn.Sequential(
-            nn.ReLU(),
-            nn.Conv2d(
-                in_channels=feature_dim,
-                out_channels=feature_dim,
-                kernel_size=3,
-                padding=1,
-                bias=False,
-            ),
-            nn.BatchNorm2d(num_features=feature_dim),
-            nn.ReLU(),
-            nn.Conv2d(
-                in_channels=feature_dim,
-                out_channels=feature_dim,
-                kernel_size=3,
-                padding=1,
-                bias=False,
-            ),
-            nn.BatchNorm2d(num_features=feature_dim),
+
+        self.conv_1 = nn.Conv2d(
+            in_channels=feature_dim,
+            out_channels=feature_dim,
+            kernel_size=3,
+            padding=1,
+            bias=False,
         )
+        self.batch_norm_1 = nn.BatchNorm2d(num_features=feature_dim)
+        self.conv_2 = nn.Conv2d(
+            in_channels=feature_dim,
+            out_channels=feature_dim,
+            kernel_size=3,
+            padding=1,
+            bias=False,
+        )
+        self.batch_norm_2 = nn.BatchNorm2d(num_features=feature_dim)
+        self.activation = nn.ReLU()
 
     def forward(self, x: torch.Tensor):
-        return x + self.conv_block(x)
+        activated_x_1 = self.activation(x)
+        conv_1_out = self.conv_1(activated_x_1)
+        batch_norm_1_out = self.batch_norm_1(conv_1_out)
+        activated_x_2 = self.activation(batch_norm_1_out)
+        conv_2_out = self.conv_2(activated_x_2)
+        batch_norm_2_out = self.batch_norm_2(conv_2_out)
+
+        return x + batch_norm_2_out
 
 
 class FusionBlock(nn.Module):
@@ -172,7 +183,6 @@ class FusionBlock(nn.Module):
             feature, scale_factor=2, align_corners=True, mode="bilinear"
         )
         feature = self.project(feature)
-        feature = self.activation(feature)
 
         return feature
 
@@ -230,9 +240,9 @@ class DPTDecoder(nn.Module):
                 :encoder_depth
             ]
 
-        self.feature_processing_blocks = nn.ModuleList(
+        self.reassemble_blocks = nn.ModuleList(
             [
-                FeatureProcessBlock(
+                ReassembleBlock(
                     transformer_embed_dim, feature_dim, out_channel, upsample_factor
                 )
                 for upsample_factor, out_channel in zip(
@@ -253,7 +263,7 @@ class DPTDecoder(nn.Module):
         # Process the encoder features to scale of [1/32,1/16,1/8,1/4]
         for index, (feature, cls_token) in enumerate(zip(features, cls_tokens)):
             readout_feature = self.readout_blocks[index](feature, cls_token)
-            processed_feature = self.feature_processing_blocks[index](readout_feature)
+            processed_feature = self.reassemble_blocks[index](readout_feature)
             processed_features.append(processed_feature)
 
         preceding_layer_feature = None
@@ -265,3 +275,38 @@ class DPTDecoder(nn.Module):
             preceding_layer_feature = out
 
         return out
+
+
+class DPTSegmentationHead(nn.Module):
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        activation: Optional[str] = None,
+        kernel_size: int = 3,
+        upsampling: float = 2.0,
+    ):
+        super().__init__()
+
+        self.head = nn.Sequential(
+            nn.Conv2d(
+                in_channels, in_channels, kernel_size=kernel_size, padding=1, bias=False
+            ),
+            nn.BatchNorm2d(in_channels),
+            nn.ReLU(True),
+            nn.Dropout(0.1, False),
+            nn.Conv2d(in_channels, out_channels, kernel_size=1),
+        )
+        self.activation = Activation(activation)
+        self.upsampling_factor = upsampling
+
+    def forward(self, x):
+        head_output = self.head(x)
+        resized_output = nn.functional.interpolate(
+            head_output,
+            scale_factor=self.upsampling_factor,
+            mode="bilinear",
+            align_corners=True,
+        )
+        activation_output = self.activation(resized_output)
+        return activation_output

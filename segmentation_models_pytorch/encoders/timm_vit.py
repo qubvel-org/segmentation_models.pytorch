@@ -4,6 +4,8 @@ import timm
 import torch
 import torch.nn as nn
 
+from .timm_universal import _merge_kwargs_no_duplicates
+
 
 class TimmViTEncoder(nn.Module):
     """
@@ -26,6 +28,7 @@ class TimmViTEncoder(nn.Module):
         in_channels: int = 3,
         depth: int = 4,
         output_indices: Optional[Union[list[int], int]] = None,
+        output_stride: Optional[int] = None,
         **kwargs: dict[str, Any],
     ):
         """
@@ -49,7 +52,6 @@ class TimmViTEncoder(nn.Module):
         super().__init__()
         self.name = name
 
-        output_stride = kwargs.pop("output_stride", None)
         if output_stride is not None:
             raise ValueError("Dilated mode not supported, set output stride to None")
 
@@ -160,6 +162,8 @@ class TimmViTEncoder(nn.Module):
 
         cls_tokens = [None] * len(self.out_indices)
 
+        # If there are multiple prefix tokens, discard the register tokens if they are present and
+        # return the CLS token, if it exists. Only patch features are retrieved if CLS token is not supported
         if self.num_prefix_tokens > 0:
             features, prefix_tokens = zip(*intermediate_outputs)
             if self.cls_token_supported:
@@ -205,42 +209,3 @@ class TimmViTEncoder(nn.Module):
             int: The effective output stride.
         """
         return self._output_stride
-
-    def load_state_dict(self, state_dict, **kwargs):
-        # for compatibility of weights for
-        # timm- ported encoders with TimmUniversalEncoder
-        patterns = ["regnet", "res2", "resnest", "mobilenetv3", "gernet"]
-
-        is_deprecated_encoder = any(
-            self.name.startswith(pattern) for pattern in patterns
-        )
-
-        if is_deprecated_encoder:
-            keys = list(state_dict.keys())
-            for key in keys:
-                new_key = key
-                if not key.startswith("model."):
-                    new_key = "model." + key
-                if "gernet" in self.name:
-                    new_key = new_key.replace(".stages.", ".stages_")
-                state_dict[new_key] = state_dict.pop(key)
-
-        return super().load_state_dict(state_dict, **kwargs)
-
-
-def _merge_kwargs_no_duplicates(a: dict[str, Any], b: dict[str, Any]) -> dict[str, Any]:
-    """
-    Merge two dictionaries, ensuring no duplicate keys exist.
-
-    Args:
-        a (dict): Base dictionary.
-        b (dict): Additional parameters to merge.
-
-    Returns:
-        dict: A merged dictionary.
-    """
-    duplicates = a.keys() & b.keys()
-    if duplicates:
-        raise ValueError(f"'{duplicates}' already specified internally")
-
-    return a | b
