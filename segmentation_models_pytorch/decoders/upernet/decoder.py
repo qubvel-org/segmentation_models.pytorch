@@ -1,3 +1,5 @@
+from typing import Any, Dict, Tuple, Union
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -8,10 +10,10 @@ from segmentation_models_pytorch.base import modules as md
 class PSPModule(nn.Module):
     def __init__(
         self,
-        in_channels,
-        out_channels,
-        sizes=(1, 2, 3, 6),
-        use_batchnorm=True,
+        in_channels: int,
+        out_channels: int,
+        sizes: Tuple[int, ...] = (1, 2, 3, 6),
+        use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
     ):
         super().__init__()
         self.blocks = nn.ModuleList(
@@ -22,7 +24,7 @@ class PSPModule(nn.Module):
                         in_channels,
                         in_channels // len(sizes),
                         kernel_size=1,
-                        use_batchnorm=use_batchnorm,
+                        use_norm=use_norm,
                     ),
                 )
                 for size in sizes
@@ -32,7 +34,7 @@ class PSPModule(nn.Module):
             in_channels=in_channels * 2,
             out_channels=out_channels,
             kernel_size=1,
-            use_batchnorm=True,
+            use_norm="batchnorm",
         )
 
     def forward(self, x):
@@ -48,14 +50,14 @@ class PSPModule(nn.Module):
 
 
 class FPNBlock(nn.Module):
-    def __init__(self, skip_channels, pyramid_channels, use_batchnorm=True):
+    def __init__(self, skip_channels: int, pyramid_channels: int, use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm"):
         super().__init__()
         self.skip_conv = (
             md.Conv2dReLU(
                 skip_channels,
                 pyramid_channels,
                 kernel_size=1,
-                use_batchnorm=use_batchnorm,
+                use_norm=use_norm,
             )
             if skip_channels != 0
             else nn.Identity()
@@ -73,10 +75,11 @@ class FPNBlock(nn.Module):
 class UPerNetDecoder(nn.Module):
     def __init__(
         self,
-        encoder_channels,
-        encoder_depth=5,
-        pyramid_channels=256,
-        segmentation_channels=64,
+        encoder_channels: Tuple[int, ...],
+        encoder_depth: int = 5,
+        pyramid_channels: int = 256,
+        segmentation_channels: int = 64,
+        use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
     ):
         super().__init__()
 
@@ -94,7 +97,7 @@ class UPerNetDecoder(nn.Module):
             in_channels=encoder_channels[0],
             out_channels=pyramid_channels,
             sizes=(1, 2, 3, 6),
-            use_batchnorm=True,
+            use_norm=use_norm,
         )
 
         # FPN Module
@@ -107,7 +110,7 @@ class UPerNetDecoder(nn.Module):
             out_channels=segmentation_channels,
             kernel_size=3,
             padding=1,
-            use_batchnorm=True,
+            use_norm=use_norm,
         )
 
     def forward(self, features):

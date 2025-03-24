@@ -7,7 +7,7 @@ from segmentation_models_pytorch.base import (
 )
 from segmentation_models_pytorch.encoders import get_encoder
 from segmentation_models_pytorch.base.hub_mixin import supports_config_loading
-from segmentation_models_pytorch.base.modules import handle_decoder_use_batchnorm_deprecation
+from segmentation_models_pytorch.base.modules import normalize_decoder_norm
 
 from .decoder import UnetDecoder
 
@@ -50,7 +50,7 @@ class Unet(SegmentationModel):
             - **True**: Defaults to `"batchnorm"`.
             - **False**: No normalization (`nn.Identity`).
             - **str**: Specifies normalization type using default parameters. Available values:
-              `"batchnorm"`, `"identity"`, `"layernorm"`, `"groupnorm"`, `"instancenorm"`, `"inplace"`.
+              `"batchnorm"`, `"identity"`, `"layernorm"`, `"instancenorm"`, `"inplace"`.
             - **dict**: Fully customizable normalization settings. Structure:
               ```python
               {"type": <norm_type>, **kwargs}
@@ -59,7 +59,7 @@ class Unet(SegmentationModel):
 
             **Example**:
             ```python
-            use_norm={"type": "groupnorm", "num_groups": 8}
+            use_norm={"type": "layernorm", "eps": 1e-2}
             ```
         decoder_attention_type: Attention module used in decoder of the model. Available options are
             **None** and **scse** (https://arxiv.org/abs/1808.08127).
@@ -115,7 +115,7 @@ class Unet(SegmentationModel):
         encoder_depth: int = 5,
         encoder_weights: Optional[str] = "imagenet",
         decoder_use_batchnorm: Union[bool, str, None] = True,
-        decoder_use_norm: Union[bool, str, Dict[str, Any]] = True,
+        decoder_use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
         decoder_channels: Sequence[int] = (256, 128, 64, 32, 16),
         decoder_attention_type: Optional[str] = None,
         decoder_interpolation_mode: str = "nearest",
@@ -136,7 +136,7 @@ class Unet(SegmentationModel):
         )
 
         add_center_block = encoder_name.startswith("vgg")
-        decoder_use_norm = handle_decoder_use_batchnorm_deprecation(decoder_use_batchnorm, decoder_use_norm)
+        decoder_use_norm = normalize_decoder_norm(decoder_use_batchnorm, decoder_use_norm)
         self.decoder = UnetDecoder(
             encoder_channels=self.encoder.out_channels,
             decoder_channels=decoder_channels,

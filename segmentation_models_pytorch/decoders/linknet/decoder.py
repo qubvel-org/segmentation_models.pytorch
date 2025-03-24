@@ -10,7 +10,7 @@ class TransposeX2(nn.Sequential):
         self,
         in_channels: int,
         out_channels: int,
-        use_norm: Union[bool, str, Dict[str, Any]] = True,
+        use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
     ):
         super().__init__()
         layers = [
@@ -20,8 +20,12 @@ class TransposeX2(nn.Sequential):
             nn.ReLU(inplace=True),
         ]
 
-        if use_norm:
-            layers.insert(1, nn.BatchNorm2d(out_channels))
+        if use_norm != "identity":
+            if isinstance(use_norm, dict):
+                if use_norm.get("type") != "identity":
+                    layers.insert(1, modules.get_norm_layer(use_norm, out_channels))
+            else:
+                layers.insert(1, modules.get_norm_layer(use_norm, out_channels))
 
         super().__init__(*layers)
 

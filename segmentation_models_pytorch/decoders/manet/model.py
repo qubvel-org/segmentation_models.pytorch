@@ -7,7 +7,7 @@ from segmentation_models_pytorch.base import (
 )
 from segmentation_models_pytorch.encoders import get_encoder
 from segmentation_models_pytorch.base.hub_mixin import supports_config_loading
-from segmentation_models_pytorch.base.modules import handle_decoder_use_batchnorm_deprecation
+from segmentation_models_pytorch.base.modules import normalize_decoder_norm
 
 from .decoder import MAnetDecoder
 
@@ -35,12 +35,12 @@ class MAnet(SegmentationModel):
             Available options are **True, False, "inplace"**
 
             **Note:** Deprecated, prefer using `decoder_use_norm` and set this to None.
-        decoder_use_norm:     Specifies normalization between Conv2D and activation.
+        decoder_use_norm: Specifies normalization between Conv2D and activation.
             Accepts the following types:
             - **True**: Defaults to `"batchnorm"`.
             - **False**: No normalization (`nn.Identity`).
             - **str**: Specifies normalization type using default parameters. Available values:
-              `"batchnorm"`, `"identity"`, `"layernorm"`, `"groupnorm"`, `"instancenorm"`, `"inplace"`.
+              `"batchnorm"`, `"identity"`, `"layernorm"`, `"instancenorm"`, `"inplace"`.
             - **dict**: Fully customizable normalization settings. Structure:
               ```python
               {"type": <norm_type>, **kwargs}
@@ -49,7 +49,7 @@ class MAnet(SegmentationModel):
 
             **Example**:
             ```python
-            use_norm={"type": "groupnorm", "num_groups": 8}
+            use_norm={"type": "layernorm", "eps": 1e-2}
             ```
         decoder_pab_channels: A number of channels for PAB module in decoder.
             Default is 64.
@@ -83,7 +83,7 @@ class MAnet(SegmentationModel):
         encoder_depth: int = 5,
         encoder_weights: Optional[str] = "imagenet",
         decoder_use_batchnorm: Union[bool, str, None] = True,
-        decoder_use_norm: Union[bool, str, Dict[str, Any], None] = True,
+        decoder_use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
         decoder_channels: List[int] = (256, 128, 64, 32, 16),
         decoder_pab_channels: int = 64,
         in_channels: int = 3,
@@ -102,7 +102,7 @@ class MAnet(SegmentationModel):
             **kwargs,
         )
 
-        decoder_use_norm = handle_decoder_use_batchnorm_deprecation(decoder_use_batchnorm, decoder_use_norm)
+        decoder_use_norm = normalize_decoder_norm(decoder_use_batchnorm, decoder_use_norm)
 
         self.decoder = MAnetDecoder(
             encoder_channels=self.encoder.out_channels,

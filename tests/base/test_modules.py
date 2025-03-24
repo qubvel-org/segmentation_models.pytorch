@@ -33,12 +33,6 @@ def test_conv2drelu_layernorm():
                 '\n  (2): ReLU(inplace=True)\n)')
     assert repr(module) == expected
 
-def test_conv2drelu_groupnorm():
-    module = Conv2dReLU(3, 16, kernel_size=3, padding=1, use_norm="groupnorm")
-    expected = ('Conv2dReLU(\n  (0): Conv2d(3, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))'
-                '\n  (1): Identity()'
-                '\n  (2): ReLU(inplace=True)\n)')
-    assert repr(module) == expected
 
 def test_conv2drelu_instancenorm():
     module = Conv2dReLU(3, 16, kernel_size=3, padding=1, use_norm="instancenorm")
