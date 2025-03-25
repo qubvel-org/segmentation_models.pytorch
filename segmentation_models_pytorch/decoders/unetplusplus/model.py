@@ -83,7 +83,7 @@ class UnetPlusPlus(SegmentationModel):
         encoder_name: str = "resnet34",
         encoder_depth: int = 5,
         encoder_weights: Optional[str] = "imagenet",
-        decoder_use_batchnorm: Union[bool, str, None] = True,
+        decoder_use_batchnorm: Union[bool, str, None] = None,
         decoder_use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
         decoder_channels: List[int] = (256, 128, 64, 32, 16),
         decoder_attention_type: Optional[str] = None,

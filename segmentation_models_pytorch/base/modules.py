@@ -40,6 +40,7 @@ def normalize_decoder_norm(decoder_use_batchnorm: Union[bool, str, None], decode
         warnings.warn(
             "The usage of use_batchnorm is deprecated. Please modify your code for use_norm",
             DeprecationWarning,
+            stacklevel=2
         )
         if decoder_use_batchnorm is True:
             decoder_use_norm = {"type": "batchnorm"}

@@ -79,7 +79,7 @@ class Linknet(SegmentationModel):
         encoder_name: str = "resnet34",
         encoder_depth: int = 5,
         encoder_weights: Optional[str] = "imagenet",
-        decoder_use_batchnorm: Union[bool, str, None] = True,
+        decoder_use_batchnorm: Union[bool, str, None] = None,
         decoder_use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
         in_channels: int = 3,
         classes: int = 1,
