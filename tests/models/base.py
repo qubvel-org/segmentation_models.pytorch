@@ -231,11 +231,18 @@ class BaseModelTester(unittest.TestCase):
         model = self.get_default_model()
         model = model.eval().to(default_device)
 
+        if not model._is_torch_compilable:
+            with self.assertRaises(RuntimeError):
+                torch.compiler.reset()
+                compiled_model = torch.compile(
+                    model, fullgraph=True, dynamic=True, backend="eager"
+                )
+            return
+
         torch.compiler.reset()
         compiled_model = torch.compile(
             model, fullgraph=True, dynamic=True, backend="eager"
         )
-
         with torch.inference_mode():
             compiled_model(sample)
 

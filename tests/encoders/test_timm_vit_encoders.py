@@ -50,6 +50,8 @@ class TestTimmViTEncoders(base.BaseEncoderTester):
             **self.default_encoder_kwargs,
         )
 
+    # Requires timm version greater than 1.0.15 as the required functionality of the timm VisionTransformer
+    # for SMP's TimmViTEncoder class were introduced in the latest version.
     @requires_timm_greater_or_equal("1.0.15")
     def test_forward_backward(self):
         for encoder_name in self.encoder_names:
@@ -191,6 +193,7 @@ class TestTimmViTEncoders(base.BaseEncoderTester):
         with self.assertRaises(ValueError):
             smp.encoders.get_encoder(self.encoder_names[0], depth=0, output_stride=None)
 
+    @requires_timm_greater_or_equal("1.0.15")
     def test_invalid_out_indices(self):
         with self.assertRaises(ValueError):
             smp.encoders.get_encoder(
@@ -202,6 +205,7 @@ class TestTimmViTEncoders(base.BaseEncoderTester):
                 self.encoder_names[0], output_stride=None, out_indices=[1, 2, 25]
             )
 
+    @requires_timm_greater_or_equal("1.0.15")
     def test_invalid_out_indices_length(self):
         with self.assertRaises(ValueError):
             smp.encoders.get_encoder(
@@ -278,6 +282,8 @@ class TestTimmViTEncoders(base.BaseEncoderTester):
                     f"Encoder `{encoder_name}` should have width output strides {expected_width_strides}, but has {width_strides}",
                 )
 
+    # Same test as in base class. However, this is not redundant as base class has a different
+    # ```get_tiny_encoder``` method
     @requires_timm_greater_or_equal("1.0.15")
     @pytest.mark.compile
     def test_compile(self):

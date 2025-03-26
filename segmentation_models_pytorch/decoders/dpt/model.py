@@ -3,7 +3,6 @@ import torch
 
 from segmentation_models_pytorch.base import (
     ClassificationHead,
-    SegmentationHead,
     SegmentationModel,
 )
 from segmentation_models_pytorch.encoders import get_encoder

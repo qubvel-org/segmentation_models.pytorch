@@ -7,7 +7,6 @@ from tests.utils import (
     slow_test,
     default_device,
     requires_torch_greater_or_equal,
-    check_run_test_on_diff_or_main,
 )
 
 
@@ -24,49 +23,6 @@ class TestDPTModel(base.BaseModelTester):
     @property
     def hub_checkpoint(self):
         return "vedantdalimkar/DPT"
-
-    @pytest.mark.compile
-    def test_compile(self):
-        if not check_run_test_on_diff_or_main(self.files_for_diff):
-            self.skipTest("No diff and not on `main`.")
-
-        sample = self._get_sample().to(default_device)
-        model = self.get_default_model()
-        model = model.eval().to(default_device)
-
-        if not model._is_torch_compilable:
-            with self.assertRaises(RuntimeError):
-                torch.compiler.reset()
-                compiled_model = torch.compile(
-                    model, fullgraph=True, dynamic=True, backend="eager"
-                )
-            return
-
-        with torch.inference_mode():
-            compiled_model(sample)
-
-    @pytest.mark.torch_script
-    def test_torch_script(self):
-        if not check_run_test_on_diff_or_main(self.files_for_diff):
-            self.skipTest("No diff and not on `main`.")
-
-        sample = self._get_sample().to(default_device)
-        model = self.get_default_model()
-        model.eval()
-
-        if not model._is_torch_scriptable:
-            with self.assertRaises(RuntimeError):
-                scripted_model = torch.jit.script(model)
-            return
-
-        scripted_model = torch.jit.script(model)
-
-        with torch.inference_mode():
-            scripted_output = scripted_model(sample)
-            eager_output = model(sample)
-
-        self.assertEqual(scripted_output.shape, eager_output.shape)
-        torch.testing.assert_close(scripted_output, eager_output)
 
     @slow_test
     @requires_torch_greater_or_equal("2.0.1")

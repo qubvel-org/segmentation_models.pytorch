@@ -1,6 +1,5 @@
 import segmentation_models_pytorch as smp
 import torch
-import huggingface_hub
 
 MODEL_WEIGHTS_PATH = r"C:\Users\vedan\Downloads\dpt_large-ade20k-b12dca68.pt"
 HF_HUB_PATH = "vedantdalimkar/DPT"
@@ -98,12 +97,4 @@ if __name__ == "__main__":
     }
 
     smp_model.load_state_dict(dpt_model_dict, strict=True)
-
-    model_name = MODEL_WEIGHTS_PATH.split("\\")[-1].replace(".pt", "")
-
-    smp_model.save_pretrained(model_name)
-
-    repo_id = HF_HUB_PATH
-    api = huggingface_hub.HfApi()
-    api.create_repo(repo_id=repo_id, repo_type="model")
-    api.upload_folder(folder_path=model_name, repo_id=repo_id)
+    smp_model.save_pretrained(HF_HUB_PATH, push_to_hub=True)

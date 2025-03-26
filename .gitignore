@@ -111,6 +111,3 @@ venv.bak/
 
 # ruff
 .ruff_cache/
-
-# model weight folder
-dpt_large-ade20k-b12dca68
