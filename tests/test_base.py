@@ -6,10 +6,10 @@ import pytest
 
 
 def test_from_pretrained_with_mismatched_keys():
-    orginal_model = smp.Unet(classes=1)
+    original_model = smp.Unet(classes=1)
 
     with tempfile.TemporaryDirectory() as temp_dir:
-        orginal_model.save_pretrained(temp_dir)
+        original_model.save_pretrained(temp_dir)
 
         # we should catch warning here and check if there specific keys there
         with pytest.warns(UserWarning):
@@ -18,7 +18,7 @@ def test_from_pretrained_with_mismatched_keys():
     assert restored_model.segmentation_head[0].out_channels == 2
 
     # verify all the weight are the same expect mismatched ones
-    original_state_dict = orginal_model.state_dict()
+    original_state_dict = original_model.state_dict()
     restored_state_dict = restored_model.state_dict()
 
     expected_mismatched_keys = [
