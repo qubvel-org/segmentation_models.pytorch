@@ -1,3 +1,4 @@
+import warnings
 from typing import Any, Dict, List, Optional, Union
 
 from segmentation_models_pytorch.base import (
@@ -7,7 +8,6 @@ from segmentation_models_pytorch.base import (
 )
 from segmentation_models_pytorch.encoders import get_encoder
 from segmentation_models_pytorch.base.hub_mixin import supports_config_loading
-from segmentation_models_pytorch.base.modules import normalize_decoder_norm
 
 from .decoder import UnetPlusPlusDecoder
 
@@ -29,11 +29,6 @@ class UnetPlusPlus(SegmentationModel):
             other pretrained weights (see table with available weights for each encoder_name)
         decoder_channels: List of integers which specify **in_channels** parameter for convolutions used in decoder.
             Length of the list should be the same as **encoder_depth**
-        decoder_use_batchnorm: (**Deprecated**) If **True**, BatchNorm2d layer between Conv2D and Activation layers
-            is used. If **"inplace"** InplaceABN will be used, allows to decrease memory consumption.
-            Available options are **True, False, "inplace"**
-
-            **Note:** Deprecated, prefer using `decoder_use_norm` and set this to None.
         decoder_use_norm:     Specifies normalization between Conv2D and activation.
             Accepts the following types:
             - **True**: Defaults to `"batchnorm"`.
@@ -83,7 +78,6 @@ class UnetPlusPlus(SegmentationModel):
         encoder_name: str = "resnet34",
         encoder_depth: int = 5,
         encoder_weights: Optional[str] = "imagenet",
-        decoder_use_batchnorm: Union[bool, str, None] = None,
         decoder_use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
         decoder_channels: List[int] = (256, 128, 64, 32, 16),
         decoder_attention_type: Optional[str] = None,
@@ -108,7 +102,15 @@ class UnetPlusPlus(SegmentationModel):
             **kwargs,
         )
 
-        decoder_use_norm = normalize_decoder_norm(decoder_use_batchnorm, decoder_use_norm)
+        decoder_use_batchnorm = kwargs.pop("decoder_use_batchnorm", None)
+        if decoder_use_batchnorm is not None:
+            warnings.warn(
+                "The usage of decoder_use_batchnorm is deprecated. Please modify your code for use_norm",
+                DeprecationWarning,
+                stacklevel=2
+            )
+            decoder_use_norm = decoder_use_batchnorm
+
         self.decoder = UnetPlusPlusDecoder(
             encoder_channels=self.encoder.out_channels,
             decoder_channels=decoder_channels,

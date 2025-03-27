@@ -1,3 +1,4 @@
+import warnings
 from typing import Any, Dict, Optional, Union
 
 from segmentation_models_pytorch.base import (
@@ -6,7 +7,6 @@ from segmentation_models_pytorch.base import (
     SegmentationModel,
 )
 from segmentation_models_pytorch.encoders import get_encoder
-from segmentation_models_pytorch.base.modules import normalize_decoder_norm
 from segmentation_models_pytorch.base.hub_mixin import supports_config_loading
 
 from .decoder import PSPDecoder
@@ -29,11 +29,6 @@ class PSPNet(SegmentationModel):
         encoder_weights: One of **None** (random initialization), **"imagenet"** (pre-training on ImageNet) and
             other pretrained weights (see table with available weights for each encoder_name)
         psp_out_channels: A number of filters in Spatial Pyramid
-        psp_use_batchnorm: (**Deprecated**) If **True**, BatchNorm2d layer between Conv2D and Activation layers
-            is used. If **"inplace"** InplaceABN will be used, allows to decrease memory consumption.
-            Available options are **True, False, "inplace"**
-
-            **Note:** Deprecated, prefer using `decoder_use_norm` and set this to None.
         decoder_use_norm:     Specifies normalization between Conv2D and activation.
             Accepts the following types:
             - **True**: Defaults to `"batchnorm"`.
@@ -81,8 +76,7 @@ class PSPNet(SegmentationModel):
         encoder_weights: Optional[str] = "imagenet",
         encoder_depth: int = 3,
         psp_out_channels: int = 512,
-        psp_use_batchnorm: Union[bool, str, None] = None,
-        decoder_use_norm: Union[bool, str, Dict[str, Any], None] = "batchnorm",
+        decoder_use_norm: Union[bool, str, Dict[str, Any], None] = True,
         psp_dropout: float = 0.2,
         in_channels: int = 3,
         classes: int = 1,
@@ -100,7 +94,16 @@ class PSPNet(SegmentationModel):
             weights=encoder_weights,
             **kwargs,
         )
-        decoder_use_norm = normalize_decoder_norm(psp_use_batchnorm, decoder_use_norm)
+
+        psp_use_batchnorm = kwargs.pop("psp_use_batchnorm", None)
+        if psp_use_batchnorm is not None:
+            warnings.warn(
+                "The usage of psp_use_batchnorm is deprecated. Please modify your code for use_norm",
+                DeprecationWarning,
+                stacklevel=2
+            )
+            decoder_use_norm = psp_use_batchnorm
+
         self.decoder = PSPDecoder(
             encoder_channels=self.encoder.out_channels,
             use_norm=decoder_use_norm,

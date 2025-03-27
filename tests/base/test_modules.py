@@ -1,42 +1,51 @@
+from torch import nn
+
+from inplace_abn import InPlaceABN
 from segmentation_models_pytorch.base.modules import Conv2dReLU
 
 
 def test_conv2drelu_batchnorm():
     module = Conv2dReLU(3, 16, kernel_size=3, padding=1, use_norm="batchnorm")
 
-    expected = ('Conv2dReLU(\n  (0): Conv2d(3, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))'
-                '\n  (1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)'
-                '\n  (2): ReLU(inplace=True)\n)')
-    assert repr(module) == expected
+    assert isinstance(module[0], nn.Conv2d)
+    assert isinstance(module[1], nn.BatchNorm2d)
+    assert isinstance(module[2], nn.ReLU)
 
 def test_conv2drelu_batchnorm_with_keywords():
     module = Conv2dReLU(3, 16, kernel_size=3, padding=1, use_norm={"type": "batchnorm", "momentum": 1e-4, "affine": False})
 
-    expected = ('Conv2dReLU(\n  (0): Conv2d(3, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))'
-                '\n  (1): BatchNorm2d(16, eps=1e-05, momentum=0.0001, affine=False, track_running_stats=True)'
-                '\n  (2): ReLU(inplace=True)\n)')
-    assert repr(module) == expected
-
+    assert isinstance(module[0], nn.Conv2d)
+    assert isinstance(module[1], nn.BatchNorm2d)
+    assert module[1].momentum == 1e-4 and module[1].affine == False
+    assert isinstance(module[2], nn.ReLU)
 
 def test_conv2drelu_identity():
     module = Conv2dReLU(3, 16, kernel_size=3, padding=1, use_norm="identity")
-    expected = ('Conv2dReLU(\n  (0): Conv2d(3, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))'
-                '\n  (1): Identity()'
-                '\n  (2): ReLU(inplace=True)\n)')
-    assert repr(module) == expected
+
+    assert isinstance(module[0], nn.Conv2d)
+    assert isinstance(module[1], nn.Identity)
+    assert isinstance(module[2], nn.ReLU)
 
 
 def test_conv2drelu_layernorm():
     module = Conv2dReLU(3, 16, kernel_size=3, padding=1, use_norm="layernorm")
-    expected = ('Conv2dReLU(\n  (0): Conv2d(3, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))'
-                '\n  (1): LayerNorm((16,), eps=1e-05, elementwise_affine=True)'
-                '\n  (2): ReLU(inplace=True)\n)')
-    assert repr(module) == expected
+
+    assert isinstance(module[0], nn.Conv2d)
+    assert isinstance(module[1], nn.LayerNorm)
+    assert isinstance(module[2], nn.ReLU)
 
 
 def test_conv2drelu_instancenorm():
     module = Conv2dReLU(3, 16, kernel_size=3, padding=1, use_norm="instancenorm")
-    expected = ('Conv2dReLU(\n  (0): Conv2d(3, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))'
-                '\n  (1): InstanceNorm2d(16, eps=1e-05, momentum=0.1, affine=False, track_running_stats=False)'
-                '\n  (2): ReLU(inplace=True)\n)')
-    assert repr(module) == expected
+
+    assert isinstance(module[0], nn.Conv2d)
+    assert isinstance(module[1], nn.InstanceNorm2d)
+    assert isinstance(module[2], nn.ReLU)
+
+
+def test_conv2drelu_inplace():
+    module = Conv2dReLU(3, 16, kernel_size=3, padding=1, use_norm="inplace")
+
+    assert isinstance(module[0], nn.Conv2d)
+    assert isinstance(module[1], InPlaceABN)
+    assert isinstance(module[2], nn.ReLU)

@@ -1,5 +1,4 @@
-from typing import Any, Dict, Tuple, Union
-import warnings
+from typing import Any, Dict, Union
 
 import torch
 import torch.nn as nn
@@ -9,11 +8,18 @@ try:
 except ImportError:
     InPlaceABN = None
 
-def normalize_use_norm(decoder_use_norm: Union[bool, str, Dict[str, Any]]) -> Dict[str, Any]:
-    if isinstance(decoder_use_norm, str):
-        norm_str = decoder_use_norm.lower()
+def get_norm_layer(use_norm: Union[bool, str, Dict[str, Any]], out_channels: int) -> nn.Module:
+    supported_norms = ("inplace", "batchnorm", "identity", "layernorm", "instancenorm")
+    if use_norm is True:
+        norm_params = {"type": "batchnorm"}
+    elif use_norm is False:
+        norm_params = {"type": "identity"}
+    elif use_norm == "inplace":
+        norm_params = {"type": "inplace", "activation": "leaky_relu", "activation_param": 0.0}
+    elif isinstance(use_norm, str):
+        norm_str = use_norm.lower()
         if norm_str == "inplace":
-            decoder_use_norm = {
+            norm_params = {
                 "type": "inplace",
                 "activation": "leaky_relu",
                 "activation_param": 0.0,
@@ -22,48 +28,31 @@ def normalize_use_norm(decoder_use_norm: Union[bool, str, Dict[str, Any]]) -> Di
                 "batchnorm",
                 "identity",
                 "layernorm",
-                "groupnorm",
                 "instancenorm",
         ):
-            decoder_use_norm = {"type": norm_str}
+            norm_params = {"type": norm_str}
         else:
-            raise ValueError("Unrecognized normalization type string provided")
-    elif isinstance(decoder_use_norm, bool):
-        decoder_use_norm = {"type": "batchnorm" if decoder_use_norm else "identity"}
-    elif not isinstance(decoder_use_norm, dict):
-        raise ValueError("use_norm must be a dictionary, boolean, or string")
+            raise ValueError(f"Unrecognized normalization type string provided: {use_norm}. Should be in {supported_norms}")
+    elif isinstance(use_norm, dict):
+        norm_params = use_norm
+    else:
+        raise ValueError("use_norm must be a dictionary, boolean, or string. Please refer to the documentation.")
 
-    return decoder_use_norm
 
-def normalize_decoder_norm(decoder_use_batchnorm: Union[bool, str, None], decoder_use_norm: Union[bool, str, Dict[str, Any]]) -> Dict[str, Any]:
-    if decoder_use_batchnorm is not None:
-        warnings.warn(
-            "The usage of use_batchnorm is deprecated. Please modify your code for use_norm",
-            DeprecationWarning,
-            stacklevel=2
+    if not "type" in norm_params:
+        raise ValueError(f"Malformed dictionary given in use_norm: {use_norm}. Should contain key 'type'.")
+    if norm_params["type"] not in supported_norms:
+        raise ValueError(f"Unrecognized normalization type string provided: {use_norm}. Should be in {supported_norms}")
+
+    norm_type = norm_params["type"]
+    extra_kwargs = {k: v for k, v in norm_params.items() if k != "type"}
+
+    if norm_type == "inplace" and InPlaceABN is None:
+        raise RuntimeError(
+            "In order to use `use_batchnorm='inplace'` or `use_norm='inplace'` the inplace_abn package must be installed. "
+            "To install see: https://github.com/mapillary/inplace_abn"
         )
-        if decoder_use_batchnorm is True:
-            decoder_use_norm = {"type": "batchnorm"}
-        elif decoder_use_batchnorm is False:
-            decoder_use_norm = {"type": "identity"}
-        elif decoder_use_batchnorm == "inplace":
-            decoder_use_norm = {
-                "type": "inplace",
-                "activation": "leaky_relu",
-                "activation_param": 0.0,
-            }
-        else:
-            raise ValueError("Unrecognized value for use_batchnorm")
-
-    decoder_use_norm = normalize_use_norm(decoder_use_norm)
-    return decoder_use_norm
-
-
-def get_norm_layer(use_norm: Dict[str, Any], out_channels: int) -> nn.Module:
-    norm_type = use_norm["type"]
-    extra_kwargs = {k: v for k, v in use_norm.items() if k != "type"}
-
-    if norm_type == "inplace":
+    elif norm_type == "inplace":
         norm = InPlaceABN(out_channels, **extra_kwargs)
     elif norm_type == "batchnorm":
         norm = nn.BatchNorm2d(out_channels, **extra_kwargs)
@@ -88,24 +77,17 @@ class Conv2dReLU(nn.Sequential):
         stride=1,
         use_norm="batchnorm",
     ):
-        use_norm = normalize_use_norm(use_norm)
-        if use_norm["type"] == "inplace" and InPlaceABN is None:
-            raise RuntimeError(
-                "In order to use `use_batchnorm='inplace'` or `use_norm='inplace'` the inplace_abn package must be installed. "
-                "To install see: https://github.com/mapillary/inplace_abn"
-            )
-
+        norm = get_norm_layer(use_norm, out_channels)
         conv = nn.Conv2d(
             in_channels,
             out_channels,
             kernel_size,
             stride=stride,
             padding=padding,
-            bias=use_norm["type"] != "inplace",
+            bias=norm._get_name() != "BatchNorm2d",
         )
-        norm = get_norm_layer(use_norm, out_channels)
 
-        if use_norm["type"] == "inplace":
+        if norm._get_name() == "Inplace":
             relu = nn.Identity()
         else:
             relu = nn.ReLU(inplace=True)
