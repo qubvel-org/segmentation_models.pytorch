@@ -282,8 +282,6 @@ class TestTimmViTEncoders(base.BaseEncoderTester):
                     f"Encoder `{encoder_name}` should have width output strides {expected_width_strides}, but has {width_strides}",
                 )
 
-    # Same test as in base class. However, this is not redundant as base class has a different
-    # ```get_tiny_encoder``` method
     @requires_timm_greater_or_equal("1.0.15")
     @pytest.mark.compile
     def test_compile(self):
