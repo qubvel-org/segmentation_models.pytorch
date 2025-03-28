@@ -1,6 +1,7 @@
 import torch
-from typing import TypeVar, Type
+import warnings
 
+from typing import TypeVar, Type
 from . import initialization as init
 from .hub_mixin import SMPHubMixin
 from .utils import is_torch_compiling
@@ -96,23 +97,45 @@ class SegmentationModel(torch.nn.Module, SMPHubMixin):
         # timm- ported encoders with TimmUniversalEncoder
         from segmentation_models_pytorch.encoders import TimmUniversalEncoder
 
-        if not isinstance(self.encoder, TimmUniversalEncoder):
-            return super().load_state_dict(state_dict, **kwargs)
+        if isinstance(self.encoder, TimmUniversalEncoder):
+            patterns = ["regnet", "res2", "resnest", "mobilenetv3", "gernet"]
+            is_deprecated_encoder = any(
+                self.encoder.name.startswith(pattern) for pattern in patterns
+            )
+            if is_deprecated_encoder:
+                keys = list(state_dict.keys())
+                for key in keys:
+                    new_key = key
+                    if key.startswith("encoder.") and not key.startswith(
+                        "encoder.model."
+                    ):
+                        new_key = "encoder.model." + key.removeprefix("encoder.")
+                    if "gernet" in self.encoder.name:
+                        new_key = new_key.replace(".stages.", ".stages_")
+                    state_dict[new_key] = state_dict.pop(key)
 
-        patterns = ["regnet", "res2", "resnest", "mobilenetv3", "gernet"]
+        # To be able to load weight with mismatched sizes
+        # We are going to filter mismatched sizes as well if strict=False
+        strict = kwargs.get("strict", True)
+        if not strict:
+            mismatched_keys = []
+            model_state_dict = self.state_dict()
+            common_keys = set(model_state_dict.keys()) & set(state_dict.keys())
+            for key in common_keys:
+                if model_state_dict[key].shape != state_dict[key].shape:
+                    mismatched_keys.append(
+                        (key, model_state_dict[key].shape, state_dict[key].shape)
+                    )
+                    state_dict.pop(key)
 
-        is_deprecated_encoder = any(
-            self.encoder.name.startswith(pattern) for pattern in patterns
-        )
-
-        if is_deprecated_encoder:
-            keys = list(state_dict.keys())
-            for key in keys:
-                new_key = key
-                if key.startswith("encoder.") and not key.startswith("encoder.model."):
-                    new_key = "encoder.model." + key.removeprefix("encoder.")
-                if "gernet" in self.encoder.name:
-                    new_key = new_key.replace(".stages.", ".stages_")
-                state_dict[new_key] = state_dict.pop(key)
+            if mismatched_keys:
+                str_keys = "\n".join(
+                    [
+                        f" - {key}: {s} (weights) -> {m} (model)"
+                        for key, m, s in mismatched_keys
+                    ]
+                )
+                text = f"\n\n !!!!!! Mismatched keys !!!!!!\n\nYou should TRAIN the model to use it:\n{str_keys}\n"
+                warnings.warn(text, stacklevel=-1)
 
         return super().load_state_dict(state_dict, **kwargs)
