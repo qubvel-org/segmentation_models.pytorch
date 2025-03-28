@@ -1,4 +1,5 @@
-from typing import Any, List, Optional, Union
+import warnings
+from typing import Any, Dict, List, Optional, Union
 
 from segmentation_models_pytorch.base import (
     ClassificationHead,
@@ -28,9 +29,22 @@ class UnetPlusPlus(SegmentationModel):
             other pretrained weights (see table with available weights for each encoder_name)
         decoder_channels: List of integers which specify **in_channels** parameter for convolutions used in decoder.
             Length of the list should be the same as **encoder_depth**
-        decoder_use_batchnorm: If **True**, BatchNorm2d layer between Conv2D and Activation layers
-            is used. If **"inplace"** InplaceABN will be used, allows to decrease memory consumption.
-            Available options are **True, False, "inplace"**
+        decoder_use_norm:     Specifies normalization between Conv2D and activation.
+            Accepts the following types:
+            - **True**: Defaults to `"batchnorm"`.
+            - **False**: No normalization (`nn.Identity`).
+            - **str**: Specifies normalization type using default parameters. Available values:
+              `"batchnorm"`, `"identity"`, `"layernorm"`, `"instancenorm"`, `"inplace"`.
+            - **dict**: Fully customizable normalization settings. Structure:
+              ```python
+              {"type": <norm_type>, **kwargs}
+              ```
+              where `norm_name` corresponds to normalization type (see above), and `kwargs` are passed directly to the normalization layer as defined in PyTorch documentation.
+
+            **Example**:
+            ```python
+            use_norm={"type": "layernorm", "eps": 1e-2}
+            ```
         decoder_attention_type: Attention module used in decoder of the model.
             Available options are **None** and **scse** (https://arxiv.org/abs/1808.08127).
         in_channels: A number of input channels for the model, default is 3 (RGB images)
@@ -64,7 +78,7 @@ class UnetPlusPlus(SegmentationModel):
         encoder_name: str = "resnet34",
         encoder_depth: int = 5,
         encoder_weights: Optional[str] = "imagenet",
-        decoder_use_batchnorm: bool = True,
+        decoder_use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
         decoder_channels: List[int] = (256, 128, 64, 32, 16),
         decoder_attention_type: Optional[str] = None,
         in_channels: int = 3,
@@ -88,11 +102,20 @@ class UnetPlusPlus(SegmentationModel):
             **kwargs,
         )
 
+        decoder_use_batchnorm = kwargs.pop("decoder_use_batchnorm", None)
+        if decoder_use_batchnorm is not None:
+            warnings.warn(
+                "The usage of decoder_use_batchnorm is deprecated. Please modify your code for use_norm",
+                DeprecationWarning,
+                stacklevel=2
+            )
+            decoder_use_norm = decoder_use_batchnorm
+
         self.decoder = UnetPlusPlusDecoder(
             encoder_channels=self.encoder.out_channels,
             decoder_channels=decoder_channels,
             n_blocks=encoder_depth,
-            use_batchnorm=decoder_use_batchnorm,
+            use_norm=decoder_use_norm,
             center=True if encoder_name.startswith("vgg") else False,
             attention_type=decoder_attention_type,
         )
