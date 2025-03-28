@@ -50,6 +50,7 @@ class MFABBlock(nn.Module):
         skip_channels: int,
         out_channels: int,
         use_batchnorm: bool = True,
+        interpolation_mode: str = "nearest",
         reduction: int = 16,
     ):
         # MFABBlock is just a modified version of SE-blocks, one for skip, one for input
@@ -96,12 +97,13 @@ class MFABBlock(nn.Module):
             padding=1,
             use_batchnorm=use_batchnorm,
         )
+        self.interpolation_mode = interpolation_mode
 
     def forward(
         self, x: torch.Tensor, skip: Optional[torch.Tensor] = None
     ) -> torch.Tensor:
         x = self.hl_conv(x)
-        x = F.interpolate(x, scale_factor=2.0, mode="nearest")
+        x = F.interpolate(x, scale_factor=2.0, mode=self.interpolation_mode)
         attention_hl = self.SE_hl(x)
         if skip is not None:
             attention_ll = self.SE_ll(skip)
@@ -120,6 +122,7 @@ class DecoderBlock(nn.Module):
         skip_channels: int,
         out_channels: int,
         use_batchnorm: bool = True,
+        interpolation_mode: str = "nearest",
     ):
         super().__init__()
         self.conv1 = md.Conv2dReLU(
@@ -136,11 +139,12 @@ class DecoderBlock(nn.Module):
             padding=1,
             use_batchnorm=use_batchnorm,
         )
+        self.interpolation_mode = interpolation_mode
 
     def forward(
         self, x: torch.Tensor, skip: Optional[torch.Tensor] = None
     ) -> torch.Tensor:
-        x = F.interpolate(x, scale_factor=2.0, mode="nearest")
+        x = F.interpolate(x, scale_factor=2.0, mode=self.interpolation_mode)
         if skip is not None:
             x = torch.cat([x, skip], dim=1)
         x = self.conv1(x)
@@ -157,6 +161,7 @@ class MAnetDecoder(nn.Module):
         reduction: int = 16,
         use_batchnorm: bool = True,
         pab_channels: int = 64,
+        interpolation_mode: str = "nearest",
     ):
         super().__init__()
 
@@ -182,7 +187,7 @@ class MAnetDecoder(nn.Module):
         self.center = PABBlock(head_channels, pab_channels=pab_channels)
 
         # combine decoder keyword arguments
-        kwargs = dict(use_batchnorm=use_batchnorm)  # no attention type here
+        kwargs = dict(use_batchnorm=use_batchnorm, interpolation_mode=interpolation_mode)  # no attention type here
         blocks = [
             MFABBlock(in_ch, skip_ch, out_ch, reduction=reduction, **kwargs)
             if skip_ch > 0
