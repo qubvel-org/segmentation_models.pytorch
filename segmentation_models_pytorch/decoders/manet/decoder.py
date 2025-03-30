@@ -49,7 +49,7 @@ class MFABBlock(nn.Module):
         in_channels: int,
         skip_channels: int,
         out_channels: int,
-        use_norm: Union[bool, str, Dict[str, Any]] = True,
+        use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
         reduction: int = 16,
     ):
         # MFABBlock is just a modified version of SE-blocks, one for skip, one for input
@@ -122,7 +122,7 @@ class DecoderBlock(nn.Module):
         in_channels: int,
         skip_channels: int,
         out_channels: int,
-        use_norm: Union[bool, str, Dict[str, Any]] = True,
+        use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
     ):
         super().__init__()
         self.conv1 = md.Conv2dReLU(
@@ -158,7 +158,7 @@ class MAnetDecoder(nn.Module):
         decoder_channels: List[int],
         n_blocks: int = 5,
         reduction: int = 16,
-        use_norm: Union[bool, str, Dict[str, Any]] = True,
+        use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
         pab_channels: int = 64,
     ):
         super().__init__()

@@ -54,7 +54,7 @@ class Unet(SegmentationModel):
 
             **Example**:
             ```python
-            use_norm={"type": "layernorm", "eps": 1e-2}
+            decoder_use_norm={"type": "layernorm", "eps": 1e-2}
             ```
         decoder_attention_type: Attention module used in decoder of the model. Available options are
             **None** and **scse** (https://arxiv.org/abs/1808.08127).
@@ -109,7 +109,7 @@ class Unet(SegmentationModel):
         encoder_name: str = "resnet34",
         encoder_depth: int = 5,
         encoder_weights: Optional[str] = "imagenet",
-        decoder_use_norm: Union[bool, str, Dict[str, Any]] = True,
+        decoder_use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
         decoder_channels: Sequence[int] = (256, 128, 64, 32, 16),
         decoder_attention_type: Optional[str] = None,
         decoder_interpolation_mode: str = "nearest",

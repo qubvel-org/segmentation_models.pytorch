@@ -44,7 +44,7 @@ class Linknet(SegmentationModel):
 
             **Example**:
             ```python
-            use_norm={"type": "layernorm", "eps": 1e-2}
+            decoder_use_norm={"type": "layernorm", "eps": 1e-2}
             ```
         in_channels: A number of input channels for the model, default is 3 (RGB images)
         classes: A number of classes for output mask (or you can think as a number of channels of output mask)
@@ -74,7 +74,7 @@ class Linknet(SegmentationModel):
         encoder_name: str = "resnet34",
         encoder_depth: int = 5,
         encoder_weights: Optional[str] = "imagenet",
-        decoder_use_norm: Union[bool, str, Dict[str, Any]] = True,
+        decoder_use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
         in_channels: int = 3,
         classes: int = 1,
         activation: Optional[Union[str, callable]] = None,

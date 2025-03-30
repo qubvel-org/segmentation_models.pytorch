@@ -8,6 +8,7 @@ try:
 except ImportError:
     InPlaceABN = None
 
+
 def get_norm_layer(use_norm: Union[bool, str, Dict[str, Any]], out_channels: int) -> nn.Module:
     supported_norms = ("inplace", "batchnorm", "identity", "layernorm", "instancenorm")
     if use_norm is True:
@@ -32,12 +33,15 @@ def get_norm_layer(use_norm: Union[bool, str, Dict[str, Any]], out_channels: int
         ):
             norm_params = {"type": norm_str}
         else:
-            raise ValueError(f"Unrecognized normalization type string provided: {use_norm}. Should be in {supported_norms}")
+            raise ValueError(f"Unrecognized normalization type string provided: {use_norm}. Should be in "
+                             f"{supported_norms}")
     elif isinstance(use_norm, dict):
         norm_params = use_norm
     else:
-        raise ValueError("use_norm must be a dictionary, boolean, or string. Please refer to the documentation.")
-
+        raise ValueError(
+            f"Invalid type for use_norm should either be a bool (batchnorm/identity), "
+            f"a string in {supported_norms}, or a dict like {{'type': 'batchnorm', **kwargs}}"
+        )
 
     if not "type" in norm_params:
         raise ValueError(f"Malformed dictionary given in use_norm: {use_norm}. Should contain key 'type'.")
@@ -66,6 +70,7 @@ def get_norm_layer(use_norm: Union[bool, str, Dict[str, Any]], out_channels: int
         raise ValueError(f"Unrecognized normalization type: {norm_type}")
 
     return norm
+
 
 class Conv2dReLU(nn.Sequential):
     def __init__(

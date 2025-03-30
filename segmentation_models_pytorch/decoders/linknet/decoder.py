@@ -35,7 +35,7 @@ class DecoderBlock(nn.Module):
         self,
         in_channels: int,
         out_channels: int,
-        use_norm: Union[bool, str, Dict[str, Any]] = True,
+        use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
     ):
         super().__init__()
 
@@ -72,7 +72,7 @@ class LinknetDecoder(nn.Module):
         encoder_channels: List[int],
         prefinal_channels: int = 32,
         n_blocks: int = 5,
-        use_norm: Union[bool, str, Dict[str, Any]] = True,
+        use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
     ):
         super().__init__()
 

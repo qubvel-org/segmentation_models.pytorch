@@ -43,7 +43,7 @@ class PSPNet(SegmentationModel):
 
             **Example**:
             ```python
-            use_norm={"type": "layernorm", "eps": 1e-2}
+            decoder_use_norm={"type": "layernorm", "eps": 1e-2}
             ```
         psp_dropout: Spatial dropout rate in [0, 1) used in Spatial Pyramid
         in_channels: A number of input channels for the model, default is 3 (RGB images)
@@ -76,7 +76,7 @@ class PSPNet(SegmentationModel):
         encoder_weights: Optional[str] = "imagenet",
         encoder_depth: int = 3,
         psp_out_channels: int = 512,
-        decoder_use_norm: Union[bool, str, Dict[str, Any], None] = True,
+        decoder_use_norm: Union[bool, str, Dict[str, Any], None] = "batchnorm",
         psp_dropout: float = 0.2,
         in_channels: int = 3,
         classes: int = 1,

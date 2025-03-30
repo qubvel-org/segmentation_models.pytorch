@@ -13,7 +13,7 @@ class DecoderBlock(nn.Module):
         in_channels: int,
         skip_channels: int,
         out_channels: int,
-        use_norm: Union[bool, str, Dict[str, Any]] = True,
+        use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
         attention_type: Optional[str] = None,
     ):
         super().__init__()
@@ -54,7 +54,7 @@ class CenterBlock(nn.Sequential):
         self,
         in_channels: int,
         out_channels: int,
-        use_norm: Union[bool, str, Dict[str, Any]] = True,
+        use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
     ):
         conv1 = md.Conv2dReLU(
             in_channels,
@@ -79,7 +79,7 @@ class UnetPlusPlusDecoder(nn.Module):
         encoder_channels: List[int],
         decoder_channels: List[int],
         n_blocks: int = 5,
-        use_norm: Union[bool, str, Dict[str, Any]] = True,
+        use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
         attention_type: Optional[str] = None,
         center: bool = False,
     ):

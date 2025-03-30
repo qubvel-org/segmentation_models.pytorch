@@ -15,7 +15,7 @@ class UnetDecoderBlock(nn.Module):
         in_channels: int,
         skip_channels: int,
         out_channels: int,
-        use_norm: Union[bool, str, Dict[str, Any]] = True,
+        use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
         attention_type: Optional[str] = None,
         interpolation_mode: str = "nearest",
     ):
@@ -68,7 +68,7 @@ class UnetCenterBlock(nn.Sequential):
         self,
         in_channels: int,
         out_channels: int,
-        use_norm: Union[bool, str, Dict[str, Any]] = True,
+        use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
     ):
         conv1 = md.Conv2dReLU(
             in_channels,
@@ -99,7 +99,7 @@ class UnetDecoder(nn.Module):
         encoder_channels: Sequence[int],
         decoder_channels: Sequence[int],
         n_blocks: int = 5,
-        use_norm: Union[bool, str, Dict[str, Any]] = True,
+        use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
         attention_type: Optional[str] = None,
         add_center_block: bool = False,
         interpolation_mode: str = "nearest",
