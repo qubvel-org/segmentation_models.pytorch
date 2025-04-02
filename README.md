@@ -37,7 +37,7 @@ The main features of the library are:
     <td align="center" vertical-align="center">
       <b>withoutBG API</b>
       <br />
-      <a href="https://withoutbg.com/?utm_source=rembg&utm_medium=github_readme&utm_campaign=sponsorship">https://withoutbg.com</a>
+      <a href="https://withoutbg.com/?utm_source=smp&utm_medium=github_readme&utm_campaign=sponsorship">https://withoutbg.com</a>
       <br />
       <p width="200px">
       High-quality background removal API at affordable rates
