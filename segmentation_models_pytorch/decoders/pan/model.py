@@ -1,4 +1,5 @@
 from typing import Any, Callable, Literal, Optional, Union
+import warnings
 
 from segmentation_models_pytorch.base import (
     ClassificationHead,
@@ -89,6 +90,15 @@ class PAN(SegmentationModel):
             output_stride=encoder_output_stride,
             **kwargs,
         )
+
+        upscale_mode = kwargs.pop("upscale_mode", None)
+        if upscale_mode is not None:
+            warnings.warn(
+                "The usage of upscale_mode is deprecated. Please modify your code for decoder_interpolation_mode",
+                DeprecationWarning,
+                stacklevel=2
+            )
+            decoder_interpolation_mode = upscale_mode
 
         self.decoder = PANDecoder(
             encoder_channels=self.encoder.out_channels,
