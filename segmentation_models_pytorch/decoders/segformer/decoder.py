@@ -50,7 +50,7 @@ class SegformerDecoder(nn.Module):
             in_channels=(len(encoder_channels) - 1) * segmentation_channels,
             out_channels=segmentation_channels,
             kernel_size=1,
-            use_batchnorm=True,
+            use_norm="batchnorm",
         )
 
     def forward(self, features: List[torch.Tensor]) -> torch.Tensor:
