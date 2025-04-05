@@ -96,14 +96,14 @@ class Conv2dReLU(nn.Sequential):
     ):
         norm = get_norm_layer(use_norm, out_channels)
 
-        is_batchnorm = isinstance(norm, nn.BatchNorm2d)
+        is_identity = isinstance(norm, nn.Identity)
         conv = nn.Conv2d(
             in_channels,
             out_channels,
             kernel_size,
             stride=stride,
             padding=padding,
-            bias=is_batchnorm,
+            bias=is_identity,
         )
 
         is_inplaceabn = InPlaceABN is not None and isinstance(norm, InPlaceABN)
