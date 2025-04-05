@@ -1,8 +1,9 @@
+from typing import Any, Dict, List, Optional, Sequence, Union
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from typing import Optional, Sequence, List
 from segmentation_models_pytorch.base import modules as md
 
 
@@ -14,7 +15,7 @@ class UnetDecoderBlock(nn.Module):
         in_channels: int,
         skip_channels: int,
         out_channels: int,
-        use_batchnorm: bool = True,
+        use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
         attention_type: Optional[str] = None,
         interpolation_mode: str = "nearest",
     ):
@@ -25,7 +26,7 @@ class UnetDecoderBlock(nn.Module):
             out_channels,
             kernel_size=3,
             padding=1,
-            use_batchnorm=use_batchnorm,
+            use_norm=use_norm,
         )
         self.attention1 = md.Attention(
             attention_type, in_channels=in_channels + skip_channels
@@ -35,7 +36,7 @@ class UnetDecoderBlock(nn.Module):
             out_channels,
             kernel_size=3,
             padding=1,
-            use_batchnorm=use_batchnorm,
+            use_norm=use_norm,
         )
         self.attention2 = md.Attention(attention_type, in_channels=out_channels)
 
@@ -63,20 +64,25 @@ class UnetDecoderBlock(nn.Module):
 class UnetCenterBlock(nn.Sequential):
     """Center block of the Unet decoder. Applied to the last feature map of the encoder."""
 
-    def __init__(self, in_channels: int, out_channels: int, use_batchnorm: bool = True):
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
+    ):
         conv1 = md.Conv2dReLU(
             in_channels,
             out_channels,
             kernel_size=3,
             padding=1,
-            use_batchnorm=use_batchnorm,
+            use_norm=use_norm,
         )
         conv2 = md.Conv2dReLU(
             out_channels,
             out_channels,
             kernel_size=3,
             padding=1,
-            use_batchnorm=use_batchnorm,
+            use_norm=use_norm,
         )
         super().__init__(conv1, conv2)
 
@@ -93,7 +99,7 @@ class UnetDecoder(nn.Module):
         encoder_channels: Sequence[int],
         decoder_channels: Sequence[int],
         n_blocks: int = 5,
-        use_batchnorm: bool = True,
+        use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
         attention_type: Optional[str] = None,
         add_center_block: bool = False,
         interpolation_mode: str = "nearest",
@@ -120,7 +126,9 @@ class UnetDecoder(nn.Module):
 
         if add_center_block:
             self.center = UnetCenterBlock(
-                head_channels, head_channels, use_batchnorm=use_batchnorm
+                head_channels,
+                head_channels,
+                use_norm=use_norm,
             )
         else:
             self.center = nn.Identity()
@@ -134,7 +142,7 @@ class UnetDecoder(nn.Module):
                 block_in_channels,
                 block_skip_channels,
                 block_out_channels,
-                use_batchnorm=use_batchnorm,
+                use_norm=use_norm,
                 attention_type=attention_type,
                 interpolation_mode=interpolation_mode,
             )

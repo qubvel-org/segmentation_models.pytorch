@@ -1,4 +1,5 @@
-from typing import Any, Optional, Union
+import warnings
+from typing import Any, Dict, Optional, Union, Callable
 
 from segmentation_models_pytorch.base import (
     ClassificationHead,
@@ -29,9 +30,22 @@ class Linknet(SegmentationModel):
             Default is 5
         encoder_weights: One of **None** (random initialization), **"imagenet"** (pre-training on ImageNet) and
             other pretrained weights (see table with available weights for each encoder_name)
-        decoder_use_batchnorm: If **True**, BatchNorm2d layer between Conv2D and Activation layers
-            is used. If **"inplace"** InplaceABN will be used, allows to decrease memory consumption.
-            Available options are **True, False, "inplace"**
+        decoder_use_norm:     Specifies normalization between Conv2D and activation.
+            Accepts the following types:
+            - **True**: Defaults to `"batchnorm"`.
+            - **False**: No normalization (`nn.Identity`).
+            - **str**: Specifies normalization type using default parameters. Available values:
+              `"batchnorm"`, `"identity"`, `"layernorm"`, `"instancenorm"`, `"inplace"`.
+            - **dict**: Fully customizable normalization settings. Structure:
+              ```python
+              {"type": <norm_type>, **kwargs}
+              ```
+              where `norm_name` corresponds to normalization type (see above), and `kwargs` are passed directly to the normalization layer as defined in PyTorch documentation.
+
+            **Example**:
+            ```python
+            decoder_use_norm={"type": "layernorm", "eps": 1e-2}
+            ```
         in_channels: A number of input channels for the model, default is 3 (RGB images)
         classes: A number of classes for output mask (or you can think as a number of channels of output mask)
         activation: An activation function to apply after the final convolution layer.
@@ -60,10 +74,10 @@ class Linknet(SegmentationModel):
         encoder_name: str = "resnet34",
         encoder_depth: int = 5,
         encoder_weights: Optional[str] = "imagenet",
-        decoder_use_batchnorm: bool = True,
+        decoder_use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
         in_channels: int = 3,
         classes: int = 1,
-        activation: Optional[Union[str, callable]] = None,
+        activation: Optional[Union[str, Callable]] = None,
         aux_params: Optional[dict] = None,
         **kwargs: dict[str, Any],
     ):
@@ -73,6 +87,15 @@ class Linknet(SegmentationModel):
             raise ValueError(
                 "Encoder `{}` is not supported for Linknet".format(encoder_name)
             )
+
+        decoder_use_batchnorm = kwargs.pop("decoder_use_batchnorm", None)
+        if decoder_use_batchnorm is not None:
+            warnings.warn(
+                "The usage of decoder_use_batchnorm is deprecated. Please modify your code for decoder_use_norm",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            decoder_use_norm = decoder_use_batchnorm
 
         self.encoder = get_encoder(
             encoder_name,
@@ -86,7 +109,7 @@ class Linknet(SegmentationModel):
             encoder_channels=self.encoder.out_channels,
             n_blocks=encoder_depth,
             prefinal_channels=32,
-            use_batchnorm=decoder_use_batchnorm,
+            use_norm=decoder_use_norm,
         )
 
         self.segmentation_head = SegmentationHead(

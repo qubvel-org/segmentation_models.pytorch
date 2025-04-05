@@ -1,4 +1,4 @@
-from typing import Any, Optional, Union
+from typing import Any, Dict, Optional, Union, Callable
 
 from segmentation_models_pytorch.base import (
     ClassificationHead,
@@ -25,6 +25,22 @@ class UPerNet(SegmentationModel):
             other pretrained weights (see table with available weights for each encoder_name)
         decoder_pyramid_channels: A number of convolution filters in Feature Pyramid, default is 256
         decoder_segmentation_channels: A number of convolution filters in segmentation blocks, default is 64
+        decoder_use_norm: Specifies normalization between Conv2D and activation.
+            Accepts the following types:
+            - **True**: Defaults to `"batchnorm"`.
+            - **False**: No normalization (`nn.Identity`).
+            - **str**: Specifies normalization type using default parameters. Available values:
+              `"batchnorm"`, `"identity"`, `"layernorm"`, `"instancenorm"`, `"inplace"`.
+            - **dict**: Fully customizable normalization settings. Structure:
+              ```python
+              {"type": <norm_type>, **kwargs}
+              ```
+              where `norm_name` corresponds to normalization type (see above), and `kwargs` are passed directly to the normalization layer as defined in PyTorch documentation.
+
+            **Example**:
+            ```python
+            use_norm={"type": "layernorm", "eps": 1e-2}
+            ```
         in_channels: A number of input channels for the model, default is 3 (RGB images)
         classes: A number of classes for output mask (or you can think as a number of channels of output mask)
         activation: An activation function to apply after the final convolution layer.
@@ -58,9 +74,10 @@ class UPerNet(SegmentationModel):
         encoder_weights: Optional[str] = "imagenet",
         decoder_pyramid_channels: int = 256,
         decoder_segmentation_channels: int = 64,
+        decoder_use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
         in_channels: int = 3,
         classes: int = 1,
-        activation: Optional[Union[str, callable]] = None,
+        activation: Optional[Union[str, Callable]] = None,
         aux_params: Optional[dict] = None,
         **kwargs: dict[str, Any],
     ):
@@ -79,6 +96,7 @@ class UPerNet(SegmentationModel):
             encoder_depth=encoder_depth,
             pyramid_channels=decoder_pyramid_channels,
             segmentation_channels=decoder_segmentation_channels,
+            use_norm=decoder_use_norm,
         )
 
         self.segmentation_head = SegmentationHead(
