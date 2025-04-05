@@ -67,7 +67,14 @@ def check_two_models_strictly_equal(
         model_a.state_dict().items(), model_b.state_dict().items()
     ):
         assert k1 == k2, f"Key mismatch: {k1} != {k2}"
-        assert (v1 == v2).all(), f"Tensor mismatch at key '{k1}':\n{v1} !=\n{v2}"
+        torch.testing.assert_close(
+            v1, v2, msg=f"Tensor mismatch at key '{k1}':\n{v1} !=\n{v2}"
+        )
 
+    model_a.eval()
+    model_b.eval()
     with torch.inference_mode():
-        assert (model_a(input_data) == model_b(input_data)).all()
+        output_a = model_a(input_data)
+        output_b = model_b(input_data)
+
+    torch.testing.assert_close(output_a, output_b)

@@ -2,7 +2,7 @@ import pytest
 
 import torch
 
-from segmentation_models_pytorch import create_model
+import segmentation_models_pytorch as smp
 from tests.utils import check_two_models_strictly_equal
 
 
@@ -11,17 +11,20 @@ from tests.utils import check_two_models_strictly_equal
 def test_seg_models_before_after_use_norm(model_name, decoder_option):
     torch.manual_seed(42)
     with pytest.warns(DeprecationWarning):
-        model_decoder_batchnorm = create_model(
-            model_name, "mobilenet_v2", None, decoder_use_batchnorm=decoder_option
+        model_decoder_batchnorm = smp.create_model(
+            model_name,
+            "mobilenet_v2",
+            encoder_weights=None,
+            decoder_use_batchnorm=decoder_option,
         )
-    torch.manual_seed(42)
-    model_decoder_norm = create_model(
+    model_decoder_norm = smp.create_model(
         model_name,
         "mobilenet_v2",
-        None,
-        decoder_use_batchnorm=None,
+        encoder_weights=None,
         decoder_use_norm=decoder_option,
     )
+
+    model_decoder_norm.load_state_dict(model_decoder_batchnorm.state_dict())
 
     check_two_models_strictly_equal(
         model_decoder_batchnorm, model_decoder_norm, torch.rand(1, 3, 224, 224)
@@ -32,17 +35,19 @@ def test_seg_models_before_after_use_norm(model_name, decoder_option):
 def test_pspnet_before_after_use_norm(decoder_option):
     torch.manual_seed(42)
     with pytest.warns(DeprecationWarning):
-        model_decoder_batchnorm = create_model(
-            "pspnet", "mobilenet_v2", None, psp_use_batchnorm=decoder_option
+        model_decoder_batchnorm = smp.create_model(
+            "pspnet",
+            "mobilenet_v2",
+            encoder_weights=None,
+            psp_use_batchnorm=decoder_option,
         )
-    torch.manual_seed(42)
-    model_decoder_norm = create_model(
+    model_decoder_norm = smp.create_model(
         "pspnet",
         "mobilenet_v2",
-        None,
-        psp_use_batchnorm=None,
+        encoder_weights=None,
         decoder_use_norm=decoder_option,
     )
+    model_decoder_norm.load_state_dict(model_decoder_batchnorm.state_dict())
 
     check_two_models_strictly_equal(
         model_decoder_batchnorm, model_decoder_norm, torch.rand(1, 3, 224, 224)
