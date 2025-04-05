@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Sequence
 
 from segmentation_models_pytorch.base import modules as md
 
@@ -76,8 +76,8 @@ class CenterBlock(nn.Sequential):
 class UnetPlusPlusDecoder(nn.Module):
     def __init__(
         self,
-        encoder_channels: List[int],
-        decoder_channels: List[int],
+        encoder_channels: Sequence[int],
+        decoder_channels: Sequence[int],
         n_blocks: int = 5,
         use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
         attention_type: Optional[str] = None,

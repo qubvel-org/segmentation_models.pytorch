@@ -1,4 +1,4 @@
-from typing import Any, Dict, Tuple, Union
+from typing import Any, Dict, Union, Sequence
 
 import torch
 import torch.nn as nn
@@ -12,7 +12,7 @@ class PSPModule(nn.Module):
         self,
         in_channels: int,
         out_channels: int,
-        sizes: Tuple[int, ...] = (1, 2, 3, 6),
+        sizes: Sequence[int] = (1, 2, 3, 6),
         use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
     ):
         super().__init__()
@@ -80,7 +80,7 @@ class FPNBlock(nn.Module):
 class UPerNetDecoder(nn.Module):
     def __init__(
         self,
-        encoder_channels: Tuple[int, ...],
+        encoder_channels: Sequence[int],
         encoder_depth: int = 5,
         pyramid_channels: int = 256,
         segmentation_channels: int = 64,
