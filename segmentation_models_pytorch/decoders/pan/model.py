@@ -31,7 +31,7 @@ class PAN(SegmentationModel):
         encoder_output_stride: 16 or 32, if 16 use dilation in encoder last layer.
             Doesn't work with ***ception***, **vgg***, **densenet*`** backbones.Default is 16.
         decoder_channels: A number of convolution layer filters in decoder blocks
-        decoder_interpolation_mode: Interpolation mode used in decoder of the model. Available options are
+        decoder_interpolation: Interpolation mode used in decoder of the model. Available options are
             **"nearest"**, **"bilinear"**, **"bicubic"**, **"area"**, **"nearest-exact"**. Default is **"bilinear"**.
         in_channels: A number of input channels for the model, default is 3 (RGB images)
         classes: A number of classes for output mask (or you can think as a number of channels of output mask)
@@ -65,7 +65,7 @@ class PAN(SegmentationModel):
         encoder_weights: Optional[str] = "imagenet",
         encoder_output_stride: Literal[16, 32] = 16,
         decoder_channels: int = 32,
-        decoder_interpolation_mode: str = "bilinear",
+        decoder_interpolation: str = "bilinear",
         in_channels: int = 3,
         classes: int = 1,
         activation: Optional[Union[str, Callable]] = None,
@@ -82,6 +82,15 @@ class PAN(SegmentationModel):
                 )
             )
 
+        upscale_mode = kwargs.pop("upscale_mode", None)
+        if upscale_mode is not None:
+            warnings.warn(
+                "The usage of upscale_mode is deprecated. Please modify your code for decoder_interpolation",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            decoder_interpolation = upscale_mode
+
         self.encoder = get_encoder(
             encoder_name,
             in_channels=in_channels,
@@ -91,20 +100,11 @@ class PAN(SegmentationModel):
             **kwargs,
         )
 
-        upscale_mode = kwargs.pop("upscale_mode", None)
-        if upscale_mode is not None:
-            warnings.warn(
-                "The usage of upscale_mode is deprecated. Please modify your code for decoder_interpolation_mode",
-                DeprecationWarning,
-                stacklevel=2,
-            )
-            decoder_interpolation_mode = upscale_mode
-
         self.decoder = PANDecoder(
             encoder_channels=self.encoder.out_channels,
             encoder_depth=encoder_depth,
             decoder_channels=decoder_channels,
-            decoder_interpolation_mode=decoder_interpolation_mode,
+            interpolation_mode=decoder_interpolation,
         )
 
         self.segmentation_head = SegmentationHead(

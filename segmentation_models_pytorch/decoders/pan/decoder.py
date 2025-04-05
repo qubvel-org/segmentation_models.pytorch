@@ -168,12 +168,12 @@ class GAUBlock(nn.Module):
         self,
         in_channels: int,
         out_channels: int,
-        decoder_interpolation_mode: str = "bilinear",
+        interpolation_mode: str = "bilinear",
     ):
         super(GAUBlock, self).__init__()
 
-        self.interpolation_mode = decoder_interpolation_mode
-        self.align_corners = True if decoder_interpolation_mode == "bilinear" else None
+        self.interpolation_mode = interpolation_mode
+        self.align_corners = True if interpolation_mode == "bilinear" else None
 
         self.conv1 = nn.Sequential(
             nn.AdaptiveAvgPool2d(1),
@@ -214,7 +214,7 @@ class PANDecoder(nn.Module):
         encoder_channels: Sequence[int],
         encoder_depth: Literal[3, 4, 5],
         decoder_channels: int,
-        decoder_interpolation_mode: str = "bilinear",
+        interpolation_mode: str = "bilinear",
     ):
         super().__init__()
 
@@ -235,19 +235,19 @@ class PANDecoder(nn.Module):
             self.gau3 = GAUBlock(
                 in_channels=encoder_channels[2],
                 out_channels=decoder_channels,
-                decoder_interpolation_mode=decoder_interpolation_mode,
+                interpolation_mode=interpolation_mode,
             )
         if encoder_depth >= 4:
             self.gau2 = GAUBlock(
                 in_channels=encoder_channels[1],
                 out_channels=decoder_channels,
-                decoder_interpolation_mode=decoder_interpolation_mode,
+                interpolation_mode=interpolation_mode,
             )
         if encoder_depth >= 3:
             self.gau1 = GAUBlock(
                 in_channels=encoder_channels[0],
                 out_channels=decoder_channels,
-                decoder_interpolation_mode=decoder_interpolation_mode,
+                interpolation_mode=interpolation_mode,
             )
 
     def forward(self, features: List[torch.Tensor]) -> torch.Tensor:
