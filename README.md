@@ -25,6 +25,27 @@ The main features of the library are:
  - 800+ **pretrained** convolution- and transform-based encoders, including [timm](https://github.com/huggingface/pytorch-image-models) support
  - Popular metrics and losses for training routines (Dice, Jaccard, Tversky, ...)
  - ONNX export and torch script/trace/compile friendly
+
+### Community-Driven Project, Supported By
+<table>
+  <tr>
+    <td align="center" vertical-align="center">
+      <a href="https://withoutbg.com/?utm_source=smp&utm_medium=github_readme&utm_campaign=sponsorship" >
+        <img src="https://withoutbg.com/images/logo-social.png" width="70px;" alt="withoutBG API Logo" />
+      </a>
+    </td>
+    <td align="center" vertical-align="center">
+      <b>withoutBG API</b>
+      <br />
+      <a href="https://withoutbg.com/?utm_source=smp&utm_medium=github_readme&utm_campaign=sponsorship">https://withoutbg.com</a>
+      <br />
+      <p width="200px">
+      High-quality background removal API
+        <br/>
+      </p>
+    </td>
+  </tr>
+</table>
  
 ### [📚 Project Documentation 📚](http://smp.readthedocs.io/)
 
