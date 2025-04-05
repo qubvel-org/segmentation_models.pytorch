@@ -13,21 +13,12 @@ class TransposeX2(nn.Sequential):
         use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
     ):
         super().__init__()
-        layers = [
-            nn.ConvTranspose2d(
-                in_channels, out_channels, kernel_size=4, stride=2, padding=1
-            ),
-            nn.ReLU(inplace=True),
-        ]
-
-        if use_norm != "identity":
-            if isinstance(use_norm, dict):
-                if use_norm.get("type") != "identity":
-                    layers.insert(1, modules.get_norm_layer(use_norm, out_channels))
-            else:
-                layers.insert(1, modules.get_norm_layer(use_norm, out_channels))
-
-        super().__init__(*layers)
+        conv = nn.ConvTranspose2d(
+            in_channels, out_channels, kernel_size=4, stride=2, padding=1
+        )
+        norm = modules.get_norm_layer(use_norm, out_channels)
+        activation = nn.ReLU(inplace=True)
+        super().__init__(conv, norm, activation)
 
 
 class DecoderBlock(nn.Module):
