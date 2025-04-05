@@ -1,6 +1,5 @@
+import pytest
 from torch import nn
-
-from inplace_abn import InPlaceABN
 from segmentation_models_pytorch.base.modules import Conv2dReLU
 
 
@@ -52,8 +51,14 @@ def test_conv2drelu_instancenorm():
 
 
 def test_conv2drelu_inplace():
+    try:
+        from inplace_abn import InPlaceABN
+    except ImportError:
+        pytest.skip("InPlaceABN is not installed")
+
     module = Conv2dReLU(3, 16, kernel_size=3, padding=1, use_norm="inplace")
 
+    assert len(module) == 3
     assert isinstance(module[0], nn.Conv2d)
     assert isinstance(module[1], InPlaceABN)
-    assert isinstance(module[2], nn.ReLU)
+    assert isinstance(module[2], nn.Identity)
