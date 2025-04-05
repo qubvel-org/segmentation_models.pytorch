@@ -24,53 +24,42 @@ def _get_feature_processing_out_channels(encoder_name: str) -> list[int]:
     return [96, 192, 384, 768]
 
 
-class Transpose(nn.Module):
-    def __init__(self, dim0: int, dim1: int):
-        super().__init__()
-        self.dim0 = dim0
-        self.dim1 = dim1
-
-    def forward(self, x: torch.Tensor):
-        return torch.transpose(x, dim0=self.dim0, dim1=self.dim1)
-
-
 class ProjectionReadout(nn.Module):
     """
     Concatenates the cls tokens with the features to make use of the global information aggregated in the cls token.
     Projects the combined feature map to the original embedding dimension using a MLP
     """
 
-    def __init__(self, in_features: int, encoder_output_stride: int):
+    def __init__(self, embed_dim: int, has_cls_token: bool):
         super().__init__()
+        in_features = embed_dim * 2 if has_cls_token else embed_dim
+        out_features = embed_dim
         self.project = nn.Sequential(
-            nn.Linear(in_features=2 * in_features, out_features=in_features), nn.GELU()
+            nn.Linear(in_features, out_features),
+            nn.GELU(),
         )
+        self.has_cls_token = has_cls_token
 
-        self.flatten = nn.Flatten(start_dim=2)
-        self.transpose = Transpose(dim0=1, dim1=2)
-        self.encoder_output_stride = encoder_output_stride
+    def forward(self, features: torch.Tensor, cls_token: Optional[torch.Tensor] = None):
+        batch_size, embed_dim, height, width = features.shape
 
-    def forward(self, feature: torch.Tensor, cls_token: torch.Tensor):
-        batch_size, _, height_dim, width_dim = feature.shape
-        feature = self.flatten(feature)
-        feature = self.transpose(feature)
+        # Rearrange to (batch_size, height * width, embed_dim)
+        features = features.view(batch_size, embed_dim, -1)
+        features = features.transpose(1, 2).contiguous()
 
-        cls_token = cls_token.expand_as(feature)
+        # Add CLS token
+        if cls_token is not None:
+            cls_token = cls_token.expand_as(features)
+            features = torch.cat([features, cls_token], dim=2)
 
-        features = torch.cat([feature, cls_token], dim=2)
+        # Project to embedding dimension
         features = self.project(features)
-        features = self.transpose(features)
 
-        features = features.view(batch_size, -1, height_dim, width_dim)
+        # Rearrange back to (batch_size, embed_dim, height, width)
+        features = features.transpose(1, 2)
+        features = features.view(batch_size, -1, height, width)
+
         return features
-
-
-class IgnoreReadout(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-    def forward(self, feature: torch.Tensor, cls_token: torch.Tensor):
-        return feature
 
 
 class ReassembleBlock(nn.Module):
@@ -214,19 +203,13 @@ class DPTDecoder(nn.Module):
 
         # If encoder has cls token, then concatenate it with the features along the embedding dimension and project it
         # back to the feature_dim dimension. Else, ignore the non-existent cls token
-
-        if cls_token_supported:
-            self.readout_blocks = nn.ModuleList(
-                [
-                    ProjectionReadout(
-                        in_features=transformer_embed_dim,
-                        encoder_output_stride=encoder_output_stride,
-                    )
-                    for _ in range(encoder_depth)
-                ]
+        self.readout_blocks = nn.ModuleList()
+        for _ in range(encoder_depth):
+            block = ProjectionReadout(
+                embed_dim=transformer_embed_dim,
+                has_cls_token=cls_token_supported,
             )
-        else:
-            self.readout_blocks = [IgnoreReadout() for _ in range(encoder_depth)]
+            self.readout_blocks.append(block)
 
         upsample_factors = [
             (encoder_output_stride / 2 ** (index + 2))
@@ -235,10 +218,11 @@ class DPTDecoder(nn.Module):
         feature_processing_out_channels = _get_feature_processing_out_channels(
             encoder_name
         )
-        if encoder_depth < len(feature_processing_out_channels):
-            feature_processing_out_channels = feature_processing_out_channels[
-                :encoder_depth
-            ]
+
+        # slice in case encoder_depth < len(feature_processing_out_channels)
+        feature_processing_out_channels = feature_processing_out_channels[
+            :encoder_depth
+        ]
 
         self.reassemble_blocks = nn.ModuleList(
             [
@@ -293,14 +277,14 @@ class DPTSegmentationHead(nn.Module):
                 in_channels, in_channels, kernel_size=kernel_size, padding=1, bias=False
             ),
             nn.BatchNorm2d(in_channels),
-            nn.ReLU(True),
-            nn.Dropout(0.1, False),
+            nn.ReLU(inplace=True),
+            nn.Dropout(p=0.1, inplace=False),
             nn.Conv2d(in_channels, out_channels, kernel_size=1),
         )
         self.activation = Activation(activation)
         self.upsampling_factor = upsampling
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         head_output = self.head(x)
         resized_output = nn.functional.interpolate(
             head_output,
