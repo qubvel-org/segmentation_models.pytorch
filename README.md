@@ -26,12 +26,12 @@ The main features of the library are:
  - Popular metrics and losses for training routines (Dice, Jaccard, Tversky, ...)
  - ONNX export and torch script/trace/compile friendly
 
-## Sponsor
+### Community-Driven Project, Supported By
 <table>
   <tr>
     <td align="center" vertical-align="center">
       <a href="https://withoutbg.com/?utm_source=smp&utm_medium=github_readme&utm_campaign=sponsorship" >
-        <img src="https://withoutbg.com/images/logo-social.png" width="120px;" alt="withoutBG API Logo" />
+        <img src="https://withoutbg.com/images/logo-social.png" width="70px;" alt="withoutBG API Logo" />
       </a>
     </td>
     <td align="center" vertical-align="center">
@@ -40,7 +40,7 @@ The main features of the library are:
       <a href="https://withoutbg.com/?utm_source=smp&utm_medium=github_readme&utm_campaign=sponsorship">https://withoutbg.com</a>
       <br />
       <p width="200px">
-      High-quality background removal API at affordable rates
+      High-quality background removal API
         <br/>
       </p>
     </td>
