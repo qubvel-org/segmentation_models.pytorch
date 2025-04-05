@@ -8,7 +8,6 @@ class TestFpnModel(base.BaseModelTester):
     files_for_diff = [r"decoders/fpn/", r"base/"]
 
     def test_interpolation(self):
-
         # test bilinear
         model_1 = smp.create_model(
             self.test_model_type,
