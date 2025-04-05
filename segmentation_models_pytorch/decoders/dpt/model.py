@@ -5,7 +5,7 @@ from segmentation_models_pytorch.base import (
     ClassificationHead,
     SegmentationModel,
 )
-from segmentation_models_pytorch.encoders import get_encoder
+from segmentation_models_pytorch.encoders.timm_vit import TimmViTEncoder
 from segmentation_models_pytorch.base.utils import is_torch_compiling
 from segmentation_models_pytorch.base.hub_mixin import supports_config_loading
 from .decoder import DPTDecoder, DPTSegmentationHead
@@ -69,31 +69,35 @@ class DPT(SegmentationModel):
         encoder_name: str = "tu-vit_base_patch8_224",
         encoder_depth: int = 4,
         encoder_weights: Optional[str] = None,
+        encoder_output_indices: Optional[list[int]] = None,
         feature_dim: int = 256,
         in_channels: int = 3,
         classes: int = 1,
         activation: Optional[Union[str, Callable]] = None,
         aux_params: Optional[dict] = None,
-        output_stride: Optional[int] = None,
         **kwargs: dict[str, Any],
     ):
         super().__init__()
 
-        self.encoder = get_encoder(
-            encoder_name,
+        if encoder_name.startswith("tu-"):
+            encoder_name = encoder_name[3:]
+        else:
+            raise ValueError(
+                f"Only Timm encoders are supported for DPT. Encoder name must start with 'tu-', got {encoder_name}"
+            )
+
+        self.encoder = TimmViTEncoder(
+            name=encoder_name,
             in_channels=in_channels,
             depth=encoder_depth,
-            weights=encoder_weights,
-            use_vit_encoder=True,
-            allow_downsampling=False,
-            output_stride=output_stride,
-            allow_output_stride_not_power_of_two=False,
+            pretrained=encoder_weights is not None,
+            output_indices=encoder_output_indices,
             **kwargs,
         )
 
         self.transformer_embed_dim = self.encoder.embed_dim
         self.encoder_output_stride = self.encoder.output_stride
-        self.cls_token_supported = self.encoder.cls_token_supported
+        self.cls_token_supported = self.encoder.has_class_token
 
         self.decoder = DPTDecoder(
             encoder_name=encoder_name,

@@ -24,7 +24,7 @@ from .mix_transformer import mix_transformer_encoders
 from .mobileone import mobileone_encoders
 
 from .timm_universal import TimmUniversalEncoder
-from .timm_vit import TimmViTEncoder
+from .timm_vit import TimmViTEncoder  # noqa F401
 
 from ._preprocessing import preprocess_input
 from ._legacy_pretrained_settings import pretrained_settings
@@ -84,19 +84,6 @@ def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **
 
     if name.startswith("tu-"):
         name = name[3:]
-        use_vit_encoder = kwargs.pop("use_vit_encoder", False)
-
-        if use_vit_encoder:
-            encoder = TimmViTEncoder(
-                name=name,
-                in_channels=in_channels,
-                depth=depth,
-                pretrained=weights is not None,
-                output_stride=output_stride,
-                **kwargs,
-            )
-            return encoder
-
         encoder = TimmUniversalEncoder(
             name=name,
             in_channels=in_channels,
