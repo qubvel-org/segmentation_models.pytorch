@@ -15,6 +15,7 @@ class DecoderBlock(nn.Module):
         out_channels: int,
         use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
         attention_type: Optional[str] = None,
+        interpolation_mode: str = "nearest",
     ):
         super().__init__()
         self.conv1 = md.Conv2dReLU(
@@ -35,11 +36,12 @@ class DecoderBlock(nn.Module):
             use_norm=use_norm,
         )
         self.attention2 = md.Attention(attention_type, in_channels=out_channels)
+        self.interpolation_mode = interpolation_mode
 
     def forward(
         self, x: torch.Tensor, skip: Optional[torch.Tensor] = None
     ) -> torch.Tensor:
-        x = F.interpolate(x, scale_factor=2.0, mode="nearest")
+        x = F.interpolate(x, scale_factor=2.0, mode=self.interpolation_mode)
         if skip is not None:
             x = torch.cat([x, skip], dim=1)
             x = self.attention1(x)
@@ -81,6 +83,7 @@ class UnetPlusPlusDecoder(nn.Module):
         n_blocks: int = 5,
         use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
         attention_type: Optional[str] = None,
+        interpolation_mode: str = "nearest",
         center: bool = False,
     ):
         super().__init__()
@@ -113,6 +116,7 @@ class UnetPlusPlusDecoder(nn.Module):
         kwargs = dict(
             use_norm=use_norm,
             attention_type=attention_type,
+            interpolation_mode=interpolation_mode,
         )
 
         blocks = {}

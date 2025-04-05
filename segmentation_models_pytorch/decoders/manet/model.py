@@ -48,6 +48,8 @@ class MAnet(SegmentationModel):
             ```
         decoder_pab_channels: A number of channels for PAB module in decoder.
             Default is 64.
+        decoder_interpolation: Interpolation mode used in decoder of the model. Available options are
+            **"nearest"**, **"bilinear"**, **"bicubic"**, **"area"**, **"nearest-exact"**. Default is **"nearest"**.
         in_channels: A number of input channels for the model, default is 3 (RGB images)
         classes: A number of classes for output mask (or you can think as a number of channels of output mask)
         activation: An activation function to apply after the final convolution layer.
@@ -80,6 +82,7 @@ class MAnet(SegmentationModel):
         decoder_use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
         decoder_channels: Sequence[int] = (256, 128, 64, 32, 16),
         decoder_pab_channels: int = 64,
+        decoder_interpolation: str = "nearest",
         in_channels: int = 3,
         classes: int = 1,
         activation: Optional[Union[str, Callable]] = None,
@@ -111,6 +114,7 @@ class MAnet(SegmentationModel):
             n_blocks=encoder_depth,
             use_norm=decoder_use_norm,
             pab_channels=decoder_pab_channels,
+            interpolation_mode=decoder_interpolation,
         )
 
         self.segmentation_head = SegmentationHead(

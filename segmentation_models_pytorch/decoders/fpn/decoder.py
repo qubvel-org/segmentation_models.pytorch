@@ -25,12 +25,18 @@ class Conv3x3GNReLU(nn.Module):
 
 
 class FPNBlock(nn.Module):
-    def __init__(self, pyramid_channels: int, skip_channels: int):
+    def __init__(
+        self,
+        pyramid_channels: int,
+        skip_channels: int,
+        interpolation_mode: str = "nearest",
+    ):
         super().__init__()
         self.skip_conv = nn.Conv2d(skip_channels, pyramid_channels, kernel_size=1)
+        self.interpolation_mode = interpolation_mode
 
     def forward(self, x: torch.Tensor, skip: torch.Tensor) -> torch.Tensor:
-        x = F.interpolate(x, scale_factor=2.0, mode="nearest")
+        x = F.interpolate(x, scale_factor=2.0, mode=self.interpolation_mode)
         skip = self.skip_conv(skip)
         x = x + skip
         return x
@@ -84,6 +90,7 @@ class FPNDecoder(nn.Module):
         segmentation_channels: int = 128,
         dropout: float = 0.2,
         merge_policy: Literal["add", "cat"] = "add",
+        interpolation_mode: str = "nearest",
     ):
         super().__init__()
 
@@ -103,9 +110,9 @@ class FPNDecoder(nn.Module):
         encoder_channels = encoder_channels[: encoder_depth + 1]
 
         self.p5 = nn.Conv2d(encoder_channels[0], pyramid_channels, kernel_size=1)
-        self.p4 = FPNBlock(pyramid_channels, encoder_channels[1])
-        self.p3 = FPNBlock(pyramid_channels, encoder_channels[2])
-        self.p2 = FPNBlock(pyramid_channels, encoder_channels[3])
+        self.p4 = FPNBlock(pyramid_channels, encoder_channels[1], interpolation_mode)
+        self.p3 = FPNBlock(pyramid_channels, encoder_channels[2], interpolation_mode)
+        self.p2 = FPNBlock(pyramid_channels, encoder_channels[3], interpolation_mode)
 
         self.seg_blocks = nn.ModuleList(
             [

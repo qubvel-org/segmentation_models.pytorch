@@ -58,7 +58,7 @@ class Unet(SegmentationModel):
             ```
         decoder_attention_type: Attention module used in decoder of the model. Available options are
             **None** and **scse** (https://arxiv.org/abs/1808.08127).
-        decoder_interpolation_mode: Interpolation mode used in decoder of the model. Available options are
+        decoder_interpolation: Interpolation mode used in decoder of the model. Available options are
             **"nearest"**, **"bilinear"**, **"bicubic"**, **"area"**, **"nearest-exact"**. Default is **"nearest"**.
         in_channels: A number of input channels for the model, default is 3 (RGB images)
         classes: A number of classes for output mask (or you can think as a number of channels of output mask)
@@ -112,7 +112,7 @@ class Unet(SegmentationModel):
         decoder_use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
         decoder_channels: Sequence[int] = (256, 128, 64, 32, 16),
         decoder_attention_type: Optional[str] = None,
-        decoder_interpolation_mode: str = "nearest",
+        decoder_interpolation: str = "nearest",
         in_channels: int = 3,
         classes: int = 1,
         activation: Optional[Union[str, Callable]] = None,
@@ -147,7 +147,7 @@ class Unet(SegmentationModel):
             use_norm=decoder_use_norm,
             add_center_block=add_center_block,
             attention_type=decoder_attention_type,
-            interpolation_mode=decoder_interpolation_mode,
+            interpolation_mode=decoder_interpolation,
         )
 
         self.segmentation_head = SegmentationHead(
