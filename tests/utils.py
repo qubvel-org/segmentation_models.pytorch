@@ -28,6 +28,15 @@ def slow_test(test_case):
     return unittest.skipUnless(RUN_SLOW, "test is slow")(test_case)
 
 
+def requires_timm_greater_or_equal(version: str):
+    timm_version = Version(timm.__version__)
+    provided_version = Version(version)
+    return unittest.skipUnless(
+        timm_version >= provided_version,
+        f"timm version {timm_version} is less than {provided_version}",
+    )
+
+
 def requires_torch_greater_or_equal(version: str):
     torch_version = Version(torch.__version__)
     provided_version = Version(version)
