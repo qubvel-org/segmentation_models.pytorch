@@ -9,14 +9,20 @@ except ImportError:
     InPlaceABN = None
 
 
-def get_norm_layer(use_norm: Union[bool, str, Dict[str, Any]], out_channels: int) -> nn.Module:
+def get_norm_layer(
+    use_norm: Union[bool, str, Dict[str, Any]], out_channels: int
+) -> nn.Module:
     supported_norms = ("inplace", "batchnorm", "identity", "layernorm", "instancenorm")
+
+    # Step 1. Convert tot dict representation
+
+    ## Check boolean
     if use_norm is True:
         norm_params = {"type": "batchnorm"}
     elif use_norm is False:
         norm_params = {"type": "identity"}
-    elif use_norm == "inplace":
-        norm_params = {"type": "inplace", "activation": "leaky_relu", "activation_param": 0.0}
+
+    ## Check string
     elif isinstance(use_norm, str):
         norm_str = use_norm.lower()
         if norm_str == "inplace":
@@ -25,47 +31,53 @@ def get_norm_layer(use_norm: Union[bool, str, Dict[str, Any]], out_channels: int
                 "activation": "leaky_relu",
                 "activation_param": 0.0,
             }
-        elif norm_str in (
-                "batchnorm",
-                "identity",
-                "layernorm",
-                "instancenorm",
-        ):
+        elif norm_str in supported_norms:
             norm_params = {"type": norm_str}
         else:
-            raise ValueError(f"Unrecognized normalization type string provided: {use_norm}. Should be in "
-                             f"{supported_norms}")
+            raise ValueError(
+                f"Unrecognized normalization type string provided: {use_norm}. Should be in "
+                f"{supported_norms}"
+            )
+
+    ## Check dict
     elif isinstance(use_norm, dict):
         norm_params = use_norm
+
     else:
         raise ValueError(
             f"Invalid type for use_norm should either be a bool (batchnorm/identity), "
             f"a string in {supported_norms}, or a dict like {{'type': 'batchnorm', **kwargs}}"
         )
 
-    if not "type" in norm_params:
-        raise ValueError(f"Malformed dictionary given in use_norm: {use_norm}. Should contain key 'type'.")
+    # Step 2. Check if the dict is valid
+    if "type" not in norm_params:
+        raise ValueError(
+            f"Malformed dictionary given in use_norm: {use_norm}. Should contain key 'type'."
+        )
     if norm_params["type"] not in supported_norms:
-        raise ValueError(f"Unrecognized normalization type string provided: {use_norm}. Should be in {supported_norms}")
-
-    norm_type = norm_params["type"]
-    extra_kwargs = {k: v for k, v in norm_params.items() if k != "type"}
-
-    if norm_type == "inplace" and InPlaceABN is None:
+        raise ValueError(
+            f"Unrecognized normalization type string provided: {use_norm}. Should be in {supported_norms}"
+        )
+    if norm_params["type"] == "inplace" and InPlaceABN is None:
         raise RuntimeError(
-            "In order to use `use_batchnorm='inplace'` or `use_norm='inplace'` the inplace_abn package must be installed. "
+            "In order to use `use_norm='inplace'` the inplace_abn package must be installed. "
             "To install see: https://github.com/mapillary/inplace_abn"
         )
-    elif norm_type == "inplace":
-        norm = InPlaceABN(out_channels, **extra_kwargs)
+
+    # Step 3. Initialize the norm layer
+    norm_type = norm_params["type"]
+    norm_kwargs = {k: v for k, v in norm_params.items() if k != "type"}
+
+    if norm_type == "inplace":
+        norm = InPlaceABN(out_channels, **norm_kwargs)
     elif norm_type == "batchnorm":
-        norm = nn.BatchNorm2d(out_channels, **extra_kwargs)
+        norm = nn.BatchNorm2d(out_channels, **norm_kwargs)
     elif norm_type == "identity":
         norm = nn.Identity()
     elif norm_type == "layernorm":
-        norm = nn.LayerNorm(out_channels, **extra_kwargs)
+        norm = nn.LayerNorm(out_channels, **norm_kwargs)
     elif norm_type == "instancenorm":
-        norm = nn.InstanceNorm2d(out_channels, **extra_kwargs)
+        norm = nn.InstanceNorm2d(out_channels, **norm_kwargs)
     else:
         raise ValueError(f"Unrecognized normalization type: {norm_type}")
 
@@ -75,29 +87,29 @@ def get_norm_layer(use_norm: Union[bool, str, Dict[str, Any]], out_channels: int
 class Conv2dReLU(nn.Sequential):
     def __init__(
         self,
-        in_channels,
-        out_channels,
-        kernel_size,
-        padding=0,
-        stride=1,
-        use_norm="batchnorm",
+        in_channels: int,
+        out_channels: int,
+        kernel_size: int,
+        padding: int = 0,
+        stride: int = 1,
+        use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
     ):
         norm = get_norm_layer(use_norm, out_channels)
+
+        is_batchnorm = isinstance(norm, nn.BatchNorm2d)
         conv = nn.Conv2d(
             in_channels,
             out_channels,
             kernel_size,
             stride=stride,
             padding=padding,
-            bias=norm._get_name() != "BatchNorm2d",
+            bias=is_batchnorm,
         )
 
-        if norm._get_name() == "Inplace":
-            relu = nn.Identity()
-        else:
-            relu = nn.ReLU(inplace=True)
+        is_inplaceabn = InPlaceABN is not None and isinstance(norm, InPlaceABN)
+        activation = nn.Identity() if is_inplaceabn else nn.ReLU(inplace=True)
 
-        super(Conv2dReLU, self).__init__(conv, norm, relu)
+        super(Conv2dReLU, self).__init__(conv, norm, activation)
 
 
 class SCSEModule(nn.Module):
