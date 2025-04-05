@@ -1,5 +1,5 @@
 import warnings
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional, Union, Callable
 
 from segmentation_models_pytorch.base import (
     ClassificationHead,
@@ -77,7 +77,7 @@ class Linknet(SegmentationModel):
         decoder_use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
         in_channels: int = 3,
         classes: int = 1,
-        activation: Optional[Union[str, callable]] = None,
+        activation: Optional[Union[str, Callable]] = None,
         aux_params: Optional[dict] = None,
         **kwargs: dict[str, Any],
     ):
@@ -88,14 +88,6 @@ class Linknet(SegmentationModel):
                 "Encoder `{}` is not supported for Linknet".format(encoder_name)
             )
 
-        self.encoder = get_encoder(
-            encoder_name,
-            in_channels=in_channels,
-            depth=encoder_depth,
-            weights=encoder_weights,
-            **kwargs,
-        )
-
         decoder_use_batchnorm = kwargs.pop("decoder_use_batchnorm", None)
         if decoder_use_batchnorm is not None:
             warnings.warn(
@@ -104,6 +96,14 @@ class Linknet(SegmentationModel):
                 stacklevel=2,
             )
             decoder_use_norm = decoder_use_batchnorm
+
+        self.encoder = get_encoder(
+            encoder_name,
+            in_channels=in_channels,
+            depth=encoder_depth,
+            weights=encoder_weights,
+            **kwargs,
+        )
 
         self.decoder = LinknetDecoder(
             encoder_channels=self.encoder.out_channels,

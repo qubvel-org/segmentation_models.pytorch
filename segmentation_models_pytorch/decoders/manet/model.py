@@ -1,5 +1,5 @@
 import warnings
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Optional, Union, Sequence, Callable
 
 from segmentation_models_pytorch.base import (
     ClassificationHead,
@@ -78,23 +78,15 @@ class MAnet(SegmentationModel):
         encoder_depth: int = 5,
         encoder_weights: Optional[str] = "imagenet",
         decoder_use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
-        decoder_channels: List[int] = (256, 128, 64, 32, 16),
+        decoder_channels: Sequence[int] = (256, 128, 64, 32, 16),
         decoder_pab_channels: int = 64,
         in_channels: int = 3,
         classes: int = 1,
-        activation: Optional[Union[str, callable]] = None,
+        activation: Optional[Union[str, Callable]] = None,
         aux_params: Optional[dict] = None,
         **kwargs: dict[str, Any],
     ):
         super().__init__()
-
-        self.encoder = get_encoder(
-            encoder_name,
-            in_channels=in_channels,
-            depth=encoder_depth,
-            weights=encoder_weights,
-            **kwargs,
-        )
 
         decoder_use_batchnorm = kwargs.pop("decoder_use_batchnorm", None)
         if decoder_use_batchnorm is not None:
@@ -104,6 +96,14 @@ class MAnet(SegmentationModel):
                 stacklevel=2,
             )
             decoder_use_norm = decoder_use_batchnorm
+
+        self.encoder = get_encoder(
+            encoder_name,
+            in_channels=in_channels,
+            depth=encoder_depth,
+            weights=encoder_weights,
+            **kwargs,
+        )
 
         self.decoder = MAnetDecoder(
             encoder_channels=self.encoder.out_channels,
