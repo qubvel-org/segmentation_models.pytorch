@@ -58,3 +58,23 @@ def check_run_test_on_diff_or_main(filepath_patterns: List[str]):
                 return True
 
     return False
+
+
+def check_two_models_strictly_equal(
+    model_a: torch.nn.Module, model_b: torch.nn.Module, input_data: torch.Tensor
+) -> None:
+    for (k1, v1), (k2, v2) in zip(
+        model_a.state_dict().items(), model_b.state_dict().items()
+    ):
+        assert k1 == k2, f"Key mismatch: {k1} != {k2}"
+        torch.testing.assert_close(
+            v1, v2, msg=f"Tensor mismatch at key '{k1}':\n{v1} !=\n{v2}"
+        )
+
+    model_a.eval()
+    model_b.eval()
+    with torch.inference_mode():
+        output_a = model_a(input_data)
+        output_b = model_b(input_data)
+
+    torch.testing.assert_close(output_a, output_b)
