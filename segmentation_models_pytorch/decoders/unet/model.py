@@ -121,6 +121,15 @@ class Unet(SegmentationModel):
     ):
         super().__init__()
 
+        decoder_use_batchnorm = kwargs.pop("decoder_use_batchnorm", None)
+        if decoder_use_batchnorm is not None:
+            warnings.warn(
+                "The usage of decoder_use_batchnorm is deprecated. Please modify your code for decoder_use_norm",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            decoder_use_norm = decoder_use_batchnorm
+
         self.encoder = get_encoder(
             encoder_name,
             in_channels=in_channels,
@@ -130,15 +139,6 @@ class Unet(SegmentationModel):
         )
 
         add_center_block = encoder_name.startswith("vgg")
-
-        decoder_use_batchnorm = kwargs.pop("decoder_use_batchnorm", None)
-        if decoder_use_batchnorm is not None:
-            warnings.warn(
-                "The usage of decoder_use_batchnorm is deprecated. Please modify your code for use_norm",
-                DeprecationWarning,
-                stacklevel=2,
-            )
-            decoder_use_norm = decoder_use_batchnorm
 
         self.decoder = UnetDecoder(
             encoder_channels=self.encoder.out_channels,
