@@ -60,8 +60,10 @@ def get_norm_layer(
         )
     if norm_params["type"] == "inplace" and InPlaceABN is None:
         raise RuntimeError(
-            "In order to use `use_norm='inplace'` the inplace_abn package must be installed. "
-            "To install see: https://github.com/mapillary/inplace_abn"
+            "In order to use `use_norm='inplace'` the inplace_abn package must be installed. Use:\n"
+            "  $ pip install -U wheel setuptools\n"
+            "  $ pip install inplace_abn --no-build-isolation\n"
+            "Also see: https://github.com/mapillary/inplace_abn"
         )
 
     # Step 3. Initialize the norm layer
