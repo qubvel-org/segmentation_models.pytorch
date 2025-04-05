@@ -165,7 +165,10 @@ class FPABlock(nn.Module):
 
 class GAUBlock(nn.Module):
     def __init__(
-        self, in_channels: int, out_channels: int, decoder_interpolation_mode: str = "bilinear"
+        self,
+        in_channels: int,
+        out_channels: int,
+        decoder_interpolation_mode: str = "bilinear",
     ):
         super(GAUBlock, self).__init__()
 

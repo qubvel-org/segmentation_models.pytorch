@@ -113,7 +113,11 @@ class UnetPlusPlusDecoder(nn.Module):
             self.center = nn.Identity()
 
         # combine decoder keyword arguments
-        kwargs = dict(use_norm=use_norm, attention_type=attention_type, interpolation_mode=interpolation_mode)
+        kwargs = dict(
+            use_norm=use_norm,
+            attention_type=attention_type,
+            interpolation_mode=interpolation_mode,
+        )
 
         blocks = {}
         for layer_idx in range(len(self.in_channels) - 1):

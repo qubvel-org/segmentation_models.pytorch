@@ -190,7 +190,9 @@ class MAnetDecoder(nn.Module):
         self.center = PABBlock(head_channels, pab_channels=pab_channels)
 
         # combine decoder keyword arguments
-        kwargs = dict(use_norm=use_norm, interpolation_mode=interpolation_mode)  # no attention type here
+        kwargs = dict(
+            use_norm=use_norm, interpolation_mode=interpolation_mode
+        )  # no attention type here
         blocks = [
             MFABBlock(in_ch, skip_ch, out_ch, reduction=reduction, **kwargs)
             if skip_ch > 0

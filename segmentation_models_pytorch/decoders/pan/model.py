@@ -96,7 +96,7 @@ class PAN(SegmentationModel):
             warnings.warn(
                 "The usage of upscale_mode is deprecated. Please modify your code for decoder_interpolation_mode",
                 DeprecationWarning,
-                stacklevel=2
+                stacklevel=2,
             )
             decoder_interpolation_mode = upscale_mode
 
@@ -104,7 +104,7 @@ class PAN(SegmentationModel):
             encoder_channels=self.encoder.out_channels,
             encoder_depth=encoder_depth,
             decoder_channels=decoder_channels,
-            decoder_interpolation_mode=decoder_interpolation_mode
+            decoder_interpolation_mode=decoder_interpolation_mode,
         )
 
         self.segmentation_head = SegmentationHead(

@@ -25,7 +25,12 @@ class Conv3x3GNReLU(nn.Module):
 
 
 class FPNBlock(nn.Module):
-    def __init__(self, pyramid_channels: int, skip_channels: int, interpolation_mode: str = "nearest"):
+    def __init__(
+        self,
+        pyramid_channels: int,
+        skip_channels: int,
+        interpolation_mode: str = "nearest",
+    ):
         super().__init__()
         self.skip_conv = nn.Conv2d(skip_channels, pyramid_channels, kernel_size=1)
         self.interpolation_mode = interpolation_mode
