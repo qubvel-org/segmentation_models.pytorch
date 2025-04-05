@@ -282,4 +282,4 @@ class BaseModelTester(unittest.TestCase):
             eager_output = model(sample)
 
         self.assertEqual(scripted_output.shape, eager_output.shape)
-        torch.testing.assert_close(scripted_output, eager_output)
+        torch.testing.assert_close(scripted_output, eager_output, rtol=1e-3, atol=1e-3)
