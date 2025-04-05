@@ -11,13 +11,21 @@ def test_conv2drelu_batchnorm():
     assert isinstance(module[1], nn.BatchNorm2d)
     assert isinstance(module[2], nn.ReLU)
 
+
 def test_conv2drelu_batchnorm_with_keywords():
-    module = Conv2dReLU(3, 16, kernel_size=3, padding=1, use_norm={"type": "batchnorm", "momentum": 1e-4, "affine": False})
+    module = Conv2dReLU(
+        3,
+        16,
+        kernel_size=3,
+        padding=1,
+        use_norm={"type": "batchnorm", "momentum": 1e-4, "affine": False},
+    )
 
     assert isinstance(module[0], nn.Conv2d)
     assert isinstance(module[1], nn.BatchNorm2d)
-    assert module[1].momentum == 1e-4 and module[1].affine == False
+    assert module[1].momentum == 1e-4 and module[1].affine is False
     assert isinstance(module[2], nn.ReLU)
+
 
 def test_conv2drelu_identity():
     module = Conv2dReLU(3, 16, kernel_size=3, padding=1, use_norm="identity")

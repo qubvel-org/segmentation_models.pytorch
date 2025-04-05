@@ -50,7 +50,12 @@ class PSPModule(nn.Module):
 
 
 class FPNBlock(nn.Module):
-    def __init__(self, skip_channels: int, pyramid_channels: int, use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm"):
+    def __init__(
+        self,
+        skip_channels: int,
+        pyramid_channels: int,
+        use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
+    ):
         super().__init__()
         self.skip_conv = (
             md.Conv2dReLU(

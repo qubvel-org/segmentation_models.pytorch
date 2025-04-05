@@ -46,9 +46,7 @@ class DecoderBlock(nn.Module):
                 kernel_size=1,
                 use_norm=use_norm,
             ),
-            TransposeX2(
-                in_channels // 4, in_channels // 4, use_norm=use_norm
-            ),
+            TransposeX2(in_channels // 4, in_channels // 4, use_norm=use_norm),
             modules.Conv2dReLU(
                 in_channels // 4,
                 out_channels,

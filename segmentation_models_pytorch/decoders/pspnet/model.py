@@ -100,7 +100,7 @@ class PSPNet(SegmentationModel):
             warnings.warn(
                 "The usage of psp_use_batchnorm is deprecated. Please modify your code for use_norm",
                 DeprecationWarning,
-                stacklevel=2
+                stacklevel=2,
             )
             decoder_use_norm = psp_use_batchnorm
 

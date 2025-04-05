@@ -101,7 +101,7 @@ class MAnet(SegmentationModel):
             warnings.warn(
                 "The usage of decoder_use_batchnorm is deprecated. Please modify your code for use_norm",
                 DeprecationWarning,
-                stacklevel=2
+                stacklevel=2,
             )
             decoder_use_norm = decoder_use_batchnorm
 

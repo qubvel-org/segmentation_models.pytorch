@@ -22,9 +22,7 @@ class PSPBlock(nn.Module):
 
         self.pool = nn.Sequential(
             nn.AdaptiveAvgPool2d(output_size=(pool_size, pool_size)),
-            modules.Conv2dReLU(
-                in_channels, out_channels, (1, 1), use_norm=use_norm
-            ),
+            modules.Conv2dReLU(in_channels, out_channels, (1, 1), use_norm=use_norm),
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
