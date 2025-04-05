@@ -76,7 +76,7 @@ class PSPNet(SegmentationModel):
         encoder_weights: Optional[str] = "imagenet",
         encoder_depth: int = 3,
         psp_out_channels: int = 512,
-        decoder_use_norm: Union[bool, str, Dict[str, Any], None] = "batchnorm",
+        decoder_use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
         psp_dropout: float = 0.2,
         in_channels: int = 3,
         classes: int = 1,
@@ -90,7 +90,7 @@ class PSPNet(SegmentationModel):
         psp_use_batchnorm = kwargs.pop("psp_use_batchnorm", None)
         if psp_use_batchnorm is not None:
             warnings.warn(
-                "The usage of psp_use_batchnorm is deprecated. Please modify your code for use_norm",
+                "The usage of psp_use_batchnorm is deprecated. Please modify your code for decoder_use_norm",
                 DeprecationWarning,
                 stacklevel=2,
             )
