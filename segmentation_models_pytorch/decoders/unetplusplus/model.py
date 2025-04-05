@@ -97,7 +97,7 @@ class UnetPlusPlus(SegmentationModel):
         decoder_use_batchnorm = kwargs.pop("decoder_use_batchnorm", None)
         if decoder_use_batchnorm is not None:
             warnings.warn(
-                "The usage of decoder_use_batchnorm is deprecated. Please modify your code for use_norm",
+                "The usage of decoder_use_batchnorm is deprecated. Please modify your code for decoder_use_norm",
                 DeprecationWarning,
                 stacklevel=2,
             )
