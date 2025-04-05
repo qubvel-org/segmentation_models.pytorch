@@ -1,3 +1,4 @@
+import pytest
 import segmentation_models_pytorch as smp
 
 from tests.models import base
@@ -37,3 +38,11 @@ class TestPanModel(base.BaseModelTester):
         assert model_2.decoder.gau2.align_corners is None
         assert model_2.decoder.gau3.interpolation_mode == "bicubic"
         assert model_2.decoder.gau3.align_corners is None
+
+        with pytest.warns(DeprecationWarning):
+            smp.create_model(
+                self.test_model_type,
+                self.test_encoder_name,
+                upscale_mode="bicubic",
+            )
+            assert model_2.decoder.gau1.interpolation_mode == "bicubic"
