@@ -31,12 +31,6 @@ def validate_output_indices(
                 f"got index = {output_index}."
             )
 
-    if len(output_indices) != depth:
-        raise ValueError(
-            f"Length of output indices for feature extraction should be equal to the depth of the encoder "
-            f"architecture, got output indices length - {len(output_indices)}, encoder depth - {depth}"
-        )
-
 
 def preprocess_output_indices(
     output_indices: Optional[list[int]], model_num_blocks: int, depth: int
@@ -91,28 +85,28 @@ class TimmViTEncoder(nn.Module):
             output_indices (Optional[list[int] | int]): Indices of blocks in the model to be used for feature extraction.
             **kwargs: Additional arguments passed to `timm.create_model`.
         """
-        # At the moment we do not support models with more than 4 stages,
-        # but can be reconfigured in the future.
+        super().__init__()
+
         if depth > 4 or depth < 1:
             raise ValueError(
                 f"{self.__class__.__name__} depth should be in range [1, 4], got {depth}"
             )
 
-        super().__init__()
+        if isinstance(output_indices, (list, tuple)) and len(output_indices) != depth:
+            raise ValueError(
+                f"Length of output indices for feature extraction should be equal to the depth of the encoder "
+                f"architecture, got output indices length - {len(output_indices)}, encoder depth - {depth}"
+            )
+
         self.name = name
 
-        # Load a temporary model to analyze its feature hierarchy
-        try:
-            with torch.device("meta"):
-                tmp_model = timm.create_model(name)
-        except Exception:
-            tmp_model = timm.create_model(name)
+        # Load a timm model
+        encoder_kwargs = dict(in_chans=in_channels, pretrained=pretrained)
+        encoder_kwargs = _merge_kwargs_no_duplicates(encoder_kwargs, kwargs)
+        self.model = timm.create_model(name, **encoder_kwargs)
 
-        # Get all the necessary information about the model, and delete the temporary model
-        self._is_channel_last = getattr(tmp_model, "output_fmt", None) == "NHWC"
-        feature_info = tmp_model.feature_info
-
-        del tmp_model
+        # Get all the necessary information about the model
+        feature_info = self.model.feature_info
 
         # Additional checks
         model_num_blocks = len(feature_info)
@@ -127,31 +121,20 @@ class TimmViTEncoder(nn.Module):
             output_indices, model_num_blocks, depth
         )
 
-        # Determine the model's downsampling pattern and set hierarchy flags
-        reduction_scales = [feature_info[i]["reduction"] for i in output_indices]
-
-        # We only support the same reduction scales for ViT encoder, e.g. [16, 16, 16], and not [16, 8, 4]
-        if len(set(reduction_scales)) > 1:
-            raise ValueError(
-                f"We only support the same reduction scales for ViT encoder, e.g. [16, 16, 16], and not {reduction_scales}"
-            )
-
-        # Initiate timm model
-        model_kwargs = dict(in_chans=in_channels, pretrained=pretrained)
-        model_kwargs = _merge_kwargs_no_duplicates(model_kwargs, kwargs)
-        self.model = timm.create_model(name, **model_kwargs)
-
         # Private attributes for model forward
         self._num_prefix_tokens = getattr(self.model, "num_prefix_tokens", 0)
         self._output_indices = output_indices
 
         # Public attributes
-        self.output_stride = reduction_scales[-1]
+        self.output_strides = [feature_info[i]["reduction"] for i in output_indices]
+        self.output_stride = self.output_strides[-1]
         self.out_channels = [feature_info[i]["num_chs"] for i in output_indices]
         self.embed_dim = self.model.embed_dim
         self.has_class_token = getattr(self.model, "has_class_token", False)
 
-    def forward(self, x: torch.Tensor) -> tuple[list[torch.Tensor], list[Optional[torch.Tensor]]]:
+    def forward(
+        self, x: torch.Tensor
+    ) -> tuple[list[torch.Tensor], list[Optional[torch.Tensor]]]:
         """
         Forward pass to extract multi-stage features.
 

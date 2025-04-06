@@ -1,30 +1,10 @@
 import torch
 import torch.nn as nn
 from segmentation_models_pytorch.base.modules import Activation
-from typing import Optional
+from typing import Optional, Sequence
 
 
-def _get_feature_processing_out_channels(encoder_name: str) -> list[int]:
-    """
-    Get the output embedding dimensions for the features after decoder processing
-    """
-
-    encoder_name = encoder_name.lower()
-    # Output channels for hybrid ViT encoder after feature processing
-    if "vit" in encoder_name and "resnet" in encoder_name:
-        return [256, 512, 768, 768]
-
-    # Output channels for ViT-large,ViT-huge,ViT-giant encoders after feature processing
-    if "vit" in encoder_name and any(
-        [variant in encoder_name for variant in ["huge", "large", "giant"]]
-    ):
-        return [256, 512, 1024, 1024]
-
-    # Output channels for ViT-base and other encoders after feature processing
-    return [96, 192, 384, 768]
-
-
-class ProjectionReadout(nn.Module):
+class ProjectionBlock(nn.Module):
     """
     Concatenates the cls tokens with the features to make use of the global information aggregated in the cls token.
     Projects the combined feature map to the original embedding dimension using a MLP
@@ -38,9 +18,10 @@ class ProjectionReadout(nn.Module):
             nn.Linear(in_features, out_features),
             nn.GELU(),
         )
-        self.has_cls_token = has_cls_token
 
-    def forward(self, features: torch.Tensor, cls_token: Optional[torch.Tensor] = None):
+    def forward(
+        self, features: torch.Tensor, cls_token: Optional[torch.Tensor] = None
+    ) -> torch.Tensor:
         batch_size, embed_dim, height, width = features.shape
 
         # Rearrange to (batch_size, height * width, embed_dim)
@@ -69,47 +50,50 @@ class ReassembleBlock(nn.Module):
     """
 
     def __init__(
-        self, embed_dim: int, feature_dim: int, out_channel: int, upsample_factor: int
+        self,
+        in_channels: int,
+        mid_channels: int,
+        out_channels: int,
+        upsample_factor: int,
     ):
         super().__init__()
 
         self.project_to_out_channel = nn.Conv2d(
-            in_channels=embed_dim, out_channels=out_channel, kernel_size=1
+            in_channels=in_channels,
+            out_channels=mid_channels,
+            kernel_size=1,
         )
 
         if upsample_factor > 1.0:
             self.upsample = nn.ConvTranspose2d(
-                in_channels=out_channel,
-                out_channels=out_channel,
+                in_channels=mid_channels,
+                out_channels=mid_channels,
                 kernel_size=int(upsample_factor),
                 stride=int(upsample_factor),
             )
-
         elif upsample_factor == 1.0:
             self.upsample = nn.Identity()
-
         else:
             self.upsample = nn.Conv2d(
-                in_channels=out_channel,
-                out_channels=out_channel,
+                in_channels=mid_channels,
+                out_channels=mid_channels,
                 kernel_size=3,
                 stride=int(1 / upsample_factor),
                 padding=1,
             )
 
         self.project_to_feature_dim = nn.Conv2d(
-            in_channels=out_channel,
-            out_channels=feature_dim,
+            in_channels=mid_channels,
+            out_channels=out_channels,
             kernel_size=3,
             padding=1,
             bias=False,
         )
 
-    def forward(self, x: torch.Tensor):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.project_to_out_channel(x)
         x = self.upsample(x)
         x = self.project_to_feature_dim(x)
-
         return x
 
 
@@ -135,15 +119,23 @@ class ResidualConvBlock(nn.Module):
         self.batch_norm_2 = nn.BatchNorm2d(num_features=feature_dim)
         self.activation = nn.ReLU()
 
-    def forward(self, x: torch.Tensor):
-        activated_x_1 = self.activation(x)
-        conv_1_out = self.conv_1(activated_x_1)
-        batch_norm_1_out = self.batch_norm_1(conv_1_out)
-        activated_x_2 = self.activation(batch_norm_1_out)
-        conv_2_out = self.conv_2(activated_x_2)
-        batch_norm_2_out = self.batch_norm_2(conv_2_out)
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        residual = x
 
-        return x + batch_norm_2_out
+        # Block 1
+        x = self.activation(x)
+        x = self.conv_1(x)
+        x = self.batch_norm_1(x)
+
+        # Block 2
+        x = self.activation(x)
+        x = self.conv_2(x)
+        x = self.batch_norm_2(x)
+
+        # Add residual
+        x = x + residual
+
+        return x
 
 
 class FusionBlock(nn.Module):
@@ -153,26 +145,24 @@ class FusionBlock(nn.Module):
 
     def __init__(self, feature_dim: int):
         super().__init__()
-        self.residual_conv_block1 = ResidualConvBlock(feature_dim=feature_dim)
-        self.residual_conv_block2 = ResidualConvBlock(feature_dim=feature_dim)
-        self.project = nn.Conv2d(
-            in_channels=feature_dim, out_channels=feature_dim, kernel_size=1
-        )
+        self.residual_conv_block1 = ResidualConvBlock(feature_dim)
+        self.residual_conv_block2 = ResidualConvBlock(feature_dim)
+        self.project = nn.Conv2d(feature_dim, feature_dim, kernel_size=1)
         self.activation = nn.ReLU()
 
-    def forward(self, feature: torch.Tensor, preceding_layer_feature: torch.Tensor):
+    def forward(
+        self,
+        feature: torch.Tensor,
+        previous_feature: Optional[torch.Tensor] = None,
+    ) -> torch.Tensor:
         feature = self.residual_conv_block1(feature)
-
-        if preceding_layer_feature is not None:
-            feature += preceding_layer_feature
-
+        if previous_feature is not None:
+            feature = feature + previous_feature
         feature = self.residual_conv_block2(feature)
-
         feature = nn.functional.interpolate(
             feature, scale_factor=2, align_corners=True, mode="bilinear"
         )
         feature = self.project(feature)
-
         return feature
 
 
@@ -181,7 +171,7 @@ class DPTDecoder(nn.Module):
     Decoder part for DPT
 
     Processes the encoder features and class tokens (if encoder has class_tokens) to have spatial downsampling ratios of
-    [1/32,1/16,1/8,1/4] relative to the input image spatial dimension.
+    [1/4, 1/8, 1/16, 1/32, ...] relative to the input image spatial dimension.
 
     The decoder then fuses these features in a residual manner and progressively upsamples them by a factor of 2 so that the
     output has a downsampling ratio of 1/2 relative to the input image spatial dimension
@@ -190,75 +180,57 @@ class DPTDecoder(nn.Module):
 
     def __init__(
         self,
-        encoder_name: str,
-        transformer_embed_dim: int,
-        encoder_output_stride: int,
-        feature_dim: int = 256,
-        encoder_depth: int = 4,
-        cls_token_supported: bool = False,
+        embed_dim: int,
+        encoder_output_strides: Sequence[int] = (16, 16, 16, 16),
+        intermediate_channels: Sequence[int] = (256, 512, 1024, 1024),
+        fusion_channels: int = 256,
+        has_cls_token: bool = False,
     ):
         super().__init__()
 
-        self.cls_token_supported = cls_token_supported
+        num_blocks = len(encoder_output_strides)
 
         # If encoder has cls token, then concatenate it with the features along the embedding dimension and project it
         # back to the feature_dim dimension. Else, ignore the non-existent cls token
-        self.readout_blocks = nn.ModuleList()
-        for _ in range(encoder_depth):
-            block = ProjectionReadout(
-                embed_dim=transformer_embed_dim,
-                has_cls_token=cls_token_supported,
+        blocks = [ProjectionBlock(embed_dim, has_cls_token) for _ in range(num_blocks)]
+        self.readout_blocks = nn.ModuleList(blocks)
+
+        # Upsample factors to resize features to [1/4, 1/8, 1/16, 1/32, ...] scales
+        scale_factors = [
+            stride / 2 ** (i + 2) for i, stride in enumerate(encoder_output_strides)
+        ]
+        self.reassemble_blocks = nn.ModuleList()
+        for factor, mid_channels in zip(scale_factors, intermediate_channels):
+            block = ReassembleBlock(
+                in_channels=embed_dim,
+                mid_channels=mid_channels,
+                out_channels=fusion_channels,
+                upsample_factor=factor,
             )
-            self.readout_blocks.append(block)
+            self.reassemble_blocks.append(block)
 
-        upsample_factors = [
-            (encoder_output_stride / 2 ** (index + 2))
-            for index in range(0, encoder_depth)
-        ]
-        feature_processing_out_channels = _get_feature_processing_out_channels(
-            encoder_name
-        )
-
-        # slice in case encoder_depth < len(feature_processing_out_channels)
-        feature_processing_out_channels = feature_processing_out_channels[
-            :encoder_depth
-        ]
-
-        self.reassemble_blocks = nn.ModuleList(
-            [
-                ReassembleBlock(
-                    transformer_embed_dim, feature_dim, out_channel, upsample_factor
-                )
-                for upsample_factor, out_channel in zip(
-                    upsample_factors, feature_processing_out_channels
-                )
-            ]
-        )
-
-        self.fusion_blocks = nn.ModuleList(
-            [FusionBlock(feature_dim=feature_dim) for _ in range(encoder_depth)]
-        )
+        # Fusion blocks to fuse the processed features in a sequential manner
+        fusion_blocks = [FusionBlock(fusion_channels) for _ in range(num_blocks)]
+        self.fusion_blocks = nn.ModuleList(fusion_blocks)
 
     def forward(
-        self, features: list[torch.Tensor], cls_tokens: list[torch.Tensor]
+        self, features: list[torch.Tensor], cls_tokens: list[Optional[torch.Tensor]]
     ) -> torch.Tensor:
+        # Process the encoder features to scale of [1/4, 1/8, 1/16, 1/32, ...]
         processed_features = []
-
-        # Process the encoder features to scale of [1/32,1/16,1/8,1/4]
-        for index, (feature, cls_token) in enumerate(zip(features, cls_tokens)):
-            readout_feature = self.readout_blocks[index](feature, cls_token)
-            processed_feature = self.reassemble_blocks[index](readout_feature)
+        for i, (feature, cls_token) in enumerate(zip(features, cls_tokens)):
+            readout_feature = self.readout_blocks[i](feature, cls_token)
+            processed_feature = self.reassemble_blocks[i](readout_feature)
             processed_features.append(processed_feature)
 
-        preceding_layer_feature = None
-
         # Fusion and progressive upsampling starting from the last processed feature
+        previous_feature = None
         processed_features = processed_features[::-1]
         for fusion_block, feature in zip(self.fusion_blocks, processed_features):
-            out = fusion_block(feature, preceding_layer_feature)
-            preceding_layer_feature = out
+            fused_feature = fusion_block(feature, previous_feature)
+            previous_feature = fused_feature
 
-        return out
+        return fused_feature
 
 
 class DPTSegmentationHead(nn.Module):

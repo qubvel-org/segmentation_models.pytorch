@@ -1,4 +1,4 @@
-from typing import Any, Optional, Union, Callable
+from typing import Any, Optional, Union, Callable, Sequence
 import torch
 
 from segmentation_models_pytorch.base import (
@@ -70,7 +70,9 @@ class DPT(SegmentationModel):
         encoder_depth: int = 4,
         encoder_weights: Optional[str] = None,
         encoder_output_indices: Optional[list[int]] = None,
-        feature_dim: int = 256,
+        decoder_intermediate_channels: Sequence[int] = (256, 512, 1024, 1024),
+        decoder_fusion_channels: int = 256,
+        feature_dim: int = 256, # TODO: remove this
         in_channels: int = 3,
         classes: int = 1,
         activation: Optional[Union[str, Callable]] = None,
@@ -78,7 +80,6 @@ class DPT(SegmentationModel):
         **kwargs: dict[str, Any],
     ):
         super().__init__()
-
         if encoder_name.startswith("tu-"):
             encoder_name = encoder_name[3:]
         else:
@@ -95,21 +96,16 @@ class DPT(SegmentationModel):
             **kwargs,
         )
 
-        self.transformer_embed_dim = self.encoder.embed_dim
-        self.encoder_output_stride = self.encoder.output_stride
-        self.cls_token_supported = self.encoder.has_class_token
-
         self.decoder = DPTDecoder(
-            encoder_name=encoder_name,
-            transformer_embed_dim=self.transformer_embed_dim,
-            feature_dim=feature_dim,
-            encoder_depth=encoder_depth,
-            encoder_output_stride=self.encoder_output_stride,
-            cls_token_supported=self.cls_token_supported,
+            embed_dim=self.encoder.embed_dim,
+            intermediate_channels=decoder_intermediate_channels,
+            fusion_channels=decoder_fusion_channels,
+            encoder_output_strides=self.encoder.output_strides,
+            has_cls_token=self.encoder.has_class_token,
         )
 
         self.segmentation_head = DPTSegmentationHead(
-            in_channels=feature_dim,
+            in_channels=decoder_fusion_channels,
             out_channels=classes,
             activation=activation,
             kernel_size=3,
@@ -135,9 +131,7 @@ class DPT(SegmentationModel):
             self.check_input_shape(x)
 
         features, cls_tokens = self.encoder(x)
-
         decoder_output = self.decoder(features, cls_tokens)
-
         masks = self.segmentation_head(decoder_output)
 
         if self.classification_head is not None:
@@ -145,3 +139,23 @@ class DPT(SegmentationModel):
             return masks, labels
 
         return masks
+
+
+def _get_feature_processing_out_channels(encoder_name: str) -> list[int]:
+    """
+    Get the output embedding dimensions for the features after decoder processing
+    """
+
+    encoder_name = encoder_name.lower()
+    # Output channels for hybrid ViT encoder after feature processing
+    if "vit" in encoder_name and "resnet" in encoder_name:
+        return [256, 512, 768, 768]
+
+    # Output channels for ViT-large,ViT-huge,ViT-giant encoders after feature processing
+    if "vit" in encoder_name and any(
+        [variant in encoder_name for variant in ["huge", "large", "giant"]]
+    ):
+        return [256, 512, 1024, 1024]
+
+    # Output channels for ViT-base and other encoders after feature processing
+    return [96, 192, 384, 768]
