@@ -28,6 +28,8 @@ class FPN(SegmentationModel):
         decoder_merge_policy: Determines how to merge pyramid features inside FPN. Available options are **add**
             and **cat**
         decoder_dropout: Spatial dropout rate in range (0, 1) for feature pyramid in FPN_
+        decoder_interpolation: Interpolation mode used in decoder of the model. Available options are
+            **"nearest"**, **"bilinear"**, **"bicubic"**, **"area"**, **"nearest-exact"**. Default is **"nearest"**.
         in_channels: A number of input channels for the model, default is 3 (RGB images)
         classes: A number of classes for output mask (or you can think as a number of channels of output mask)
         activation: An activation function to apply after the final convolution layer.
@@ -61,6 +63,7 @@ class FPN(SegmentationModel):
         decoder_segmentation_channels: int = 128,
         decoder_merge_policy: str = "add",
         decoder_dropout: float = 0.2,
+        decoder_interpolation: str = "nearest",
         in_channels: int = 3,
         classes: int = 1,
         activation: Optional[str] = None,
@@ -91,6 +94,7 @@ class FPN(SegmentationModel):
             segmentation_channels=decoder_segmentation_channels,
             dropout=decoder_dropout,
             merge_policy=decoder_merge_policy,
+            interpolation_mode=decoder_interpolation,
         )
 
         self.segmentation_head = SegmentationHead(

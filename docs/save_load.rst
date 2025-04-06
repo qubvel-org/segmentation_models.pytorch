@@ -40,6 +40,14 @@ For example:
     # Alternatively, load the model directly from the Hugging Face Hub
     model = smp.from_pretrained('username/my-model')
 
+Loading pre-trained model with different number of classes for fine-tuning:
+
+.. code:: python
+
+    import segmentation_models_pytorch as smp
+
+    model = smp.from_pretrained('<path-or-repo-name>', classes=5, strict=False)
+
 Saving model Metrics and Dataset Name
 -------------------------------------
 

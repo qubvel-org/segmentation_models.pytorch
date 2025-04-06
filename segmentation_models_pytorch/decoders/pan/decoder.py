@@ -165,12 +165,15 @@ class FPABlock(nn.Module):
 
 class GAUBlock(nn.Module):
     def __init__(
-        self, in_channels: int, out_channels: int, upscale_mode: str = "bilinear"
+        self,
+        in_channels: int,
+        out_channels: int,
+        interpolation_mode: str = "bilinear",
     ):
         super(GAUBlock, self).__init__()
 
-        self.upscale_mode = upscale_mode
-        self.align_corners = True if upscale_mode == "bilinear" else None
+        self.interpolation_mode = interpolation_mode
+        self.align_corners = True if interpolation_mode == "bilinear" else None
 
         self.conv1 = nn.Sequential(
             nn.AdaptiveAvgPool2d(1),
@@ -196,7 +199,7 @@ class GAUBlock(nn.Module):
         y_up = F.interpolate(
             y,
             size=(height, width),
-            mode=self.upscale_mode,
+            mode=self.interpolation_mode,
             align_corners=self.align_corners,
         )
         x = self.conv2(x)
@@ -211,7 +214,7 @@ class PANDecoder(nn.Module):
         encoder_channels: Sequence[int],
         encoder_depth: Literal[3, 4, 5],
         decoder_channels: int,
-        upscale_mode: str = "bilinear",
+        interpolation_mode: str = "bilinear",
     ):
         super().__init__()
 
@@ -232,19 +235,19 @@ class PANDecoder(nn.Module):
             self.gau3 = GAUBlock(
                 in_channels=encoder_channels[2],
                 out_channels=decoder_channels,
-                upscale_mode=upscale_mode,
+                interpolation_mode=interpolation_mode,
             )
         if encoder_depth >= 4:
             self.gau2 = GAUBlock(
                 in_channels=encoder_channels[1],
                 out_channels=decoder_channels,
-                upscale_mode=upscale_mode,
+                interpolation_mode=interpolation_mode,
             )
         if encoder_depth >= 3:
             self.gau1 = GAUBlock(
                 in_channels=encoder_channels[0],
                 out_channels=decoder_channels,
-                upscale_mode=upscale_mode,
+                interpolation_mode=interpolation_mode,
             )
 
     def forward(self, features: List[torch.Tensor]) -> torch.Tensor:
