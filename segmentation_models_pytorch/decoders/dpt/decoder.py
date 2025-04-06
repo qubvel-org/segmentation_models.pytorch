@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from segmentation_models_pytorch.base.modules import Activation
-from typing import Optional, Sequence
+from typing import Optional, Sequence, Union, Callable
 
 
 class ProjectionBlock(nn.Module):
@@ -241,7 +241,7 @@ class DPTSegmentationHead(nn.Module):
         self,
         in_channels: int,
         out_channels: int,
-        activation: Optional[str] = None,
+        activation: Optional[Union[str, Callable]] = None,
         kernel_size: int = 3,
         upsampling: float = 2.0,
     ):
