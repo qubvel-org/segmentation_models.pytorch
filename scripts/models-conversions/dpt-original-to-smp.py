@@ -5,6 +5,7 @@ import segmentation_models_pytorch as smp
 
 MODEL_WEIGHTS_PATH = r"dpt_large-ade20k-b12dca68.pt"
 HF_HUB_PATH = "qubvel-hf/dpt-large-ade20k"
+PUSH_TO_HUB = False
 
 
 def get_transform():
@@ -115,7 +116,7 @@ if __name__ == "__main__":
     transform = get_transform()
 
     transform.save_pretrained(HF_HUB_PATH)
-    smp_model.save_pretrained(HF_HUB_PATH, push_to_hub=False)
+    smp_model.save_pretrained(HF_HUB_PATH, push_to_hub=PUSH_TO_HUB)
 
     # Re-loading to make sure everything is saved correctly
     smp_model = smp.from_pretrained(HF_HUB_PATH)
