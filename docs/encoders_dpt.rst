@@ -3,8 +3,7 @@
 DPT Encoders
 ============
 
-This is a list of Vision Transformer encoders that are compatible with the DPT architecture
-These encoders have been tested and verified to work with DPT models.
+This is a list of Vision Transformer encoders that are compatible with the DPT architecture.
 While other Vision Transformer encoders from timm may also be compatible, the ones listed below are tested to work properly.
 
 .. list-table:: Encoder Name
