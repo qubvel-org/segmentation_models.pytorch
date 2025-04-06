@@ -131,8 +131,9 @@ class TimmViTEncoder(nn.Module):
         self.out_channels = [feature_info[i]["num_chs"] for i in output_indices]
         self.has_class_token = getattr(self.model, "has_class_token", False)
 
-    def _forward_with_prefix_tokens(self, x: torch.Tensor) -> tuple[list[torch.Tensor], list[Optional[torch.Tensor]]]:
-        
+    def _forward_with_cls_token(
+        self, x: torch.Tensor
+    ) -> tuple[list[torch.Tensor], list[torch.Tensor]]:
         intermediate_outputs = self.model.forward_intermediates(
             x,
             indices=self._output_indices,
@@ -141,24 +142,20 @@ class TimmViTEncoder(nn.Module):
         )
 
         features = [output[0] for output in intermediate_outputs]
-        prefix_tokens = [output[1] for output in intermediate_outputs]
+        cls_tokens = [output[1] for output in intermediate_outputs]
 
         if self.has_class_token and self._num_prefix_tokens > 1:
-            cls_tokens = [x[:, 0, :] for x in prefix_tokens]
-        else:
-            cls_tokens = [None] * len(intermediate_outputs)
+            cls_tokens = [x[:, 0, :] for x in cls_tokens]
 
         return features, cls_tokens
-    
-    def _forward_without_prefix_tokens(self, x: torch.Tensor) -> tuple[list[torch.Tensor], list[Optional[torch.Tensor]]]:
+
+    def _forward_without_cls_token(self, x: torch.Tensor) -> list[torch.Tensor]:
         features = self.model.forward_intermediates(
             x,
             indices=self._output_indices,
             intermediates_only=True,
         )
-        cls_tokens = [None] * len(features)
-
-        return features, cls_tokens
+        return features
 
     def forward(
         self, x: torch.Tensor
@@ -172,8 +169,11 @@ class TimmViTEncoder(nn.Module):
         Returns:
             tuple[list[torch.Tensor], list[torch.Tensor]]: Tuple of feature maps and cls tokens (if supported) at different scales.
         """
-        
-        if self._num_prefix_tokens > 0:
-            return self._forward_with_prefix_tokens(x)
+
+        if self.has_class_token:
+            features, cls_tokens = self._forward_with_cls_token(x)
         else:
-            return self._forward_without_prefix_tokens(x)
+            features = self._forward_without_cls_token(x)
+            cls_tokens = [None] * len(features)
+
+        return features, cls_tokens
