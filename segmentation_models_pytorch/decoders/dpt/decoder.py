@@ -192,7 +192,10 @@ class DPTDecoder(nn.Module):
 
         # If encoder has cls token, then concatenate it with the features along the embedding dimension and project it
         # back to the feature_dim dimension. Else, ignore the non-existent cls token
-        blocks = [ProjectionBlock(in_channels, has_cls_token) for in_channels in encoder_out_channels]
+        blocks = [
+            ProjectionBlock(in_channels, has_cls_token)
+            for in_channels in encoder_out_channels
+        ]
         self.readout_blocks = nn.ModuleList(blocks)
 
         # Upsample factors to resize features to [1/4, 1/8, 1/16, 1/32, ...] scales
