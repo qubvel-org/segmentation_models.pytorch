@@ -1,12 +1,12 @@
 import segmentation_models_pytorch as smp
 import torch
 
-MODEL_WEIGHTS_PATH = r"C:\Users\vedan\Downloads\dpt_large-ade20k-b12dca68.pt"
-HF_HUB_PATH = "vedantdalimkar/DPT"
+MODEL_WEIGHTS_PATH = r"dpt_large-ade20k-b12dca68.pt"
+HF_HUB_PATH = "qubvel-hf/dpt-large-ade20k"
 
 if __name__ == "__main__":
     smp_model = smp.DPT(encoder_name="tu-vit_large_patch16_384", classes=150)
-    dpt_model_dict = torch.load(MODEL_WEIGHTS_PATH)
+    dpt_model_dict = torch.load(MODEL_WEIGHTS_PATH, weights_only=True)
 
     for layer_index in range(0, 4):
         for param in [
@@ -96,5 +96,25 @@ if __name__ == "__main__":
         if not name.startswith("auxlayer")
     }
 
+    # ------- DO NOT touch this section -------
     smp_model.load_state_dict(dpt_model_dict, strict=True)
-    smp_model.save_pretrained(HF_HUB_PATH, push_to_hub=True)
+    smp_model.save_pretrained(HF_HUB_PATH, push_to_hub=False)
+
+    smp_model = smp.from_pretrained(HF_HUB_PATH)
+    smp_model.eval()
+
+    input_tensor = torch.ones((1, 3, 384, 384))
+    output = smp_model(input_tensor)
+
+    print(output.shape)
+    print(output[0, 0, :3, :3])
+
+    expected_slice = torch.tensor(
+        [
+            [3.4243, 3.4553, 3.4863],
+            [3.3332, 3.2876, 3.2419],
+            [3.2422, 3.1199, 2.9975],
+        ]
+    )
+
+    torch.testing.assert_close(output[0, 0, :3, :3], expected_slice, atol=1e-4, rtol=1e-4)
