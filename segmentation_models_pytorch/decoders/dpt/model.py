@@ -53,16 +53,10 @@ class DPT(SegmentationModel):
                 - activation (str): An activation function to apply "sigmoid"/"softmax"
                     (could be **None** to return logits)
         kwargs: Arguments passed to the encoder class ``__init__()`` function. Applies only to ``timm`` models. Keys with
-                ``None`` values are pruned before passing.
-                allow_downsampling : Allow ViT encoder to have progressive spatial downsampling for it's representations.
-                Set to False for DPT as the architecture requires all encoder feature outputs to have the same spatial shape.
-                allow_output_stride_not_power_of_two : Allow ViT encoders with output_stride not being a power of 2. This
-                    is set False for DPT as the architecture requires the encoder output features to have an output stride of
-                    [1/32,1/16,1/8,1/4]
+                ``None`` values are pruned before passing. Specify ``dynamic_img_size=True`` to allow the model to handle images of different sizes.
 
     Returns:
         ``torch.nn.Module``: DPT
-
 
     """
 
