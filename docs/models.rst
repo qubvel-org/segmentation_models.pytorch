@@ -91,4 +91,8 @@ DPT
 
     See full list of DPT-compatible timm encoders in :ref:`dpt-encoders`.
 
+.. note::
+
+    For some encoders, the model requires ``dynamic_img_size=True`` to be passed in order to work with resolutions different from what the encoder was trained for.
+
 .. autoclass:: segmentation_models_pytorch.DPT
