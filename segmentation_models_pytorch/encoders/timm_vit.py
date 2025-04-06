@@ -105,6 +105,12 @@ class TimmViTEncoder(nn.Module):
         encoder_kwargs = _merge_kwargs_no_duplicates(encoder_kwargs, kwargs)
         self.model = timm.create_model(name, **encoder_kwargs)
 
+        if not hasattr(self.model, "forward_intermediates"):
+            raise ValueError(
+                f"Encoder `{name}` does not support `forward_intermediates` for feature extraction. "
+                f"Please update `timm` or use another encoder."
+            )
+
         # Get all the necessary information about the model
         feature_info = self.model.feature_info
 
@@ -130,6 +136,14 @@ class TimmViTEncoder(nn.Module):
         self.output_stride = self.output_strides[-1]
         self.out_channels = [feature_info[i]["num_chs"] for i in output_indices]
         self.has_class_token = getattr(self.model, "has_class_token", False)
+
+    @property
+    def is_fixed_input_size(self) -> bool:
+        return self.model.pretrained_cfg.get("fixed_input_size", False)
+
+    @property
+    def input_size(self) -> int:
+        return self.model.pretrained_cfg.get("input_size", None)
 
     def _forward_with_cls_token(
         self, x: torch.Tensor

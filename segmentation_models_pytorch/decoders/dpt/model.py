@@ -23,6 +23,13 @@ class DPT(SegmentationModel):
     field at every stage. These properties allow the dense vision transformer to provide finer-grained and more globally coherent
     predictions when compared to fully-convolutional networks
 
+    Note:
+        Since this model uses a Vision Transformer backbone, it typically requires a fixed input image size.
+        To handle variable input sizes, you can set `dynamic_img_size=True` in the model initialization 
+        (if supported by the specific `timm` encoder). You can check if an encoder requires fixed size
+        using `model.encoder.is_fixed_input_size`, and get the required input dimensions from
+        `model.encoder.input_size`, however it's no guarantee that information is available.
+
     Args:
         encoder_name: Name of the classification model that will be used as an encoder (a.k.a backbone)
             to extract features of different spatial resolution
