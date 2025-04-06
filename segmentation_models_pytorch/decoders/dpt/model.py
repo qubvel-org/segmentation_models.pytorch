@@ -31,7 +31,14 @@ class DPT(SegmentationModel):
             Default is 4
         encoder_weights: One of **None** (random initialization), or other pretrained weights (see table with
             available weights for each encoder_name)
-        feature_dim : The latent dimension to which the encoder features will be projected to.
+        encoder_output_indices: The indices of the encoder output features to use. If **None** will be sampled uniformly
+            across the number of blocks in encoder, e.g. if number of blocks is 4 and encoder has 20 blocks, then
+            encoder_output_indices will be (4, 9, 14, 19). If specified the number of indices should be equal to
+            encoder_depth. Default is **None**.
+        decoder_intermediate_channels: The number of channels for the intermediate decoder layers. Reduce if you
+            want to reduce the number of parameters in the decoder. Default is (256, 512, 1024, 1024).
+        decoder_fusion_channels: The latent dimension to which the encoder features will be projected to before fusion.
+            Default is 256.
         in_channels: Number of input channels for the model, default is 3 (RGB images)
         classes: Number of classes for output mask (or you can think as a number of channels of output mask)
         activation: An activation function to apply after the final convolution layer.
@@ -138,23 +145,3 @@ class DPT(SegmentationModel):
             return masks, labels
 
         return masks
-
-
-def _get_feature_processing_out_channels(encoder_name: str) -> list[int]:
-    """
-    Get the output embedding dimensions for the features after decoder processing
-    """
-
-    encoder_name = encoder_name.lower()
-    # Output channels for hybrid ViT encoder after feature processing
-    if "vit" in encoder_name and "resnet" in encoder_name:
-        return [256, 512, 768, 768]
-
-    # Output channels for ViT-large,ViT-huge,ViT-giant encoders after feature processing
-    if "vit" in encoder_name and any(
-        [variant in encoder_name for variant in ["huge", "large", "giant"]]
-    ):
-        return [256, 512, 1024, 1024]
-
-    # Output channels for ViT-base and other encoders after feature processing
-    return [96, 192, 384, 768]
