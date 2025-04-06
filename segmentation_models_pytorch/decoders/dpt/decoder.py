@@ -180,7 +180,7 @@ class DPTDecoder(nn.Module):
 
     def __init__(
         self,
-        embed_dim: int,
+        encoder_out_channels: Sequence[int] = (756, 756, 756, 756),
         encoder_output_strides: Sequence[int] = (16, 16, 16, 16),
         intermediate_channels: Sequence[int] = (256, 512, 1024, 1024),
         fusion_channels: int = 256,
@@ -192,7 +192,7 @@ class DPTDecoder(nn.Module):
 
         # If encoder has cls token, then concatenate it with the features along the embedding dimension and project it
         # back to the feature_dim dimension. Else, ignore the non-existent cls token
-        blocks = [ProjectionBlock(embed_dim, has_cls_token) for _ in range(num_blocks)]
+        blocks = [ProjectionBlock(in_channels, has_cls_token) for in_channels in encoder_out_channels]
         self.readout_blocks = nn.ModuleList(blocks)
 
         # Upsample factors to resize features to [1/4, 1/8, 1/16, 1/32, ...] scales
@@ -200,12 +200,12 @@ class DPTDecoder(nn.Module):
             stride / 2 ** (i + 2) for i, stride in enumerate(encoder_output_strides)
         ]
         self.reassemble_blocks = nn.ModuleList()
-        for factor, mid_channels in zip(scale_factors, intermediate_channels):
+        for i in range(num_blocks):
             block = ReassembleBlock(
-                in_channels=embed_dim,
-                mid_channels=mid_channels,
+                in_channels=encoder_out_channels[i],
+                mid_channels=intermediate_channels[i],
                 out_channels=fusion_channels,
-                upsample_factor=factor,
+                upsample_factor=scale_factors[i],
             )
             self.reassemble_blocks.append(block)
 

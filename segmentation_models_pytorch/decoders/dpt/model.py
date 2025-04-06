@@ -97,7 +97,7 @@ class DPT(SegmentationModel):
         )
 
         self.decoder = DPTDecoder(
-            embed_dim=self.encoder.embed_dim,
+            encoder_out_channels=self.encoder.out_channels,
             intermediate_channels=decoder_intermediate_channels,
             fusion_channels=decoder_fusion_channels,
             encoder_output_strides=self.encoder.output_strides,

@@ -129,8 +129,36 @@ class TimmViTEncoder(nn.Module):
         self.output_strides = [feature_info[i]["reduction"] for i in output_indices]
         self.output_stride = self.output_strides[-1]
         self.out_channels = [feature_info[i]["num_chs"] for i in output_indices]
-        self.embed_dim = self.model.embed_dim
         self.has_class_token = getattr(self.model, "has_class_token", False)
+
+    def _forward_with_prefix_tokens(self, x: torch.Tensor) -> tuple[list[torch.Tensor], list[Optional[torch.Tensor]]]:
+        
+        intermediate_outputs = self.model.forward_intermediates(
+            x,
+            indices=self._output_indices,
+            return_prefix_tokens=True,
+            intermediates_only=True,
+        )
+
+        features = [output[0] for output in intermediate_outputs]
+        prefix_tokens = [output[1] for output in intermediate_outputs]
+
+        if self.has_class_token and self._num_prefix_tokens > 1:
+            cls_tokens = [x[:, 0, :] for x in prefix_tokens]
+        else:
+            cls_tokens = [None] * len(intermediate_outputs)
+
+        return features, cls_tokens
+    
+    def _forward_without_prefix_tokens(self, x: torch.Tensor) -> tuple[list[torch.Tensor], list[Optional[torch.Tensor]]]:
+        features = self.model.forward_intermediates(
+            x,
+            indices=self._output_indices,
+            intermediates_only=True,
+        )
+        cls_tokens = [None] * len(features)
+
+        return features, cls_tokens
 
     def forward(
         self, x: torch.Tensor
@@ -144,27 +172,8 @@ class TimmViTEncoder(nn.Module):
         Returns:
             tuple[list[torch.Tensor], list[torch.Tensor]]: Tuple of feature maps and cls tokens (if supported) at different scales.
         """
-        intermediate_outputs = self.model.forward_intermediates(
-            x,
-            indices=self._output_indices,
-            return_prefix_tokens=True,
-            intermediates_only=True,
-        )
-
-        # Split to features and prefix tokens
+        
         if self._num_prefix_tokens > 0:
-            features = [output[0] for output in intermediate_outputs]
-            prefix_tokens = [output[1] for output in intermediate_outputs]
+            return self._forward_with_prefix_tokens(x)
         else:
-            features = intermediate_outputs
-            prefix_tokens = None
-
-        # Get CLS token from prefix tokens
-        if self.has_class_token and self._num_prefix_tokens == 1:
-            cls_tokens = prefix_tokens
-        elif self.has_class_token and self._num_prefix_tokens > 1:
-            cls_tokens = [x[:, 0, :] for x in prefix_tokens]
-        else:
-            cls_tokens = [None] * len(self._output_indices)
-
-        return features, cls_tokens
+            return self._forward_without_prefix_tokens(x)
