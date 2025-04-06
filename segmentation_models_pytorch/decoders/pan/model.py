@@ -34,8 +34,7 @@ class PAN(SegmentationModel):
         classes: A number of classes for output mask (or you can think as a number of channels of output mask)
         activation: An activation function to apply after the final convolution layer.
             Available options are **"sigmoid"**, **"softmax"**, **"logsoftmax"**, **"tanh"**, **"identity"**,
-                **callable** and **None**.
-            Default is **None**
+            **callable** and **None**. Default is **None**.
         upsampling: Final upsampling factor. Default is 4 to preserve input-output spatial shape identity
         aux_params: Dictionary with parameters of the auxiliary output (classification head). Auxiliary output is build
             on top of encoder if **aux_params** is not **None** (default). Supported params:

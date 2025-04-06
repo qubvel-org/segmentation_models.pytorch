@@ -32,12 +32,13 @@ class DPT(SegmentationModel):
 
     Args:
         encoder_name: Name of the classification model that will be used as an encoder (a.k.a backbone)
-            to extract features of different spatial resolution
+            to extract features of different spatial resolution.
         encoder_depth: A number of stages used in encoder in range [1,4]. Each stage generate features
             smaller by a factor equal to the ViT model patch_size in spatial dimensions.
-            Default is 4
-        encoder_weights: One of **None** (random initialization), or other pretrained weights (see table with
-            available weights for each encoder_name)
+            Default is 4.
+        encoder_weights: One of **None** (random initialization), or not **None** (pretrained weights would be loaded
+            with respect to the encoder_name, e.g. for ``"tu-vit_base_patch16_224.augreg_in21k"`` - ``"augreg_in21k"``
+            weights would be loaded).
         encoder_output_indices: The indices of the encoder output features to use. If **None** will be sampled uniformly
             across the number of blocks in encoder, e.g. if number of blocks is 4 and encoder has 20 blocks, then
             encoder_output_indices will be (4, 9, 14, 19). If specified the number of indices should be equal to
@@ -50,8 +51,7 @@ class DPT(SegmentationModel):
         classes: Number of classes for output mask (or you can think as a number of channels of output mask)
         activation: An activation function to apply after the final convolution layer.
             Available options are **"sigmoid"**, **"softmax"**, **"logsoftmax"**, **"tanh"**, **"identity"**,
-                **callable** and **None**.
-            Default is **None**
+            **callable** and **None**. Default is **None**.
         aux_params: Dictionary with parameters of the auxiliary output (classification head). Auxiliary output is build
             on top of encoder if **aux_params** is not **None** (default). Supported params:
                 - classes (int): A number of classes
@@ -74,9 +74,9 @@ class DPT(SegmentationModel):
     @supports_config_loading
     def __init__(
         self,
-        encoder_name: str = "tu-vit_base_patch8_224",
+        encoder_name: str = "tu-vit_base_patch16_224.augreg_in21k",
         encoder_depth: int = 4,
-        encoder_weights: Optional[str] = None,
+        encoder_weights: Optional[str] = "imagenet",
         encoder_output_indices: Optional[list[int]] = None,
         decoder_intermediate_channels: Sequence[int] = (256, 512, 1024, 1024),
         decoder_fusion_channels: int = 256,
