@@ -81,3 +81,14 @@ Segformer
 ~~~~~~~~~
 .. autoclass:: segmentation_models_pytorch.Segformer
 
+
+.. _dpt:
+
+DPT
+~~~
+
+.. note::
+
+    See full list of DPT-compatible timm encoders in :ref:`dpt-encoders`.
+
+.. autoclass:: segmentation_models_pytorch.DPT
