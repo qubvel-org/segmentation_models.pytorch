@@ -72,7 +72,6 @@ class DPT(SegmentationModel):
         encoder_output_indices: Optional[list[int]] = None,
         decoder_intermediate_channels: Sequence[int] = (256, 512, 1024, 1024),
         decoder_fusion_channels: int = 256,
-        feature_dim: int = 256, # TODO: remove this
         in_channels: int = 3,
         classes: int = 1,
         activation: Optional[Union[str, Callable]] = None,

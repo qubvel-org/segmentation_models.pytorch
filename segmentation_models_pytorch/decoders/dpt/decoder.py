@@ -196,7 +196,7 @@ class DPTDecoder(nn.Module):
             ProjectionBlock(in_channels, has_cls_token)
             for in_channels in encoder_out_channels
         ]
-        self.readout_blocks = nn.ModuleList(blocks)
+        self.projection_blocks = nn.ModuleList(blocks)
 
         # Upsample factors to resize features to [1/4, 1/8, 1/16, 1/32, ...] scales
         scale_factors = [
@@ -222,8 +222,8 @@ class DPTDecoder(nn.Module):
         # Process the encoder features to scale of [1/4, 1/8, 1/16, 1/32, ...]
         processed_features = []
         for i, (feature, cls_token) in enumerate(zip(features, cls_tokens)):
-            readout_feature = self.readout_blocks[i](feature, cls_token)
-            processed_feature = self.reassemble_blocks[i](readout_feature)
+            projected_feature = self.projection_blocks[i](feature, cls_token)
+            processed_feature = self.reassemble_blocks[i](projected_feature)
             processed_features.append(processed_feature)
 
         # Fusion and progressive upsampling starting from the last processed feature

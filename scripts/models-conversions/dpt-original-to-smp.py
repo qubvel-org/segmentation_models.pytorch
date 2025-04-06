@@ -5,7 +5,7 @@ MODEL_WEIGHTS_PATH = r"dpt_large-ade20k-b12dca68.pt"
 HF_HUB_PATH = "qubvel-hf/dpt-large-ade20k"
 
 if __name__ == "__main__":
-    smp_model = smp.DPT(encoder_name="tu-vit_large_patch16_384", classes=150)
+    smp_model = smp.DPT(encoder_name="tu-vit_large_patch16_384", classes=150, dynamic_img_size=True)
     dpt_model_dict = torch.load(MODEL_WEIGHTS_PATH, weights_only=True)
 
     for layer_index in range(0, 4):
@@ -51,7 +51,7 @@ if __name__ == "__main__":
                 )
 
                 dpt_model_dict[
-                    f"decoder.readout_blocks.{layer_index}.project.0.{param}"
+                    f"decoder.projection_blocks.{layer_index}.project.0.{param}"
                 ] = dpt_model_dict.pop(
                     f"pretrained.act_postprocess{layer_index + 1}.0.project.0.{param}"
                 )
