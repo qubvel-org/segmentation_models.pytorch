@@ -21,7 +21,7 @@ Segmentation based on [PyTorch](https://pytorch.org/).**
 The main features of the library are:
 
  - Super simple high-level API (just two lines to create a neural network)
- - 11 encoder-decoder model architectures (Unet, Unet++, Segformer, ...)
+ - 12 encoder-decoder model architectures (Unet, Unet++, Segformer, DPT, ...)
  - 800+ **pretrained** convolution- and transform-based encoders, including [timm](https://github.com/huggingface/pytorch-image-models) support
  - Popular metrics and losses for training routines (Dice, Jaccard, Tversky, ...)
  - ONNX export and torch script/trace/compile friendly
@@ -123,6 +123,7 @@ Congratulations! You are done! Now you can train your model with your favorite f
  - DeepLabV3+ [[paper](https://arxiv.org/abs/1802.02611)] [[docs](https://smp.readthedocs.io/en/latest/models.html#id9)]
  - UPerNet [[paper](https://arxiv.org/abs/1807.10221)] [[docs](https://smp.readthedocs.io/en/latest/models.html#upernet)]
  - Segformer [[paper](https://arxiv.org/abs/2105.15203)] [[docs](https://smp.readthedocs.io/en/latest/models.html#segformer)]
+ - DPT [[paper](https://arxiv.org/abs/2103.13413)] [[docs](https://smp.readthedocs.io/en/latest/models.html#dpt)]
 
 ### Encoders <a name="encoders"></a>
 
