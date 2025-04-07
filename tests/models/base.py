@@ -99,6 +99,9 @@ class BaseModelTester(unittest.TestCase):
         if self.model_type in ["unet", "unetplusplus", "manet"]:
             kwargs = {"decoder_channels": self.decoder_channels[:depth]}
 
+        if self.model_type == "dpt":
+            kwargs = {"decoder_intermediate_channels": self.decoder_channels[:depth]}
+
         model = (
             smp.create_model(
                 arch=self.model_type,

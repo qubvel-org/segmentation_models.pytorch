@@ -1,4 +1,5 @@
 import pytest
+import inspect
 import torch
 import segmentation_models_pytorch as smp
 
@@ -21,6 +22,11 @@ class TestDPTModel(base.BaseModelTester):
     test_model_type = "dpt"
 
     compile_dynamic = False
+
+    @property
+    def decoder_channels(self):
+        signature = inspect.signature(self.model_class)
+        return signature.parameters["decoder_intermediate_channels"].default
 
     @property
     def hub_checkpoint(self):
