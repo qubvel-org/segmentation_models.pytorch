@@ -1,4 +1,6 @@
-from typing import Any, Optional, Union, Callable, Sequence
+import warnings
+from typing import Any, Optional, Union, Callable, Sequence, Literal
+
 import torch
 
 from segmentation_models_pytorch.base import (
@@ -43,6 +45,8 @@ class DPT(SegmentationModel):
             across the number of blocks in encoder, e.g. if number of blocks is 4 and encoder has 20 blocks, then
             encoder_output_indices will be (4, 9, 14, 19). If specified the number of indices should be equal to
             encoder_depth. Default is **None**.
+        decoder_readout: The strategy to utilize the prefix tokens (e.g. cls_token) from the encoder.
+            Can be one of **"cat"**, **"add"**, or **"ignore"**. Default is **"cat"**.
         decoder_intermediate_channels: The number of channels for the intermediate decoder layers. Reduce if you
             want to reduce the number of parameters in the decoder. Default is (256, 512, 1024, 1024).
         decoder_fusion_channels: The latent dimension to which the encoder features will be projected to before fusion.
@@ -78,6 +82,7 @@ class DPT(SegmentationModel):
         encoder_depth: int = 4,
         encoder_weights: Optional[str] = "imagenet",
         encoder_output_indices: Optional[list[int]] = None,
+        decoder_readout: Literal["ignore", "add", "cat"] = "cat",
         decoder_intermediate_channels: Sequence[int] = (256, 512, 1024, 1024),
         decoder_fusion_channels: int = 256,
         in_channels: int = 3,
@@ -94,6 +99,11 @@ class DPT(SegmentationModel):
                 f"Only Timm encoders are supported for DPT. Encoder name must start with 'tu-', got {encoder_name}"
             )
 
+        if decoder_readout not in ["ignore", "add", "cat"]:
+            raise ValueError(
+                f"Invalid decoder readout mode. Must be one of: 'ignore', 'add', 'cat'. Got: {decoder_readout}"
+            )
+
         self.encoder = TimmViTEncoder(
             name=encoder_name,
             in_channels=in_channels,
@@ -103,12 +113,20 @@ class DPT(SegmentationModel):
             **kwargs,
         )
 
+        if not self.encoder.has_prefix_tokens and decoder_readout != "ignore":
+            warnings.warn(
+                f"Encoder does not have prefix tokens (e.g. cls_token), but `decoder_readout` is set to '{decoder_readout}'. "
+                f"It's recommended to set `decoder_readout='ignore'` when using a encoder without prefix tokens.",
+                UserWarning,
+            )
+
         self.decoder = DPTDecoder(
             encoder_out_channels=self.encoder.out_channels,
+            encoder_output_strides=self.encoder.output_strides,
+            encoder_has_prefix_tokens=self.encoder.has_prefix_tokens,
+            readout=decoder_readout,
             intermediate_channels=decoder_intermediate_channels,
             fusion_channels=decoder_fusion_channels,
-            encoder_output_strides=self.encoder.output_strides,
-            has_cls_token=self.encoder.has_class_token,
         )
 
         self.segmentation_head = DPTSegmentationHead(

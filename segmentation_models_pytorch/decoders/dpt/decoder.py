@@ -1,18 +1,21 @@
 import torch
 import torch.nn as nn
 from segmentation_models_pytorch.base.modules import Activation
-from typing import Optional, Sequence, Union, Callable
+from typing import Optional, Sequence, Union, Callable, Literal
 
 
-class ProjectionBlock(nn.Module):
+class ReadoutConcatBlock(nn.Module):
     """
-    Concatenates the cls tokens with the features to make use of the global information aggregated in the cls token.
-    Projects the combined feature map to the original embedding dimension using a MLP
+    Concatenates the cls tokens with the features to make use of the global information aggregated in the prefix (cls) tokens.
+    Projects the combined feature map to the original embedding dimension using a MLP.
+
+    According to:
+        https://github.com/isl-org/DPT/blob/cd3fe90bb4c48577535cc4d51b602acca688a2ee/dpt/vit.py#L79-L90
     """
 
-    def __init__(self, embed_dim: int, has_cls_token: bool):
+    def __init__(self, embed_dim: int, has_prefix_tokens: bool):
         super().__init__()
-        in_features = embed_dim * 2 if has_cls_token else embed_dim
+        in_features = embed_dim * 2 if has_prefix_tokens else embed_dim
         out_features = embed_dim
         self.project = nn.Sequential(
             nn.Linear(in_features, out_features),
@@ -20,7 +23,7 @@ class ProjectionBlock(nn.Module):
         )
 
     def forward(
-        self, features: torch.Tensor, cls_token: Optional[torch.Tensor] = None
+        self, features: torch.Tensor, prefix_tokens: Optional[torch.Tensor] = None
     ) -> torch.Tensor:
         batch_size, embed_dim, height, width = features.shape
 
@@ -28,10 +31,10 @@ class ProjectionBlock(nn.Module):
         features = features.view(batch_size, embed_dim, -1)
         features = features.transpose(1, 2).contiguous()
 
-        # Add CLS token
-        if cls_token is not None:
-            cls_token = cls_token.expand_as(features)
-            features = torch.cat([features, cls_token], dim=2)
+        if prefix_tokens is not None:
+            # (batch_size, num_tokens, embed_dim) -> (batch_size, embed_dim)
+            prefix_tokens = prefix_tokens[:, 0].expand_as(features)
+            features = torch.cat([features, prefix_tokens], dim=2)
 
         # Project to embedding dimension
         features = self.project(features)
@@ -40,6 +43,34 @@ class ProjectionBlock(nn.Module):
         features = features.transpose(1, 2)
         features = features.view(batch_size, -1, height, width)
 
+        return features
+
+
+class ReadoutAddBlock(nn.Module):
+    """
+    Adds the prefix tokens to the features to make use of the global information aggregated in the prefix (cls) tokens.
+
+    According to:
+        https://github.com/isl-org/DPT/blob/cd3fe90bb4c48577535cc4d51b602acca688a2ee/dpt/vit.py#L71-L76
+    """
+
+    def forward(
+        self, features: torch.Tensor, prefix_tokens: Optional[torch.Tensor] = None
+    ) -> torch.Tensor:
+        if prefix_tokens is not None:
+            batch_size, embed_dim, height, width = features.shape
+            prefix_tokens = prefix_tokens.mean(dim=1)
+            prefix_tokens = prefix_tokens.view(batch_size, embed_dim, 1, 1)
+            features = features + prefix_tokens
+        return features
+
+
+class ReadoutIgnoreBlock(nn.Module):
+    """
+    Ignores the prefix tokens and returns the features as is.
+    """
+
+    def forward(self, features: torch.Tensor, *args, **kwargs) -> torch.Tensor:
         return features
 
 
@@ -182,20 +213,30 @@ class DPTDecoder(nn.Module):
         self,
         encoder_out_channels: Sequence[int] = (756, 756, 756, 756),
         encoder_output_strides: Sequence[int] = (16, 16, 16, 16),
+        encoder_has_prefix_tokens: bool = True,
+        readout: Literal["cat", "add", "ignore"] = "cat",
         intermediate_channels: Sequence[int] = (256, 512, 1024, 1024),
         fusion_channels: int = 256,
-        has_cls_token: bool = False,
     ):
         super().__init__()
 
         num_blocks = len(encoder_output_strides)
 
-        # If encoder has cls token, then concatenate it with the features along the embedding dimension and project it
-        # back to the feature_dim dimension. Else, ignore the non-existent cls token
-        blocks = [
-            ProjectionBlock(in_channels, has_cls_token)
-            for in_channels in encoder_out_channels
-        ]
+        # If encoder has prefix tokens (e.g. cls_token), then we can concat/add/ignore them
+        # according to the readout mode
+        if readout == "cat":
+            blocks = [
+                ReadoutConcatBlock(in_channels, encoder_has_prefix_tokens)
+                for in_channels in encoder_out_channels
+            ]
+        elif readout == "add":
+            blocks = [ReadoutAddBlock() for _ in encoder_out_channels]
+        elif readout == "ignore":
+            blocks = [ReadoutIgnoreBlock() for _ in encoder_out_channels]
+        else:
+            raise ValueError(
+                f"Invalid readout mode: {readout}, should be one of: 'cat', 'add', 'ignore'"
+            )
         self.projection_blocks = nn.ModuleList(blocks)
 
         # Upsample factors to resize features to [1/4, 1/8, 1/16, 1/32, ...] scales

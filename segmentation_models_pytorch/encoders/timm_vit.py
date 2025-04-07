@@ -129,13 +129,14 @@ class TimmViTEncoder(nn.Module):
 
         # Private attributes for model forward
         self._num_prefix_tokens = getattr(self.model, "num_prefix_tokens", 0)
+        self._has_cls_token = getattr(self.model, "has_cls_token", False)
         self._output_indices = output_indices
 
         # Public attributes
         self.output_strides = [feature_info[i]["reduction"] for i in output_indices]
         self.output_stride = self.output_strides[-1]
         self.out_channels = [feature_info[i]["num_chs"] for i in output_indices]
-        self.has_class_token = getattr(self.model, "has_class_token", False)
+        self.has_prefix_tokens = self._num_prefix_tokens > 0
 
     @property
     def is_fixed_input_size(self) -> bool:
@@ -145,25 +146,22 @@ class TimmViTEncoder(nn.Module):
     def input_size(self) -> int:
         return self.model.pretrained_cfg.get("input_size", None)
 
-    def _forward_with_cls_token(
+    def _forward_with_prefix_tokens(
         self, x: torch.Tensor
     ) -> tuple[list[torch.Tensor], list[torch.Tensor]]:
         intermediate_outputs = self.model.forward_intermediates(
             x,
             indices=self._output_indices,
-            return_prefix_tokens=True,
             intermediates_only=True,
+            return_prefix_tokens=True,
         )
 
         features = [output[0] for output in intermediate_outputs]
-        cls_tokens = [output[1] for output in intermediate_outputs]
+        prefix_tokens = [output[1] for output in intermediate_outputs]
 
-        if self.has_class_token and self._num_prefix_tokens > 1:
-            cls_tokens = [x[:, 0, :] for x in cls_tokens]
+        return features, prefix_tokens
 
-        return features, cls_tokens
-
-    def _forward_without_cls_token(self, x: torch.Tensor) -> list[torch.Tensor]:
+    def _forward_without_prefix_tokens(self, x: torch.Tensor) -> list[torch.Tensor]:
         features = self.model.forward_intermediates(
             x,
             indices=self._output_indices,
@@ -184,10 +182,10 @@ class TimmViTEncoder(nn.Module):
             tuple[list[torch.Tensor], list[torch.Tensor]]: Tuple of feature maps and cls tokens (if supported) at different scales.
         """
 
-        if self.has_class_token:
-            features, cls_tokens = self._forward_with_cls_token(x)
+        if self.has_prefix_tokens:
+            features, prefix_tokens = self._forward_with_prefix_tokens(x)
         else:
             features = self._forward_without_cls_token(x)
-            cls_tokens = [None] * len(features)
+            prefix_tokens = [None] * len(features)
 
-        return features, cls_tokens
+        return features, prefix_tokens
