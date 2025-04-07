@@ -24,6 +24,7 @@ from .mix_transformer import mix_transformer_encoders
 from .mobileone import mobileone_encoders
 
 from .timm_universal import TimmUniversalEncoder
+from .timm_vit import TimmViTEncoder  # noqa F401
 
 from ._preprocessing import preprocess_input
 from ._legacy_pretrained_settings import pretrained_settings

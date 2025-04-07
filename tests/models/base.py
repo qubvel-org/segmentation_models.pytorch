@@ -33,6 +33,8 @@ class BaseModelTester(unittest.TestCase):
     default_height = 64
     default_width = 64
 
+    compile_dynamic = True
+
     @property
     def model_type(self):
         if self.test_model_type is None:
@@ -96,6 +98,9 @@ class BaseModelTester(unittest.TestCase):
 
         if self.model_type in ["unet", "unetplusplus", "manet"]:
             kwargs = {"decoder_channels": self.decoder_channels[:depth]}
+
+        if self.model_type == "dpt":
+            kwargs = {"decoder_intermediate_channels": self.decoder_channels[:depth]}
 
         model = (
             smp.create_model(
@@ -231,11 +236,18 @@ class BaseModelTester(unittest.TestCase):
         model = self.get_default_model()
         model = model.eval().to(default_device)
 
+        if not model._is_torch_compilable:
+            with self.assertRaises((RuntimeError)):
+                torch.compiler.reset()
+                compiled_model = torch.compile(
+                    model, fullgraph=True, dynamic=self.compile_dynamic, backend="eager"
+                )
+            return
+
         torch.compiler.reset()
         compiled_model = torch.compile(
-            model, fullgraph=True, dynamic=True, backend="eager"
+            model, fullgraph=True, dynamic=self.compile_dynamic, backend="eager"
         )
-
         with torch.inference_mode():
             compiled_model(sample)
 
