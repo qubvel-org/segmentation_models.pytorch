@@ -20,15 +20,20 @@ class TestDPTModel(base.BaseModelTester):
     # should be overriden
     test_model_type = "dpt"
 
+    compile_dynamic = False
+
     @property
     def hub_checkpoint(self):
-        return "smp-hub/dpt-large-ade20k"
+        return "smp-test-models/dpt-tu-test_vit"
 
     @slow_test
     @requires_torch_greater_or_equal("2.0.1")
     @pytest.mark.logits_match
-    def test_preserve_forward_output(self):
-        model = smp.from_pretrained(self.hub_checkpoint).eval().to(default_device)
+    def test_load_pretrained(self):
+        hub_checkpoint = "smp-hub/dpt-large-ade20k"
+
+        model = smp.from_pretrained(hub_checkpoint)
+        model = model.eval().to(default_device)
 
         input_tensor = torch.ones((1, 3, 384, 384))
         input_tensor = input_tensor.to(default_device)
