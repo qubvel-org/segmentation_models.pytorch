@@ -2,6 +2,6 @@ gitpython==3.1.44
 packaging==24.2
 pytest==8.3.5
 pytest-xdist==3.6.1
-pytest-cov==6.1.0
+pytest-cov==6.1.1
 ruff==0.11.4
 setuptools==78.1.0
