@@ -61,9 +61,10 @@ class TimmViTEncoder(nn.Module):
         - Ensures consistent multi-level feature extraction across all ViT models.
     """
 
+    # prefix tokens are not supported for scripting
     _is_torch_scriptable = False
     _is_torch_exportable = True
-    _is_torch_compilable = False
+    _is_torch_compilable = True
 
     def __init__(
         self,
@@ -87,10 +88,8 @@ class TimmViTEncoder(nn.Module):
         """
         super().__init__()
 
-        if depth > 4 or depth < 1:
-            raise ValueError(
-                f"{self.__class__.__name__} depth should be in range [1, 4], got {depth}"
-            )
+        if depth < 1:
+            raise ValueError(f"`encoder_depth` should be greater than 1, got {depth}.")
 
         # Output stride validation needed for smp encoder test consistency
         output_stride = kwargs.pop("output_stride", None)
@@ -142,14 +141,10 @@ class TimmViTEncoder(nn.Module):
         self.output_stride = self.output_strides[-1]
         self.out_channels = [feature_info[i]["num_chs"] for i in output_indices]
         self.has_prefix_tokens = self._num_prefix_tokens > 0
-
-    @property
-    def is_fixed_input_size(self) -> bool:
-        return self.model.pretrained_cfg.get("fixed_input_size", False)
-
-    @property
-    def input_size(self) -> int:
-        return self.model.pretrained_cfg.get("input_size", None)
+        self.input_size = self.model.pretrained_cfg.get("input_size", None)
+        self.is_fixed_input_size = self.model.pretrained_cfg.get(
+            "fixed_input_size", False
+        )
 
     def _forward_with_prefix_tokens(
         self, x: torch.Tensor
