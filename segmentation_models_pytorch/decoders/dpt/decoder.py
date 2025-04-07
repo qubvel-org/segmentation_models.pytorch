@@ -220,7 +220,16 @@ class DPTDecoder(nn.Module):
     ):
         super().__init__()
 
-        num_blocks = len(encoder_output_strides)
+        if not (
+            len(encoder_out_channels)
+            == len(encoder_output_strides)
+            == len(intermediate_channels)
+        ):
+            raise ValueError(
+                "encoder_out_channels, encoder_output_strides and intermediate_channels must have the same length"
+            )
+
+        num_blocks = len(encoder_out_channels)
 
         # If encoder has prefix tokens (e.g. cls_token), then we can concat/add/ignore them
         # according to the readout mode
@@ -269,12 +278,9 @@ class DPTDecoder(nn.Module):
 
         # Fusion and progressive upsampling starting from the last processed feature
         processed_features = processed_features[::-1]
-        for i, fusion_block in enumerate(self.fusion_blocks):
-            processed_feature = processed_features[i]
-            if i == 0:
-                fused_feature = fusion_block(processed_feature)
-            else:
-                fused_feature = fusion_block(processed_feature, fused_feature)
+        fused_feature = None
+        for fusion_block, feature in zip(self.fusion_blocks, processed_features):
+            fused_feature = fusion_block(feature, fused_feature)
 
         return fused_feature
 
