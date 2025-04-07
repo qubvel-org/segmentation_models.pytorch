@@ -22,7 +22,7 @@ class TestDPTModel(base.BaseModelTester):
 
     @property
     def hub_checkpoint(self):
-        return "vedantdalimkar/DPT"
+        return "smp-hub/dpt-large-ade20k"
 
     @slow_test
     @requires_torch_greater_or_equal("2.0.1")

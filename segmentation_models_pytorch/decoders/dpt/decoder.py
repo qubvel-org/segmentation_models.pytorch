@@ -258,21 +258,23 @@ class DPTDecoder(nn.Module):
         self.fusion_blocks = nn.ModuleList(fusion_blocks)
 
     def forward(
-        self, features: list[torch.Tensor], cls_tokens: list[Optional[torch.Tensor]]
+        self, features: list[torch.Tensor], prefix_tokens: list[Optional[torch.Tensor]]
     ) -> torch.Tensor:
         # Process the encoder features to scale of [1/4, 1/8, 1/16, 1/32, ...]
         processed_features = []
-        for i, (feature, cls_token) in enumerate(zip(features, cls_tokens)):
-            projected_feature = self.projection_blocks[i](feature, cls_token)
+        for i, (feature, prefix_tokens_i) in enumerate(zip(features, prefix_tokens)):
+            projected_feature = self.projection_blocks[i](feature, prefix_tokens_i)
             processed_feature = self.reassemble_blocks[i](projected_feature)
             processed_features.append(processed_feature)
 
         # Fusion and progressive upsampling starting from the last processed feature
-        previous_feature = None
         processed_features = processed_features[::-1]
-        for fusion_block, feature in zip(self.fusion_blocks, processed_features):
-            fused_feature = fusion_block(feature, previous_feature)
-            previous_feature = fused_feature
+        for i, fusion_block in enumerate(self.fusion_blocks):
+            processed_feature = processed_features[i]
+            if i == 0:
+                fused_feature = fusion_block(processed_feature)
+            else:
+                fused_feature = fusion_block(processed_feature, fused_feature)
 
         return fused_feature
 

@@ -71,7 +71,8 @@ class DPT(SegmentationModel):
 
     """
 
-    _is_torch_scriptable = True
+    # fails for encoders with prefix tokens
+    _is_torch_scriptable = False
     _is_torch_compilable = True
     requires_divisible_input_shape = True
 
@@ -155,8 +156,8 @@ class DPT(SegmentationModel):
         ):
             self.check_input_shape(x)
 
-        features, cls_tokens = self.encoder(x)
-        decoder_output = self.decoder(features, cls_tokens)
+        features, prefix_tokens = self.encoder(x)
+        decoder_output = self.decoder(features, prefix_tokens)
         masks = self.segmentation_head(decoder_output)
 
         if self.classification_head is not None:
