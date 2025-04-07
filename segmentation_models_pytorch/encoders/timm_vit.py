@@ -92,6 +92,11 @@ class TimmViTEncoder(nn.Module):
                 f"{self.__class__.__name__} depth should be in range [1, 4], got {depth}"
             )
 
+        # Output stride validation needed for smp encoder test consistency
+        output_stride = kwargs.pop("output_stride", None)
+        if output_stride is not None:
+            raise ValueError("Dilated mode not supported, set output stride to None")
+
         if isinstance(output_indices, (list, tuple)) and len(output_indices) != depth:
             raise ValueError(
                 f"Length of output indices for feature extraction should be equal to the depth of the encoder "
@@ -185,7 +190,7 @@ class TimmViTEncoder(nn.Module):
         if self.has_prefix_tokens:
             features, prefix_tokens = self._forward_with_prefix_tokens(x)
         else:
-            features = self._forward_without_cls_token(x)
+            features = self._forward_without_prefix_tokens(x)
             prefix_tokens = [None] * len(features)
 
         return features, prefix_tokens

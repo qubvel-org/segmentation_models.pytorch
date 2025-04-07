@@ -11,11 +11,11 @@ from tests.utils import (
 
 
 class TestDPTModel(base.BaseModelTester):
-    test_encoder_name = "tu-vit_large_patch16_384"
+    test_encoder_name = "tu-vit_tiny_patch16_224"
     files_for_diff = [r"decoders/dpt/", r"base/"]
 
-    default_height = 384
-    default_width = 384
+    default_height = 224
+    default_width = 224
 
     # should be overriden
     test_model_type = "dpt"

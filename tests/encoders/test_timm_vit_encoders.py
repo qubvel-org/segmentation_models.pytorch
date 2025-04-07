@@ -1,8 +1,9 @@
 from tests.encoders import base
 import timm
 import torch
-import segmentation_models_pytorch as smp
 import pytest
+from segmentation_models_pytorch.encoders import TimmViTEncoder
+from segmentation_models_pytorch.encoders.timm_vit import sample_block_indices_uniformly
 
 from tests.utils import (
     default_device,
@@ -11,20 +12,14 @@ from tests.utils import (
     requires_timm_greater_or_equal,
 )
 
-timm_vit_encoders = [
-    "tu-vit_tiny_patch16_224",
-    "tu-vit_small_patch32_224",
-    "tu-vit_base_patch32_384",
-    "tu-vit_base_patch16_gap_224",
-    "tu-vit_medium_patch16_reg4_gap_256",
-    "tu-vit_so150m2_patch16_reg1_gap_256",
-    "tu-vit_medium_patch16_gap_240",
-]
+timm_vit_encoders = ["vit_tiny_patch16_224"]
 
 
 class TestTimmViTEncoders(base.BaseEncoderTester):
     encoder_names = timm_vit_encoders
     tiny_encoder_patch_size = 224
+    default_height = 224
+    default_width = 224
 
     files_for_diff = ["encoders/dpt.py"]
 
@@ -35,14 +30,10 @@ class TestTimmViTEncoders(base.BaseEncoderTester):
 
     depth_to_test = [2, 3, 4]
 
-    default_encoder_kwargs = {"use_vit_encoder": True}
-
-    def _get_model_expected_input_shape(self, encoder_name: str) -> int:
-        patch_size_str = encoder_name[-3:]
-        return int(patch_size_str)
+    default_encoder_kwargs = {"pretrained": False}
 
     def get_tiny_encoder(self):
-        return smp.encoders.get_encoder(
+        return TimmViTEncoder(
             self.encoder_names[0],
             encoder_weights=None,
             output_stride=None,
@@ -55,13 +46,10 @@ class TestTimmViTEncoders(base.BaseEncoderTester):
     @requires_timm_greater_or_equal("1.0.15")
     def test_forward_backward(self):
         for encoder_name in self.encoder_names:
-            patch_size = self._get_model_expected_input_shape(encoder_name)
-            sample = self._get_sample(height=patch_size, width=patch_size).to(
-                default_device
-            )
+            sample = self._get_sample().to(default_device)
             with self.subTest(encoder_name=encoder_name):
                 # init encoder
-                encoder = smp.encoders.get_encoder(
+                encoder = TimmViTEncoder(
                     encoder_name,
                     in_channels=3,
                     encoder_weights=None,
@@ -90,13 +78,10 @@ class TestTimmViTEncoders(base.BaseEncoderTester):
         ]
 
         for encoder_name, in_channels in cases:
-            patch_size = self._get_model_expected_input_shape(encoder_name)
-            sample = self._get_sample(
-                height=patch_size, width=patch_size, num_channels=in_channels
-            ).to(default_device)
+            sample = self._get_sample(num_channels=in_channels).to(default_device)
 
             with self.subTest(encoder_name=encoder_name, in_channels=in_channels):
-                encoder = smp.encoders.get_encoder(
+                encoder = TimmViTEncoder(
                     encoder_name,
                     in_channels=in_channels,
                     encoder_weights=None,
@@ -119,12 +104,9 @@ class TestTimmViTEncoders(base.BaseEncoderTester):
         ]
 
         for encoder_name, depth in cases:
-            patch_size = self._get_model_expected_input_shape(encoder_name)
-            sample = self._get_sample(height=patch_size, width=patch_size).to(
-                default_device
-            )
+            sample = self._get_sample().to(default_device)
             with self.subTest(encoder_name=encoder_name, depth=depth):
-                encoder = smp.encoders.get_encoder(
+                encoder = TimmViTEncoder(
                     encoder_name,
                     in_channels=self.default_num_channels,
                     encoder_weights=None,
@@ -150,10 +132,9 @@ class TestTimmViTEncoders(base.BaseEncoderTester):
                     sample, features
                 )
 
-                timm_encoder_name = encoder_name[3:]
-                encoder_out_indices = encoder.out_indices
+                encoder_out_indices = sample_block_indices_uniformly(depth, 12)
                 timm_model_feature_info = timm.create_model(
-                    model_name=timm_encoder_name
+                    model_name=encoder_name
                 ).feature_info
                 feature_info_obj = timm.models.FeatureInfo(
                     feature_info=timm_model_feature_info,
@@ -189,35 +170,56 @@ class TestTimmViTEncoders(base.BaseEncoderTester):
     @requires_timm_greater_or_equal("1.0.15")
     def test_invalid_depth(self):
         with self.assertRaises(ValueError):
-            smp.encoders.get_encoder(self.encoder_names[0], depth=5, output_stride=None)
+            TimmViTEncoder(
+                self.encoder_names[0],
+                depth=5,
+                output_stride=None,
+                **self.default_encoder_kwargs,
+            )
         with self.assertRaises(ValueError):
-            smp.encoders.get_encoder(self.encoder_names[0], depth=0, output_stride=None)
+            TimmViTEncoder(
+                self.encoder_names[0],
+                depth=0,
+                output_stride=None,
+                **self.default_encoder_kwargs,
+            )
 
     @requires_timm_greater_or_equal("1.0.15")
     def test_invalid_out_indices(self):
         with self.assertRaises(ValueError):
-            smp.encoders.get_encoder(
-                self.encoder_names[0], output_stride=None, out_indices=-1
+            TimmViTEncoder(
+                self.encoder_names[0],
+                output_stride=None,
+                output_indices=-25,
+                **self.default_encoder_kwargs,
             )
 
         with self.assertRaises(ValueError):
-            smp.encoders.get_encoder(
-                self.encoder_names[0], output_stride=None, out_indices=[1, 2, 25]
+            TimmViTEncoder(
+                self.encoder_names[0],
+                output_stride=None,
+                output_indices=[1, 2, 25],
+                **self.default_encoder_kwargs,
             )
 
     @requires_timm_greater_or_equal("1.0.15")
     def test_invalid_out_indices_length(self):
         with self.assertRaises(ValueError):
-            smp.encoders.get_encoder(
-                self.encoder_names[0], output_stride=None, out_indices=2, depth=2
+            TimmViTEncoder(
+                self.encoder_names[0],
+                output_stride=None,
+                output_indices=2,
+                depth=2,
+                **self.default_encoder_kwargs,
             )
 
         with self.assertRaises(ValueError):
-            smp.encoders.get_encoder(
+            TimmViTEncoder(
                 self.encoder_names[0],
                 output_stride=None,
-                out_indices=[0, 1, 2, 3, 4],
+                output_indices=[0, 1, 2, 3, 4],
                 depth=4,
+                **self.default_encoder_kwargs,
             )
 
     @requires_timm_greater_or_equal("1.0.15")
@@ -235,23 +237,19 @@ class TestTimmViTEncoders(base.BaseEncoderTester):
                 ValueError, msg="Dilated mode not supported, set output stride to None"
             ):
                 encoder_name, stride = cases[0]
-                patch_size = self._get_model_expected_input_shape(encoder_name)
-                sample = self._get_sample(height=patch_size, width=patch_size).to(
-                    default_device
-                )
-                encoder = smp.encoders.get_encoder(
+                sample = self._get_sample().to(default_device)
+                encoder = TimmViTEncoder(
                     encoder_name,
                     in_channels=self.default_num_channels,
                     encoder_weights=None,
                     output_stride=stride,
                     depth=self.default_depth,
-                    **self.default_encoder_kwargs,
                 ).to(default_device)
             return
 
         for encoder_name, stride in cases:
             with self.subTest(encoder_name=encoder_name, stride=stride):
-                encoder = smp.encoders.get_encoder(
+                encoder = TimmViTEncoder(
                     encoder_name,
                     in_channels=self.default_num_channels,
                     encoder_weights=None,

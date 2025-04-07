@@ -71,8 +71,8 @@ class DPT(SegmentationModel):
 
     """
 
-    _is_torch_scriptable = False
-    _is_torch_compilable = False
+    _is_torch_scriptable = True
+    _is_torch_compilable = True
     requires_divisible_input_shape = True
 
     @supports_config_loading
