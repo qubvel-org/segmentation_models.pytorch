@@ -29,6 +29,7 @@ class Segformer(SegmentationModel):
         activation: An activation function to apply after the final convolution layer.
             Available options are **"sigmoid"**, **"softmax"**, **"logsoftmax"**, **"tanh"**, **"identity"**,
             **callable** and **None**. Default is **None**.
+        upsampling: A number to upsample the output of the model, default is 4 (same size as input)
         aux_params: Dictionary with parameters of the auxiliary output (classification head). Auxiliary output is build
             on top of encoder if **aux_params** is not **None** (default). Supported params:
                 - classes (int): A number of classes
