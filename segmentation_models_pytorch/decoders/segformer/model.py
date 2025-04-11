@@ -56,6 +56,7 @@ class Segformer(SegmentationModel):
         in_channels: int = 3,
         classes: int = 1,
         activation: Optional[Union[str, Callable]] = None,
+        upsampling: int = 4,
         aux_params: Optional[dict] = None,
         **kwargs: dict[str, Any],
     ):
@@ -80,7 +81,7 @@ class Segformer(SegmentationModel):
             out_channels=classes,
             activation=activation,
             kernel_size=1,
-            upsampling=4,
+            upsampling=upsampling,
         )
 
         if aux_params is not None:
