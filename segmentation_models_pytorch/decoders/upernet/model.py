@@ -63,8 +63,6 @@ class UPerNet(SegmentationModel):
 
     """
 
-    _is_torch_scriptable = False
-
     @supports_config_loading
     def __init__(
         self,

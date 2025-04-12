@@ -1,4 +1,4 @@
-from typing import Any, Dict, Union, Sequence
+from typing import Any, Dict, Union, Sequence, List
 
 import torch
 import torch.nn as nn
@@ -57,7 +57,9 @@ class PSPModule(nn.Module):
 class LayerNorm2d(nn.LayerNorm):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = x.permute(0, 2, 3, 1)  # to channels_last
-        normed_x = super().forward(x)
+        normed_x = nn.functional.layer_norm(
+            x, self.normalized_shape, self.weight, self.bias, self.eps
+        )
         normed_x = normed_x.permute(0, 3, 1, 2)  # to channels_first
         return normed_x
 
@@ -158,10 +160,10 @@ class UPerNetDecoder(nn.Module):
             use_norm=use_norm,
         )
 
-    def forward(self, features: Sequence[torch.Tensor]) -> torch.Tensor:
+    def forward(self, features: List[torch.Tensor]) -> torch.Tensor:
         """
         Args:
-            features (Sequence[torch.Tensor]):
+            features (List[torch.Tensor]):
                 features with: [1, 1/2, 1/4, 1/8, 1/16, ...] spatial resolutions,
                 where the first feature is the highest resolution and the number
                 of features is equal to encoder_depth + 1.
@@ -171,24 +173,23 @@ class UPerNetDecoder(nn.Module):
         features = features[2:]
 
         # normalize feature maps
-        features = [
-            self.feature_norms[i](feature) for i, feature in enumerate(features)
-        ]
+        for i, norm in enumerate(self.feature_norms):
+            features[i] = norm(features[i])
 
         # pass lowest resolution feature to PSP module
         psp_out = self.psp(features[-1])
 
         # skip lowest features for FPN + reverse the order
         # [1/4, 1/8, 1/16, 1/32] -> [1/16, 1/8, 1/4]
-        fpn_encoder_features = features[:-1][::-1]
+        fpn_lateral_features = features[:-1][::-1]
         fpn_features = [psp_out]
-        for fpn_encoder_feature, block in zip(
-            fpn_encoder_features, self.fpn_lateral_blocks
-        ):
+        for i, block in enumerate(self.fpn_lateral_blocks):
             # 1. for each encoder (skip) feature we apply 1x1 ConvNormRelu,
             # 2. upsample latest fpn feature to it's resolution
             # 3. sum them together
-            fpn_feature = block(fpn_features[-1], fpn_encoder_feature)
+            lateral_feature = fpn_lateral_features[i]
+            state_feature = fpn_features[-1]
+            fpn_feature = block(state_feature, lateral_feature)
             fpn_features.append(fpn_feature)
 
         # Apply FPN conv blocks, but skip PSP module
