@@ -130,9 +130,9 @@ class TimmUniversalEncoder(nn.Module):
                 # Most transformer-like models use out_indices=(0, 1, 2, 3) for depth=5.
                 common_kwargs["out_indices"] = tuple(range(depth - 1))
 
-            self.model = timm.create_model(
-                name, **_merge_kwargs_no_duplicates(common_kwargs, kwargs)
-            )
+            timm_model_kwargs = _merge_kwargs_no_duplicates(common_kwargs, kwargs)
+            self.model = timm.create_model(name, **timm_model_kwargs)
+
             # Add a dummy output channel (0) to align with traditional encoder structures.
             self._out_channels = (
                 [in_channels] + [0] + self.model.feature_info.channels()
