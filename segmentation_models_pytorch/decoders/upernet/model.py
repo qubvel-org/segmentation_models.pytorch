@@ -63,20 +63,18 @@ class UPerNet(SegmentationModel):
 
     """
 
-    _is_torch_scriptable = False
-
     @supports_config_loading
     def __init__(
         self,
         encoder_name: str = "resnet34",
         encoder_depth: int = 5,
         encoder_weights: Optional[str] = "imagenet",
-        decoder_pyramid_channels: int = 256,
-        decoder_segmentation_channels: int = 64,
+        decoder_channels: int = 256,
         decoder_use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
         in_channels: int = 3,
         classes: int = 1,
         activation: Optional[Union[str, Callable]] = None,
+        upsampling: int = 4,
         aux_params: Optional[dict] = None,
         **kwargs: dict[str, Any],
     ):
@@ -93,17 +91,16 @@ class UPerNet(SegmentationModel):
         self.decoder = UPerNetDecoder(
             encoder_channels=self.encoder.out_channels,
             encoder_depth=encoder_depth,
-            pyramid_channels=decoder_pyramid_channels,
-            segmentation_channels=decoder_segmentation_channels,
+            decoder_channels=decoder_channels,
             use_norm=decoder_use_norm,
         )
 
         self.segmentation_head = SegmentationHead(
-            in_channels=decoder_segmentation_channels,
+            in_channels=decoder_channels,
             out_channels=classes,
             activation=activation,
             kernel_size=1,
-            upsampling=4,
+            upsampling=upsampling,
         )
 
         if aux_params is not None:
