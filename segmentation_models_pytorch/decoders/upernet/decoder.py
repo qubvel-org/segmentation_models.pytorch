@@ -82,15 +82,12 @@ class FPNLateralBlock(nn.Module):
     ) -> torch.Tensor:
         # 1. Apply block to encoder feature
         lateral_feature = self.conv_norm_relu(lateral_feature)
-        # print("lateral_feature", lateral_feature.shape, lateral_feature.min(), lateral_feature.max(), lateral_feature.mean(), lateral_feature.std())
         # 2. Upsample encoder feature to the "state" feature resolution
         _, _, height, width = lateral_feature.shape
-        # print("current feature", state_feature.shape, state_feature.min(), state_feature.max(), state_feature.mean(), state_feature.std())
         state_feature = F.interpolate(
             state_feature, size=(height, width), mode="bilinear", align_corners=False
         )
         # 3. Sum state and encoder features
-        # print("Fusion::", state_feature.shape, state_feature.max(), lateral_feature.max())
         fused_feature = state_feature + lateral_feature
         return fused_feature
 
@@ -178,26 +175,8 @@ class UPerNetDecoder(nn.Module):
             self.feature_norms[i](feature) for i, feature in enumerate(features)
         ]
 
-        for i, feature in enumerate(features):
-            print(
-                f"Encoder feature {i}",
-                feature.shape,
-                feature.min(),
-                feature.max(),
-                feature.mean(),
-                feature.std(),
-            )
-
         # pass lowest resolution feature to PSP module
         psp_out = self.psp(features[-1])
-        print(
-            "psp_out",
-            psp_out.shape,
-            psp_out.min(),
-            psp_out.max(),
-            psp_out.mean(),
-            psp_out.std(),
-        )
 
         # skip lowest features for FPN + reverse the order
         # [1/4, 1/8, 1/16, 1/32] -> [1/16, 1/8, 1/4]
@@ -212,29 +191,9 @@ class UPerNetDecoder(nn.Module):
             fpn_feature = block(fpn_features[-1], fpn_encoder_feature)
             fpn_features.append(fpn_feature)
 
-        for i, fpn_feature in enumerate(fpn_features[::-1]):
-            print(
-                f"fpn_feature (before conv) {i}",
-                fpn_feature.shape,
-                fpn_feature.min(),
-                fpn_feature.max(),
-                fpn_feature.mean(),
-                fpn_feature.std(),
-            )
-
         # Apply FPN conv blocks, but skip PSP module
         for i, conv_block in enumerate(self.fpn_conv_blocks, start=1):
             fpn_features[i] = conv_block(fpn_features[i])
-
-        for i, fpn_feature in enumerate(fpn_features[::-1]):
-            print(
-                f"fpn_feature (after conv) {i}",
-                fpn_feature.shape,
-                fpn_feature.min(),
-                fpn_feature.max(),
-                fpn_feature.mean(),
-                fpn_feature.std(),
-            )
 
         # Resize all FPN features to 1/4 of the original resolution.
         resized_fpn_features = []
@@ -247,21 +206,5 @@ class UPerNetDecoder(nn.Module):
 
         # reverse and concatenate
         stacked_features = torch.cat(resized_fpn_features[::-1], dim=1)
-        print(
-            "stacked_features",
-            stacked_features.shape,
-            stacked_features.min(),
-            stacked_features.max(),
-            stacked_features.mean(),
-            stacked_features.std(),
-        )
         output = self.fusion_block(stacked_features)
-        print(
-            "fusion_block",
-            output.shape,
-            output.min(),
-            output.max(),
-            output.mean(),
-            output.std(),
-        )
         return output
