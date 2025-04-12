@@ -87,9 +87,7 @@ class SegmentationModel(torch.nn.Module, SMPHubMixin):
         """
         if self.training:
             self.eval()
-
-        x = self.forward(x)
-
+        x = self(x)
         return x
 
     def load_state_dict(self, state_dict, **kwargs):
