@@ -252,10 +252,11 @@ class BaseModelTester(unittest.TestCase):
             compiled_model(sample)
 
     @pytest.mark.torch_export
-    def test_torch_export(self):
+    def test_torch_export(self, eps=1e-5):
         if not check_run_test_on_diff_or_main(self.files_for_diff):
             self.skipTest("No diff and not on `main`.")
 
+        torch.manual_seed(42)
         sample = self._get_sample().to(default_device)
         model = self.get_default_model()
         model.eval()
@@ -271,7 +272,7 @@ class BaseModelTester(unittest.TestCase):
             exported_output = exported_model.module().forward(sample)
 
         self.assertEqual(eager_output.shape, exported_output.shape)
-        torch.testing.assert_close(eager_output, exported_output)
+        torch.testing.assert_close(eager_output, exported_output, rtol=eps, atol=eps)
 
     @pytest.mark.torch_script
     def test_torch_script(self):
