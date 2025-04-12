@@ -161,11 +161,15 @@ def group_qkv_layers(state_dict: dict) -> dict:
 
 def convert_model(model_name: str, push_to_hub: bool = False):
     params = PRETRAINED_CHECKPOINTS[model_name]
+    
+    print(f"Converting model: {model_name}")
+    print(f"Downloading weights from: {params['repo_id']}")
 
     hf_weights_path = hf_hub_download(
         repo_id=params["repo_id"], filename="pytorch_model.bin"
     )
     hf_state_dict = torch.load(hf_weights_path, weights_only=True)
+    print(f"Loaded HuggingFace state dict with {len(hf_state_dict)} keys")
 
     # Rename keys
     keys_mapping = convert_old_keys_to_new_keys(hf_state_dict.keys(), params["mapping"])
@@ -186,6 +190,7 @@ def convert_model(model_name: str, push_to_hub: bool = False):
     }
 
     # Create model
+    print(f"Creating SMP UPerNet model with encoder: {params['encoder_name']}")
     extra_kwargs = params.get("extra_kwargs", {})
     smp_model = smp.UPerNet(
         encoder_name=params["encoder_name"],
@@ -195,18 +200,21 @@ def convert_model(model_name: str, push_to_hub: bool = False):
         **extra_kwargs,
     )
 
+    print("Loading weights into SMP model...")
     smp_model.load_state_dict(smp_state_dict, strict=True)
     
     # Check we can run the model
+    print("Verifying model with test inference...")
     smp_model.eval()
     sample = torch.ones(1, 3, 512, 512)
     with torch.no_grad():
         output = smp_model(sample)
-
+    print(f"Test inference successful. Output shape: {output.shape}")
     
     # Save model with preprocessing
     smp_repo_id = f"smp-hub/upernet-{model_name}"
-    smp_model.save_pretrained(smp_repo_id)
+    print(f"Saving model to: {smp_repo_id}")
+    smp_model.save_pretrained(save_directory=smp_repo_id)
 
     transform = A.Compose(
         [
@@ -221,14 +229,21 @@ def convert_model(model_name: str, push_to_hub: bool = False):
     transform.save_pretrained(save_directory=smp_repo_id)
 
     if push_to_hub:
+        print(f"Pushing model to HuggingFace Hub: {smp_repo_id}")
         api = HfApi()
+        if not api.repo_exists(smp_repo_id):
+            api.create_repo(repo_id=smp_repo_id, repo_type="model")
         api.upload_folder(
             repo_id=smp_repo_id,
             folder_path=smp_repo_id,
             repo_type="model",
         )
+    
+    print(f"Conversion of {model_name} completed successfully!")
 
 
 if __name__ == "__main__":
+    print(f"Starting conversion of {len(PRETRAINED_CHECKPOINTS)} UPerNet models")
     for model_name in PRETRAINED_CHECKPOINTS.keys():
-        convert_model(model_name, push_to_hub=False)
+        convert_model(model_name, push_to_hub=True)
+    print("All conversions completed!")
