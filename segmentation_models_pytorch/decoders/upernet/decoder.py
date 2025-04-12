@@ -22,7 +22,7 @@ class PSPModule(nn.Module):
                     nn.AdaptiveAvgPool2d(size),
                     md.Conv2dReLU(
                         in_channels,
-                        in_channels // len(sizes),
+                        out_channels,
                         kernel_size=1,
                         use_norm=use_norm,
                     ),
@@ -31,50 +31,68 @@ class PSPModule(nn.Module):
             ]
         )
         self.out_conv = md.Conv2dReLU(
-            in_channels=in_channels * 2,
+            in_channels=in_channels + len(sizes) * out_channels,
             out_channels=out_channels,
-            kernel_size=1,
+            kernel_size=3,
+            padding=1,
             use_norm="batchnorm",
         )
 
-    def forward(self, x):
-        _, _, height, width = x.shape
-        out = [x] + [
-            F.interpolate(
-                block(x), size=(height, width), mode="bilinear", align_corners=False
+    def forward(self, feature: torch.Tensor) -> torch.Tensor:
+        _, _, height, width = feature.shape
+        pyramid_features = [feature]
+        for block in self.blocks:
+            pooled_feature = block(feature)
+            resized_feature = F.interpolate(
+                pooled_feature,
+                size=(height, width),
+                mode="bilinear",
+                align_corners=False,
             )
-            for block in self.blocks
-        ]
-        out = self.out_conv(torch.cat(out, dim=1))
-        return out
+            pyramid_features.append(resized_feature)
+        fused_feature = self.out_conv(torch.cat(pyramid_features, dim=1))
+        return fused_feature
 
 
-class FPNBlock(nn.Module):
+class LayerNorm2d(nn.LayerNorm):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        x = x.permute(0, 2, 3, 1)  # to channels_last
+        normed_x = super().forward(x)
+        normed_x = normed_x.permute(0, 3, 1, 2)  # to channels_first
+        return normed_x
+
+
+class FPNLateralBlock(nn.Module):
     def __init__(
         self,
-        skip_channels: int,
-        pyramid_channels: int,
+        lateral_channels: int,
+        out_channels: int,
         use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
     ):
         super().__init__()
-        self.skip_conv = (
-            md.Conv2dReLU(
-                skip_channels,
-                pyramid_channels,
-                kernel_size=1,
-                use_norm=use_norm,
-            )
-            if skip_channels != 0
-            else nn.Identity()
+        self.conv_norm_relu = md.Conv2dReLU(
+            lateral_channels,
+            out_channels,
+            kernel_size=1,
+            use_norm=use_norm,
         )
 
-    def forward(self, x, skip):
-        _, channels, height, width = skip.shape
-        x = F.interpolate(x, size=(height, width), mode="bilinear", align_corners=False)
-        if channels != 0:
-            skip = self.skip_conv(skip)
-            x = x + skip
-        return x
+    def forward(
+        self, state_feature: torch.Tensor, lateral_feature: torch.Tensor
+    ) -> torch.Tensor:
+        # 1. Apply block to encoder feature
+        lateral_feature = self.conv_norm_relu(lateral_feature)
+        # print("lateral_feature", lateral_feature.shape, lateral_feature.min(), lateral_feature.max(), lateral_feature.mean(), lateral_feature.std())
+        # 2. Upsample encoder feature to the "state" feature resolution
+        _, _, height, width = lateral_feature.shape
+        # print("current feature", state_feature.shape, state_feature.min(), state_feature.max(), state_feature.mean(), state_feature.std())
+        state_feature = F.interpolate(
+            state_feature, size=(height, width), mode="bilinear", align_corners=False
+        )
+        # 3. Sum state and encoder features
+        # print("Fusion::", state_feature.shape, state_feature.max(), lateral_feature.max())
+        fused_feature = state_feature + lateral_feature
+        return fused_feature
 
 
 class UPerNetDecoder(nn.Module):
@@ -82,8 +100,7 @@ class UPerNetDecoder(nn.Module):
         self,
         encoder_channels: Sequence[int],
         encoder_depth: int = 5,
-        pyramid_channels: int = 256,
-        segmentation_channels: int = 64,
+        decoder_channels: int = 256,
         use_norm: Union[bool, str, Dict[str, Any]] = "batchnorm",
     ):
         super().__init__()
@@ -95,51 +112,156 @@ class UPerNetDecoder(nn.Module):
                 )
             )
 
-        encoder_channels = encoder_channels[::-1]
+        # Encoder channels for input features starting from the highest resolution
+        # [1, 1/2, 1/4, 1/8, 1/16, ...] for num_features = encoder_depth + 1,
+        # but we use only [1/4, 1/8, 1/16, ...] for UPerNet
+        encoder_channels = encoder_channels[2:]
+
+        self.feature_norms = nn.ModuleList(
+            [LayerNorm2d(channels, eps=1e-6) for channels in encoder_channels]
+        )
 
         # PSP Module
+        lowest_resolution_feature_channels = encoder_channels[-1]
         self.psp = PSPModule(
-            in_channels=encoder_channels[0],
-            out_channels=pyramid_channels,
+            in_channels=lowest_resolution_feature_channels,
+            out_channels=decoder_channels,
             sizes=(1, 2, 3, 6),
             use_norm=use_norm,
         )
 
         # FPN Module
-        self.fpn_stages = nn.ModuleList(
-            [FPNBlock(ch, pyramid_channels) for ch in encoder_channels[1:]]
-        )
+        # we skip lower resolution feature maps + reverse the order
+        # [1/4, 1/8, 1/16, 1/32] -> [1/16, 1/8, 1/4]
+        lateral_channels = encoder_channels[:-1][::-1]
+        self.fpn_lateral_blocks = nn.ModuleList([])
+        self.fpn_conv_blocks = nn.ModuleList([])
+        for channels in lateral_channels:
+            block = FPNLateralBlock(
+                lateral_channels=channels,
+                out_channels=decoder_channels,
+                use_norm=use_norm,
+            )
+            self.fpn_lateral_blocks.append(block)
+            conv_block = md.Conv2dReLU(
+                in_channels=decoder_channels,
+                out_channels=decoder_channels,
+                kernel_size=3,
+                padding=1,
+                use_norm=use_norm,
+            )
+            self.fpn_conv_blocks.append(conv_block)
 
-        self.fpn_bottleneck = md.Conv2dReLU(
-            in_channels=(len(encoder_channels) - 1) * pyramid_channels,
-            out_channels=segmentation_channels,
+        num_blocks_to_fuse = len(self.fpn_conv_blocks) + 1  # +1 for the PSP module
+        self.fusion_block = md.Conv2dReLU(
+            in_channels=num_blocks_to_fuse * decoder_channels,
+            out_channels=decoder_channels,
             kernel_size=3,
             padding=1,
             use_norm=use_norm,
         )
 
-    def forward(self, features):
-        output_size = features[0].shape[2:]
-        target_size = [size // 4 for size in output_size]
+    def forward(self, features: Sequence[torch.Tensor]) -> torch.Tensor:
+        """
+        Args:
+            features (Sequence[torch.Tensor]):
+                features with: [1, 1/2, 1/4, 1/8, 1/16, ...] spatial resolutions,
+                where the first feature is the highest resolution and the number
+                of features is equal to encoder_depth + 1.
+        """
 
-        features = features[1:]  # remove first skip with same spatial resolution
-        features = features[::-1]  # reverse channels to start from head of encoder
+        # skip 1/1 and 1/2 resolution features
+        features = features[2:]
 
-        psp_out = self.psp(features[0])
+        # normalize feature maps
+        features = [
+            self.feature_norms[i](feature) for i, feature in enumerate(features)
+        ]
 
+        for i, feature in enumerate(features):
+            print(
+                f"Encoder feature {i}",
+                feature.shape,
+                feature.min(),
+                feature.max(),
+                feature.mean(),
+                feature.std(),
+            )
+
+        # pass lowest resolution feature to PSP module
+        psp_out = self.psp(features[-1])
+        print(
+            "psp_out",
+            psp_out.shape,
+            psp_out.min(),
+            psp_out.max(),
+            psp_out.mean(),
+            psp_out.std(),
+        )
+
+        # skip lowest features for FPN + reverse the order
+        # [1/4, 1/8, 1/16, 1/32] -> [1/16, 1/8, 1/4]
+        fpn_encoder_features = features[:-1][::-1]
         fpn_features = [psp_out]
-        for feature, stage in zip(features[1:], self.fpn_stages):
-            fpn_feature = stage(fpn_features[-1], feature)
+        for fpn_encoder_feature, block in zip(
+            fpn_encoder_features, self.fpn_lateral_blocks
+        ):
+            # 1. for each encoder (skip) feature we apply 1x1 ConvNormRelu,
+            # 2. upsample latest fpn feature to it's resolution
+            # 3. sum them together
+            fpn_feature = block(fpn_features[-1], fpn_encoder_feature)
             fpn_features.append(fpn_feature)
+
+        for i, fpn_feature in enumerate(fpn_features[::-1]):
+            print(
+                f"fpn_feature (before conv) {i}",
+                fpn_feature.shape,
+                fpn_feature.min(),
+                fpn_feature.max(),
+                fpn_feature.mean(),
+                fpn_feature.std(),
+            )
+
+        # Apply FPN conv blocks, but skip PSP module
+        for i, conv_block in enumerate(self.fpn_conv_blocks, start=1):
+            fpn_features[i] = conv_block(fpn_features[i])
+
+        for i, fpn_feature in enumerate(fpn_features[::-1]):
+            print(
+                f"fpn_feature (after conv) {i}",
+                fpn_feature.shape,
+                fpn_feature.min(),
+                fpn_feature.max(),
+                fpn_feature.mean(),
+                fpn_feature.std(),
+            )
 
         # Resize all FPN features to 1/4 of the original resolution.
         resized_fpn_features = []
+        target_size = fpn_features[-1].shape[2:]  # 1/4 of the original resolution
         for feature in fpn_features:
             resized_feature = F.interpolate(
                 feature, size=target_size, mode="bilinear", align_corners=False
             )
             resized_fpn_features.append(resized_feature)
 
-        output = self.fpn_bottleneck(torch.cat(resized_fpn_features, dim=1))
-
+        # reverse and concatenate
+        stacked_features = torch.cat(resized_fpn_features[::-1], dim=1)
+        print(
+            "stacked_features",
+            stacked_features.shape,
+            stacked_features.min(),
+            stacked_features.max(),
+            stacked_features.mean(),
+            stacked_features.std(),
+        )
+        output = self.fusion_block(stacked_features)
+        print(
+            "fusion_block",
+            output.shape,
+            output.min(),
+            output.max(),
+            output.mean(),
+            output.std(),
+        )
         return output
