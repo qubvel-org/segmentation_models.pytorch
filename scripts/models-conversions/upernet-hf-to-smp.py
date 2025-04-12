@@ -161,7 +161,7 @@ def group_qkv_layers(state_dict: dict) -> dict:
 
 def convert_model(model_name: str, push_to_hub: bool = False):
     params = PRETRAINED_CHECKPOINTS[model_name]
-    
+
     print(f"Converting model: {model_name}")
     print(f"Downloading weights from: {params['repo_id']}")
 
@@ -202,7 +202,7 @@ def convert_model(model_name: str, push_to_hub: bool = False):
 
     print("Loading weights into SMP model...")
     smp_model.load_state_dict(smp_state_dict, strict=True)
-    
+
     # Check we can run the model
     print("Verifying model with test inference...")
     smp_model.eval()
@@ -210,7 +210,7 @@ def convert_model(model_name: str, push_to_hub: bool = False):
     with torch.no_grad():
         output = smp_model(sample)
     print(f"Test inference successful. Output shape: {output.shape}")
-    
+
     # Save model with preprocessing
     smp_repo_id = f"smp-hub/upernet-{model_name}"
     print(f"Saving model to: {smp_repo_id}")
@@ -238,7 +238,7 @@ def convert_model(model_name: str, push_to_hub: bool = False):
             folder_path=smp_repo_id,
             repo_type="model",
         )
-    
+
     print(f"Conversion of {model_name} completed successfully!")
 
 
