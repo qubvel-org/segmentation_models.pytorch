@@ -53,7 +53,7 @@ You are done! Now you can train your model with your favorite framework, or as s
 
     for images, gt_masks in dataloader:
 
-        predicted_mask = model(image)
+        predicted_mask = model(images)
         loss = loss_fn(predicted_mask, gt_masks)
 
         loss.backward()
