@@ -3,6 +3,9 @@ name: Upload Python Package
 on:
   release:
     types: [published]
+  push:
+    branches:
+      - pypi-debug
 
 jobs:
   deploy:
@@ -14,7 +17,7 @@ jobs:
       with:
         python-version: '3.9'
     - name: Install dependencies
-      run: pip install --upgrade pip twine
+      run: pip install --upgrade pip twine build
     - name: Build and publish
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
