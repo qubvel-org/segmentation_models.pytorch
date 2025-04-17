@@ -3,9 +3,6 @@ name: Upload Python Package
 on:
   release:
     types: [published]
-  push:
-    branches:
-      - pypi-debug
 
 jobs:
   pypi-publish:
@@ -30,4 +27,3 @@ jobs:
 
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-
