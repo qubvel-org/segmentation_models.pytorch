@@ -5,25 +5,46 @@ on:
     types: [published]
 
 jobs:
-  pypi-publish:
-    name: upload release to PyPI
+  build:
+    name: build
     runs-on: ubuntu-latest
-    environment: pypi
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v4.2.2
+
+      - name: Set up python
+        uses: actions/setup-python@v5.5.0
+        with:
+          python-version: '3.13'
+
+      - name: Install pip dependencies
+        run: pip install build
+
+      - name: List pip dependencies
+        run: pip list
+
+      - name: Build project
+        run: python3 -m build
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: pypi-dist
+          path: dist/
+
+  pypi:
+    name: pypi
+    needs:
+      - build
     permissions:
       id-token: write
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Download artifacts
+        uses: actions/download-artifact@v4.2.1
         with:
-          python-version: '3.9'
+          name: pypi-dist
+          path: dist/
 
-      - name: Install build tool
-        run: python -m pip install --upgrade build
-
-      - name: Build package
-        run: python -m build
-
-      - name: Publish package distributions to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@v1.12.4
