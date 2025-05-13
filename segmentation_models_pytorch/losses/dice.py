@@ -70,7 +70,7 @@ class DiceLoss(_Loss):
 
         bs = y_true.size(0)
         num_classes = y_pred.size(1)
-        dims = (0, 2)
+        dims = (2)
 
         if self.mode == BINARY_MODE:
             y_true = y_true.view(bs, 1, -1)
