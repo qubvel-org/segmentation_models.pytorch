@@ -175,7 +175,7 @@ def get_stats(
     return tp, fp, fn, tn
 
 
-@torch.no_grad()
+@torch.inference_mode()
 def _get_stats_multiclass(
     output: torch.LongTensor,
     target: torch.LongTensor,
@@ -221,7 +221,7 @@ def _get_stats_multiclass(
     return tp_count, fp_count, fn_count, tn_count
 
 
-@torch.no_grad()
+@torch.inference_mode()
 def _get_stats_multilabel(
     output: torch.LongTensor, target: torch.LongTensor
 ) -> Tuple[torch.LongTensor, torch.LongTensor, torch.LongTensor, torch.LongTensor]:

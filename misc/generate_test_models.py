@@ -52,7 +52,7 @@ for model_name, model_class in smp.MODEL_ARCHITECTURES_MAPPING.items():
     torch.manual_seed(423553)
     sample = torch.rand(1, 3, 256, 256)
 
-    with torch.no_grad():
+    with torch.inference_mode():
         output = model(sample)
 
     save_and_push(model, sample, output, model_name, encoder_name)
