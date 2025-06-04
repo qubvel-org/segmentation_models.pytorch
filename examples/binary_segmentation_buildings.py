@@ -269,7 +269,7 @@ def train_and_evaluate_one_epoch(
     # Set the model to evaluation mode
     model.eval()
     val_loss = 0
-    with torch.no_grad():
+    with torch.inference_mode():
         for batch in tqdm(valid_dataloader, desc="Evaluating"):
             images, masks = batch
             images, masks = images.to(device), masks.to(device)
@@ -325,7 +325,7 @@ def test_model(model, output_dir, test_dataloader, loss_fn, device):
     model.eval()
     test_loss = 0
     tp, fp, fn, tn = 0, 0, 0, 0
-    with torch.no_grad():
+    with torch.inference_mode():
         for batch in tqdm(test_dataloader, desc="Evaluating"):
             images, masks = batch
             images, masks = images.to(device), masks.to(device)

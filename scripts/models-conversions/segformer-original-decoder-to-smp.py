@@ -107,7 +107,7 @@ def main(args):
     tensor = torch.tensor(normalized_image).permute(2, 0, 1).unsqueeze(0).float()
 
     # Forward pass
-    with torch.no_grad():
+    with torch.inference_mode():
         mask = model(tensor)
 
     # Postprocessing

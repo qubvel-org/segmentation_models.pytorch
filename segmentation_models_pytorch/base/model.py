@@ -74,9 +74,9 @@ class SegmentationModel(torch.nn.Module, SMPHubMixin):
 
         return masks
 
-    @torch.no_grad()
+    @torch.inference_mode()
     def predict(self, x):
-        """Inference method. Switch model to `eval` mode, call `.forward(x)` with `torch.no_grad()`
+        """Inference method. Switch model to `eval` mode, call `.forward(x)` with `torch.inference_mode()`
 
         Args:
             x: 4D torch tensor with shape (batch_size, channels, height, width)

@@ -110,7 +110,7 @@ class ValidEpoch(Epoch):
         self.model.eval()
 
     def batch_update(self, x, y):
-        with torch.no_grad():
+        with torch.inference_mode():
             prediction = self.model.forward(x)
             loss = self.loss(prediction, y)
         return loss, prediction

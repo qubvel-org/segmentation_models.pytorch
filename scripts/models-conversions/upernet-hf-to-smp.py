@@ -207,7 +207,7 @@ def convert_model(model_name: str, push_to_hub: bool = False):
     print("Verifying model with test inference...")
     smp_model.eval()
     sample = torch.ones(1, 3, 512, 512)
-    with torch.no_grad():
+    with torch.inference_mode():
         output = smp_model(sample)
     print(f"Test inference successful. Output shape: {output.shape}")
 
