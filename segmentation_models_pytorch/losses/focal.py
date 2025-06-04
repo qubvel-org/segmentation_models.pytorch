@@ -45,6 +45,7 @@ class FocalLoss(_Loss):
 
         self.mode = mode
         self.ignore_index = ignore_index
+        self.reduction = reduction
         self.focal_loss_fn = partial(
             focal_loss_with_logits,
             alpha=alpha,
