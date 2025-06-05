@@ -73,8 +73,8 @@ class JaccardLoss(_Loss):
         dims = (0, 2)
 
         if self.mode == BINARY_MODE:
-            y_true = y_true.view(bs, 1, -1)
-            y_pred = y_pred.view(bs, 1, -1)
+            y_true = y_true.reshape(bs, 1, -1)
+            y_pred = y_pred.reshape(bs, 1, -1)
 
             if self.ignore_index is not None:
                 mask = y_true != self.ignore_index
@@ -82,8 +82,8 @@ class JaccardLoss(_Loss):
                 y_true = y_true * mask
 
         if self.mode == MULTICLASS_MODE:
-            y_true = y_true.view(bs, -1)
-            y_pred = y_pred.view(bs, num_classes, -1)
+            y_true = y_true.reshape(bs, -1)
+            y_pred = y_pred.reshape(bs, num_classes, -1)
 
             if self.ignore_index is not None:
                 mask = y_true != self.ignore_index
@@ -98,8 +98,8 @@ class JaccardLoss(_Loss):
                 y_true = y_true.permute(0, 2, 1)  # N, C, H*W
 
         if self.mode == MULTILABEL_MODE:
-            y_true = y_true.view(bs, num_classes, -1)
-            y_pred = y_pred.view(bs, num_classes, -1)
+            y_true = y_true.reshape(bs, num_classes, -1)
+            y_pred = y_pred.reshape(bs, num_classes, -1)
 
             if self.ignore_index is not None:
                 mask = y_true != self.ignore_index

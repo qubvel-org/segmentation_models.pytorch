@@ -29,8 +29,8 @@ class MCCLoss(_Loss):
 
         bs = y_true.shape[0]
 
-        y_true = y_true.view(bs, 1, -1)
-        y_pred = y_pred.view(bs, 1, -1)
+        y_true = y_true.reshape(bs, 1, -1)
+        y_pred = y_pred.reshape(bs, 1, -1)
 
         tp = torch.sum(torch.mul(y_pred, y_true)) + self.eps
         tn = torch.sum(torch.mul((1 - y_pred), (1 - y_true))) + self.eps

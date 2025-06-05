@@ -57,8 +57,8 @@ class FocalLoss(_Loss):
 
     def forward(self, y_pred: torch.Tensor, y_true: torch.Tensor) -> torch.Tensor:
         if self.mode in {BINARY_MODE, MULTILABEL_MODE}:
-            y_true = y_true.view(-1)
-            y_pred = y_pred.view(-1)
+            y_true = y_true.reshape(-1)
+            y_pred = y_pred.reshape(-1)
 
             if self.ignore_index is not None:
                 # Filter predictions with ignore label from loss computation
