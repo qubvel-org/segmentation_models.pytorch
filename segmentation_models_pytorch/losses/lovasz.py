@@ -77,8 +77,8 @@ def _flatten_binary_scores(scores, labels, ignore=None):
     """Flattens predictions in the batch (binary case)
     Remove labels equal to 'ignore'
     """
-    scores = scores.view(-1)
-    labels = labels.view(-1)
+    scores = scores.reshape(-1)
+    labels = labels.reshape(-1)
     if ignore is None:
         return scores, labels
     valid = labels != ignore
@@ -151,13 +151,13 @@ def _flatten_probas(probas, labels, ignore=None):
     if probas.dim() == 3:
         # assumes output of a sigmoid layer
         B, H, W = probas.size()
-        probas = probas.view(B, 1, H, W)
+        probas = probas.reshape(B, 1, H, W)
 
     C = probas.size(1)
     probas = torch.movedim(probas, 1, -1)  # [B, C, Di, Dj, ...] -> [B, Di, Dj, ..., C]
-    probas = probas.contiguous().view(-1, C)  # [P, C]
+    probas = probas.reshape(-1, C)  # [P, C]
 
-    labels = labels.view(-1)
+    labels = labels.reshape(-1)
     if ignore is None:
         return probas, labels
     valid = labels != ignore
