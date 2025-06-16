@@ -115,8 +115,8 @@ class DiceLoss(_Loss):
         else:
             loss = 1.0 - scores
 
-        # Dice loss is undefined for non-empty classes
-        # So we zero contribution of channel that does not have true pixels
+        # Dice loss is undefined for empty images with no classes
+        # So we set the contribution of any channel without true pixels to zero
         # NOTE: A better workaround would be to use loss term `mean(y_pred)`
         # for this case, however it will be a modified jaccard loss
 
