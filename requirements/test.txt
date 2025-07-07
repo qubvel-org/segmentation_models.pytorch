@@ -3,5 +3,5 @@ packaging==25.0
 pytest==8.4.1
 pytest-xdist==3.7.0
 pytest-cov==6.2.1
-ruff==0.12.1
+ruff==0.12.2
 setuptools==80.9.0
