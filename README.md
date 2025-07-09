@@ -238,3 +238,5 @@ make table        # Generates a table with encoders and print to stdout
 
 ## 🛡️ License <a name="license"></a>
 The project is primarily distributed under [MIT License](https://github.com/qubvel/segmentation_models.pytorch/blob/main/LICENSE), while some files are subject to other licenses. Please refer to [LICENSES](licenses/LICENSES.md) and license statements in each file for careful check, especially for commercial use.
+
+<!-- GitAds-Verify: T1452I5Y1X6LC6PFHM9EMDOETGQEU72P -->
