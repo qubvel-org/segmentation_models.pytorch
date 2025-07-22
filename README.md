@@ -26,27 +26,15 @@ The main features of the library are:
  - Popular metrics and losses for training routines (Dice, Jaccard, Tversky, ...)
  - ONNX export and torch script/trace/compile friendly
 
-### Community-Driven Project, Supported By
-<table>
-  <tr>
-    <td align="center" vertical-align="center">
-      <a href="https://withoutbg.com/?utm_source=smp&utm_medium=github_readme&utm_campaign=sponsorship" >
-        <img src="https://withoutbg.com/images/logo-social.png" width="70px;" alt="withoutBG API Logo" />
-      </a>
-    </td>
-    <td align="center" vertical-align="center">
-      <b>withoutBG API</b>
-      <br />
-      <a href="https://withoutbg.com/?utm_source=smp&utm_medium=github_readme&utm_campaign=sponsorship">https://withoutbg.com</a>
-      <br />
-      <p width="200px">
-      High-quality background removal API
-        <br/>
-      </p>
-    </td>
-  </tr>
-</table>
- 
+### Community-driven Project, Supported by GitAds
+<a href="https://gitads.dev/v1/ad-track?source=qubvel-org/segmentation_models.pytorch@github" target="_blank" rel="noopener">
+  <img 
+    src="https://gitads.dev/v1/ad-serve?source=qubvel-org/segmentation_models.pytorch@github" 
+    alt="Sponsored by GitAds" 
+    style="width:400px; height:auto;" />
+</a>
+
+
 ### [📚 Project Documentation 📚](http://smp.readthedocs.io/)
 
 Visit [Read The Docs Project Page](https://smp.readthedocs.io/) or read the following README to know more about Segmentation Models Pytorch (SMP for short) library
