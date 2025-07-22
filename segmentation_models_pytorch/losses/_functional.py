@@ -66,7 +66,7 @@ def focal_loss_with_logits(
     References:
         https://github.com/open-mmlab/mmdetection/blob/master/mmdet/core/loss/losses.py
     """
-    target = target.to(dtype=output.dtype, device=output.device)
+    target = target.type(output.type())
 
     logpt = F.binary_cross_entropy_with_logits(output, target, reduction="none")
     pt = torch.exp(-logpt)
