@@ -119,6 +119,7 @@ class DeepLabV3(SegmentationModel):
             )
         else:
             self.classification_head = None
+        self.name = "deeplabv3-{}".format(encoder_name)
 
     def load_state_dict(self, state_dict, *args, **kwargs):
         # For backward compatibility, previously Decoder module was Sequential
@@ -238,3 +239,4 @@ class DeepLabV3Plus(SegmentationModel):
             )
         else:
             self.classification_head = None
+        self.name = "deeplabv3plus-{}".format(encoder_name)
