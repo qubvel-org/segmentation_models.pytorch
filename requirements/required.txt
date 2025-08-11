@@ -1,7 +1,7 @@
 huggingface_hub==0.34.3
 numpy==2.2.4
 pillow==11.3.0
-safetensors==0.5.3
+safetensors==0.6.2
 timm==1.0.19
 torch==2.7.1
 torchvision==0.22.1
