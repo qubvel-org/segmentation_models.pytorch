@@ -137,3 +137,29 @@ class SegmentationModel(torch.nn.Module, SMPHubMixin):
                 warnings.warn(text, stacklevel=-1)
 
         return super().load_state_dict(state_dict, **kwargs)
+
+    def encoder_freeze(self):
+        """
+        Freeze the encoder parameters and normalization layers.
+
+        This method sets ``requires_grad = False`` for all encoder parameters,
+        preventing them from being updated during backpropagation. In addition,
+        it switches BatchNorm and InstanceNorm layers into evaluation mode
+        (``.eval()``), which stops updates to their running statistics
+        (``running_mean`` and ``running_var``) during training.
+
+        **Important:** If you call :meth:`model.train()` after
+        :meth:`encoder_freeze`, the encoder’s BatchNorm/InstanceNorm layers
+        will be put back into training mode, and their running statistics
+        will be updated again. To re-freeze them after switching modes,
+        call :meth:`encoder_freeze` again.
+        """
+        for param in self.encoder.parameters():
+            param.requires_grad = False
+
+        # Putting norm layers into eval mode stops running stats updates
+        for module in self.encoder.modules():
+            # _NormBase is the common base of _InstanceNorm and _BatchNorm classes
+            # These are the two classes that track running stats
+            if isinstance(module, torch.nn.modules.batchnorm._NormBase):
+                module.eval()
