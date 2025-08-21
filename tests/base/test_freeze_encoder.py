@@ -47,8 +47,10 @@ def test_freeze_encoder_stops_running_stats():
     assert bn is not None
 
     orig_mean = bn.running_mean.clone()
+    orig_var = bn.running_var.clone()
 
     x = torch.randn(2, 3, 64, 64)
     _ = model(x)
 
     torch.testing.assert_close(orig_mean, bn.running_mean)
+    torch.testing.assert_close(orig_var, bn.running_var)
