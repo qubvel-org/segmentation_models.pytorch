@@ -23,7 +23,7 @@ class SegmentationModel(torch.nn.Module, SMPHubMixin):
     def __new__(cls: Type[T], *args, **kwargs) -> T:
         instance = super().__new__(cls, *args, **kwargs)
         return instance
-    
+
     def __init__(self):
         super().__init__()
         self._is_encoder_frozen = False
@@ -166,13 +166,12 @@ class SegmentationModel(torch.nn.Module, SMPHubMixin):
             raise ValueError("training mode is expected to be boolean")
         self.training = mode
         for name, module in self.named_children():
-            print(name)
             # skip encoder if it is frozen
             if self._is_encoder_frozen and name == "encoder":
                 continue
             module.train(mode)
         return self
-    
+
     def _set_encoder_trainable(self, mode: bool):
         for param in self.encoder.parameters():
             param.requires_grad = mode
