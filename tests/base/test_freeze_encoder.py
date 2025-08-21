@@ -4,28 +4,34 @@ import segmentation_models_pytorch as smp
 
 def test_freeze_and_unfreeze_encoder():
     model = smp.Unet(encoder_name="resnet18", encoder_weights=None)
-    model.train()
+    
     # Initially, encoder params should be trainable
+    model.train()
     assert all(p.requires_grad for p in model.encoder.parameters())
-    model.freeze_encoder()
+    
     # Check encoder params are frozen
+    model.freeze_encoder()
+    
     assert all(not p.requires_grad for p in model.encoder.parameters())
-    # Check normalization layers are in eval mode
     for m in model.encoder.modules():
         if isinstance(m, torch.nn.modules.batchnorm._NormBase):
             assert not m.training
+
     # Call train() and ensure encoder norm layers stay frozen
     model.train()
     for m in model.encoder.modules():
         if isinstance(m, torch.nn.modules.batchnorm._NormBase):
             assert not m.training
-    model.unfreeze_encoder()
+    
     # Params should be trainable again
+    model.unfreeze_encoder()
+    
     assert all(p.requires_grad for p in model.encoder.parameters())
     # Norm layers should go back to training mode after unfreeze
     for m in model.encoder.modules():
         if isinstance(m, torch.nn.modules.batchnorm._NormBase):
             assert m.training
+    
     model.train()
     # Norm layers should have the same training mode after train()
     for m in model.encoder.modules():
