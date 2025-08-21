@@ -4,39 +4,47 @@ import segmentation_models_pytorch as smp
 
 def test_freeze_and_unfreeze_encoder():
     model = smp.Unet(encoder_name="resnet18", encoder_weights=None)
-    
+
+    def assert_encoder_params_trainable(expected: bool):
+        assert all(p.requires_grad == expected for p in model.encoder.parameters())
+
+    def assert_norm_layers_training(expected: bool):
+        for m in model.encoder.modules():
+            if isinstance(m, torch.nn.modules.batchnorm._NormBase):
+                assert m.training == expected
+
     # Initially, encoder params should be trainable
     model.train()
-    assert all(p.requires_grad for p in model.encoder.parameters())
-    
-    # Check encoder params are frozen
+    assert_encoder_params_trainable(True)
+
+    # Freeze encoder
     model.freeze_encoder()
-    
-    assert all(not p.requires_grad for p in model.encoder.parameters())
-    for m in model.encoder.modules():
-        if isinstance(m, torch.nn.modules.batchnorm._NormBase):
-            assert not m.training
+    assert_encoder_params_trainable(False)
+    assert_norm_layers_training(False)
 
     # Call train() and ensure encoder norm layers stay frozen
     model.train()
-    for m in model.encoder.modules():
-        if isinstance(m, torch.nn.modules.batchnorm._NormBase):
-            assert not m.training
-    
-    # Params should be trainable again
+    assert_norm_layers_training(False)
+
+    # Unfreeze encoder
     model.unfreeze_encoder()
-    
-    assert all(p.requires_grad for p in model.encoder.parameters())
-    # Norm layers should go back to training mode after unfreeze
-    for m in model.encoder.modules():
-        if isinstance(m, torch.nn.modules.batchnorm._NormBase):
-            assert m.training
-    
+    assert_encoder_params_trainable(True)
+    assert_norm_layers_training(True)
+
+    # Call train() again — should stay trainable
     model.train()
-    # Norm layers should have the same training mode after train()
-    for m in model.encoder.modules():
-        if isinstance(m, torch.nn.modules.batchnorm._NormBase):
-            assert m.training
+    assert_norm_layers_training(True)
+
+    # Switch to eval, then freeze
+    model.eval()
+    model.freeze_encoder()
+    assert_encoder_params_trainable(False)
+    assert_norm_layers_training(False)
+
+    # Unfreeze again
+    model.unfreeze_encoder()
+    assert_encoder_params_trainable(True)
+    assert_norm_layers_training(True)
 
 
 def test_freeze_encoder_stops_running_stats():
