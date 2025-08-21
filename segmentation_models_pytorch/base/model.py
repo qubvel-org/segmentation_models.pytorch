@@ -167,7 +167,7 @@ class SegmentationModel(torch.nn.Module, SMPHubMixin):
         self.training = mode
         for name, module in self.named_children():
             print(name)
-            # skip encoder encoder if it is frozen
+            # skip encoder if it is frozen
             if self._is_encoder_frozen and name == "encoder":
                 continue
             module.train(mode)
