@@ -180,11 +180,7 @@ class SegmentationModel(torch.nn.Module, SMPHubMixin):
             # _NormBase is the common base of classes like _InstanceNorm
             # and _BatchNorm that track running stats
             if isinstance(module, torch.nn.modules.batchnorm._NormBase):
-                if mode:
-                    module.train()
-                else:
-                    # Putting norm layers into eval mode stops running stats updates
-                    module.eval()
+                module.train(mode)
 
         self._is_encoder_frozen = not mode
 
