@@ -117,3 +117,25 @@ Example:
 
     mask.shape, label.shape
     # (N, 4, H, W), (N, 4)
+
+4. Freezing and unfreezing the encoder
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sometimes you may want to freeze the encoder during training, e.g. when using pretrained backbones and only fine-tuning the decoder and segmentation head. 
+
+All segmentation models in SMP provide two helper methods:
+
+.. code-block:: python
+
+    model = smp.Unet("resnet34", classes=2)
+
+    # Freeze encoder: stops gradient updates and freezes normalization layer stats
+    model.freeze_encoder()
+
+    # Unfreeze encoder: re-enables training for encoder parameters and normalization layers
+    model.unfreeze_encoder()
+
+.. important::
+    - Freezing sets ``requires_grad = False`` for all encoder parameters.
+    - Normalization layers that track running statistics (e.g., BatchNorm and InstanceNorm layers) are set to ``.eval()`` mode to prevent updates to ``running_mean`` and ``running_var``.
+    - If you later call ``model.train()``, frozen encoders will remain frozen until you call ``unfreeze_encoder()``.
