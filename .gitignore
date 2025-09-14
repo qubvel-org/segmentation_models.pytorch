@@ -110,3 +110,5 @@ venv.bak/
 
 # ruff
 .ruff_cache/
+
+*.ipynb
