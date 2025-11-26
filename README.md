@@ -26,13 +26,13 @@ The main features of the library are:
  - Popular metrics and losses for training routines (Dice, Jaccard, Tversky, ...)
  - ONNX export and torch script/trace/compile friendly
 
-### Community-driven Project, Supported by GitAds
-<a href="https://gitads.dev/v1/ad-track?source=qubvel-org/segmentation_models.pytorch@github" target="_blank" rel="noopener">
-  <img 
-    src="https://gitads.dev/v1/ad-serve?source=qubvel-org/segmentation_models.pytorch@github" 
-    alt="Sponsored by GitAds" 
-    style="width:400px; height:auto;" />
+### 🤝 Sponsor: withoutBG
+
+<a href="https://github.com/withoutbg/withoutbg" target="_blank">
+  <img src="https://withoutbg.com/images/img-and-matte.png" alt="Sponsored by withoutBG"/>
 </a>
+
+[withoutBG](https://github.com/withoutbg/withoutbg) is a high-quality background removal tool. They built their open-source image matting and refiner models using `smp.Unet` and are proudly sponsoring this project.
 
 
 ### [📚 Project Documentation 📚](http://smp.readthedocs.io/)
@@ -191,6 +191,11 @@ $ pip install git+https://github.com/qubvel/segmentation_models.pytorch
 `Segmentation Models` package is widely used in image segmentation competitions.
 [Here](https://github.com/qubvel/segmentation_models.pytorch/blob/main/HALLOFFAME.md) you can find competitions, names of the winners and links to their solutions.
 
+## 🛠 Projects built with SMP
+
+- [withoutBG](https://github.com/withoutbg/withoutbg): An open-source background removal tool that uses `smp.Unet` for its image matting and refinement models. Check [withoutBG Focus on HuggingFace](https://huggingface.co/withoutbg/focus).
+
+
 ## 🤝 Contributing <a name="contributing"></a>
 
 1. Install SMP in dev mode
@@ -227,4 +232,4 @@ make table        # Generates a table with encoders and print to stdout
 ## 🛡️ License <a name="license"></a>
 The project is primarily distributed under [MIT License](https://github.com/qubvel/segmentation_models.pytorch/blob/main/LICENSE), while some files are subject to other licenses. Please refer to [LICENSES](licenses/LICENSES.md) and license statements in each file for careful check, especially for commercial use.
 
-<!-- GitAds-Verify: T1452I5Y1X6LC6PFHM9EMDOETGQEU72P -->
+
