@@ -1,4 +1,5 @@
 import torch.nn as nn
+
 from .modules import Activation
 
 
@@ -10,7 +11,7 @@ class SegmentationHead(nn.Sequential):
             in_channels, out_channels, kernel_size=kernel_size, padding=kernel_size // 2
         )
         upsampling = (
-            nn.Upsample(mode="bilinear", scale_factor=upsampling)
+            nn.Upsample(mode="bilinear", scale_factor=upsampling, align_corners=True)
             if upsampling > 1
             else nn.Identity()
         )

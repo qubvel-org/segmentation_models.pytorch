@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 from collections.abc import Iterable, Sequence
-from typing import Literal, List
+from typing import List, Literal
 
 import torch
 from torch import nn
@@ -105,7 +105,9 @@ class DeepLabV3PlusDecoder(nn.Module):
         )
 
         scale_factor = 4 if output_stride == 16 and encoder_depth > 3 else 2
-        self.up = nn.Upsample(mode="bilinear", scale_factor=scale_factor)
+        self.up = nn.Upsample(
+            mode="bilinear", scale_factor=scale_factor, align_corners=True
+        )
 
         highres_in_channels = encoder_channels[2]
         highres_out_channels = 48  # proposed by authors of paper
