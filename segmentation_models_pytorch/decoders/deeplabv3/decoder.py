@@ -105,7 +105,7 @@ class DeepLabV3PlusDecoder(nn.Module):
         )
 
         scale_factor = 4 if output_stride == 16 and encoder_depth > 3 else 2
-        self.up = nn.UpsamplingBilinear2d(scale_factor=scale_factor)
+        self.up = nn.Upsample(mode="bilinear", scale_factor=scale_factor)
 
         highres_in_channels = encoder_channels[2]
         highres_out_channels = 48  # proposed by authors of paper
