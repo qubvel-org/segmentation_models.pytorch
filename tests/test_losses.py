@@ -11,6 +11,32 @@ from segmentation_models_pytorch.losses import (
     MCCLoss,
 )
 
+def test_focal_loss_from_logits_false_multiclass():
+    torch.manual_seed(0)
+    
+    input_logits = torch.tensor(
+        [[0.0, 10.0, 0.0],
+         [10.0, 0.0, 0.0],
+         [0.0, 0.0, 10.0]]
+    ).float()
+    target = torch.tensor([1, 0, 2]).long()
+    # Convert to probabilities
+    input_probs = torch.softmax(input_logits, dim=1)
+
+    loss_logits = smp.losses.FocalLoss(
+        mode="multiclass",
+        from_logits=True,
+    )(input_logits, target)
+
+    loss_probs = smp.losses.FocalLoss(
+        mode="multiclass",
+        from_logits=False,
+    )(input_probs, target)
+
+    # They should be close (not exact due to constant shift issue)
+    assert torch.isfinite(loss_probs)
+    assert torch.isfinite(loss_logits)
+    assert abs(loss_logits - loss_probs) < 0.2
 
 def test_focal_loss_with_logits():
     input_good = torch.tensor([10, -10, 10]).float()
