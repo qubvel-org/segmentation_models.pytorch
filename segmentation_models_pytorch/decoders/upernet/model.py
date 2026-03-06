@@ -22,7 +22,8 @@ class UPerNet(SegmentationModel):
             with shapes [(N, C, H, W),], for depth 1 - [(N, C, H, W), (N, C, H // 2, W // 2)] and so on).
             Default is 5
         encoder_weights: One of **None** (random initialization), **"imagenet"** (pre-training on ImageNet) and
-            other pretrained weights (see table with available weights for each encoder_name)
+            other pretrained weights (see table with available weights for each encoder_name).
+            For ``tu-`` encoders, this is a boolean flag. The variant is selected via the encoder name
         decoder_pyramid_channels: A number of convolution filters in Feature Pyramid, default is 256
         decoder_segmentation_channels: A number of convolution filters in segmentation blocks, default is 64
         decoder_use_norm: Specifies normalization between Conv2D and activation.

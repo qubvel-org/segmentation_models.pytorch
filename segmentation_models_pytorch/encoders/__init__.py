@@ -83,6 +83,14 @@ def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **
             name = name.replace("tu-", "tu-tf_")
 
     if name.startswith("tu-"):
+        if not isinstance(weights, bool):
+            warnings.warn(
+                f"""For 'tu-' (timm universal) encoders, `encoder_weights` is used as a boolean flag whether
+                to use pretrained weights that you define in encoder name i.e 'tu-<model_name>.<pretrained_tag>'.
+                The value you passed '{weights} will be evaluated to a {bool(weights)}. Please use a Boolean to 
+                remove this warning""",
+                UserWarning,
+            )
         name = name[3:]
         encoder = TimmUniversalEncoder(
             name=name,
