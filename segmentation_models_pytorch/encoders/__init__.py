@@ -4,7 +4,6 @@ import copy
 import warnings
 import functools
 
-from torch import NoneType
 from torch.utils.model_zoo import load_url
 from huggingface_hub import hf_hub_download
 from safetensors.torch import load_file
