@@ -28,7 +28,8 @@ class PAN(SegmentationModel):
             Default is 5
         encoder_weights: One of **None** (random initialization), **"imagenet"** (pre-training on ImageNet) and
             other pretrained weights (see table with available weights for each encoder_name).
-            For ``tu-`` encoders, this is a boolean flag. The variant is selected via the encoder name
+            For ``tu-`` encoders, set to **True** to download pretrained weights or **None** for
+            random initialization. The pretrained variant is defined in the encoder name
         encoder_output_stride: 16 or 32, if 16 use dilation in encoder last layer.
             Doesn't work with ***ception***, **vgg***, **densenet*`** backbones.Default is 16.
         decoder_channels: A number of convolution layer filters in decoder blocks

@@ -30,7 +30,8 @@ class Linknet(SegmentationModel):
             Default is 5
         encoder_weights: One of **None** (random initialization), **"imagenet"** (pre-training on ImageNet) and
             other pretrained weights (see table with available weights for each encoder_name).
-            For ``tu-`` encoders, this is a boolean flag. The variant is selected via the encoder name
+            For ``tu-`` encoders, set to **True** to download pretrained weights or **None** for
+            random initialization. The pretrained variant is defined in the encoder name
         decoder_use_norm:     Specifies normalization between Conv2D and activation.
             Accepts the following types:
             - **True**: Defaults to `"batchnorm"`.

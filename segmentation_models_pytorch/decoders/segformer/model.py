@@ -23,7 +23,8 @@ class Segformer(SegmentationModel):
             Default is 5
         encoder_weights: One of **None** (random initialization), **"imagenet"** (pre-training on ImageNet) and
             other pretrained weights (see table with available weights for each encoder_name).
-            For ``tu-`` encoders, this is a boolean flag. The variant is selected via the encoder name
+            For ``tu-`` encoders, set to **True** to download pretrained weights or **None** for
+            random initialization. The pretrained variant is defined in the encoder name
         decoder_segmentation_channels: A number of convolution filters in segmentation blocks, default is 256
         in_channels: A number of input channels for the model, default is 3 (RGB images)
         classes: A number of classes for output mask (or you can think as a number of channels of output mask)

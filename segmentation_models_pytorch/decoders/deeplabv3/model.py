@@ -25,7 +25,8 @@ class DeepLabV3(SegmentationModel):
             Default is 5
         encoder_weights: One of **None** (random initialization), **"imagenet"** (pre-training on ImageNet) and
             other pretrained weights (see table with available weights for each encoder_name).
-            For ``tu-`` encoders, this is a boolean flag. The variant is selected via the encoder name
+            For ``tu-`` encoders, set to **True** to download pretrained weights or **None** for
+            random initialization. The pretrained variant is defined in the encoder name
         decoder_channels: A number of convolution filters in ASPP module. Default is 256
         encoder_output_stride: Downsampling factor for last encoder features (see original paper for explanation)
         decoder_atrous_rates: Dilation rates for ASPP module (should be an iterable of 3 integer values)
@@ -151,7 +152,8 @@ class DeepLabV3Plus(SegmentationModel):
             Default is 5
         encoder_weights: One of **None** (random initialization), **"imagenet"** (pre-training on ImageNet) and
             other pretrained weights (see table with available weights for each encoder_name).
-            For ``tu-`` encoders, this is a boolean flag. The variant is selected via the encoder name
+            For ``tu-`` encoders, set to **True** to download pretrained weights or **None** for
+            random initialization. The pretrained variant is defined in the encoder name
         encoder_output_stride: Downsampling factor for last encoder features (see original paper for explanation)
         decoder_atrous_rates: Dilation rates for ASPP module (should be an iterable of 3 integer values)
         decoder_aspp_separable: Use separable convolutions in ASPP module. Default is True
