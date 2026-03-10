@@ -3,6 +3,7 @@ import timm
 import copy
 import warnings
 import functools
+
 from torch.utils.model_zoo import load_url
 from huggingface_hub import hf_hub_download
 from safetensors.torch import load_file
@@ -83,6 +84,14 @@ def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **
             name = name.replace("tu-", "tu-tf_")
 
     if name.startswith("tu-"):
+        if not isinstance(weights, (type(None), bool)):
+            warnings.warn(
+                f"For 'tu-' (timm universal) encoders, `encoder_weights` should be set to True "
+                f"to download pretrained weights or None for random initialization. "
+                f"The pretrained variant is defined in the encoder name i.e 'tu-<model_name>.<pretrained_tag>'. "
+                f"Got encoder_weights='{weights}'.",
+                UserWarning,
+            )
         name = name[3:]
         encoder = TimmUniversalEncoder(
             name=name,
