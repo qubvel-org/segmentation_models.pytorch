@@ -3,7 +3,7 @@ from functools import partial
 
 import torch
 from torch.nn.modules.loss import _Loss
-from ._functional import focal_loss_with_logits,softmax_focal_loss_with_logits
+from ._functional import focal_loss_with_logits, softmax_focal_loss_with_logits
 from .constants import BINARY_MODE, MULTICLASS_MODE, MULTILABEL_MODE
 
 __all__ = ["FocalLoss"]
