@@ -48,7 +48,7 @@ class FocalLoss(_Loss):
         super().__init__()
 
         self.mode = mode
-        self.from_logits=from_logits
+        self.from_logits = from_logits
         self.ignore_index = ignore_index
         self.reduction = reduction
         self.eps=eps
