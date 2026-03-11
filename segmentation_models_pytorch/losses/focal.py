@@ -13,11 +13,11 @@ class FocalLoss(_Loss):
     def __init__(
         self,
         mode: str,
-        from_logits: bool = True,
-        eps: float = 1e-7,
         alpha: Optional[float] = None,
         gamma: Optional[float] = 2.0,
         ignore_index: Optional[int] = None,
+        from_logits: bool = True,
+        eps: float = 1e-7,
         reduction: Optional[str] = "mean",
         normalized: bool = False,
         reduced_threshold: Optional[float] = None,
