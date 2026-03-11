@@ -139,10 +139,26 @@ def get_stats(
         )
 
     if output.shape != target.shape:
+        # Check if user accidentally passed a one-hot / logits tensor in multiclass mode
+        if mode == "multiclass" and output.ndim == target.ndim + 1:
+            raise ValueError(
+                f"In 'multiclass' mode, ``output`` should contain class indices of shape "
+                f"(N, ...), but got shape {output.shape}. "
+                f"It looks like you passed a one-hot or logits tensor. "
+                f"Please convert it first with ``output.argmax(dim=1)``."
+            )
+        if mode == "multiclass" and target.ndim == output.ndim + 1:
+            raise ValueError(
+                f"In 'multiclass' mode, ``target`` should contain class indices of shape "
+                f"(N, ...), but got shape {target.shape}. "
+                f"It looks like you passed a one-hot tensor. "
+                f"Please convert it first with ``target.argmax(dim=1)``."
+            )
         raise ValueError(
             "Dimensions should match, but ``output`` shape is not equal to ``target`` "
             + f"shape, {output.shape} != {target.shape}"
         )
+
 
     if mode != "multiclass" and ignore_index is not None:
         raise ValueError(
@@ -163,6 +179,21 @@ def get_stats(
         )
 
     if mode == "multiclass":
+        if output.ndim > 1 and output.shape[1] == num_classes and output.ndim >= 3:
+            raise ValueError(
+                f"In 'multiclass' mode, ``output`` should contain class indices of shape "
+                f"(N, H, W) or (N,), but got shape {tuple(output.shape)}. "
+                f"It looks like you passed a one-hot or logits tensor of shape (N, C, ...). "
+                f"For that use case, please use mode='multilabel' instead, "
+                f"or convert your tensor with ``output.argmax(dim=1)`` first."
+            )
+        if target.ndim > 1 and target.shape[1] == num_classes and target.ndim >= 3:
+            raise ValueError(
+                f"In 'multiclass' mode, ``target`` should contain class indices of shape "
+                f"(N, H, W) or (N,), but got shape {tuple(target.shape)}. "
+                f"It looks like you passed a one-hot encoded tensor of shape (N, C, ...). "
+                f"Convert it with ``target.argmax(dim=1)`` first."
+            )
         tp, fp, fn, tn = _get_stats_multiclass(
             output, target, num_classes, ignore_index
         )
