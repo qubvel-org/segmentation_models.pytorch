@@ -11,7 +11,6 @@ license = "MIT"
 license-files = ["LICENSE"]
 authors = [{name = 'Pavel Iakubovskii', email = 'qubvel@gmail.com'}]
 classifiers = [
-    'License :: OSI Approved :: MIT License',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
     'Programming Language :: Python :: Implementation :: CPython',
