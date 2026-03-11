@@ -51,7 +51,7 @@ class FocalLoss(_Loss):
         self.from_logits = from_logits
         self.ignore_index = ignore_index
         self.reduction = reduction
-        self.eps=eps
+        self.eps = eps
         
         self.focal_loss_fn = partial(
             focal_loss_with_logits,
