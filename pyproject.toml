@@ -1,5 +1,5 @@
 [build-system]
-requires = ['setuptools>=61']
+requires = ['setuptools>=77']
 build-backend = 'setuptools.build_meta'
 
 [project]
@@ -7,7 +7,8 @@ name = 'segmentation_models_pytorch'
 description = 'Image segmentation models with pre-trained backbones. PyTorch.'
 readme = 'README.md'
 requires-python = '>=3.9'
-license = {file = 'LICENSE'}
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [{name = 'Pavel Iakubovskii', email = 'qubvel@gmail.com'}]
 classifiers = [
     'License :: OSI Approved :: MIT License',
