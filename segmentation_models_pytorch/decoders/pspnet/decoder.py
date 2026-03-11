@@ -6,6 +6,7 @@ import torch.nn.functional as F
 
 from segmentation_models_pytorch.base import modules
 
+
 class PSPBlock(nn.Module):
     def __init__(
         self,
@@ -17,13 +18,15 @@ class PSPBlock(nn.Module):
         super().__init__()
 
         if pool_size == 1:
-            use_norm = "identity"
+            use_norm = "identity"  # PyTorch does not support BatchNorm for 1x1 shape
 
-        self.pool_size = pool_size
-        
-        self.pool = nn.AdaptiveAvgPool2d(output_size=(pool_size, pool_size))
-        self.conv = modules.Conv2dReLU(
-            in_channels, out_channels, kernel_size=1, use_norm=use_norm
+        self.pool_size = pool_size 
+
+        self.pool = nn.Sequential(
+            nn.AdaptiveAvgPool2d(output_size=(pool_size, pool_size)),
+            modules.Conv2dReLU(
+                in_channels, out_channels, kernel_size=1, use_norm=use_norm
+            ),
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -34,10 +37,11 @@ class PSPBlock(nn.Module):
         # (average pooling) while being more robustly supported.
         if torch.onnx.is_in_onnx_export():
             x = F.interpolate(x, size=(self.pool_size, self.pool_size), mode='area')
+            x = self.pool[1](x) # use only ConvRelu block from pool
         else:
             x = self.pool(x)
 
-        x = self.conv(x)
+        # x = self.conv(x)
         x = F.interpolate(x, size=(height, width), mode="bilinear", align_corners=True)
         return x
 
