@@ -44,16 +44,22 @@ class TverskyLoss(DiceLoss):
         alpha: float = 0.5,
         beta: float = 0.5,
         gamma: float = 1.0,
+        class_weights: Optional[List[float]] = None,
     ):
         assert mode in {BINARY_MODE, MULTILABEL_MODE, MULTICLASS_MODE}
         super().__init__(
-            mode, classes, log_loss, from_logits, smooth, ignore_index, eps
+            mode, classes, log_loss, from_logits, smooth, ignore_index, eps, class_weights
         )
         self.alpha = alpha
         self.beta = beta
         self.gamma = gamma
 
-    def aggregate_loss(self, loss):
+    def aggregate_loss(self, loss: torch.Tensor) -> torch.Tensor:
+        if self.class_weights is not None:
+            weights = self.class_weights.to(loss.device)
+            if self.classes is not None:
+                weights = weights[self.classes]
+            return ((loss * weights).sum() / weights.sum()) ** self.gamma
         return loss.mean() ** self.gamma
 
     def compute_score(
