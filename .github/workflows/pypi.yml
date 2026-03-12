@@ -15,7 +15,7 @@ jobs:
       - name: Set up python
         uses: actions/setup-python@v6.2.0
         with:
-          python-version: '3.13'
+          python-version: '3.14'
 
       - name: Install pip dependencies
         run: pip install build
