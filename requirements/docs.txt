@@ -2,4 +2,4 @@ autodocsumm==0.2.14
 huggingface-hub==1.6.0
 six==1.17.0
 sphinx==8.2.3
-sphinx-book-theme==1.1.4
+sphinx-book-theme==1.2.0
