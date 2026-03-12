@@ -40,8 +40,6 @@ class PSPBlock(nn.Module):
             x = self.pool[1](x) # use only ConvRelu block from pool
         else:
             x = self.pool(x)
-
-        # x = self.conv(x)
         x = F.interpolate(x, size=(height, width), mode="bilinear", align_corners=True)
         return x
 
