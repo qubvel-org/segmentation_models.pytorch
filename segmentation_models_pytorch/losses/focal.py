@@ -3,7 +3,7 @@ from functools import partial
 
 import torch
 from torch.nn.modules.loss import _Loss
-from ._functional import focal_loss_with_logits, softmax_focal_loss_with_logits
+from ._functional import focal_loss_with_logits
 from .constants import BINARY_MODE, MULTICLASS_MODE, MULTILABEL_MODE
 
 __all__ = ["FocalLoss"]
@@ -52,7 +52,7 @@ class FocalLoss(_Loss):
         self.ignore_index = ignore_index
         self.reduction = reduction
         self.eps = eps
-        
+
         self.focal_loss_fn = partial(
             focal_loss_with_logits,
             alpha=alpha,
@@ -63,7 +63,7 @@ class FocalLoss(_Loss):
         )
 
     def forward(self, y_pred: torch.Tensor, y_true: torch.Tensor) -> torch.Tensor:
-        
+
         if not self.from_logits:
             y_pred = torch.clamp(y_pred, self.eps, 1 - self.eps)
 
