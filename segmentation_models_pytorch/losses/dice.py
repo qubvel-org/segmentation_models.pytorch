@@ -33,7 +33,7 @@ class DiceLoss(_Loss):
             ignore_index: Label that indicates ignored pixels (does not contribute to loss)
             eps: A small epsilon for numerical stability to avoid zero division error
                 (denominator will be always greater or equal to eps)
-            class_weights: Array of weights for each class. If not None, the loss for each class
+            class_weights: List of weights for each class. If not ``None``, the loss for each class
                 is multiplied by the corresponding weight. Only supported for multiclass and
                 multilabel modes. Weights do not need to be normalized.
 
@@ -62,7 +62,9 @@ class DiceLoss(_Loss):
         self.log_loss = log_loss
         self.ignore_index = ignore_index
         self.class_weights = (
-            to_tensor(class_weights, dtype=torch.float) if class_weights is not None else None
+            to_tensor(class_weights, dtype=torch.float)
+            if class_weights is not None
+            else None
         )
 
     def forward(self, y_pred: torch.Tensor, y_true: torch.Tensor) -> torch.Tensor:

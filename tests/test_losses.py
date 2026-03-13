@@ -345,7 +345,9 @@ def test_class_weights_uniform_equivalent_to_no_weights_multiclass():
 
     for loss_cls in [DiceLoss, JaccardLoss, TverskyLoss]:
         loss_no_w = loss_cls(mode=smp.losses.MULTICLASS_MODE)(y_pred, y_true)
-        loss_uniform = loss_cls(mode=smp.losses.MULTICLASS_MODE, class_weights=[1.0, 1.0, 1.0])(y_pred, y_true)
+        loss_uniform = loss_cls(
+            mode=smp.losses.MULTICLASS_MODE, class_weights=[1.0, 1.0, 1.0]
+        )(y_pred, y_true)
         assert torch.allclose(loss_no_w, loss_uniform, atol=eps), (
             f"Uniform weights should be equivalent to no weights for {loss_cls.__name__}"
         )
@@ -361,7 +363,9 @@ def test_class_weights_uniform_equivalent_to_no_weights_multilabel():
 
     for loss_cls in [DiceLoss, JaccardLoss, TverskyLoss]:
         loss_no_w = loss_cls(mode=smp.losses.MULTILABEL_MODE)(y_pred, y_true)
-        loss_uniform = loss_cls(mode=smp.losses.MULTILABEL_MODE, class_weights=[1.0, 1.0, 1.0])(y_pred, y_true)
+        loss_uniform = loss_cls(
+            mode=smp.losses.MULTILABEL_MODE, class_weights=[1.0, 1.0, 1.0]
+        )(y_pred, y_true)
         assert torch.allclose(loss_no_w, loss_uniform, atol=eps), (
             f"Uniform weights should be equivalent to no weights for {loss_cls.__name__}"
         )
@@ -376,7 +380,9 @@ def test_class_weights_nonuniform_changes_loss_multiclass():
 
     for loss_cls in [DiceLoss, JaccardLoss, TverskyLoss]:
         loss_no_w = loss_cls(mode=smp.losses.MULTICLASS_MODE)(y_pred, y_true)
-        loss_weighted = loss_cls(mode=smp.losses.MULTICLASS_MODE, class_weights=[1.0, 2.0, 0.5])(y_pred, y_true)
+        loss_weighted = loss_cls(
+            mode=smp.losses.MULTICLASS_MODE, class_weights=[1.0, 2.0, 0.5]
+        )(y_pred, y_true)
         assert not torch.allclose(loss_no_w, loss_weighted, atol=1e-6), (
             f"Non-uniform weights should change the loss for {loss_cls.__name__}"
         )
@@ -391,8 +397,12 @@ def test_class_weights_scale_invariant_multiclass():
     y_true = torch.randint(0, 3, (2, 4, 4))
 
     for loss_cls in [DiceLoss, JaccardLoss, TverskyLoss]:
-        loss_w = loss_cls(mode=smp.losses.MULTICLASS_MODE, class_weights=[1.0, 2.0, 0.5])(y_pred, y_true)
-        loss_w_scaled = loss_cls(mode=smp.losses.MULTICLASS_MODE, class_weights=[10.0, 20.0, 5.0])(y_pred, y_true)
+        loss_w = loss_cls(
+            mode=smp.losses.MULTICLASS_MODE, class_weights=[1.0, 2.0, 0.5]
+        )(y_pred, y_true)
+        loss_w_scaled = loss_cls(
+            mode=smp.losses.MULTICLASS_MODE, class_weights=[10.0, 20.0, 5.0]
+        )(y_pred, y_true)
         assert torch.allclose(loss_w, loss_w_scaled, atol=eps), (
             f"Loss should be scale-invariant w.r.t. class_weights for {loss_cls.__name__}"
         )
@@ -408,18 +418,17 @@ def test_class_weights_binary_mode_raises():
 
 @torch.inference_mode()
 def test_focal_class_weights_uniform_equivalent_to_no_weights():
-    """Uniform class_weights should produce a loss proportional to no-weights loss."""
+    """Uniform class_weights should produce a loss equivalent to no-weights loss."""
     eps = 1e-5
     torch.manual_seed(0)
     y_pred = torch.randn(2, 3, 4, 4)
     y_true = torch.randint(0, 3, (2, 4, 4))
-    num_classes = 3
 
-    from segmentation_models_pytorch.losses import FocalLoss
     loss_no_w = FocalLoss(mode=smp.losses.MULTICLASS_MODE)(y_pred, y_true)
-    loss_uniform = FocalLoss(mode=smp.losses.MULTICLASS_MODE, class_weights=[1.0, 1.0, 1.0])(y_pred, y_true)
-    assert torch.allclose(loss_no_w / num_classes, loss_uniform, atol=eps)
-
+    loss_uniform = FocalLoss(
+        mode=smp.losses.MULTICLASS_MODE, class_weights=[1.0, 1.0, 1.0]
+    )(y_pred, y_true)
+    assert torch.allclose(loss_no_w, loss_uniform, atol=eps)
 
 
 @torch.inference_mode()
@@ -430,7 +439,10 @@ def test_focal_class_weights_scale_invariant():
     y_pred = torch.randn(2, 3, 4, 4)
     y_true = torch.randint(0, 3, (2, 4, 4))
 
-    from segmentation_models_pytorch.losses import FocalLoss
-    loss_w = FocalLoss(mode=smp.losses.MULTICLASS_MODE, class_weights=[1.0, 2.0, 0.5])(y_pred, y_true)
-    loss_w_scaled = FocalLoss(mode=smp.losses.MULTICLASS_MODE, class_weights=[10.0, 20.0, 5.0])(y_pred, y_true)
+    loss_w = FocalLoss(mode=smp.losses.MULTICLASS_MODE, class_weights=[1.0, 2.0, 0.5])(
+        y_pred, y_true
+    )
+    loss_w_scaled = FocalLoss(
+        mode=smp.losses.MULTICLASS_MODE, class_weights=[10.0, 20.0, 5.0]
+    )(y_pred, y_true)
     assert torch.allclose(loss_w, loss_w_scaled, atol=eps)

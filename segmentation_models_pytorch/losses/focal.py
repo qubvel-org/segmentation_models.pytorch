@@ -32,9 +32,9 @@ class FocalLoss(_Loss):
             normalized: Compute normalized focal loss (https://arxiv.org/pdf/1909.07829.pdf).
             reduced_threshold: Switch to reduced focal loss. Note, when using this mode you
                 should use `reduction="sum"`.
-            class_weights: Array of weights for each class. If not None, the loss for each class
-                is multiplied by the corresponding weight. Only supported for multiclass mode.
-                Weights do not need to be normalized.
+            class_weights: List of weights for each class. If not ``None``, the loss for each class
+                is multiplied by the corresponding weight. Only supported for multiclass and
+                multilabel modes. Weights do not need to be normalized.
 
         Shape
              - **y_pred** - torch.Tensor of shape (N, C, H, W)
@@ -47,8 +47,8 @@ class FocalLoss(_Loss):
         assert mode in {BINARY_MODE, MULTILABEL_MODE, MULTICLASS_MODE}
         super().__init__()
 
-        if class_weights is not None and mode != MULTICLASS_MODE:
-            raise ValueError("class_weights are only supported with mode=multiclass")
+        if class_weights is not None and mode == BINARY_MODE:
+            raise ValueError("class_weights are not supported with mode=binary")
 
         self.mode = mode
         self.ignore_index = ignore_index
@@ -61,10 +61,14 @@ class FocalLoss(_Loss):
             reduction=reduction,
             normalized=normalized,
         )
-        self.class_weights = to_tensor(class_weights, dtype=torch.float) if class_weights is not None else None
+        self.class_weights = (
+            to_tensor(class_weights, dtype=torch.float)
+            if class_weights is not None
+            else None
+        )
 
     def forward(self, y_pred: torch.Tensor, y_true: torch.Tensor) -> torch.Tensor:
-        if self.mode in {BINARY_MODE, MULTILABEL_MODE}:
+        if self.mode == BINARY_MODE:
             y_true = y_true.reshape(-1)
             y_pred = y_pred.reshape(-1)
 
@@ -76,7 +80,7 @@ class FocalLoss(_Loss):
 
             loss = self.focal_loss_fn(y_pred, y_true)
 
-        elif self.mode == MULTICLASS_MODE:
+        elif self.mode in {MULTILABEL_MODE, MULTICLASS_MODE}:
             num_classes = y_pred.size(1)
 
             # Filter anchors with -1 label from loss computation
@@ -85,7 +89,10 @@ class FocalLoss(_Loss):
 
             class_losses = []
             for cls in range(num_classes):
-                cls_y_true = (y_true == cls).long()
+                if self.mode == MULTICLASS_MODE:
+                    cls_y_true = (y_true == cls).long()
+                else:
+                    cls_y_true = y_true[:, cls, ...]
                 cls_y_pred = y_pred[:, cls, ...]
 
                 if self.ignore_index is not None:
@@ -99,6 +106,6 @@ class FocalLoss(_Loss):
                 weights = self.class_weights.to(class_losses.device)
                 loss = (class_losses * weights).sum() / weights.sum()
             else:
-                loss = class_losses.sum()
+                loss = class_losses.mean()
 
         return loss
