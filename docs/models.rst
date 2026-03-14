@@ -19,6 +19,13 @@ Unet++
 .. autoclass:: segmentation_models_pytorch.UnetPlusPlus
 
 
+.. _attentionunet:
+
+AttentionUnet
+~~~~~~~~~~~~~
+.. autoclass:: segmentation_models_pytorch.AttentionUnet
+
+
 .. _fpn:
 
 FPN
