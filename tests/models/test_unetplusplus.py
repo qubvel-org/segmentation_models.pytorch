@@ -1,4 +1,5 @@
 import segmentation_models_pytorch as smp
+import torch
 
 from tests.models import base
 
@@ -6,6 +7,14 @@ from tests.models import base
 class TestUnetPlusPlusModel(base.BaseModelTester):
     test_model_type = "unetplusplus"
     files_for_diff = [r"decoders/unetplusplus/", r"base/"]
+
+    def test_timm_transformer_style_encoder(self):
+        model = smp.UnetPlusPlus("tu-convnext_atto", encoder_weights=None).eval()
+
+        with torch.inference_mode():
+            output = model(torch.rand(1, 3, 256, 256))
+
+        assert output.shape == (1, 1, 256, 256)
 
     def test_interpolation(self):
         # test bilinear

@@ -18,6 +18,17 @@ class DecoderBlock(nn.Module):
         interpolation_mode: str = "nearest",
     ):
         super().__init__()
+        self.out_channels = out_channels
+        self.is_empty = out_channels == 0
+        self.interpolation_mode = interpolation_mode
+
+        if self.is_empty:
+            self.conv1 = None
+            self.attention1 = None
+            self.conv2 = None
+            self.attention2 = None
+            return
+
         self.conv1 = md.Conv2dReLU(
             in_channels + skip_channels,
             out_channels,
@@ -36,12 +47,14 @@ class DecoderBlock(nn.Module):
             use_norm=use_norm,
         )
         self.attention2 = md.Attention(attention_type, in_channels=out_channels)
-        self.interpolation_mode = interpolation_mode
 
     def forward(
         self, x: torch.Tensor, skip: Optional[torch.Tensor] = None
     ) -> torch.Tensor:
         x = F.interpolate(x, scale_factor=2.0, mode=self.interpolation_mode)
+        if self.is_empty:
+            height, width = x.shape[2:]
+            return x.new_empty(x.shape[0], 0, height, width)
         if skip is not None:
             x = torch.cat([x, skip], dim=1)
             x = self.attention1(x)
