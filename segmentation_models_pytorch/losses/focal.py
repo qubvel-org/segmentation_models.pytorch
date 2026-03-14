@@ -70,20 +70,21 @@ class FocalLoss(_Loss):
 
         elif self.mode == MULTICLASS_MODE:
             num_classes = y_pred.size(1)
-            loss = 0
 
-            # Filter anchors with -1 label from loss computation
+            # If ignore_index parameter is passed, treat it as an extra class during one-hot encoding and remove it later
+            # One-hot encoding the labels allows us to vectorise the focal loss computation
             if self.ignore_index is not None:
-                not_ignored = y_true != self.ignore_index
+                y_true[y_true == self.ignore_index] = num_classes
+                y_true_one_hot = torch.nn.functional.one_hot(y_true,num_classes = num_classes + 1)
+                y_true_one_hot = y_true_one_hot[ ... , : -1]
 
-            for cls in range(num_classes):
-                cls_y_true = (y_true == cls).long()
-                cls_y_pred = y_pred[:, cls, ...]
+            else:     
+                y_true_one_hot = torch.nn.functional.one_hot(y_true,num_classes = num_classes)
 
-                if self.ignore_index is not None:
-                    cls_y_true = cls_y_true[not_ignored]
-                    cls_y_pred = cls_y_pred[not_ignored]
+            y_true_one_hot = torch.permute(y_true_one_hot,(0,3,1,2))
 
-                loss += self.focal_loss_fn(cls_y_pred, cls_y_true)
+            # Multiplying the loss by num_classes in order to stay consistent with the earlier loss computation which did not
+            # take a classwise average of the loss
+            loss = num_classes * self.focal_loss_fn(y_pred, y_true_one_hot)
 
         return loss
