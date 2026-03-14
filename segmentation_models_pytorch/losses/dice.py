@@ -19,6 +19,7 @@ class DiceLoss(_Loss):
         smooth: float = 0.0,
         ignore_index: Optional[int] = None,
         eps: float = 1e-7,
+        class_weights: Optional[List[float]] = None,
     ):
         """Dice loss for image segmentation task.
         It supports binary, multiclass and multilabel cases
@@ -32,6 +33,9 @@ class DiceLoss(_Loss):
             ignore_index: Label that indicates ignored pixels (does not contribute to loss)
             eps: A small epsilon for numerical stability to avoid zero division error
                 (denominator will be always greater or equal to eps)
+            class_weights: List of weights for each class. If not ``None``, the loss for each class
+                is multiplied by the corresponding weight. Only supported for multiclass and
+                multilabel modes. Weights do not need to be normalized.
 
         Shape
              - **y_pred** - torch.Tensor of shape (N, C, H, W)
@@ -43,6 +47,8 @@ class DiceLoss(_Loss):
         assert mode in {BINARY_MODE, MULTILABEL_MODE, MULTICLASS_MODE}
         super(DiceLoss, self).__init__()
         self.mode = mode
+        if class_weights is not None and mode == BINARY_MODE:
+            raise ValueError("class_weights are not supported with mode=binary")
         if classes is not None:
             assert mode != BINARY_MODE, (
                 "Masking classes is not supported with mode=binary"
@@ -55,6 +61,11 @@ class DiceLoss(_Loss):
         self.eps = eps
         self.log_loss = log_loss
         self.ignore_index = ignore_index
+        self.class_weights = (
+            to_tensor(class_weights, dtype=torch.float)
+            if class_weights is not None
+            else None
+        )
 
     def forward(self, y_pred: torch.Tensor, y_true: torch.Tensor) -> torch.Tensor:
         assert y_true.size(0) == y_pred.size(0)
@@ -128,7 +139,21 @@ class DiceLoss(_Loss):
 
         return self.aggregate_loss(loss)
 
-    def aggregate_loss(self, loss):
+    def aggregate_loss(self, loss: torch.Tensor) -> torch.Tensor:
+        """Aggregate per-class losses into a single scalar.
+
+        Args:
+            loss: Per-class loss tensor of shape (C,)
+
+        Returns:
+            Scalar loss value
+        """
+        if self.class_weights is not None:
+            weights = self.class_weights.to(loss.device)
+            # If classes filter is applied, slice weights accordingly
+            if self.classes is not None:
+                weights = weights[self.classes]
+            return (loss * weights).sum() / weights.sum()
         return loss.mean()
 
     def compute_score(
