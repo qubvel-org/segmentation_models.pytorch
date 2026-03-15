@@ -20,6 +20,8 @@ class PSPBlock(nn.Module):
         if pool_size == 1:
             use_norm = "identity"  # PyTorch does not support BatchNorm for 1x1 shape
 
+        self.pool_size = pool_size
+
         self.pool = nn.Sequential(
             nn.AdaptiveAvgPool2d(output_size=(pool_size, pool_size)),
             modules.Conv2dReLU(
@@ -29,7 +31,19 @@ class PSPBlock(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         height, width = x.shape[2:]
-        x = self.pool(x)
+
+        if torch.jit.is_scripting():
+            # TorchScript path: use standard AdaptiveAvgPool2d via self.pool
+            x = self.pool(x)
+        elif torch.onnx.is_in_onnx_export():
+            # ONNX export path: AdaptiveAvgPool2d is often problematic during export.
+            # Using F.interpolate with 'area' mode provides the same mathematical result
+            # (average pooling) while being more robustly supported.
+            x = F.interpolate(x, size=(self.pool_size, self.pool_size), mode="area")
+            x = self.pool[1](x)  # use only ConvRelu block from pool
+        else:
+            x = self.pool(x)
+
         x = F.interpolate(x, size=(height, width), mode="bilinear", align_corners=True)
         return x
 
