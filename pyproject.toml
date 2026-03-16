@@ -30,7 +30,6 @@ dynamic = ['version']
 
 [project.optional-dependencies]
 docs = [
-    'autodocsumm',
     'huggingface-hub',
     'six',
     'sphinx',
