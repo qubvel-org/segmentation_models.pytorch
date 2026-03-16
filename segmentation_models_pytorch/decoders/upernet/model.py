@@ -29,6 +29,7 @@ class UPerNet(SegmentationModel):
         decoder_segmentation_channels: A number of convolution filters in segmentation blocks, default is 64
         decoder_use_norm: Specifies normalization between Conv2D and activation.
             Accepts the following types:
+
             - **True**: Defaults to `"batchnorm"`.
             - **False**: No normalization (`nn.Identity`).
             - **str**: Specifies normalization type using default parameters. Available values:
@@ -50,11 +51,12 @@ class UPerNet(SegmentationModel):
             **callable** and **None**. Default is **None**.
         aux_params: Dictionary with parameters of the auxiliary output (classification head). Auxiliary output is build
             on top of encoder if **aux_params** is not **None** (default). Supported params:
-                - classes (int): A number of classes
-                - pooling (str): One of "max", "avg". Default is "avg"
-                - dropout (float): Dropout factor in [0, 1)
-                - activation (str): An activation function to apply "sigmoid"/"softmax"
-                    (could be **None** to return logits)
+
+            - classes (int): A number of classes
+            - pooling (str): One of "max", "avg". Default is "avg"
+            - dropout (float): Dropout factor in [0, 1)
+            - activation (str): An activation function to apply "sigmoid"/"softmax"
+              (could be **None** to return logits)
         kwargs: Arguments passed to the encoder class ``__init__()`` function. Applies only to ``timm`` models. Keys with ``None`` values are pruned before passing.
 
     Returns:
