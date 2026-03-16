@@ -1,7 +1,7 @@
 📉 Losses
 =========
 
-Collection of popular semantic segmentation losses. Adapted from 
+Collection of popular semantic segmentation losses. Adapted from
 an awesome repo with pytorch utils https://github.com/BloodAxe/pytorch-toolbelt
 
 Constants
@@ -18,7 +18,7 @@ DiceLoss
 .. autoclass:: segmentation_models_pytorch.losses.DiceLoss
 
 TverskyLoss
-~~~~~~~~
+~~~~~~~~~~~
 .. autoclass:: segmentation_models_pytorch.losses.TverskyLoss
 
 FocalLoss
