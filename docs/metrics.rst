@@ -3,6 +3,8 @@
 
 Functional metrics
 ~~~~~~~~~~~~~~~~~~
-.. automodule:: segmentation_models_pytorch.metrics.functional
-        :members:
-        :autosummary:
+
+.. autosummary::
+   :recursive:
+
+   segmentation_models_pytorch.metrics.functional
