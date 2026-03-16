@@ -15,9 +15,10 @@ from .decoder import MAnetDecoder
 class MAnet(SegmentationModel):
     """MAnet_ :  Multi-scale Attention Net. The MA-Net can capture rich contextual dependencies based on
     the attention mechanism, using two blocks:
-     - Position-wise Attention Block (PAB), which captures the spatial dependencies between pixels in a global view
-     - Multi-scale Fusion Attention Block (MFAB), which  captures the channel dependencies between any feature map by
-       multi-scale semantic feature fusion
+
+    - Position-wise Attention Block (PAB), which captures the spatial dependencies between pixels in a global view
+    - Multi-scale Fusion Attention Block (MFAB), which  captures the channel dependencies between any feature map by
+      multi-scale semantic feature fusion
 
     Args:
         encoder_name: Name of the classification model that will be used as an encoder (a.k.a backbone)
