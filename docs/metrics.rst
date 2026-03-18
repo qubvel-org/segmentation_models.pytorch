@@ -4,8 +4,7 @@
 Functional metrics
 ~~~~~~~~~~~~~~~~~~
 
-.. automodule:: segmentation_models_pytorch.metrics.functional
-   :members:
+.. currentmodule:: segmentation_models_pytorch.metrics.functional
 
 .. autosummary::
 
@@ -27,3 +26,6 @@ Functional metrics
    false_omission_rate
    positive_likelihood_ratio
    negative_likelihood_ratio
+
+.. automodule:: segmentation_models_pytorch.metrics.functional
+   :members:
