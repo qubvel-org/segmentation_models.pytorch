@@ -101,3 +101,10 @@ Please, follow these rules, when adding a solution to the "Hall of Fame":
 - 1st place. [Gihun Lee](https://github.com/Lee-Gihun), [Sangmook Kim](https://github.com/ElvinKim), [Joonkee Kim](https://github.com/joonkeekim)
 - [[code](https://github.com/Lee-Gihun/MEDIAR)]
 [[Paper](https://arxiv.org/abs/2212.03465)]
+
+### [ICIP2025 Colorectal Cancer Tumor Grade Segmentation in Digital Histopathology Images: From Giga to Mini Challenge](https://sites.google.com/view/cctgs-challenge/home)
+
+- 2nd place. [Ümit Mert Çağlar](linkedin.com/in/mertcaglar), [Alptekin Temizel](https://blog.metu.edu.tr/atemizel/)
+- [[code](https://github.com/caglarmert/ICIP2025)]
+[[paper](https://doi.org/10.1117/12.3096537)]
+[[challange results](https://arxiv.org/abs/2507.04681)]
