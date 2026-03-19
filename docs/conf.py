@@ -57,6 +57,7 @@ extensions = [
 nitpicky = True
 nitpick_ignore = [
     # Undocumented classes
+    ("py:class", "torch.FloatTensor"),
     ("py:class", "torch.LongTensor"),
 ]
 
