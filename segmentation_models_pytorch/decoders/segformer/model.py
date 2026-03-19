@@ -12,7 +12,7 @@ from .decoder import SegformerDecoder
 
 
 class Segformer(SegmentationModel):
-    """Segformer is simple and efficient design for semantic segmentation with Transformers
+    """`Segformer`__ is simple and efficient design for semantic segmentation with Transformers
 
     Args:
         encoder_name: Name of the classification model that will be used as an encoder (a.k.a backbone)
@@ -45,9 +45,7 @@ class Segformer(SegmentationModel):
     Returns:
         ``torch.nn.Module``: **Segformer**
 
-    .. _Segformer:
-        https://arxiv.org/abs/2105.15203
-
+    .. __: https://arxiv.org/abs/2105.15203
     """
 
     @supports_config_loading

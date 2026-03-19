@@ -13,7 +13,7 @@ from .decoder import PSPDecoder
 
 
 class PSPNet(SegmentationModel):
-    """PSPNet_ is a fully convolution neural network for image semantic segmentation. Consist of
+    """`PSPNet`__ is a fully convolution neural network for image semantic segmentation. Consist of
     *encoder* and *Spatial Pyramid* (decoder). Spatial Pyramid build on top of encoder and does not
     use "fine-features" (features of high spatial resolution). PSPNet can be used for multiclass segmentation
     of high resolution images, however it is not good for detecting small objects and producing accurate,
@@ -68,8 +68,7 @@ class PSPNet(SegmentationModel):
     Returns:
         ``torch.nn.Module``: **PSPNet**
 
-    .. _PSPNet:
-        https://arxiv.org/abs/1612.01105
+    .. __: https://arxiv.org/abs/1612.01105
     """
 
     @supports_config_loading

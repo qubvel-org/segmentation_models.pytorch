@@ -14,7 +14,7 @@ from .decoder import DeepLabV3Decoder, DeepLabV3PlusDecoder
 
 
 class DeepLabV3(SegmentationModel):
-    """DeepLabV3_ implementation from "Rethinking Atrous Convolution for Semantic Image Segmentation"
+    """`DeepLabV3`__ implementation from "Rethinking Atrous Convolution for Semantic Image Segmentation"
 
     Args:
         encoder_name: Name of the classification model that will be used as an encoder (a.k.a backbone)
@@ -52,9 +52,7 @@ class DeepLabV3(SegmentationModel):
     Returns:
         ``torch.nn.Module``: **DeepLabV3**
 
-    .. _DeeplabV3:
-        https://arxiv.org/abs/1706.05587
-
+    .. __: https://arxiv.org/abs/1706.05587
     """
 
     @supports_config_loading
@@ -141,7 +139,7 @@ class DeepLabV3(SegmentationModel):
 
 
 class DeepLabV3Plus(SegmentationModel):
-    """DeepLabV3+ implementation from "Encoder-Decoder with Atrous Separable
+    """`DeepLabV3+`__ implementation from "Encoder-Decoder with Atrous Separable
     Convolution for Semantic Image Segmentation"
 
     Args:
@@ -180,9 +178,7 @@ class DeepLabV3Plus(SegmentationModel):
     Returns:
         ``torch.nn.Module``: **DeepLabV3Plus**
 
-    Reference:
-        https://arxiv.org/abs/1802.02611v3
-
+    .. __: https://arxiv.org/abs/1802.02611v3
     """
 
     @supports_config_loading
