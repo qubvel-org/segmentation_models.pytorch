@@ -13,7 +13,7 @@ from .decoder import UnetPlusPlusDecoder
 
 
 class UnetPlusPlus(SegmentationModel):
-    """Unet++ is a fully convolution neural network for image semantic segmentation. Consist of *encoder*
+    """`U-Net++`__ is a fully convolution neural network for image semantic segmentation. Consist of *encoder*
     and *decoder* parts connected with *skip connections*. Encoder extract features of different spatial
     resolution (skip connections) which are used by decoder to define accurate segmentation mask. Decoder of
     Unet++ is more complex than in usual Unet.
@@ -70,9 +70,7 @@ class UnetPlusPlus(SegmentationModel):
     Returns:
         ``torch.nn.Module``: **Unet++**
 
-    Reference:
-        https://arxiv.org/abs/1807.10165
-
+    .. __: https://arxiv.org/abs/1807.10165
     """
 
     _is_torch_scriptable = False

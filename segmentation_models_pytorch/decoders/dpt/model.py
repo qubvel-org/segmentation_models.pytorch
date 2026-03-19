@@ -15,7 +15,7 @@ from .decoder import DPTDecoder, DPTSegmentationHead
 
 class DPT(SegmentationModel):
     """
-    DPT is a dense prediction architecture that leverages vision transformers in place of convolutional networks as
+    `DPT`__ is a dense prediction architecture that leverages vision transformers in place of convolutional networks as
     a backbone for dense prediction tasks
 
     It assembles tokens from various stages of the vision transformer into image-like representations at various resolutions
@@ -69,6 +69,7 @@ class DPT(SegmentationModel):
     Returns:
         ``torch.nn.Module``: DPT
 
+    .. __: https://arxiv.org/abs/2103.13413
     """
 
     # fails for encoders with prefix tokens
