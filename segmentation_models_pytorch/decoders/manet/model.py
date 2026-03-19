@@ -15,9 +15,10 @@ from .decoder import MAnetDecoder
 class MAnet(SegmentationModel):
     """MAnet_ :  Multi-scale Attention Net. The MA-Net can capture rich contextual dependencies based on
     the attention mechanism, using two blocks:
-     - Position-wise Attention Block (PAB), which captures the spatial dependencies between pixels in a global view
-     - Multi-scale Fusion Attention Block (MFAB), which  captures the channel dependencies between any feature map by
-       multi-scale semantic feature fusion
+
+    - Position-wise Attention Block (PAB), which captures the spatial dependencies between pixels in a global view
+    - Multi-scale Fusion Attention Block (MFAB), which  captures the channel dependencies between any feature map by
+      multi-scale semantic feature fusion
 
     Args:
         encoder_name: Name of the classification model that will be used as an encoder (a.k.a backbone)
@@ -34,6 +35,7 @@ class MAnet(SegmentationModel):
             Length of the list should be the same as **encoder_depth**
         decoder_use_norm: Specifies normalization between Conv2D and activation.
             Accepts the following types:
+
             - **True**: Defaults to `"batchnorm"`.
             - **False**: No normalization (`nn.Identity`).
             - **str**: Specifies normalization type using default parameters. Available values:
@@ -59,11 +61,12 @@ class MAnet(SegmentationModel):
             **callable** and **None**. Default is **None**.
         aux_params: Dictionary with parameters of the auxiliary output (classification head). Auxiliary output is build
             on top of encoder if **aux_params** is not **None** (default). Supported params:
-                - classes (int): A number of classes
-                - pooling (str): One of "max", "avg". Default is "avg"
-                - dropout (float): Dropout factor in [0, 1)
-                - activation (str): An activation function to apply "sigmoid"/"softmax"
-                    (could be **None** to return logits)
+
+            - classes (int): A number of classes
+            - pooling (str): One of "max", "avg". Default is "avg"
+            - dropout (float): Dropout factor in [0, 1)
+            - activation (str): An activation function to apply "sigmoid"/"softmax"
+              (could be **None** to return logits)
         kwargs: Arguments passed to the encoder class ``__init__()`` function. Applies only to ``timm`` models. Keys with ``None`` values are pruned before passing.
 
     Returns:

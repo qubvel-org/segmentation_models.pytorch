@@ -40,11 +40,12 @@ class DeepLabV3(SegmentationModel):
         upsampling: Final upsampling factor. Default is **None** to preserve input-output spatial shape identity
         aux_params: Dictionary with parameters of the auxiliary output (classification head). Auxiliary output is build
             on top of encoder if **aux_params** is not **None** (default). Supported params:
-                - classes (int): A number of classes
-                - pooling (str): One of "max", "avg". Default is "avg"
-                - dropout (float): Dropout factor in [0, 1)
-                - activation (str): An activation function to apply "sigmoid"/"softmax"
-                    (could be **None** to return logits)
+
+            - classes (int): A number of classes
+            - pooling (str): One of "max", "avg". Default is "avg"
+            - dropout (float): Dropout factor in [0, 1)
+            - activation (str): An activation function to apply "sigmoid"/"softmax"
+              (could be **None** to return logits)
         kwargs: Arguments passed to the encoder class ``__init__()`` function. Applies only to ``timm`` models.
             Keys with ``None`` values are pruned before passing.
 
@@ -167,11 +168,12 @@ class DeepLabV3Plus(SegmentationModel):
         upsampling: Final upsampling factor. Default is 4 to preserve input-output spatial shape identity.
         aux_params: Dictionary with parameters of the auxiliary output (classification head). Auxiliary output is build
             on top of encoder if **aux_params** is not **None** (default). Supported params:
-                - classes (int): A number of classes
-                - pooling (str): One of "max", "avg". Default is "avg"
-                - dropout (float): Dropout factor in [0, 1)
-                - activation (str): An activation function to apply "sigmoid"/"softmax"
-                    (could be **None** to return logits)
+
+            - classes (int): A number of classes
+            - pooling (str): One of "max", "avg". Default is "avg"
+            - dropout (float): Dropout factor in [0, 1)
+            - activation (str): An activation function to apply "sigmoid"/"softmax"
+              (could be **None** to return logits)
         kwargs: Arguments passed to the encoder class ``__init__()`` function. Applies only to ``timm`` models.
             Keys with ``None`` values are pruned before passing.
 
