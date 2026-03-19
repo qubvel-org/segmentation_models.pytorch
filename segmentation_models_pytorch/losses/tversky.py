@@ -31,8 +31,7 @@ class TverskyLoss(DiceLoss):
             multilabel modes. Weights do not need to be normalized.
 
     Return:
-        loss: torch.Tensor
-
+        torch.Tensor: loss
     """
 
     def __init__(
