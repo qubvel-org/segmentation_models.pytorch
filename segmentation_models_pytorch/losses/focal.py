@@ -16,6 +16,8 @@ class FocalLoss(_Loss):
         alpha: Optional[float] = None,
         gamma: Optional[float] = 2.0,
         ignore_index: Optional[int] = None,
+        from_logits: bool = True,
+        eps: float = 1e-7,
         reduction: Optional[str] = "mean",
         normalized: bool = False,
         reduced_threshold: Optional[float] = None,
@@ -25,6 +27,8 @@ class FocalLoss(_Loss):
 
         Args:
             mode: Loss mode 'binary', 'multiclass' or 'multilabel'
+            from_logits: If True, assumes input is raw logits
+            eps: Small value used for numerical stability when converting probabilities to logits .
             alpha: Prior probability of having positive value in target.
             gamma: Power factor for dampening weight (focal strength).
             ignore_index: If not None, targets may contain values to be ignored.
@@ -51,8 +55,11 @@ class FocalLoss(_Loss):
             raise ValueError("class_weights are not supported with mode=binary")
 
         self.mode = mode
+        self.from_logits = from_logits
         self.ignore_index = ignore_index
         self.reduction = reduction
+        self.eps = eps
+
         self.focal_loss_fn = partial(
             focal_loss_with_logits,
             alpha=alpha,
@@ -68,6 +75,18 @@ class FocalLoss(_Loss):
         )
 
     def forward(self, y_pred: torch.Tensor, y_true: torch.Tensor) -> torch.Tensor:
+
+        if not self.from_logits:
+            y_pred = torch.clamp(y_pred, self.eps, 1 - self.eps)
+
+            if self.mode in {BINARY_MODE, MULTILABEL_MODE}:
+                # inverse sigmoid
+                y_pred = torch.log(y_pred / (1 - y_pred))
+
+            elif self.mode == MULTICLASS_MODE:
+                # convert softmax probabilities to log-space
+                y_pred = torch.log(y_pred)
+
         if self.mode == BINARY_MODE:
             y_true = y_true.reshape(-1)
             y_pred = y_pred.reshape(-1)
