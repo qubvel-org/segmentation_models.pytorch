@@ -12,7 +12,7 @@ from .decoder import FPNDecoder
 
 
 class FPN(SegmentationModel):
-    """FPN_ is a fully convolution neural network for image semantic segmentation.
+    """`FPN`_ is a fully convolution neural network for image semantic segmentation.
 
     Args:
         encoder_name: Name of the classification model that will be used as an encoder (a.k.a backbone)
@@ -51,7 +51,7 @@ class FPN(SegmentationModel):
     Returns:
         ``torch.nn.Module``: **FPN**
 
-    .. _FPN:
+    .. __FPN:
         http://presentations.cocodataset.org/COCO17-Stuff-FAIR.pdf
 
     """
