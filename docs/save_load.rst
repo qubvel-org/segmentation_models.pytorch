@@ -104,6 +104,9 @@ Conclusion
 
 By following these steps, you can easily save, share, and load your models, facilitating collaboration and reproducibility in your projects. Don't forget to replace the placeholders with your actual model paths and names.
 
+|binary-segmentation-intro|
+|save-load-model-and-share-with-hf-hub|
+
 .. |binary-segmentation-intro| image:: https://colab.research.google.com/assets/colab-badge.svg
     :target: https://colab.research.google.com/github/qubvel/segmentation_models.pytorch/blob/main/examples/binary_segmentation_intro.ipynb
     :alt: Open In Colab
