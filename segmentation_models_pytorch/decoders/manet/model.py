@@ -13,7 +13,7 @@ from .decoder import MAnetDecoder
 
 
 class MAnet(SegmentationModel):
-    """MAnet_ :  Multi-scale Attention Net. The MA-Net can capture rich contextual dependencies based on
+    """`MAnet`__:  Multi-scale Attention Net. The MA-Net can capture rich contextual dependencies based on
     the attention mechanism, using two blocks:
 
     - Position-wise Attention Block (PAB), which captures the spatial dependencies between pixels in a global view
@@ -72,9 +72,7 @@ class MAnet(SegmentationModel):
     Returns:
         ``torch.nn.Module``: **MAnet**
 
-    .. _MAnet:
-        https://ieeexplore.ieee.org/abstract/document/9201310
-
+    .. __: https://ieeexplore.ieee.org/abstract/document/9201310
     """
 
     @supports_config_loading

@@ -13,7 +13,7 @@ from .decoder import LinknetDecoder
 
 
 class Linknet(SegmentationModel):
-    """Linknet_ is a fully convolution neural network for image semantic segmentation. Consist of *encoder*
+    """`Linknet`__ is a fully convolution neural network for image semantic segmentation. Consist of *encoder*
     and *decoder* parts connected with *skip connections*. Encoder extract features of different spatial
     resolution (skip connections) which are used by decoder to define accurate segmentation mask. Use *sum*
     for fusing decoder blocks with skip connections.
@@ -67,8 +67,7 @@ class Linknet(SegmentationModel):
     Returns:
         ``torch.nn.Module``: **Linknet**
 
-    .. _Linknet:
-        https://arxiv.org/abs/1707.03718
+    .. __: https://arxiv.org/abs/1707.03718
     """
 
     @supports_config_loading

@@ -70,8 +70,8 @@ For example:
 Saving with preprocessing transform (Albumentations)
 ----------------------------------------------------
 
-You can save the preprocessing transform along with the model and push it to the Hub. 
-This can be useful when you want to share the model with the preprocessing transform that was used during training, 
+You can save the preprocessing transform along with the model and push it to the Hub.
+This can be useful when you want to share the model with the preprocessing transform that was used during training,
 to make sure that the inference pipeline is consistent with the training pipeline.
 
 .. code:: python
@@ -104,12 +104,13 @@ Conclusion
 
 By following these steps, you can easily save, share, and load your models, facilitating collaboration and reproducibility in your projects. Don't forget to replace the placeholders with your actual model paths and names.
 
-|colab-badge|
+|binary-segmentation-intro|
+|save-load-model-and-share-with-hf-hub|
 
-.. |colab-badge| image:: https://colab.research.google.com/assets/colab-badge.svg
+.. |binary-segmentation-intro| image:: https://colab.research.google.com/assets/colab-badge.svg
     :target: https://colab.research.google.com/github/qubvel/segmentation_models.pytorch/blob/main/examples/binary_segmentation_intro.ipynb
     :alt: Open In Colab
 
-.. |colab-badge| image:: https://colab.research.google.com/assets/colab-badge.svg
+.. |save-load-model-and-share-with-hf-hub| image:: https://colab.research.google.com/assets/colab-badge.svg
     :target: https://colab.research.google.com/github/qubvel/segmentation_models.pytorch/blob/main/examples/save_load_model_and_share_with_hf_hub.ipynb
     :alt: Open In Colab

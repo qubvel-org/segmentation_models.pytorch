@@ -12,7 +12,7 @@ from .decoder import UPerNetDecoder
 
 
 class UPerNet(SegmentationModel):
-    """UPerNet is a unified perceptual parsing network for image segmentation.
+    """`UPerNet`__ is a unified perceptual parsing network for image segmentation.
 
     Args:
         encoder_name: Name of the classification model that will be used as an encoder (a.k.a backbone)
@@ -62,9 +62,7 @@ class UPerNet(SegmentationModel):
     Returns:
         ``torch.nn.Module``: **UPerNet**
 
-    .. _UPerNet:
-        https://arxiv.org/abs/1807.10221
-
+    .. __: https://arxiv.org/abs/1807.10221
     """
 
     @supports_config_loading

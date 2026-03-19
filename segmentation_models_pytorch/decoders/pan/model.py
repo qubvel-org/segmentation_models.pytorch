@@ -13,7 +13,7 @@ from .decoder import PANDecoder
 
 
 class PAN(SegmentationModel):
-    """Implementation of PAN_ (Pyramid Attention Network).
+    """Implementation of `PAN`__ (Pyramid Attention Network).
 
     Note:
         Currently works with shape of input tensor >= [B x C x 128 x 128] for pytorch <= 1.1.0
@@ -54,9 +54,7 @@ class PAN(SegmentationModel):
     Returns:
         ``torch.nn.Module``: **PAN**
 
-    .. _PAN:
-        https://arxiv.org/abs/1805.10180
-
+    .. __: https://arxiv.org/abs/1805.10180
     """
 
     @supports_config_loading

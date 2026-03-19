@@ -6,7 +6,7 @@
 Segmentation model is just a PyTorch nn.Module, which can be created as easy as:
 
 .. code-block:: python
-    
+
     import segmentation_models_pytorch as smp
 
     model = smp.Unet(
@@ -65,5 +65,5 @@ Check the following examples:
    :target: https://colab.research.google.com/github/qubvel/segmentation_models.pytorch/blob/main/examples/binary_segmentation_intro.ipynb
    :alt: Open In Colab
 
-- Finetuning notebook on Oxford Pet dataset with `PyTorch Lightning <https://github.com/qubvel/segmentation_models.pytorch/blob/main/examples/binary_segmentation_intro.ipynb>`_ |colab-badge|
-- Finetuning script for cloth segmentation with `PyTorch Lightning <https://github.com/ternaus/cloths_segmentation>`_
+- Finetuning notebook on Oxford Pet dataset with `PyTorch Lightning <https://github.com/qubvel/segmentation_models.pytorch/blob/main/examples/binary_segmentation_intro.ipynb>`__ |colab-badge|
+- Finetuning script for cloth segmentation with `PyTorch Lightning <https://github.com/ternaus/cloths_segmentation>`__
