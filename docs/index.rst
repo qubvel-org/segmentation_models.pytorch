@@ -20,11 +20,6 @@ Welcome to Segmentation Models's documentation!
    save_load
    insights
 
-.. toctree::
-   :hidden:
-
-   encoders_dpt
-
 
 Indices and tables
 ==================
