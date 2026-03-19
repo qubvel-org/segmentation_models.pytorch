@@ -15,11 +15,12 @@ jobs:
   style:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up Python
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v7
         with:
-          python-version: "3.11"
+          python-version: "3.14"
+          activate-environment: true
 
       - name: Install dependencies
         run: uv pip install -r requirements/test.txt
@@ -34,15 +35,16 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["3.12", "3.13", "3.14"]
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@v7
       with:
         python-version: ${{ matrix.python-version }}
+        activate-environment: true
 
     - name: Install dependencies
       run: uv pip install -r requirements/required.txt -r requirements/test.txt
@@ -58,16 +60,16 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         slug: qubvel-org/segmentation_models.pytorch
-      if: matrix.os == 'macos-latest' && matrix.python-version == '3.12'
 
   test_logits_match:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Set up Python
-      uses: astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@v7
       with:
-        python-version: "3.10"
+        python-version: "3.14"
+        activate-environment: true
     - name: Install dependencies
       run: uv pip install -r requirements/required.txt -r requirements/test.txt
     - name: Show installed packages
@@ -78,11 +80,12 @@ jobs:
   test_torch_compile:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Set up Python
-      uses: astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@v7
       with:
-        python-version: "3.10"
+        python-version: "3.14"
+        activate-environment: true
     - name: Install dependencies
       run: uv pip install -r requirements/required.txt -r requirements/test.txt
     - name: Show installed packages
@@ -93,11 +96,12 @@ jobs:
   test_torch_export:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Set up Python
-      uses: astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@v7
       with:
-        python-version: "3.10"
+        python-version: "3.14"
+        activate-environment: true
     - name: Install dependencies
       run: uv pip install -r requirements/required.txt -r requirements/test.txt
     - name: Show installed packages
@@ -108,11 +112,12 @@ jobs:
   test_torch_script:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Set up Python
-      uses: astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@v7
       with:
-        python-version: "3.10"
+        python-version: "3.14"
+        activate-environment: true
     - name: Install dependencies
       run: uv pip install -r requirements/required.txt -r requirements/test.txt
     - name: Show installed packages
@@ -123,11 +128,12 @@ jobs:
   minimum:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Set up Python
-      uses: astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@v7
       with:
-        python-version: "3.9"
+        python-version: "3.10"
+        activate-environment: true
     - name: Install dependencies
       run: uv pip install -r requirements/minimum.old -r requirements/test.txt
     - name: Show installed packages

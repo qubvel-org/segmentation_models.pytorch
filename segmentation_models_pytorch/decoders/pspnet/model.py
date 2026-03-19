@@ -27,10 +27,13 @@ class PSPNet(SegmentationModel):
             with shapes [(N, C, H, W),], for depth 1 - [(N, C, H, W), (N, C, H // 2, W // 2)] and so on).
             Default is 5
         encoder_weights: One of **None** (random initialization), **"imagenet"** (pre-training on ImageNet) and
-            other pretrained weights (see table with available weights for each encoder_name)
+            other pretrained weights (see table with available weights for each encoder_name).
+            For ``tu-`` encoders, set to **True** to download pretrained weights or **None** for
+            random initialization. The pretrained variant is defined in the encoder name
         psp_out_channels: A number of filters in Spatial Pyramid
         decoder_use_norm:     Specifies normalization between Conv2D and activation.
             Accepts the following types:
+
             - **True**: Defaults to `"batchnorm"`.
             - **False**: No normalization (`nn.Identity`).
             - **str**: Specifies normalization type using default parameters. Available values:
@@ -54,11 +57,12 @@ class PSPNet(SegmentationModel):
         upsampling: Final upsampling factor. Default is 8 to preserve input-output spatial shape identity
         aux_params: Dictionary with parameters of the auxiliary output (classification head). Auxiliary output is build
             on top of encoder if **aux_params** is not **None** (default). Supported params:
-                - classes (int): A number of classes
-                - pooling (str): One of "max", "avg". Default is "avg"
-                - dropout (float): Dropout factor in [0, 1)
-                - activation (str): An activation function to apply "sigmoid"/"softmax"
-                    (could be **None** to return logits)
+
+            - classes (int): A number of classes
+            - pooling (str): One of "max", "avg". Default is "avg"
+            - dropout (float): Dropout factor in [0, 1)
+            - activation (str): An activation function to apply "sigmoid"/"softmax"
+              (could be **None** to return logits)
         kwargs: Arguments passed to the encoder class ``__init__()`` function. Applies only to ``timm`` models. Keys with ``None`` values are pruned before passing.
 
     Returns:

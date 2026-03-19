@@ -1,7 +1,7 @@
-gitpython==3.1.45
-packaging==25.0
-pytest==8.4.1
+gitpython==3.1.46
+packaging==26.0
+pytest==9.0.2
 pytest-xdist==3.8.0
-pytest-cov==6.2.1
-ruff==0.12.7
-setuptools==80.9.0
+pytest-cov==7.0.0
+ruff==0.15.6
+setuptools==82.0.1

@@ -17,7 +17,7 @@ class TverskyLoss(DiceLoss):
     Args:
         mode: Metric mode {'binary', 'multiclass', 'multilabel'}
         classes: Optional list of classes that contribute in loss computation;
-        By default, all channels are included.
+            By default, all channels are included.
         log_loss: If True, loss computed as ``-log(tversky)`` otherwise ``1 - tversky``
         from_logits: If True assumes input is raw logits
         smooth:
@@ -26,6 +26,9 @@ class TverskyLoss(DiceLoss):
         alpha: Weight constant that penalize model for FPs (False Positives)
         beta: Weight constant that penalize model for FNs (False Negatives)
         gamma: Constant that squares the error function. Defaults to ``1.0``
+        class_weights: List of weights for each class. If not ``None``, the loss for each class
+            is multiplied by the corresponding weight. Only supported for multiclass and
+            multilabel modes. Weights do not need to be normalized.
 
     Return:
         loss: torch.Tensor
@@ -35,7 +38,7 @@ class TverskyLoss(DiceLoss):
     def __init__(
         self,
         mode: str,
-        classes: List[int] = None,
+        classes: Optional[List[int]] = None,
         log_loss: bool = False,
         from_logits: bool = True,
         smooth: float = 0.0,
@@ -44,16 +47,37 @@ class TverskyLoss(DiceLoss):
         alpha: float = 0.5,
         beta: float = 0.5,
         gamma: float = 1.0,
+        class_weights: Optional[List[float]] = None,
     ):
         assert mode in {BINARY_MODE, MULTILABEL_MODE, MULTICLASS_MODE}
         super().__init__(
-            mode, classes, log_loss, from_logits, smooth, ignore_index, eps
+            mode,
+            classes,
+            log_loss,
+            from_logits,
+            smooth,
+            ignore_index,
+            eps,
+            class_weights,
         )
         self.alpha = alpha
         self.beta = beta
         self.gamma = gamma
 
-    def aggregate_loss(self, loss):
+    def aggregate_loss(self, loss: torch.Tensor) -> torch.Tensor:
+        """Aggregate per-class losses into a single scalar, raised to the power of gamma.
+
+        Args:
+            loss: Per-class loss tensor of shape (C,)
+
+        Returns:
+            Scalar loss value
+        """
+        if self.class_weights is not None:
+            weights = self.class_weights.to(loss.device)
+            if self.classes is not None:
+                weights = weights[self.classes]
+            return ((loss * weights).sum() / weights.sum()) ** self.gamma
         return loss.mean() ** self.gamma
 
     def compute_score(
