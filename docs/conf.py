@@ -115,8 +115,8 @@ autodoc_typehints = "description"
 
 # sphinx.ext.intersphinx
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3', None),
-    'torch': ('https://docs.pytorch.org/docs/stable/', None),
+    "python": ("https://docs.python.org/3", None),
+    "torch": ("https://docs.pytorch.org/docs/stable/", None),
 }
 
 # --- Work around to make autoclass signatures not (*args, **kwargs) ----------
