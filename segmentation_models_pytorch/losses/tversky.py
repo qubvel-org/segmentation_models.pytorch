@@ -17,7 +17,7 @@ class TverskyLoss(DiceLoss):
     Args:
         mode: Metric mode {'binary', 'multiclass', 'multilabel'}
         classes: Optional list of classes that contribute in loss computation;
-        By default, all channels are included.
+            By default, all channels are included.
         log_loss: If True, loss computed as ``-log(tversky)`` otherwise ``1 - tversky``
         from_logits: If True assumes input is raw logits
         smooth:

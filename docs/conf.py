@@ -46,6 +46,7 @@ version = get_version()
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.coverage",
+    "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
     "sphinx.ext.mathjax",
@@ -111,6 +112,12 @@ autodoc_mock_imports = [
 
 autoclass_content = "both"
 autodoc_typehints = "description"
+
+# sphinx.ext.intersphinx
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', None),
+    'torch': ('https://docs.pytorch.org/docs/stable/', None),
+}
 
 # --- Work around to make autoclass signatures not (*args, **kwargs) ----------
 
