@@ -14,7 +14,7 @@ from .decoder import UnetDecoder
 
 class Unet(SegmentationModel):
     """
-    `U-Net`_ is a fully convolutional neural network architecture designed for semantic image segmentation.
+    `U-Net`__ is a fully convolutional neural network architecture designed for semantic image segmentation.
 
     It consists of two main parts:
 
@@ -99,9 +99,7 @@ class Unet(SegmentationModel):
             print(mask.shape)
             # torch.Size([2, 5, 256, 256])
 
-    .. __U-Net:
-        https://arxiv.org/abs/1505.04597
-
+    .. __: https://arxiv.org/abs/1505.04597
     """
 
     requires_divisible_input_shape = False
