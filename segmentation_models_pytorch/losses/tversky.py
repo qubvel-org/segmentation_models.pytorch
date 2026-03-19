@@ -28,8 +28,7 @@ class TverskyLoss(DiceLoss):
         gamma: Constant that squares the error function. Defaults to ``1.0``
 
     Return:
-        loss: torch.Tensor
-
+        torch.Tensor: loss
     """
 
     def __init__(

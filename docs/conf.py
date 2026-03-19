@@ -55,6 +55,10 @@ extensions = [
 
 # Warn about all references where the target cannot be found.
 nitpicky = True
+nitpick_ignore = [
+    # Undocumented classes
+    ("py:class", "torch.LongTensor"),
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
