@@ -14,12 +14,16 @@ Welcome to Segmentation Models's documentation!
    quickstart
    models
    encoders
-   encoders_dpt
    encoders_timm
    losses
    metrics
    save_load
    insights
+
+.. toctree::
+   :hidden:
+
+   encoders_dpt
 
 
 Indices and tables
