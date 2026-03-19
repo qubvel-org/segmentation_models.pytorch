@@ -50,7 +50,7 @@ class DecoderBlock(nn.Module):
         self, x: torch.Tensor, skip: Optional[torch.Tensor] = None
     ) -> torch.Tensor:
         x = self.block(x)
-        if skip is not None:
+        if skip is not None and skip.shape[1] != 0:
             x = x + skip
         return x
 
@@ -71,6 +71,12 @@ class LinknetDecoder(nn.Module):
         encoder_channels = encoder_channels[::-1]
 
         channels = list(encoder_channels) + [prefinal_channels]
+        for i in range(1, len(channels) - 1):
+            # Transformer-style encoders may expose a 0-channel placeholder for the
+            # missing 1/2-scale skip. Keep the decoder stream non-empty and just
+            # skip feature fusion at that stage.
+            if channels[i] == 0:
+                channels[i] = channels[i - 1]
 
         self.blocks = nn.ModuleList(
             [
