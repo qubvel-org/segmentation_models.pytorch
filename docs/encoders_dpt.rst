@@ -1,3 +1,5 @@
+:orphan:
+
 .. _dpt-encoders:
 
 DPT Encoders
