@@ -45,12 +45,12 @@ version = get_version()
 
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
     "sphinx.ext.coverage",
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
     "sphinx.ext.mathjax",
-    "autodocsumm",
 ]
 
 # Warn about all references where the target cannot be found.
