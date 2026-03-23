@@ -38,7 +38,6 @@ class TestGetStatsMulticlass:
                 num_classes=3,
             )
 
-
     def test_argmax_fix_gives_perfect_iou(self):
         """Correcting a one-hot tensor with argmax(dim=1) should yield IoU=1.0."""
         output_onehot = torch.tensor([[[1, 0, 0], [0, 1, 0], [0, 0, 1]]])
