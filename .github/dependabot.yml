@@ -13,6 +13,3 @@ updates:
         patterns:
           - "torch"
           - "torchvision"
-    ignore:
-      - dependency-name: "setuptools"
-        update-types: ["version-update:semver-patch"]
