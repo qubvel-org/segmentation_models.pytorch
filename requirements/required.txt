@@ -1,6 +1,6 @@
 huggingface_hub==1.8.0
 numpy==2.4.4
-pillow==12.1.1
+pillow==12.2.0
 safetensors==0.7.0
 timm==1.0.26
 torch==2.11.0
