@@ -1,4 +1,4 @@
-huggingface_hub==1.9.0
+huggingface_hub==1.9.1
 numpy==2.4.4
 pillow==12.2.0
 safetensors==0.7.0
