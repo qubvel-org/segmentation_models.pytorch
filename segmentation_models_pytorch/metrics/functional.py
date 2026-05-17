@@ -66,6 +66,7 @@ def get_stats(
     ignore_index: Optional[int] = None,
     threshold: Optional[Union[float, List[float]]] = None,
     num_classes: Optional[int] = None,
+    strict: bool = False,
 ) -> Tuple[torch.LongTensor, torch.LongTensor, torch.LongTensor, torch.LongTensor]:
     """Compute true positive, false positive, false negative, true negative 'pixels'
     for each image and each class.
@@ -103,6 +104,9 @@ def get_stats(
             only for ``'multiclass'`` mode. Class values should be in range 0..(num_classes - 1).
             If ``ignore_index`` is specified it should be outside the classes range, e.g. ``-1`` or
             ``255``.
+        strict (bool): If True, perform additional validation to detect accidentally
+            passed one-hot encoded tensors in multiclass mode. This adds O(n) overhead
+            for tensor scanning. Default is False.
 
     Raises:
         ValueError: in case of misconfiguration.
@@ -110,6 +114,12 @@ def get_stats(
     Returns:
         Tuple[torch.LongTensor]: true_positive, false_positive, false_negative,
             true_negative tensors (N, C) shape each.
+
+    Note:
+        In multiclass mode, ``output`` and ``target`` should contain class indices
+        in range [0, num_classes). One-hot encoded tensors should be converted with
+        ``argmax(dim=1)`` before passing to this function. Use ``strict=True`` to
+        enable detection of accidentally passed one-hot tensors.
 
     """
 
@@ -139,23 +149,6 @@ def get_stats(
         )
 
     if output.shape != target.shape:
-        # Check if user accidentally passed a one-hot / logits tensor in multiclass mode
-        if mode == "multiclass":
-            if output.ndim >= 3 and output.shape[1] == num_classes:
-                raise ValueError(
-                    f"In 'multiclass' mode, ``output`` should contain class indices of shape "
-                    f"(N, H, W) or (N,), but got shape {tuple(output.shape)}. "
-                    f"It looks like you passed a one-hot or logits tensor of shape (N, C, ...). "
-                    f"For that use case, please use mode='multilabel' instead, "
-                    f"or convert your tensor with ``output.argmax(dim=1)`` first."
-                )
-            if target.ndim >= 3 and target.shape[1] == num_classes:
-                raise ValueError(
-                    f"In 'multiclass' mode, ``target`` should contain class indices of shape "
-                    f"(N, H, W) or (N,), but got shape {tuple(target.shape)}. "
-                    f"It looks like you passed a one-hot encoded tensor of shape (N, C, ...). "
-                    f"Convert it with ``target.argmax(dim=1)`` first."
-                )
         raise ValueError(
             "Dimensions should match, but ``output`` shape is not equal to ``target`` "
             + f"shape, {output.shape} != {target.shape}"
@@ -180,37 +173,54 @@ def get_stats(
         )
 
     if mode == "multiclass":
-        if output.ndim >= 3 and output.shape[1] == num_classes:
+        # Range validation for output
+        if output.min() < 0 or output.max() >= num_classes:
             raise ValueError(
-                f"In 'multiclass' mode, ``output`` should contain class indices of shape "
-                f"(N, H, W) or (N,), but got shape {tuple(output.shape)}. "
-                f"It looks like you passed a one-hot or logits tensor of shape (N, C, ...). "
-                f"For that use case, please use mode='multilabel' instead, "
-                f"or convert your tensor with ``output.argmax(dim=1)`` first."
+                f"In 'multiclass' mode, output values should be in range [0, num_classes), "
+                f"but got values in range [{output.min().item()}, {output.max().item()}]. "
+                f"If passing one-hot encoded tensors, convert with output.argmax(dim=1) first."
             )
-        if target.ndim >= 3 and target.shape[1] == num_classes:
+
+        # Range validation for target (with ignore_index masking)
+        if ignore_index is not None:
+            target_to_check = target[target != ignore_index]
+        else:
+            target_to_check = target
+
+        if target_to_check.numel() > 0 and (
+            target_to_check.min() < 0 or target_to_check.max() >= num_classes
+        ):
             raise ValueError(
-                f"In 'multiclass' mode, ``target`` should contain class indices of shape "
-                f"(N, H, W) or (N,), but got shape {tuple(target.shape)}. "
-                f"It looks like you passed a one-hot encoded tensor of shape (N, C, ...). "
-                f"Convert it with ``target.argmax(dim=1)`` first."
+                f"In 'multiclass' mode, target values should be in range [0, num_classes), "
+                f"but got values in range [{target_to_check.min().item()}, {target_to_check.max().item()}]. "
+                f"If passing one-hot encoded tensors, convert with target.argmax(dim=1) first."
             )
-        # Additional robustness: a 4D tensor (N, C, H, W) is always incorrect in
-        # 'multiclass' mode, regardless of whether shape[1] matches num_classes
-        if output.ndim == 4:
-            raise ValueError(
-                f"In 'multiclass' mode, ``output`` should contain class indices of shape "
-                f"(N, H, W), but got shape {tuple(output.shape)}. "
-                f"A 4D tensor is always incorrect in 'multiclass' mode. "
-                f"Convert it with ``output.argmax(dim=1)`` first."
-            )
-        if target.ndim == 4:
-            raise ValueError(
-                f"In 'multiclass' mode, ``target`` should contain class indices of shape "
-                f"(N, H, W), but got shape {tuple(target.shape)}. "
-                f"A 4D tensor is always incorrect in 'multiclass' mode. "
-                f"Convert it with ``target.argmax(dim=1)`` first."
-            )
+
+        if strict:
+            if output.ndim >= 3:
+                values_are_0_or_1 = torch.isin(
+                    output, torch.tensor([0, 1], device=output.device)
+                ).all()
+                sums_to_1 = output.sum(dim=1).eq(1).all()
+                if values_are_0_or_1 and sums_to_1:
+                    raise ValueError(
+                        f"In 'multiclass' mode with strict=True, output appears to be one-hot "
+                        f"encoded with shape {tuple(output.shape)}. "
+                        f"Convert with output.argmax(dim=1) first."
+                    )
+
+            if target.ndim >= 3:
+                values_are_0_or_1 = torch.isin(
+                    target, torch.tensor([0, 1], device=target.device)
+                ).all()
+                sums_to_1 = target.sum(dim=1).eq(1).all()
+                if values_are_0_or_1 and sums_to_1:
+                    raise ValueError(
+                        f"In 'multiclass' mode with strict=True, target appears to be one-hot "
+                        f"encoded with shape {tuple(target.shape)}. "
+                        f"Convert with target.argmax(dim=1) first."
+                    )
+
         tp, fp, fn, tn = _get_stats_multiclass(
             output, target, num_classes, ignore_index
         )
