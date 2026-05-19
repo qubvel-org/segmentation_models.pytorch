@@ -1,5 +1,5 @@
 huggingface_hub==1.11.0
-numpy==2.4.5
+numpy==2.4.6
 pillow==12.2.0
 safetensors==0.7.0
 timm==1.0.27
