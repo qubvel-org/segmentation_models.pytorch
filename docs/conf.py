@@ -102,19 +102,6 @@ napoleon_google_docstring = True
 napoleon_include_init_with_doc = True
 napoleon_numpy_docstring = False
 
-autodoc_mock_imports = [
-    "torch",
-    "tqdm",
-    "numpy",
-    "timm",
-    "cv2",
-    "PIL",
-    "torchvision",
-    "segmentation_models_pytorch.encoders",
-    "segmentation_models_pytorch.utils",
-    # 'segmentation_models_pytorch.base',
-]
-
 autoclass_content = "both"
 autodoc_typehints = "description"
 
