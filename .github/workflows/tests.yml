@@ -15,7 +15,7 @@ jobs:
   style:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up Python
         uses: astral-sh/setup-uv@v7
         with:
@@ -38,7 +38,7 @@ jobs:
         python-version: ["3.12", "3.13", "3.14"]
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: astral-sh/setup-uv@v7
@@ -64,7 +64,7 @@ jobs:
   test_logits_match:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Set up Python
       uses: astral-sh/setup-uv@v7
       with:
@@ -80,7 +80,7 @@ jobs:
   test_torch_compile:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Set up Python
       uses: astral-sh/setup-uv@v7
       with:
@@ -96,7 +96,7 @@ jobs:
   test_torch_export:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Set up Python
       uses: astral-sh/setup-uv@v7
       with:
@@ -112,7 +112,7 @@ jobs:
   test_torch_script:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Set up Python
       uses: astral-sh/setup-uv@v7
       with:
@@ -128,7 +128,7 @@ jobs:
   minimum:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Set up Python
       uses: astral-sh/setup-uv@v7
       with:
