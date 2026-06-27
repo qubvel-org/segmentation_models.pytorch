@@ -2,6 +2,7 @@ from typing import Any, Dict, Union
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 try:
     from inplace_abn import InPlaceABN
@@ -16,13 +17,13 @@ def get_norm_layer(
 
     # Step 1. Convert tot dict representation
 
-    ## Check boolean
+    # Check boolean
     if use_norm is True:
         norm_params = {"type": "batchnorm"}
     elif use_norm is False:
         norm_params = {"type": "identity"}
 
-    ## Check string
+    # Check string
     elif isinstance(use_norm, str):
         norm_str = use_norm.lower()
         if norm_str == "inplace":
@@ -39,7 +40,7 @@ def get_norm_layer(
                 f"{supported_norms}"
             )
 
-    ## Check dict
+    # Check dict
     elif isinstance(use_norm, dict):
         norm_params = use_norm
 
@@ -195,3 +196,66 @@ class Attention(nn.Module):
 
     def forward(self, x):
         return self.attention(x)
+
+
+class AttentionGate(nn.Module):
+    """
+    Attention Gate as in Attention U-Net (Oktay et al., 2018).
+
+    Reference:
+        https://arxiv.org/abs/1804.03999
+    """
+
+    def __init__(
+        self,
+        in_channels,
+        gating_channels,
+        inter_channels=None,
+        upsample_mode="bilinear",
+    ):
+        super().__init__()
+        if inter_channels is None:
+            inter_channels = in_channels
+
+        self.upsample_mode = upsample_mode
+
+        # Downsample skip connection to match gating signal
+        self.theta = nn.Conv2d(
+            in_channels, inter_channels, kernel_size=1, stride=2, padding=0, bias=True
+        )
+        self.W_g = nn.Sequential(
+            nn.Conv2d(
+                gating_channels,
+                inter_channels,
+                kernel_size=1,
+                stride=1,
+                padding=0,
+                bias=True,
+            ),
+            nn.BatchNorm2d(inter_channels),
+        )
+        self.psi = nn.Sequential(
+            nn.Conv2d(inter_channels, 1, kernel_size=1, stride=1, padding=0, bias=True),
+            nn.Sigmoid(),
+        )
+        self.relu = nn.ReLU(inplace=True)
+
+    def forward(self, x: torch.Tensor, g: torch.Tensor) -> torch.Tensor:
+        # Downsample skip connection
+        theta_x = self.theta(x)
+
+        # Transform gating signal
+        phi_g = self.W_g(g)
+
+        if phi_g.shape[-2:] != theta_x.shape[-2:]:
+            phi_g = F.interpolate(phi_g, size=theta_x.shape[-2:], mode="bilinear")
+
+        # Compute attention
+        f = self.relu(theta_x + phi_g)
+        alpha = self.psi(f)
+
+        # Upsample attention to original skip connection size
+        alpha = F.interpolate(alpha, size=x.shape[2:], mode=self.upsample_mode)
+
+        # Apply attention to skip connection
+        return x * alpha
