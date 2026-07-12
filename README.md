@@ -1,20 +1,20 @@
 <div align="center">
- 
-![logo](https://i.ibb.co/dc1XdhT/Segmentation-Models-V2-Side-1-1.png)  
-**Python library with Neural Networks for Image Semantic  
-Segmentation based on [PyTorch](https://pytorch.org/).**  
 
- 
-[![GitHub Workflow Status (branch)](https://img.shields.io/github/actions/workflow/status/qubvel/segmentation_models.pytorch/tests.yml?branch=main&style=for-the-badge)](https://github.com/qubvel/segmentation_models.pytorch/actions/workflows/tests.yml) 
+![logo](https://i.ibb.co/dc1XdhT/Segmentation-Models-V2-Side-1-1.png)
+**Python library with Neural Networks for Image Semantic
+Segmentation based on [PyTorch](https://pytorch.org/).**
+
+
+[![GitHub Workflow Status (branch)](https://img.shields.io/github/actions/workflow/status/qubvel/segmentation_models.pytorch/tests.yml?branch=main&style=for-the-badge)](https://github.com/qubvel/segmentation_models.pytorch/actions/workflows/tests.yml)
 ![Codecov](https://img.shields.io/codecov/c/github/qubvel-org/segmentation_models.pytorch?style=for-the-badge)
-[![Read the Docs](https://img.shields.io/readthedocs/smp?style=for-the-badge&logo=readthedocs&logoColor=white)](https://smp.readthedocs.io/en/latest/) 
+[![Read the Docs](https://img.shields.io/readthedocs/smp?style=for-the-badge&logo=readthedocs&logoColor=white)](https://smp.readthedocs.io/en/latest/)
 <br>
-[![PyPI](https://img.shields.io/pypi/v/segmentation-models-pytorch?color=red&style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/segmentation-models-pytorch/) 
-[![PyTorch - Version](https://img.shields.io/badge/PYTORCH-1.9+-red?style=for-the-badge&logo=pytorch)](https://pepy.tech/project/segmentation-models-pytorch) 
-[![Python - Version](https://img.shields.io/badge/PYTHON-3.9+-red?style=for-the-badge&logo=python&logoColor=white)](https://pepy.tech/project/segmentation-models-pytorch) 
+[![PyPI](https://img.shields.io/pypi/v/segmentation-models-pytorch?color=red&style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/segmentation-models-pytorch/)
+[![PyTorch - Version](https://img.shields.io/badge/PYTORCH-1.9+-red?style=for-the-badge&logo=pytorch)](https://pepy.tech/project/segmentation-models-pytorch)
+[![Python - Version](https://img.shields.io/badge/PYTHON-3.9+-red?style=for-the-badge&logo=python&logoColor=white)](https://pepy.tech/project/segmentation-models-pytorch)
 <br>
 [![Generic badge](https://img.shields.io/badge/License-MIT-<COLOR>.svg?style=for-the-badge&color=blue)](https://github.com/qubvel/segmentation_models.pytorch/blob/main/LICENSE)
-[![PyPI - Downloads](https://img.shields.io/pypi/dm/segmentation-models-pytorch?style=for-the-badge&color=blue)](https://pepy.tech/project/segmentation-models-pytorch) 
+[![PyPI - Downloads](https://img.shields.io/pypi/dm/segmentation-models-pytorch?style=for-the-badge&color=blue)](https://pepy.tech/project/segmentation-models-pytorch)
 
 </div>
 
@@ -119,25 +119,25 @@ Congratulations! You are done! Now you can train your model with your favorite f
 
 ### Encoders <a name="encoders"></a>
 
-The library provides a wide range of **pretrained** encoders (also known as backbones) for segmentation models. Instead of using features from the final layer of a classification model, we extract **intermediate features** and feed them into the decoder for segmentation tasks.  
+The library provides a wide range of **pretrained** encoders (also known as backbones) for segmentation models. Instead of using features from the final layer of a classification model, we extract **intermediate features** and feed them into the decoder for segmentation tasks.
 
-All encoders come with **pretrained weights**, which help achieve **faster and more stable convergence** when training segmentation models.  
+All encoders come with **pretrained weights**, which help achieve **faster and more stable convergence** when training segmentation models.
 
-Given the extensive selection of supported encoders, you can choose the best one for your specific use case, for example:  
-- **Lightweight encoders** for low-latency applications or real-time inference on edge devices (mobilenet/mobileone).  
-- **High-capacity architectures** for complex tasks involving a large number of segmented classes, providing superior accuracy (convnext/swin/mit).  
+Given the extensive selection of supported encoders, you can choose the best one for your specific use case, for example:
+- **Lightweight encoders** for low-latency applications or real-time inference on edge devices (mobilenet/mobileone).
+- **High-capacity architectures** for complex tasks involving a large number of segmented classes, providing superior accuracy (convnext/swin/mit).
 
-By selecting the right encoder, you can balance **efficiency, performance, and model complexity** to suit your project needs.  
+By selecting the right encoder, you can balance **efficiency, performance, and model complexity** to suit your project needs.
 
 All encoders and corresponding pretrained weight are listed in the documentation:
- - [table](https://smp.readthedocs.io/en/latest/encoders.html) with natively ported encoders 
+ - [table](https://smp.readthedocs.io/en/latest/encoders.html) with natively ported encoders
  - [table](https://smp.readthedocs.io/en/latest/encoders_timm.html) with [timm](https://github.com/huggingface/pytorch-image-models) encoders supported
 
 ## 🔁 Models API <a name="api"></a>
 
 ### Input channels
 
-The input channels parameter allows you to create a model that can process a tensor with an arbitrary number of channels. 
+The input channels parameter allows you to create a model that can process a tensor with an arbitrary number of channels.
 If you use pretrained weights from ImageNet, the weights of the first convolution will be reused:
  - For the 1-channel case, it would be a sum of the weights of the first convolution layer.
  - Otherwise, channels would be populated with weights like `new_weight[:, i] = pretrained_weight[:, i % 3]`, and then scaled with `new_weight * 3 / new_in_channels`.
@@ -149,10 +149,10 @@ mask = model(torch.ones([1, 1, 64, 64]))
 
 ### Auxiliary classification output
 
-All models support `aux_params` parameters, which is default set to `None`. 
+All models support `aux_params` parameters, which is default set to `None`.
 If `aux_params = None` then classification auxiliary output is not created, else
 model produce not only `mask`, but also `label` output with shape `NC`.
-Classification head consists of GlobalPooling->Dropout(optional)->Linear->Activation(optional) layers, which can be 
+Classification head consists of GlobalPooling->Dropout(optional)->Linear->Activation(optional) layers, which can be
 configured by `aux_params` as follows:
 ```python
 aux_params=dict(
