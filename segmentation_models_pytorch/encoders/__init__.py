@@ -144,7 +144,7 @@ def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **
                 )
                 warnings.warn(message, UserWarning)
                 url = pretrained_settings[name][weights]["url"]
-                state_dict = load_url(url, map_location="cpu")
+                state_dict = load_url(url, map_location="cpu", weights_only=True)
             else:
                 raise e
 
