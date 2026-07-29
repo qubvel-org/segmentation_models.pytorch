@@ -212,7 +212,7 @@ pretrained_settings = {
     },
     "dpn68": {
         "imagenet": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/dpn68-4af7d88d2.pth",
+            "url": "https://data.lip6.fr/cadene/pretrainedmodels/dpn68-4af7d88d2.pth",
             "input_space": "RGB",
             "input_size": [3, 224, 224],
             "input_range": [0, 1],
@@ -223,7 +223,7 @@ pretrained_settings = {
     },
     "dpn68b": {
         "imagenet+5k": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/dpn68b_extra-363ab9c19.pth",
+            "url": "https://data.lip6.fr/cadene/pretrainedmodels/dpn68b_extra-363ab9c19.pth",
             "input_space": "RGB",
             "input_size": [3, 224, 224],
             "input_range": [0, 1],
@@ -234,7 +234,7 @@ pretrained_settings = {
     },
     "dpn92": {
         "imagenet+5k": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/dpn92_extra-fda993c95.pth",
+            "url": "https://data.lip6.fr/cadene/pretrainedmodels/dpn92_extra-fda993c95.pth",
             "input_space": "RGB",
             "input_size": [3, 224, 224],
             "input_range": [0, 1],
@@ -245,7 +245,7 @@ pretrained_settings = {
     },
     "dpn98": {
         "imagenet": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/dpn98-722954780.pth",
+            "url": "https://data.lip6.fr/cadene/pretrainedmodels/dpn98-722954780.pth",
             "input_space": "RGB",
             "input_size": [3, 224, 224],
             "input_range": [0, 1],
@@ -256,7 +256,7 @@ pretrained_settings = {
     },
     "dpn107": {
         "imagenet+5k": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/dpn107_extra-b7f9f4cc9.pth",
+            "url": "https://data.lip6.fr/cadene/pretrainedmodels/dpn107_extra-b7f9f4cc9.pth",
             "input_space": "RGB",
             "input_size": [3, 224, 224],
             "input_range": [0, 1],
@@ -267,7 +267,7 @@ pretrained_settings = {
     },
     "dpn131": {
         "imagenet": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/dpn131-7af84be88.pth",
+            "url": "https://data.lip6.fr/cadene/pretrainedmodels/dpn131-7af84be88.pth",
             "input_space": "RGB",
             "input_size": [3, 224, 224],
             "input_range": [0, 1],
@@ -366,7 +366,7 @@ pretrained_settings = {
     },
     "senet154": {
         "imagenet": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/senet154-c7b49a05.pth",
+            "url": "https://data.lip6.fr/cadene/pretrainedmodels/senet154-c7b49a05.pth",
             "input_space": "RGB",
             "input_size": [3, 224, 224],
             "input_range": [0, 1],
@@ -377,7 +377,7 @@ pretrained_settings = {
     },
     "se_resnet50": {
         "imagenet": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/se_resnet50-ce0d4300.pth",
+            "url": "https://data.lip6.fr/cadene/pretrainedmodels/se_resnet50-ce0d4300.pth",
             "input_space": "RGB",
             "input_size": [3, 224, 224],
             "input_range": [0, 1],
@@ -388,7 +388,7 @@ pretrained_settings = {
     },
     "se_resnet101": {
         "imagenet": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/se_resnet101-7e38fcc6.pth",
+            "url": "https://data.lip6.fr/cadene/pretrainedmodels/se_resnet101-7e38fcc6.pth",
             "input_space": "RGB",
             "input_size": [3, 224, 224],
             "input_range": [0, 1],
@@ -399,7 +399,7 @@ pretrained_settings = {
     },
     "se_resnet152": {
         "imagenet": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/se_resnet152-d17c99b7.pth",
+            "url": "https://data.lip6.fr/cadene/pretrainedmodels/se_resnet152-d17c99b7.pth",
             "input_space": "RGB",
             "input_size": [3, 224, 224],
             "input_range": [0, 1],
@@ -410,7 +410,7 @@ pretrained_settings = {
     },
     "se_resnext50_32x4d": {
         "imagenet": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/se_resnext50_32x4d-a260b3a4.pth",
+            "url": "https://data.lip6.fr/cadene/pretrainedmodels/se_resnext50_32x4d-a260b3a4.pth",
             "input_space": "RGB",
             "input_size": [3, 224, 224],
             "input_range": [0, 1],
@@ -421,7 +421,7 @@ pretrained_settings = {
     },
     "se_resnext101_32x4d": {
         "imagenet": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/se_resnext101_32x4d-3b2fe3d8.pth",
+            "url": "https://data.lip6.fr/cadene/pretrainedmodels/se_resnext101_32x4d-3b2fe3d8.pth",
             "input_space": "RGB",
             "input_size": [3, 224, 224],
             "input_range": [0, 1],
@@ -432,7 +432,7 @@ pretrained_settings = {
     },
     "densenet121": {
         "imagenet": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/densenet121-fbdb23505.pth",
+            "url": "https://data.lip6.fr/cadene/pretrainedmodels/densenet121-fbdb23505.pth",
             "input_space": "RGB",
             "input_size": [3, 224, 224],
             "input_range": [0, 1],
@@ -443,7 +443,7 @@ pretrained_settings = {
     },
     "densenet169": {
         "imagenet": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/densenet169-f470b90a4.pth",
+            "url": "https://data.lip6.fr/cadene/pretrainedmodels/densenet169-f470b90a4.pth",
             "input_space": "RGB",
             "input_size": [3, 224, 224],
             "input_range": [0, 1],
@@ -454,7 +454,7 @@ pretrained_settings = {
     },
     "densenet201": {
         "imagenet": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/densenet201-5750cbb1e.pth",
+            "url": "https://data.lip6.fr/cadene/pretrainedmodels/densenet201-5750cbb1e.pth",
             "input_space": "RGB",
             "input_size": [3, 224, 224],
             "input_range": [0, 1],
@@ -465,7 +465,7 @@ pretrained_settings = {
     },
     "densenet161": {
         "imagenet": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/densenet161-347e6b360.pth",
+            "url": "https://data.lip6.fr/cadene/pretrainedmodels/densenet161-347e6b360.pth",
             "input_space": "RGB",
             "input_size": [3, 224, 224],
             "input_range": [0, 1],
@@ -476,7 +476,7 @@ pretrained_settings = {
     },
     "inceptionresnetv2": {
         "imagenet": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/inceptionresnetv2-520b38e4.pth",
+            "url": "https://data.lip6.fr/cadene/pretrainedmodels/inceptionresnetv2-520b38e4.pth",
             "input_space": "RGB",
             "input_size": [3, 299, 299],
             "input_range": [0, 1],
@@ -485,7 +485,7 @@ pretrained_settings = {
             "num_classes": 1000,
         },
         "imagenet+background": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/inceptionresnetv2-520b38e4.pth",
+            "url": "https://data.lip6.fr/cadene/pretrainedmodels/inceptionresnetv2-520b38e4.pth",
             "input_space": "RGB",
             "input_size": [3, 299, 299],
             "input_range": [0, 1],
@@ -496,7 +496,7 @@ pretrained_settings = {
     },
     "inceptionv4": {
         "imagenet": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/inceptionv4-8e4777a0.pth",
+            "url": "https://data.lip6.fr/cadene/pretrainedmodels/inceptionv4-8e4777a0.pth",
             "input_space": "RGB",
             "input_size": [3, 299, 299],
             "input_range": [0, 1],
@@ -505,7 +505,7 @@ pretrained_settings = {
             "num_classes": 1000,
         },
         "imagenet+background": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/inceptionv4-8e4777a0.pth",
+            "url": "https://data.lip6.fr/cadene/pretrainedmodels/inceptionv4-8e4777a0.pth",
             "input_space": "RGB",
             "input_size": [3, 299, 299],
             "input_range": [0, 1],
@@ -653,7 +653,7 @@ pretrained_settings = {
     },
     "xception": {
         "imagenet": {
-            "url": "http://data.lip6.fr/cadene/pretrainedmodels/xception-43020ad28.pth",
+            "url": "https://data.lip6.fr/cadene/pretrainedmodels/xception-43020ad28.pth",
             "input_space": "RGB",
             "input_size": [3, 299, 299],
             "input_range": [0, 1],
