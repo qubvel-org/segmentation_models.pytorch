@@ -28,7 +28,6 @@ from .timm_universal import TimmUniversalEncoder
 from .timm_vit import TimmViTEncoder  # noqa F401
 
 from ._preprocessing import preprocess_input
-from ._legacy_pretrained_settings import pretrained_settings
 
 __all__ = [
     "encoders",
@@ -127,29 +126,11 @@ def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **
         repo_id = settings["repo_id"]
         revision = settings["revision"]
 
-        # First, try to load from  HF-Hub, but as far as I know not all countries have
-        # access to the Hub (e.g. China), so we try to load from the original url if
-        # the first attempt fails.
-        weights_path = None
-        try:
-            hf_hub_download(repo_id, filename="config.json", revision=revision)
-            weights_path = hf_hub_download(
-                repo_id, filename="model.safetensors", revision=revision
-            )
-        except Exception as e:
-            if name in pretrained_settings and weights in pretrained_settings[name]:
-                message = (
-                    f"Error loading {name} `{weights}` weights from Hugging Face Hub, "
-                    "trying loading from original url..."
-                )
-                warnings.warn(message, UserWarning)
-                url = pretrained_settings[name][weights]["url"]
-                state_dict = load_url(url, map_location="cpu", weights_only=True)
-            else:
-                raise e
-
-        if weights_path is not None:
-            state_dict = load_file(weights_path, device="cpu")
+        hf_hub_download(repo_id, filename="config.json", revision=revision)
+        weights_path = hf_hub_download(
+            repo_id, filename="model.safetensors", revision=revision
+        )
+        state_dict = load_file(weights_path, device="cpu")
 
         # Load model weights
         encoder.load_state_dict(state_dict)
@@ -184,20 +165,11 @@ def get_preprocessing_params(encoder_name, pretrained="imagenet"):
         revision = all_settings[pretrained]["revision"]
 
         # Load config and model
-        try:
-            config_path = hf_hub_download(
-                repo_id, filename="config.json", revision=revision
-            )
-            with open(config_path, "r") as f:
-                settings = json.load(f)
-        except Exception as e:
-            if (
-                encoder_name in pretrained_settings
-                and pretrained in pretrained_settings[encoder_name]
-            ):
-                settings = pretrained_settings[encoder_name][pretrained]
-            else:
-                raise e
+        config_path = hf_hub_download(
+            repo_id, filename="config.json", revision=revision
+        )
+        with open(config_path, "r") as f:
+            settings = json.load(f)
 
     formatted_settings = {}
     formatted_settings["input_space"] = settings.get("input_space", "RGB")
