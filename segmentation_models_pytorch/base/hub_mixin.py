@@ -136,6 +136,11 @@ def from_pretrained(
         config = json.load(f)
     model_class_name = config.pop("_model_class")
 
+    # The checkpoint already stores the (trained) encoder weights, so there is no
+    # need to download the encoder's pretrained weights when reloading the model.
+    if "encoder_weights" in config:
+        kwargs.setdefault("encoder_weights", None)
+
     import segmentation_models_pytorch as smp
 
     model_class = getattr(smp, model_class_name)
