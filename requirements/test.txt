@@ -1,4 +1,4 @@
-gitpython==3.1.58
+gitpython==3.1.59
 packaging==26.3
 pytest==9.1.1
 pytest-xdist==3.8.0
