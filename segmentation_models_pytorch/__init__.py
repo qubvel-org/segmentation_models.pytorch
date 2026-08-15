@@ -6,6 +6,7 @@ from . import metrics
 
 from .decoders.unet import Unet
 from .decoders.unetplusplus import UnetPlusPlus
+from .decoders.attentionunet import AttentionUnet
 from .decoders.manet import MAnet
 from .decoders.linknet import Linknet
 from .decoders.fpn import FPN
@@ -26,6 +27,7 @@ import torch as _torch
 _MODEL_ARCHITECTURES = [
     Unet,
     UnetPlusPlus,
+    AttentionUnet,
     MAnet,
     Linknet,
     FPN,
@@ -76,6 +78,7 @@ __all__ = [
     "losses",
     "metrics",
     "Unet",
+    "AttentionUnet",
     "UnetPlusPlus",
     "MAnet",
     "Linknet",

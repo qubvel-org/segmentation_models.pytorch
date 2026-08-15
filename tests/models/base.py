@@ -96,7 +96,7 @@ class BaseModelTester(unittest.TestCase):
     ):
         kwargs = {}
 
-        if self.model_type in ["unet", "unetplusplus", "manet"]:
+        if self.model_type in ["unet", "attentionunet", "unetplusplus", "manet"]:
             kwargs = {"decoder_channels": self.decoder_channels[:depth]}
 
         if self.model_type == "dpt":
