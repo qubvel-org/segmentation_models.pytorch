@@ -159,7 +159,7 @@ class DPT(SegmentationModel):
 
         features, prefix_tokens = self.encoder(x)
         decoder_output = self.decoder(features, prefix_tokens)
-        masks = self.segmentation_head(decoder_output)
+        masks = self.segmentation_head(decoder_output, output_size=x.shape[-2:])
 
         if self.classification_head is not None:
             labels = self.classification_head(features[-1])
