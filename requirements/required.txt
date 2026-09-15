@@ -5,4 +5,4 @@ safetensors==0.8.0
 timm==1.0.29
 torch==2.14.0
 torchvision==0.29.0
-tqdm==4.70.0
+tqdm==4.70.1
