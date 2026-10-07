@@ -120,7 +120,7 @@ def get_stats(
 
     if torch.is_floating_point(output) and threshold is None:
         raise ValueError(
-            f"Output should be one of the integer types if ``threshold`` is not None, got {output.dtype}."
+            f"Output should be one of the integer types if ``threshold`` is None, got {output.dtype}."
         )
 
     if torch.is_floating_point(output) and mode == "multiclass":
