@@ -12,6 +12,11 @@ jobs:
       - name: Clone repo
         uses: actions/checkout@v7
 
+      - name: Check tag matches package version
+        run: |
+          version=$(sed -nE 's/^__version__ = "(.+)"/\1/p' segmentation_models_pytorch/__version__.py)
+          [ "v$version" = "$GITHUB_REF_NAME" ] || { echo "::error::tag $GITHUB_REF_NAME != version $version"; exit 1; }
+
       - name: Set up python
         uses: actions/setup-python@v7.1.0
         with:
