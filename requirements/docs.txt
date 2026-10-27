@@ -1,4 +1,4 @@
-huggingface-hub==2.2.0
+huggingface-hub==2.3.0
 six==1.17.0
 sphinx==9.2.0
 sphinx-book-theme==1.4.0
