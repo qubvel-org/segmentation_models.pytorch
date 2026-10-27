@@ -1,3 +1,4 @@
+import hashlib
 import os
 import torch
 import shutil
@@ -66,6 +67,7 @@ class OxfordPetDataset(torch.utils.data.Dataset):
         download_url(
             url="https://www.robots.ox.ac.uk/~vgg/data/pets/data/images.tar.gz",
             filepath=filepath,
+            sha256="67195c5e1c01f1ab5f9b6a5d22b8c27a580d896ece458917e61d459337fa318d",
         )
         extract_archive(filepath)
 
@@ -74,6 +76,7 @@ class OxfordPetDataset(torch.utils.data.Dataset):
         download_url(
             url="https://www.robots.ox.ac.uk/~vgg/data/pets/data/annotations.tar.gz",
             filepath=filepath,
+            sha256="52425fb6de5c424942b7626b428656fcbd798db970a937df61750c0f1d358e91",
         )
         extract_archive(filepath)
 
@@ -108,7 +111,17 @@ class TqdmUpTo(tqdm):
         self.update(b * bsize - self.n)
 
 
-def download_url(url, filepath):
+def download_url(url: str, filepath: str, sha256: bool | None = None):
+    """Download a file to disk.
+
+    Args:
+        url: URL of the file to download.
+        filepath: Local filepath to save to.
+        sha256: Optional sha256 checksum to compare against.
+
+    Raises:
+        AssertionError: If *sha256* does not match.
+    """
     directory = os.path.dirname(os.path.abspath(filepath))
     os.makedirs(directory, exist_ok=True)
     if os.path.exists(filepath):
@@ -123,6 +136,10 @@ def download_url(url, filepath):
     ) as t:
         urlretrieve(url, filename=filepath, reporthook=t.update_to, data=None)
         t.total = t.n
+
+    if sha256 is not None:
+        with open(filepath, "rb") as f:
+            assert hashlib.file_digest(f, "sha256").hexdigest() == sha256
 
 
 def extract_archive(filepath):
