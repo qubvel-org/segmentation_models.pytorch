@@ -22,8 +22,8 @@ dependencies = [
     'pillow>=8.4',
     'safetensors>=0.3.1',
     'timm>=0.9',
-    'torch>=1.11',
-    'torchvision>=0.12',
+    'torch>=1.13',
+    'torchvision>=0.15.1',
     'tqdm>=4.42.1',
 ]
 dynamic = ['version']
