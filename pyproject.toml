@@ -18,8 +18,8 @@ classifiers = [
 ]
 dependencies = [
     'huggingface-hub>=0.24',
-    'numpy>=1.21.2',
-    'pillow>=8.4',
+    'numpy>=1.23.2',
+    'pillow>=9.2',
     'safetensors>=0.3.1',
     'timm>=0.9',
     'torch>=2',
