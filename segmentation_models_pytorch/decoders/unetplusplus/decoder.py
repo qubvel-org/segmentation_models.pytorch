@@ -154,17 +154,29 @@ class UnetPlusPlusDecoder(nn.Module):
         self.blocks = nn.ModuleDict(blocks)
         self.depth = len(self.in_channels) - 1
 
+    def _apply_block(
+        self, name: str, x: torch.Tensor, skip: Optional[torch.Tensor] = None
+    ) -> torch.Tensor:
+        # TorchScript only supports ModuleDict indexing with string literals,
+        # so the block is selected by iterating over the dict.
+        for key, block in self.blocks.items():
+            if key == name:
+                return block(x, skip)
+        raise KeyError(name)
+
     def forward(self, features: List[torch.Tensor]) -> torch.Tensor:
         features = features[1:]  # remove first skip with same spatial resolution
         features = features[::-1]  # reverse channels to start from head of encoder
 
         # start building dense connections
-        dense_x = {}
+        dense_x: Dict[str, torch.Tensor] = {}
         for layer_idx in range(len(self.in_channels) - 1):
             for depth_idx in range(self.depth - layer_idx):
                 if layer_idx == 0:
-                    output = self.blocks[f"x_{depth_idx}_{depth_idx}"](
-                        features[depth_idx], features[depth_idx + 1]
+                    output = self._apply_block(
+                        f"x_{depth_idx}_{depth_idx}",
+                        features[depth_idx],
+                        features[depth_idx + 1],
                     )
                     dense_x[f"x_{depth_idx}_{depth_idx}"] = output
                 else:
@@ -176,10 +188,12 @@ class UnetPlusPlusDecoder(nn.Module):
                     cat_features = torch.cat(
                         cat_features + [features[dense_l_i + 1]], dim=1
                     )
-                    dense_x[f"x_{depth_idx}_{dense_l_i}"] = self.blocks[
-                        f"x_{depth_idx}_{dense_l_i}"
-                    ](dense_x[f"x_{depth_idx}_{dense_l_i - 1}"], cat_features)
-        dense_x[f"x_{0}_{self.depth}"] = self.blocks[f"x_{0}_{self.depth}"](
-            dense_x[f"x_{0}_{self.depth - 1}"]
+                    dense_x[f"x_{depth_idx}_{dense_l_i}"] = self._apply_block(
+                        f"x_{depth_idx}_{dense_l_i}",
+                        dense_x[f"x_{depth_idx}_{dense_l_i - 1}"],
+                        cat_features,
+                    )
+        dense_x[f"x_{0}_{self.depth}"] = self._apply_block(
+            f"x_{0}_{self.depth}", dense_x[f"x_{0}_{self.depth - 1}"]
         )
         return dense_x[f"x_{0}_{self.depth}"]
