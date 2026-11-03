@@ -281,8 +281,15 @@ def label_smoothed_nll_loss(
         nll_loss = nll_loss.sum()
         smooth_loss = smooth_loss.sum()
     if reduction == "mean":
-        nll_loss = nll_loss.mean()
-        smooth_loss = smooth_loss.mean()
+        if ignore_index is not None:
+            # Ignored positions were filled with zero. A plain mean still
+            # counts them, so padding shrinks the loss.
+            denom = (~pad_mask).sum().clamp_min(1)
+            nll_loss = nll_loss.sum() / denom
+            smooth_loss = smooth_loss.sum() / denom
+        else:
+            nll_loss = nll_loss.mean()
+            smooth_loss = smooth_loss.mean()
 
     eps_i = epsilon / lprobs.size(dim)
     loss = (1.0 - epsilon) * nll_loss + eps_i * smooth_loss
