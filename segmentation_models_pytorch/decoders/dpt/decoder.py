@@ -85,9 +85,14 @@ class ReassembleBlock(nn.Module):
         in_channels: int,
         mid_channels: int,
         out_channels: int,
-        upsample_factor: int,
+        upsample_factor: float,
     ):
         super().__init__()
+
+        if upsample_factor <= 0:
+            raise ValueError(
+                f"upsample_factor must be greater than zero, got {upsample_factor}"
+            )
 
         self.project_to_out_channel = nn.Conv2d(
             in_channels=in_channels,
@@ -95,7 +100,10 @@ class ReassembleBlock(nn.Module):
             kernel_size=1,
         )
 
-        if upsample_factor > 1.0:
+        # Preserve learned resampling for integer ratios. Truncating fractional
+        # ratios (for example, 14 / 4) produces incompatible pyramid sizes.
+        self.upsample_factor = upsample_factor
+        if upsample_factor > 1.0 and float(upsample_factor).is_integer():
             self.upsample = nn.ConvTranspose2d(
                 in_channels=mid_channels,
                 out_channels=mid_channels,
@@ -104,7 +112,7 @@ class ReassembleBlock(nn.Module):
             )
         elif upsample_factor == 1.0:
             self.upsample = nn.Identity()
-        else:
+        elif float(1 / upsample_factor).is_integer():
             self.upsample = nn.Conv2d(
                 in_channels=mid_channels,
                 out_channels=mid_channels,
@@ -112,6 +120,8 @@ class ReassembleBlock(nn.Module):
                 stride=int(1 / upsample_factor),
                 padding=1,
             )
+        else:
+            self.upsample = None
 
         self.project_to_feature_dim = nn.Conv2d(
             in_channels=mid_channels,
@@ -123,7 +133,15 @@ class ReassembleBlock(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.project_to_out_channel(x)
-        x = self.upsample(x)
+        if self.upsample is None:
+            target_size = tuple(
+                max(1, int(size * self.upsample_factor)) for size in x.shape[-2:]
+            )
+            x = nn.functional.interpolate(
+                x, size=target_size, mode="bilinear", align_corners=True
+            )
+        else:
+            x = self.upsample(x)
         x = self.project_to_feature_dim(x)
         return x
 
@@ -188,6 +206,14 @@ class FusionBlock(nn.Module):
     ) -> torch.Tensor:
         feature = self.residual_conv_block1(feature)
         if previous_feature is not None:
+            # Fractional pyramid ratios can round adjacent levels differently.
+            if previous_feature.shape[-2:] != feature.shape[-2:]:
+                previous_feature = nn.functional.interpolate(
+                    previous_feature,
+                    size=feature.shape[-2:],
+                    mode="bilinear",
+                    align_corners=True,
+                )
             feature = feature + previous_feature
         feature = self.residual_conv_block2(feature)
         feature = nn.functional.interpolate(
@@ -308,13 +334,26 @@ class DPTSegmentationHead(nn.Module):
         self.activation = Activation(activation)
         self.upsampling_factor = upsampling
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(
+        self,
+        x: torch.Tensor,
+        output_size: Optional[tuple[int, int]] = None,
+    ) -> torch.Tensor:
         head_output = self.head(x)
-        resized_output = nn.functional.interpolate(
-            head_output,
-            scale_factor=self.upsampling_factor,
-            mode="bilinear",
-            align_corners=True,
-        )
+        if output_size is None:
+            resized_output = nn.functional.interpolate(
+                head_output,
+                scale_factor=self.upsampling_factor,
+                mode="bilinear",
+                align_corners=True,
+            )
+        else:
+            # A fixed scale factor cannot recover non-power-of-two input sizes.
+            resized_output = nn.functional.interpolate(
+                head_output,
+                size=output_size,
+                mode="bilinear",
+                align_corners=True,
+            )
         activation_output = self.activation(resized_output)
         return activation_output
