@@ -281,8 +281,15 @@ def label_smoothed_nll_loss(
         nll_loss = nll_loss.sum()
         smooth_loss = smooth_loss.sum()
     if reduction == "mean":
-        nll_loss = nll_loss.mean()
-        smooth_loss = smooth_loss.mean()
+        if ignore_index is not None:
+            # Ignored positions were zeroed above, so average over the remaining
+            # ones only, the same way torch.nn.functional.cross_entropy does.
+            num_valid = (~pad_mask).sum().clamp_min(1)
+            nll_loss = nll_loss.sum() / num_valid
+            smooth_loss = smooth_loss.sum() / num_valid
+        else:
+            nll_loss = nll_loss.mean()
+            smooth_loss = smooth_loss.mean()
 
     eps_i = epsilon / lprobs.size(dim)
     loss = (1.0 - epsilon) * nll_loss + eps_i * smooth_loss

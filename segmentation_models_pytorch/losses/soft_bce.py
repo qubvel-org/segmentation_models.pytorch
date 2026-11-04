@@ -75,7 +75,11 @@ class SoftBCEWithLogitsLoss(nn.Module):
             loss *= not_ignored_mask.type_as(loss)
 
         if self.reduction == "mean":
-            loss = loss.mean()
+            if self.ignore_index is not None:
+                # Ignored elements must not count towards the mean denominator.
+                loss = loss.sum() / not_ignored_mask.sum().clamp_min(1)
+            else:
+                loss = loss.mean()
 
         if self.reduction == "sum":
             loss = loss.sum()
