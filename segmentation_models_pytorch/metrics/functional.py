@@ -168,6 +168,13 @@ def get_stats(
         )
     else:
         if threshold is not None:
+            threshold = torch.as_tensor(threshold, dtype=output.dtype, device=output.device)
+            if threshold.ndim == 1:
+                if threshold.numel() != output.shape[1]:
+                    raise ValueError(
+                        f"Number of thresholds ({threshold.numel()}) must match number of channels ({output.shape[1]})."
+                    )
+                threshold = threshold.view(1, -1, *([1] * (output.ndim - 2)))
             output = torch.where(output >= threshold, 1, 0)
             target = torch.where(target >= threshold, 1, 0)
         tp, fp, fn, tn = _get_stats_multilabel(output, target)
