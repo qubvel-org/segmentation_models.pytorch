@@ -2,7 +2,10 @@ import pytest
 import inspect
 import torch
 import segmentation_models_pytorch as smp
-
+from segmentation_models_pytorch.decoders.dpt.decoder import (
+    DPTDecoder,
+    DPTSegmentationHead,
+)
 from tests.models import base
 from tests.utils import (
     slow_test,
@@ -58,3 +61,49 @@ class TestDPTModel(base.BaseModelTester):
         )
         max_diff = torch.max(torch.abs(expected_logits_slice - resulted_logits_slice))
         self.assertTrue(is_close, f"Max diff: {max_diff}")
+
+
+def test_patch14_encoder():
+    model = smp.DPT(
+        encoder_name="tu-eva02_tiny_patch14_224",
+        encoder_weights=None,
+        decoder_intermediate_channels=(16, 16, 16, 16),
+        decoder_fusion_channels=16,
+        classes=2,
+    ).eval()
+
+    with torch.inference_mode():
+        masks = model(torch.randn(1, 3, 224, 224))
+
+    assert model.encoder.output_strides == [14, 14, 14, 14]
+    assert masks.shape == (1, 2, 224, 224)
+
+
+def test_non_power_of_two_patch_stride_with_odd_feature_sizes():
+    input_size = 518
+    patch_size = 14
+    feature_size = input_size // patch_size
+    encoder_output_strides = (patch_size,) * 4
+
+    decoder = DPTDecoder(
+        encoder_out_channels=(8, 8, 8, 8),
+        encoder_output_strides=encoder_output_strides,
+        encoder_has_prefix_tokens=False,
+        readout="ignore",
+        intermediate_channels=(4, 4, 4, 4),
+        fusion_channels=4,
+    ).eval()
+    head = DPTSegmentationHead(in_channels=4, out_channels=2).eval()
+    features = [torch.randn(1, 8, feature_size, feature_size) for _ in range(4)]
+
+    with torch.inference_mode():
+        reassembled_features = [
+            block(feature)
+            for block, feature in zip(decoder.reassemble_blocks, features)
+        ]
+        decoder_output = decoder(features, [None] * 4)
+        masks = head(decoder_output, output_size=(input_size, input_size))
+
+    expected_sizes = [input_size // stride for stride in (4, 8, 16, 32)]
+    assert [feature.shape[-1] for feature in reassembled_features] == expected_sizes
+    assert masks.shape == (1, 2, input_size, input_size)
