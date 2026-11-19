@@ -78,14 +78,9 @@ class FocalLoss(_Loss):
 
         if not self.from_logits:
             y_pred = torch.clamp(y_pred, self.eps, 1 - self.eps)
-
-            if self.mode in {BINARY_MODE, MULTILABEL_MODE}:
-                # inverse sigmoid
-                y_pred = torch.log(y_pred / (1 - y_pred))
-
-            elif self.mode == MULTICLASS_MODE:
-                # convert softmax probabilities to log-space
-                y_pred = torch.log(y_pred)
+            # In every mode the focal term below applies a sigmoid to each channel,
+            # so probabilities are mapped back with the inverse sigmoid.
+            y_pred = torch.log(y_pred / (1 - y_pred))
 
         if self.mode == BINARY_MODE:
             y_true = y_true.reshape(-1)
