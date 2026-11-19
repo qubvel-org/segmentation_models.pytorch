@@ -300,7 +300,10 @@ def test_soft_ce_loss():
     y_true = torch.tensor([0, 1, -100, 3]).long()
 
     loss = criterion(y_pred, y_true)
-    assert float(loss) == pytest.approx(1.0125, abs=0.0001)
+    reference = torch.nn.functional.cross_entropy(
+        y_pred, y_true, ignore_index=-100, label_smoothing=0.1
+    )
+    assert torch.allclose(loss, reference, atol=1e-4)
 
 
 @torch.inference_mode()
@@ -311,7 +314,23 @@ def test_soft_bce_loss():
     y_true = torch.tensor([0, 1, -100, 1, 0]).long()
 
     loss = criterion(y_pred, y_true)
-    assert float(loss) == pytest.approx(0.7201, abs=0.0001)
+    assert float(loss) == pytest.approx(0.9001, abs=0.0001)
+
+
+def test_an_ignored_label_does_not_shrink_soft_ce():
+    criterion = SoftCrossEntropyLoss(smooth_factor=0.0, ignore_index=-100)
+    logits = torch.tensor([[0.0, 5.0], [0.0, 5.0]])
+    one = criterion(logits[:1], torch.tensor([0]))
+    padded = criterion(logits, torch.tensor([0, -100]))
+    assert torch.allclose(one, padded)
+
+
+def test_an_ignored_label_does_not_shrink_soft_bce():
+    criterion = SoftBCEWithLogitsLoss(smooth_factor=0.0, ignore_index=-100)
+    pred = torch.tensor([2.0, -3.0])
+    one = criterion(pred[:1], torch.tensor([1.0]))
+    padded = criterion(pred, torch.tensor([1.0, -100.0]))
+    assert torch.allclose(one, padded)
 
 
 @torch.inference_mode()
