@@ -304,6 +304,16 @@ def test_soft_ce_loss():
 
 
 @torch.inference_mode()
+def test_soft_ce_loss_default_smooth_factor():
+    y_pred = torch.tensor([[+2.0, -1.0, 0.5], [-1.0, +2.0, 0.5]])
+    y_true = torch.tensor([0, 2]).long()
+
+    loss = SoftCrossEntropyLoss()(y_pred, y_true)
+    expected = torch.nn.functional.cross_entropy(y_pred, y_true)
+    assert float(loss) == pytest.approx(float(expected), abs=1e-6)
+
+
+@torch.inference_mode()
 def test_soft_bce_loss():
     criterion = SoftBCEWithLogitsLoss(smooth_factor=0.1, ignore_index=-100)
 
