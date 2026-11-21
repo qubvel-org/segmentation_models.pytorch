@@ -12,8 +12,13 @@ jobs:
       - name: Clone repo
         uses: actions/checkout@v7
 
+      - name: Check tag matches package version
+        run: |
+          version=$(sed -nE 's/^__version__ = "(.+)"/\1/p' segmentation_models_pytorch/__version__.py)
+          [ "v$version" = "$GITHUB_REF_NAME" ] || { echo "::error::tag $GITHUB_REF_NAME != version $version"; exit 1; }
+
       - name: Set up python
-        uses: actions/setup-python@v6.2.0
+        uses: actions/setup-python@v7.1.0
         with:
           python-version: '3.14'
 
@@ -27,7 +32,7 @@ jobs:
         run: python3 -m build
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v7.0.1
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: pypi-dist
           path: dist/
@@ -41,10 +46,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8.0.2
         with:
           name: pypi-dist
           path: dist/
 
       - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@v1.14.0
+        uses: pypa/gh-action-pypi-publish@v1.14.3

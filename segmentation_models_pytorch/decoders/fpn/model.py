@@ -51,7 +51,7 @@ class FPN(SegmentationModel):
     Returns:
         ``torch.nn.Module``: **FPN**
 
-    .. __: http://presentations.cocodataset.org/COCO17-Stuff-FAIR.pdf
+    .. __: https://arxiv.org/abs/1612.03144
     """
 
     @supports_config_loading
