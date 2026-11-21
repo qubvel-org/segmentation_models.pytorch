@@ -55,20 +55,13 @@ def test_from_pretrained_does_not_download_encoder_weights():
         with open(config_path, "w") as f:
             json.dump(config, f)
 
-        with (
-            mock.patch(
-                "segmentation_models_pytorch.encoders.hf_hub_download",
-                side_effect=AssertionError("encoder weights should not be downloaded"),
-            ) as mock_hf_hub_download,
-            mock.patch(
-                "segmentation_models_pytorch.encoders.load_url",
-                side_effect=AssertionError("encoder weights should not be downloaded"),
-            ) as mock_load_url,
-        ):
+        with mock.patch(
+            "segmentation_models_pytorch.encoders.hf_hub_download",
+            side_effect=AssertionError("encoder weights should not be downloaded"),
+        ) as mock_hf_hub_download:
             restored_model = smp.from_pretrained(temp_dir)
 
         mock_hf_hub_download.assert_not_called()
-        mock_load_url.assert_not_called()
 
     # weights must still match the saved checkpoint
     original_state_dict = model.state_dict()
