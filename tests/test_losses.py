@@ -39,6 +39,20 @@ def test_focal_loss_from_logits_false_multiclass():
     assert abs(loss_logits - loss_probs) < 0.2
 
 
+def test_focal_loss_from_logits_false_multiclass_uses_probabilities():
+    torch.manual_seed(0)
+    target = torch.randint(0, 3, (2, 4, 4))
+    one_hot = torch.nn.functional.one_hot(target, 3).permute(0, 3, 1, 2).float()
+
+    criterion = smp.losses.FocalLoss(mode="multiclass", from_logits=False)
+    assert float(criterion(one_hot, target)) == pytest.approx(0.0, abs=1e-6)
+
+    probs = torch.rand(2, 3, 4, 4).clamp(0.01, 0.99)
+    loss_probs = criterion(probs, target)
+    loss_logits = smp.losses.FocalLoss(mode="multiclass")(torch.logit(probs), target)
+    assert float(loss_probs) == pytest.approx(float(loss_logits), abs=1e-6)
+
+
 def test_focal_loss_with_logits():
     input_good = torch.tensor([10, -10, 10]).float()
     input_bad = torch.tensor([-1, 2, 0]).float()
