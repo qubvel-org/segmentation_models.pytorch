@@ -205,6 +205,8 @@ class LovaszLoss(_Loss):
             mode: Loss mode 'binary', 'multiclass' or 'multilabel'
             ignore_index: Label that indicates ignored pixels (does not contribute to loss)
             per_image: If True loss computed per each image and then averaged, else computed per whole batch
+            from_logits: If True, assumes input is raw logits. If False, assumes probabilities
+                (sigmoid output for binary/multilabel, softmax output for multiclass)
 
         Shape
              - **y_pred** - torch.Tensor of shape (N, C, H, W)
@@ -219,14 +221,20 @@ class LovaszLoss(_Loss):
         self.mode = mode
         self.ignore_index = ignore_index
         self.per_image = per_image
+        self.from_logits = from_logits
 
     def forward(self, y_pred, y_true):
         if self.mode in {BINARY_MODE, MULTILABEL_MODE}:
+            if not self.from_logits:
+                # The hinge loss works on logits, so map probabilities back with
+                # the inverse sigmoid (as FocalLoss does).
+                y_pred = torch.logit(y_pred, eps=1e-7)
             loss = _lovasz_hinge(
                 y_pred, y_true, per_image=self.per_image, ignore=self.ignore_index
             )
         elif self.mode == MULTICLASS_MODE:
-            y_pred = y_pred.softmax(dim=1)
+            if self.from_logits:
+                y_pred = y_pred.softmax(dim=1)
             loss = _lovasz_softmax(
                 y_pred, y_true, per_image=self.per_image, ignore=self.ignore_index
             )
