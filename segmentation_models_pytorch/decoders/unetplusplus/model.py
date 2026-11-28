@@ -73,8 +73,6 @@ class UnetPlusPlus(SegmentationModel):
     .. __: https://arxiv.org/abs/1807.10165
     """
 
-    _is_torch_scriptable = False
-
     @supports_config_loading
     def __init__(
         self,
