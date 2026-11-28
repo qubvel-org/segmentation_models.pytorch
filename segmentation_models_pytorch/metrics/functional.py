@@ -278,6 +278,7 @@ def _compute_metric(
         fn = fn.sum()
         tn = tn.sum()
         score = metric_fn(tp, fp, fn, tn, **metric_kwargs)
+        score = _handle_zero_division(score, zero_division)
 
     elif reduction == "macro":
         tp = tp.sum(0)
