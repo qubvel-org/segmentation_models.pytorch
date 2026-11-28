@@ -10,6 +10,7 @@ from segmentation_models_pytorch.losses import (
     TverskyLoss,
     MCCLoss,
     FocalLoss,
+    LovaszLoss,
 )
 
 
@@ -37,6 +38,41 @@ def test_focal_loss_from_logits_false_multiclass():
     assert torch.isfinite(loss_probs)
     assert torch.isfinite(loss_logits)
     assert abs(loss_logits - loss_probs) < 0.2
+
+
+@torch.inference_mode()
+def test_lovasz_loss_from_logits_false_multiclass():
+    torch.manual_seed(0)
+    logits = torch.randn(2, 3, 8, 8) * 3
+    target = torch.randint(0, 3, (2, 8, 8))
+
+    loss_logits = LovaszLoss(mode="multiclass", from_logits=True)(logits, target)
+    loss_probs = LovaszLoss(mode="multiclass", from_logits=False)(
+        logits.softmax(dim=1), target
+    )
+    assert torch.allclose(loss_logits, loss_probs, atol=1e-6)
+
+    # A perfect one-hot prediction has zero loss.
+    one_hot = torch.nn.functional.one_hot(target, 3).permute(0, 3, 1, 2).float()
+    loss = LovaszLoss(mode="multiclass", from_logits=False)(one_hot, target)
+    assert loss.item() == pytest.approx(0.0, abs=1e-6)
+
+
+@torch.inference_mode()
+@pytest.mark.parametrize("mode", ["binary", "multilabel"])
+def test_lovasz_loss_from_logits_false_binary(mode):
+    torch.manual_seed(0)
+    channels = 1 if mode == "binary" else 3
+    logits = torch.randn(2, channels, 8, 8) * 3
+    target = torch.randint(0, 2, (2, channels, 8, 8)).float()
+
+    loss_logits = LovaszLoss(mode=mode, from_logits=True)(logits, target)
+    loss_probs = LovaszLoss(mode=mode, from_logits=False)(logits.sigmoid(), target)
+    assert torch.allclose(loss_logits, loss_probs, atol=1e-4)
+
+    # A perfect prediction has zero loss.
+    loss = LovaszLoss(mode=mode, from_logits=False)(target, target)
+    assert loss.item() == pytest.approx(0.0, abs=1e-6)
 
 
 def test_focal_loss_with_logits():
