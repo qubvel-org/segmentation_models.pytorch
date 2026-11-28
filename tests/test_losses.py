@@ -472,3 +472,35 @@ def test_focal_class_weights_scale_invariant():
         mode=smp.losses.MULTICLASS_MODE, class_weights=[10.0, 20.0, 5.0]
     )(y_pred, y_true)
     assert torch.allclose(loss_w, loss_w_scaled, atol=eps)
+
+
+@torch.inference_mode()
+def test_focal_loss_multilabel_ignore_index():
+    """ignore_index in multilabel mode should mask each class channel separately."""
+    eps = 1e-5
+    torch.manual_seed(0)
+    y_pred = torch.randn(2, 3, 4, 4)
+    y_true = torch.randint(0, 2, (2, 3, 4, 4)).float()
+
+    # no ignored values: same result as without ignore_index
+    loss = FocalLoss(mode=smp.losses.MULTILABEL_MODE)(y_pred, y_true)
+    loss_ignore = FocalLoss(mode=smp.losses.MULTILABEL_MODE, ignore_index=255)(
+        y_pred, y_true
+    )
+    assert torch.allclose(loss, loss_ignore, atol=eps)
+
+    # ignored values in one channel only
+    y_true[0, 1, :2, :2] = 255
+    loss_ignore = FocalLoss(mode=smp.losses.MULTILABEL_MODE, ignore_index=255)(
+        y_pred, y_true
+    )
+    keep = y_true != 255
+    expected = torch.stack(
+        [
+            F.focal_loss_with_logits(
+                y_pred[:, c][keep[:, c]], y_true[:, c][keep[:, c]], alpha=None
+            )
+            for c in range(3)
+        ]
+    ).mean()
+    assert torch.allclose(loss_ignore, expected, atol=eps)

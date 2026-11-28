@@ -115,8 +115,13 @@ class FocalLoss(_Loss):
                 cls_y_pred = y_pred[:, cls, ...]
 
                 if self.ignore_index is not None:
-                    cls_y_true = cls_y_true[not_ignored]
-                    cls_y_pred = cls_y_pred[not_ignored]
+                    # multilabel targets have a channel dim, so the mask is per class
+                    if self.mode == MULTILABEL_MODE:
+                        cls_not_ignored = not_ignored[:, cls, ...]
+                    else:
+                        cls_not_ignored = not_ignored
+                    cls_y_true = cls_y_true[cls_not_ignored]
+                    cls_y_pred = cls_y_pred[cls_not_ignored]
 
                 class_losses.append(self.focal_loss_fn(cls_y_pred, cls_y_true))
             class_losses = torch.stack(class_losses)  # shape (C,)
