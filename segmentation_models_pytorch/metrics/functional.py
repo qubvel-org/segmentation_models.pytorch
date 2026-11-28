@@ -306,10 +306,15 @@ def _compute_metric(
         score = _handle_zero_division(score, zero_division)
         score = score.mean()
 
-    elif reduction == "macro-imagewise" or reduction == "weighted-imagewise":
+    elif reduction == "macro-imagewise":
         score = metric_fn(tp, fp, fn, tn, **metric_kwargs)
         score = _handle_zero_division(score, zero_division)
         score = (score.mean(0) * class_weights).mean()
+
+    elif reduction == "weighted-imagewise":
+        score = metric_fn(tp, fp, fn, tn, **metric_kwargs)
+        score = _handle_zero_division(score, zero_division)
+        score = (score.mean(0) * class_weights).sum()
 
     elif reduction == "none" or reduction is None:
         score = metric_fn(tp, fp, fn, tn, **metric_kwargs)
